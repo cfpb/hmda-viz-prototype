@@ -1,4 +1,5 @@
 * left trailing commas where there could be more than one *
+* theres a line somewhere, descriptive is good but can make it overcomplex *
 
 # table i
 
@@ -566,15 +567,19 @@
 "types of dwellings": [
 	{
 		"type": { // 1-4 family, manufactured
-			"status": { // incidence of pricing, hoepa status
-				"loan-uses": [
-					{
-						"loan-use": { // purchase, refi, improvement
-							"first-lien": 0,
-							"junior-lien": 0
-						}
+			"statuses": [
+				{
+					"status": { // incidence of pricing, hoepa status
+						"loan-uses": [
+							{
+								"loan-use": { // purchase, refi, improvement
+									"first-lien": 0,
+									"junior-lien": 0
+								}
+							}
+						]
 					}
-				]
+				}
 			}
 		}
 	}
