@@ -1,10 +1,10 @@
 import json
 import psycopg2
 
-from report1v6 import report_1_
+from report1 import report_1_
 #report 3 aggregates 1 census tract from inside an MSA
 #to build a report, loop over all tracts and then sum the appropriate lines
-from report3v6 import report_3_
+from report31 import report_3_
 #credentials read in as variables in the format "'dbname', 'username', 'serverhost', 'password'"
 #comments for which reports require which variables
 with open('/users/roellk/desktop/python/credentials.txt', 'r') as f:
@@ -23,7 +23,7 @@ junk = 'junk.txt'
 #report_1.write_report_1_json(junk)
 
 
-test = 'testfile.txt'
+test = 'testfile.json'
 report_3 = report_3_()
 report_3.report_3_main(location, cred_list)
 report_3.print_report_3()
