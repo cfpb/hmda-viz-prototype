@@ -19,7 +19,7 @@ class report_3_(object):
 
 	def __init__(self):
 		self.inputs = {} #will hold one row's values for all inputs into the other functions to determine how to aggregate the loan
-	   #JSON object to hold data for tables 3-1, 3-2
+		 #JSON object to hold data for tables 3-1, 3-2
 		self.table_3 = {
 		"table": "",
 		"type": "aggregate",
@@ -956,9 +956,9 @@ class report_3_(object):
 		else:
 			print "error loan not aggregated"
 
-		print self.inputs['a ethn'], 'applicant ethnicity'
-		print self.inputs['co ethn'], 'co applicant ethnicity'
-		print self.inputs['ethnicity'], 'ethnicity result'
+		#print self.inputs['a ethn'], 'applicant ethnicity'
+		#print self.inputs['co ethn'], 'co applicant ethnicity'
+		#print self.inputs['ethnicity'], 'ethnicity result'
 
 	def parse_inputs(self, rows):
 		#parsing inputs for report 3.1
@@ -1190,7 +1190,7 @@ class report_3_(object):
 		if ethnicity in self.table_3['borrower-characteristics'][1]['types'][self.inputs['ethnicity']]['name'] and purchaser in self.table_3['borrower-characteristics'][1]['types'][self.inputs['ethnicity']]['purchasers'][self.inputs['purchaser']]['name']:
 			self.table_3['borrower-characteristics'][2]['types'][self.inputs['minority status']]['purchasers'][self.inputs['purchaser']]['count'] += 1
 			self.table_3['borrower-characteristics'][2]['types'][self.inputs['minority status']]['purchasers'][self.inputs['purchaser']]['value'] += int(self.inputs['loan value'])
-			pass
+
 
 	#Race: American Indian or Alaska NAtive(1), Asian(2), Black(3), Native Hawaiian or Pacific Islander(4), White(5), Not provided(6), Not applicable(7), no co-applicant(8)
 	#joint definition: one minority race and one white
@@ -1209,7 +1209,7 @@ class report_3_(object):
 		password = credentials[3]
 		cred = (dbname, user, host, password)
 		connect_string = "dbname=%s user=%s host=%s password=%s" % (dbname, user, host, password)
-		print connect_string
+
 		#attempte a connection to the SQL database hosting the LAR information
 		try: #this login information must be set appropriately, it is currently set to localhost with a specified user
 			conn = psycopg2.connect(connect_string)
