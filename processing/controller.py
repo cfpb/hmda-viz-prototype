@@ -22,7 +22,31 @@ MSA = ['36540']
 geo_aggregator = geo_aggregator()
 geo_aggregator.main(cred_list, MSA)
 geo_aggregator.write_geo_dict('geotest.json')
-geo_aggregator.print_geo_dict()
+#geo_aggregator.print_geo_dict()
+
+#create a report 3 object to use functions
+report_3 = report_3_()
+
+#return a geography dictionary of all sub geographies from the MSA list
+geography_list = geo_aggregator.return_geo_dict()
+
+#print geography_list #test print of geography dict
+#set state and county to pass to location tuples, this will be used to generate multiple instances of report 3 (multiple tracts)
+state = geography_list['MSAs'][0]['States'][0]['State name']
+county =geography_list['MSAs'][0]['States'][0]['Counties'][0]['County name']
+print len(geography_list['MSAs'][0]['States'][0]['Counties'][0]['Tracts']), "length of loop"
+for i in range(0, len(geography_list['MSAs'][0]['States'][0]['Counties'][0]['Tracts'])):
+	tract = str(geography_list['MSAs'][0]['States'][0]['Counties'][0]['Tracts'][i]['Tract name'])
+	location = (state, county, tract)
+	print tract
+	report3_1 = 'report3_1_' + tract + '.json'
+	report_3.report_3_main(location, cred_list)
+	report_3.write_report_3(report3_1)
+	#print geography_list['MSAs'][0]['States'][0]['Counties'][0]['Tracts'][i]
+
+#for i in range(0, len(geography_list['MSAs'][0]['States'][0]['Counties'][0]['Tracts']):
+	#print geography_list['MSAs'][0]['States'][0]['Counties'][0]['Tracts'][i]
+
 #location is statecode, countycode, censustractnumber (as in SQL)
 #location = ('29', '119', '0702.00')
 location = ('31', '153', '0105.02')
@@ -35,7 +59,7 @@ junk = 'junk.txt'
 
 
 report3_1 = 'report3_1.json'
-report_3 = report_3_()
+
 report_3.report_3_main(location, cred_list)
 #report_3.print_report_3()
 report_3.write_report_3(report3_1)

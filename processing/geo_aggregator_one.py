@@ -139,3 +139,5 @@ class geo_aggregator(object):
 	def print_geo_dict(self):
 		print self.geo_dictionary
 
+	def return_geo_dict(self):
+		return self.geo_dictionary
