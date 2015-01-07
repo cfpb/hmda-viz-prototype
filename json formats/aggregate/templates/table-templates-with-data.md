@@ -54,16 +54,20 @@
 	{
 		"characteristic": [ // race, ethnicity, etc
 			{
-				"category": { // american indian, asian, etc
-					"purchasers": [
-						{
-							"purchaser": { // fannie mae, ginnie mae, etc
-								"count": 0,
-								"value": 0
-							},
-						}
-					]
-				},
+				"categories": [
+					{
+						"category": { // american indian, asian, etc
+							"purchasers": [
+								{
+									"purchaser": { // fannie mae, ginnie mae, etc
+										"count": 0,
+										"value": 0
+									},
+								}
+							]
+						},
+					}
+				]
 			},
 		]
 	},
@@ -72,16 +76,20 @@
 	{
 		"characteristic": [ // race, income, etc
 			{
-				"category": { // less than 10%, 10-19%, etc
-					"purchasers": [
-						{
-							"purchaser": { // fannie mae, ginnie mae, etc
-								"count": 0,
-								"value": 0
-							},
-						}
-					]
-				},
+				"categories": [
+					{
+						"category": { // american indian, asian, etc
+							"purchasers": [
+								{
+									"purchaser": { // fannie mae, ginnie mae, etc
+										"count": 0,
+										"value": 0
+									},
+								}
+							]
+						},
+					}
+				]
 			},
 		]
 	},
@@ -150,16 +158,20 @@
 	{
 		"race": [ // american indian, asian, etc
 			{
-				"gender": { // male, female, joint
-					"dispositions": [
-						{
-							"disposition": { // applications received, loans originated, etc
-								"count": 0,
-								"value": 0
-							},
-						}
-					]
-				},
+				"genders": [
+					{
+						"gender": { // male, female, joint
+							"dispositions": [
+								{
+									"disposition": { // applications received, loans originated, etc
+										"count": 0,
+										"value": 0
+									},
+								}
+							]
+						},
+					}
+				]
 			},
 		]
 	}
@@ -168,16 +180,20 @@
 	{
 		"enthicity": [ // hispanic or latino, not hispanic or latino, etc
 			{
-				"gender": { // male, female, joint
-					"dispositions": [
-						{
-							"disposition": { // applications received, loans originated, etc
-								"count": 0,
-								"value": 0
-							},
-						}
-					]
-				},
+				"genders": [
+					{
+						"gender": { // male, female, joint
+							"dispositions": [
+								{
+									"disposition": { // applications received, loans originated, etc
+										"count": 0,
+										"value": 0
+									},
+								}
+							]
+						},
+					}
+				]
 			},
 		]
 	}
@@ -186,16 +202,20 @@
 	{
 		"status": [ // white non-hispanic, other
 			{
-				"gender": { // male, female, joint
-					"dispositions": [
-						{
-							"disposition": { // applications received, loans originated, etc
-								"count": 0,
-								"value": 0
-							},
-						}
-					]
-				},
+				"genders": [
+					{
+						"gender": { // male, female, joint
+							"dispositions": [
+								{
+									"disposition": { // applications received, loans originated, etc
+										"count": 0,
+										"value": 0
+									},
+								}
+							]
+						},
+					}
+				]
 			},
 		]
 	}
@@ -347,8 +367,10 @@
 	{
 		"characteristic": [ // race, ethnicity, etc
 			{
-				"category": { // american indian, asian, etc
-					"denial reasons": [
+				"categories": [
+					{
+						"category": { // american indian, asian, etc
+							"denial reasons": [
 						{
 							"reason": { // debt-to-income, employment, etc
 								"number": 0,
@@ -356,7 +378,9 @@
 							},
 						}
 					]
-				},
+						},
+					}
+				]
 			},
 		]
 	},
@@ -389,16 +413,20 @@
 	{
 		"characteristic": [ // race, ethnicity, etc
 			{
-				"category": { // american indian, asian, etc, OR less than 10%, 10-19%, etc, OR male, female, etc
-					"pricing data": [
-						{
-							"pricing": { // no reporting data, reported data, 1.50-1.99, mean, median, etc
-								"count": 0,
-								"value": 0
-							},
-						}
-					]
-				},
+				"categories": [
+					{
+						"category": { // american indian, asian, etc, OR less than 10%, 10-19%, etc, OR male, female, etc
+							"pricing data": [
+								{
+									"pricing": { // no reporting data, reported data, 1.50-1.99, mean, median, etc
+										"count": 0,
+										"value": 0
+									},
+								}
+							]
+						},
+					}
+				]
 			},
 		]
 	},
@@ -407,16 +435,20 @@
 	{
 		"characteristic": [ // racial comp, income characteristics
 			{
-				"category": { // less than 10%, 10-19%, etc OR low income, moderate, etc
-					"pricing data": [
-						{
-							"pricing": { // no reporting data, reported data, 1.50-1.99, mean, median, etc
-								"count": 0,
-								"value": 0
-							},
-						}
-					]
-				},
+				"categories": [
+					{
+						"category": { // american indian, asian, etc, OR less than 10%, 10-19%, etc, OR male, female, etc
+							"pricing data": [
+								{
+									"pricing": { // no reporting data, reported data, 1.50-1.99, mean, median, etc
+										"count": 0,
+										"value": 0
+									},
+								}
+							]
+						},
+					}
+				]
 			},
 		]
 	},
@@ -428,16 +460,20 @@
 	{
 		"characteristic": [ // race, ethnicity, etc
 			{
-				"category": { // american indian, asian, etc, OR less than 10%, 10-19%, etc, OR male, female, etc
-					"dispositions": [
-						{
-							"disposition": { // applications received, loans originated, etc
-								"count": 0,
-								"value": 0
-							},
-						}
-					]
-				},
+				"categories": [
+					{
+						"category": { // american indian, asian, etc, OR less than 10%, 10-19%, etc, OR male, female, etc
+							"dispositions": [
+								{
+									"disposition": { // applications received, loans originated, etc
+										"count": 0,
+										"value": 0
+									},
+								}
+							]
+						},
+					}
+				]
 			},
 		]
 	},
@@ -446,16 +482,20 @@
 	{
 		"characteristic": [ // racial comp, income characteristics
 			{
-				"category": { // less than 10%, 10-19%, etc OR low income, moderate, etc
-					"dispositions": [
-						{
-							"disposition": { // applications received, loans originated, etc
-								"count": 0,
-								"value": 0
-							},
-						}
-					]
-				},
+				"categories": [
+					{
+						"category": { // american indian, asian, etc, OR less than 10%, 10-19%, etc, OR male, female, etc
+							"dispositions": [
+								{
+									"disposition": { // applications received, loans originated, etc
+										"count": 0,
+										"value": 0
+									},
+								}
+							]
+						},
+					}
+				]
 			},
 		]
 	},
@@ -467,16 +507,20 @@
 	{
 		"characteristic": [ // race, ethnicity, etc
 			{
-				"category": { // american indian, asian, etc, OR less than 10%, 10-19%, etc, OR male, female, etc
-					"pricing data": [
-						{
-							"pricing": { // no reporting data, reported data, 1.50-1.99, mean, median, etc
-								"count": 0,
-								"value": 0
-							},
-						}
-					]
-				},
+				"categories": [
+					{
+						"category": { // american indian, asian, etc, OR less than 10%, 10-19%, etc, OR male, female, etc
+							"pricing data": [
+								{
+									"pricing": { // no reporting data, reported data, 1.50-1.99, mean, median, etc
+										"count": 0,
+										"value": 0
+									},
+								}
+							]
+						},
+					}
+				]
 			},
 		]
 	},
@@ -485,16 +529,20 @@
 	{
 		"characteristic": [ // racial comp, income characteristics
 			{
-				"category": { // less than 10%, 10-19%, etc OR low income, moderate, etc
-					"pricing data": [
-						{
-							"pricing": { // no reporting data, reported data, 1.50-1.99, mean, median, etc
-								"count": 0,
-								"value": 0
-							},
-						}
-					]
-				},
+				"categories": [
+					{
+						"category": { // less than 10%, 10-19%, etc OR low income, moderate, etc
+							"pricing data": [
+								{
+									"pricing": { // no reporting data, reported data, 1.50-1.99, mean, median, etc
+										"count": 0,
+										"value": 0
+									},
+								}
+							]
+						},
+					}
+				]
 			},
 		]
 	},
@@ -527,36 +575,42 @@
 
 "borrower-characteristics": [
 	{
-		"characteristic": [ // race, ethnicity, etc
-			{
-				"category": { // american indian, asian, etc, OR less than 10%, 10-19%, etc, OR male, female, etc
-					"dispositions": [
-						{
-							"disposition": { // preappovals
-								"count": 0,
-								"value": 0
-							},
-						}
-					]
-				},
-			},
-		]
+		"characteristic": { // race, ethnicity, etc
+			"categories": [
+				{
+					"category": { // american indian, asian, etc, OR less than 10%, 10-19%, etc, OR male, female, etc
+						"dispositions": [
+							{
+								"disposition": { // preappovals
+									"count": 0,
+									"value": 0
+								},
+							}
+						]
+					},
+				}
+			]
+		},
 	},
 ],
 "census-characteristics": [
 	{
 		"characteristic": [ // racial comp, income characteristics
 			{
-				"category": { // less than 10%, 10-19%, etc OR low income, moderate, etc
-					"dispositions": [
-						{
-							"disposition": { // preappovals
-								"count": 0,
-								"value": 0
-							},
-						}
-					]
-				},
+				"categories": [
+					{
+						"category": { // american indian, asian, etc, OR less than 10%, 10-19%, etc, OR male, female, etc
+							"dispositions": [
+								{
+									"disposition": { // preappovals
+										"count": 0,
+										"value": 0
+									},
+								}
+							]
+						},
+					}
+				]
 			},
 		]
 	},
