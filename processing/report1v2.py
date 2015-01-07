@@ -7,6 +7,12 @@ class report_1_(object):
 		import psycopg2
 
 		self.inputs = {}
+        dbname = credentials[0]
+        user = credentials[1]
+        host = credentials[2]
+        password = credentials[3]
+        
+        connect_string = "dbname=%s user=%s host=%s password=%s" % (dbname, user, host, password)
 		#attempte a connection to the SQL database hosting the LAR information
 		conn = psycopg2.connect("dbname='hmdamaster' user='roellk' host='localhost' password=''")
 		self.conn = conn
