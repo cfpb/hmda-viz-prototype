@@ -50,6 +50,8 @@ for i in range(0, len(geography_list['MSAs'][0]['States'][0]['Counties'][0]['Tra
 	tract = str(geography_list['MSAs'][0]['States'][0]['Counties'][0]['Tracts'][i]['Tract name'])
 	location = (state, county, tract)
 	print location
+	#create a report 3 object to use functions
+	report_3 = report_3_()
 	#report3_1 = 'report3_1_' + tract + '.json'
 	report_3.report_3_main(location, cred_list)
 	#print report_3.table_3

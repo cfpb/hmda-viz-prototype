@@ -1193,7 +1193,7 @@ class report_3_(object):
 			print "loan not added, code not present - ethnicity"
 
 		#aggregate loans by minority status and purchaser
-		print self.inputs['minority status'], 'minority status'
+		#print self.inputs['minority status'], 'minority status'
 		if self.inputs['minority status'] in self.table_3['borrower-characteristics'][2]['types'] and purchaser in self.table_3['borrower-characteristics'][2]['types'][self.inputs['minority status']]['purchasers'][self.inputs['purchaser']]['name']:
 			self.table_3['borrower-characteristics'][2]['types'][self.inputs['minority status']]['purchasers'][self.inputs['purchaser']]['count'] += 1
 			self.table_3['borrower-characteristics'][2]['types'][self.inputs['minority status']]['purchasers'][self.inputs['purchaser']]['value'] += int(self.inputs['loan value'])
@@ -1217,7 +1217,7 @@ class report_3_(object):
 		password = credentials[3]
 		cred = (dbname, user, host, password)
 		connect_string = "dbname=%s user=%s host=%s password=%s" % (dbname, user, host, password)
-		print cred
+		#print cred
 		#attempte a connection to the SQL database hosting the LAR information
 		try: #this login information must be set appropriately, it is currently set to localhost with a specified user
 			conn = psycopg2.connect(connect_string)
@@ -1279,7 +1279,7 @@ class report_3_(object):
 			self.table_3_aggregator()
 
 		#self.print_report_3()
-		name = 'report_3_1_' + location[2] + '.json'
+		name = 'report_3_1_' + location[0] + '_' + location[1] +'_' + location[2] + '.json'
 		self.write_report_3(name)
 		#self.print_report_3()
 		#print self.table_3
