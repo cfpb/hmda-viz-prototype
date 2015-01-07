@@ -39,7 +39,7 @@ class geo_aggregator(object):
 			tract_list = []
 
 			for msa in range(0, len(MSA_list)): #MSA_list is all unique MSAs in the LAR file
-					print msa, "of ", len(MSA_list), "\n", "*"*15
+					print msa+1, "of ", len(MSA_list), "\n", "*"*15
 					#append one MSA to the MSA list inside the MSAs dictionary
 					self.geo_dictionary["MSAs"].append({"MSA number": MSA_list[msa]})
 

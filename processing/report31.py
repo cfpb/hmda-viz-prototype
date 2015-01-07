@@ -21,7 +21,7 @@ class report_3_(object):
 		self.inputs = {} #will hold one row's values for all inputs into the other functions to determine how to aggregate the loan
 		 #JSON object to hold data for tables 3-1, 3-2
 		self.table_3 = {
-		"table": "",
+		"table": "3-1",
 		"type": "aggregate",
 		"desc": "Loans sold, by characteristics of borrower and of census tract in which property is located and by type of purchaser (includes originations and purchased loans",
 		"year": "",
@@ -998,6 +998,7 @@ class report_3_(object):
 		self.inputs['state code'] = rows[21]
 		self.inputs['census tract'] = rows[22]
 		self.inputs['county code'] = rows[23]
+		self.inputs['minority status'] = ' '
 
 		#the minority count is the count of minority races listed for the primary applicant
 		minority_count = 0
@@ -1040,6 +1041,7 @@ class report_3_(object):
 
 
 	def set_minority_status(self): #inputs is a dictionary, app non white flag and co non white flag are booleans
+		#print 'in minority status set'
 		#determine minority status
 		#minority_status = False
 		#if either applicant reported a non-white race or an ethinicity of hispanic or latino then minority status is true
@@ -1048,6 +1050,8 @@ class report_3_(object):
 
 		#if both applicants reported white race and non-hispanic/latino ethnicity then minority status is false
 		elif self.inputs['app non white flag'] == False and self.inputs['co non white flag'] == False and self.inputs['a ethn']  == '2' and self.inputs['co ethn'] == '2':
+			self.inputs['minority status'] = 0
+		else:
 			self.inputs['minority status'] = 0
 
 	def set_race(self): #joint_status is a boolean, inputs is a list
@@ -1084,6 +1088,8 @@ class report_3_(object):
 	def table_3_aggregator(self):
 		#convert the race to a text to access the JSON structure to aggregate and store data
 		#may be able to combine this with the integer setting step below
+		#print "in aggregator function"
+
 		if self.inputs['race'] == 1:
 			race = 'American Indian/Alaska Native'
 		elif self.inputs['race'] == 2:
@@ -1187,7 +1193,8 @@ class report_3_(object):
 			print "loan not added, code not present - ethnicity"
 
 		#aggregate loans by minority status and purchaser
-		if ethnicity in self.table_3['borrower-characteristics'][1]['types'][self.inputs['ethnicity']]['name'] and purchaser in self.table_3['borrower-characteristics'][1]['types'][self.inputs['ethnicity']]['purchasers'][self.inputs['purchaser']]['name']:
+		print self.inputs['minority status'], 'minority status'
+		if self.inputs['minority status'] in self.table_3['borrower-characteristics'][2]['types'] and purchaser in self.table_3['borrower-characteristics'][2]['types'][self.inputs['minority status']]['purchasers'][self.inputs['purchaser']]['name']:
 			self.table_3['borrower-characteristics'][2]['types'][self.inputs['minority status']]['purchasers'][self.inputs['purchaser']]['count'] += 1
 			self.table_3['borrower-characteristics'][2]['types'][self.inputs['minority status']]['purchasers'][self.inputs['purchaser']]['value'] += int(self.inputs['loan value'])
 
@@ -1202,6 +1209,7 @@ class report_3_(object):
 	#purchaser codes: Fannie(1), Ginnie(2), Freddie(3), Farmer(4), Private(5), Commercial(6), Insurance(7), Affiliate(8), Other(9)
 	#hoepa status: hoepa loan(1), non-hoepa loan(2)
 	def report_3_main(self, location, credentials):
+		#print "in main report 3"
 		import psycopg2 #to access a SQL database
 		dbname = credentials[0]
 		user = credentials[1]
@@ -1209,7 +1217,7 @@ class report_3_(object):
 		password = credentials[3]
 		cred = (dbname, user, host, password)
 		connect_string = "dbname=%s user=%s host=%s password=%s" % (dbname, user, host, password)
-
+		print cred
 		#attempte a connection to the SQL database hosting the LAR information
 		try: #this login information must be set appropriately, it is currently set to localhost with a specified user
 			conn = psycopg2.connect(connect_string)
@@ -1218,27 +1226,28 @@ class report_3_(object):
 			print "I am unable to connect to the database"
 		#create a cursor object to use with the SQL database
 		cur = conn.cursor()
-
+		#location = ('31', '155', '9685.00')
 		#count the number of rows to be selected for the geography
-		SQL = "SELECT COUNT(geocode) FROM LAR_TEST WHERE statecode = %s and countycode = %s and censustractnumber = %s;"
+		SQL = "SELECT COUNT(statecode) FROM hmda_lar_public_final_2012 WHERE statecode = %s and countycode = %s and censustractnumber = %s;"
 		cur.execute(SQL, location) #location is a list passed in from the controller object. The list order must match the variable order in the SQL string
 		#produces a tuple that is a count of the number of records in the selected geography
 		rows_selected = cur.fetchone()
 		#determine how many rows were selected, this will be used to set the loop range when aggregating all loans
 		count = rows_selected[0]
-
+		print count, "count"
+		print location, "location"
 		#set the SQL statement to select the needed fields to aggregate loans for the table_3 JSON structure
 		SQL = '''SELECT
-			geocode, applicantrace1, applicantrace2, applicantrace3, applicantrace4, applicantrace5,
+			censustractnumber, applicantrace1, applicantrace2, applicantrace3, applicantrace4, applicantrace5,
 			coapplicantrace1, coapplicantrace2, coapplicantrace3, coapplicantrace4,	coapplicantrace5,
 			applicantethnicity, coapplicantethnicity, applicantincome, ratespeed, lienstatus, hoepastatus,
 			purchasertype, loanamount,sequencenumber, asofdate, statecode, censustractnumber, countycode
-		FROM LAR_TEST WHERE statecode = %s and countycode = %s and censustractnumber = %s; '''
+		FROM hmda_lar_public_final_2012 WHERE statecode = %s and countycode = %s and censustractnumber = %s; '''
 
 		cur.execute(SQL, location)
 
-
 		for i in range(0, count):
+			#print "in query loop"
 			#pull one record from the database query
 			rows = cur.fetchone()
 			#parse the selected row and rename for readability
@@ -1257,17 +1266,23 @@ class report_3_(object):
 			#if one white and one minority race are listed, use the minority race
 			self.set_race()
 
-			#set the ethnicity of the loan
-			self.set_ethnicity()
 
 			#determine minority status: if either applicant is non-white or has hispanic or latino ethinicity
 			#then the loan is a minority loan
 			self.set_minority_status()
 
+			#set the ethnicity of the loan
+			self.set_ethnicity()
+
 			#table 3-1 logic filters
 			#counts loans and aggregates values by race and purchaser
 			self.table_3_aggregator()
 
+		#self.print_report_3()
+		name = 'report_3_1_' + location[2] + '.json'
+		self.write_report_3(name)
+		#self.print_report_3()
+		#print self.table_3
 
 	def print_report_3(self): #prints the JSON structure to the terminal
 		for i in range(0, 10):

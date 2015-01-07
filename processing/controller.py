@@ -34,14 +34,26 @@ geography_list = geo_aggregator.return_geo_dict()
 #set state and county to pass to location tuples, this will be used to generate multiple instances of report 3 (multiple tracts)
 state = geography_list['MSAs'][0]['States'][0]['State name']
 county =geography_list['MSAs'][0]['States'][0]['Counties'][0]['County name']
-print len(geography_list['MSAs'][0]['States'][0]['Counties'][0]['Tracts']), "length of loop"
+#tract = geography_list['MSAs'][0]['States'][0]['Counties'][0]['Tracts'][0]['Tract name']
+#location = (state, county, tract)
+
+
+#location = ('31', '155', '9685.00')
+#location= ('31', '153', '0105.02')
+#print location, "in controller"
+#report_3.report_3_main(location, cred_list)
+#print len(geography_list['MSAs'][0]['States'][0]['Counties'][0]['Tracts']), "length of loop"
+
+
+
 for i in range(0, len(geography_list['MSAs'][0]['States'][0]['Counties'][0]['Tracts'])):
 	tract = str(geography_list['MSAs'][0]['States'][0]['Counties'][0]['Tracts'][i]['Tract name'])
 	location = (state, county, tract)
-	print tract
-	report3_1 = 'report3_1_' + tract + '.json'
+	print location
+	#report3_1 = 'report3_1_' + tract + '.json'
 	report_3.report_3_main(location, cred_list)
-	report_3.write_report_3(report3_1)
+	#print report_3.table_3
+	#report_3.write_report_3(report3_1)
 	#print geography_list['MSAs'][0]['States'][0]['Counties'][0]['Tracts'][i]
 
 #for i in range(0, len(geography_list['MSAs'][0]['States'][0]['Counties'][0]['Tracts']):
@@ -49,17 +61,17 @@ for i in range(0, len(geography_list['MSAs'][0]['States'][0]['Counties'][0]['Tra
 
 #location is statecode, countycode, censustractnumber (as in SQL)
 #location = ('29', '119', '0702.00')
-location = ('31', '153', '0105.02')
+#location = ('31', '153', '0105.02')
 #report_1 = report_1_()
 
 #report_1.report_1_main(location)
 #report_1.print_table_1()
-junk = 'junk.txt'
+#junk = 'junk.txt'
 #report_1.write_report_1_json(junk)
 
 
-report3_1 = 'report3_1.json'
+#report3_1 = 'report3_1.json'
 
-report_3.report_3_main(location, cred_list)
+#report_3.report_3_main(location, cred_list)
 #report_3.print_report_3()
-report_3.write_report_3(report3_1)
+#report_3.write_report_3(report3_1)
