@@ -2,15 +2,18 @@
 
 ##Roadmap
 * Add in modules and supporting software
+
 * Initial code work
     1. Report Engines
     2. Controller
     3. Geo-aggregator
     4. Output files
+    
 * Known issues
-* 1. Unit testing required
-* 2. Not all loans are aggregating
-* 3. Objects must be aggregated to higher geography levels than tract
+    1. Unit testing required
+    2. Not all loans are aggregating
+    3. Objects must be aggregated to higher geography levels than tract
+
 * End state goal
 
 ##Report Engines:
@@ -58,6 +61,4 @@ Using Psycopg2 the report engines access a locally hosted SQL database to pull i
     The Controller will determine which reports are run for which FIs or geographies
     Report generators will take arguments based on the input file that determine whether:
         * the report is aggregate or disclosure
-        * which geography to aggregate loans for
-        * 
-
+        * for which geography to aggregate loans 
