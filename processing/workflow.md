@@ -15,16 +15,17 @@
     3. Objects must be aggregated to higher geography levels than tract
 
 * End state goal
-
+##Add-in modules and supporting software
+    Using Psycopg2 the report engines access a locally hosted SQL database to pull information from the HMDA LAR files
+    
 ##Report Engines:
-Using Psycopg2 the report engines access a locally hosted SQL database to pull information from the HMDA LAR files
 
-###1. Report 1
+    ###1. Report 1
     Constructed to take a single tract and aggregate loans for aggregate Table 1
     Modified to be an initializable object with most methods called by an internal aggregator function
     Output is a JSON file dump
 
-###2. Report 3
+    ###2. Report 3
     Required significant time to address all the demographic logic prior to loan aggregation
     Constructed to take a single tract and aggregate loans for aggregate Table 3-1
     Modified to be an initializable object with demographic logic called by an internal fucntion
