@@ -57,7 +57,7 @@
 
 ##End-State goal
     A Controller object will take a file input (likely CSV) that will determine which reports are run on which geogprahies and financial institutions
-    * Ideally this file can be created using scripts
+        * Ideally this file can be created using scripts
     The Controller will pass MSAs to the Geo-aggregator to determine which tracts need to be run through the report generators
     The Controller will either aggregate the tracts to appropriate geography levels or call another object that does this
     The Controller will determine which reports are run for which FIs or geographies
