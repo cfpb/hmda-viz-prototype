@@ -54,6 +54,7 @@
     * This may be accomplished using SQL queries that mimic the python logic used in the report generators
 2. Not all loans are aggregating according to each demographic data element
 3. JSON objects need to be produced for geographies other than tracts
+4. Need a test for the Geo-aggregator
 
 ##End-State goal
     A Controller object will take a file input (likely CSV) that will determine which reports are run on which geogprahies and financial institutions
