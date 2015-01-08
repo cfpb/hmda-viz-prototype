@@ -954,7 +954,7 @@ class report_3_(object):
 		elif (self.inputs['a ethn'] == '3' or self.inputs['a ethn'] == '4') and (self.inputs['co ethn'] != '1' and self.inputs['co ethn'] != '2'):
 			self.inputs['ethnicity'] = 3
 		else:
-			print "error loan not aggregated"
+			print "error setting ethnicity"
 
 		#print self.inputs['a ethn'], 'applicant ethnicity'
 		#print self.inputs['co ethn'], 'co applicant ethnicity'
@@ -1197,7 +1197,8 @@ class report_3_(object):
 		if self.inputs['minority status'] in self.table_3['borrower-characteristics'][2]['types'] and purchaser in self.table_3['borrower-characteristics'][2]['types'][self.inputs['minority status']]['purchasers'][self.inputs['purchaser']]['name']:
 			self.table_3['borrower-characteristics'][2]['types'][self.inputs['minority status']]['purchasers'][self.inputs['purchaser']]['count'] += 1
 			self.table_3['borrower-characteristics'][2]['types'][self.inputs['minority status']]['purchasers'][self.inputs['purchaser']]['value'] += int(self.inputs['loan value'])
-
+		else:
+			print "loan not added in minority status"
 
 	#Race: American Indian or Alaska NAtive(1), Asian(2), Black(3), Native Hawaiian or Pacific Islander(4), White(5), Not provided(6), Not applicable(7), no co-applicant(8)
 	#joint definition: one minority race and one white
@@ -1234,8 +1235,9 @@ class report_3_(object):
 		rows_selected = cur.fetchone()
 		#determine how many rows were selected, this will be used to set the loop range when aggregating all loans
 		count = rows_selected[0]
-		print count, "count"
 		print location, "location"
+		print count, "count of loans in tract"
+
 		#set the SQL statement to select the needed fields to aggregate loans for the table_3 JSON structure
 		SQL = '''SELECT
 			censustractnumber, applicantrace1, applicantrace2, applicantrace3, applicantrace4, applicantrace5,
