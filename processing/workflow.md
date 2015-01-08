@@ -13,11 +13,12 @@
     1. Unit testing required
     2. Not all loans are aggregating
     3. Objects must be aggregated to higher geography levels than tract
+    4. Report 1 object needs a revised connect string and more articulation
 
 * End state goal
 ##Add-in modules and supporting software
     Using Psycopg2 the report engines access a locally hosted SQL database to pull information from the HMDA LAR files
-    
+
 ##Report Engines:
 
     ###1. Report 1
@@ -63,3 +64,4 @@
     Report generators will take arguments based on the input file that determine whether:
         * the report is aggregate or disclosure
         * for which geography to aggregate loans 
+    A master JSON object file will be contain all the JSON structures for the reports, each report generator will pull a piece of this file to use in aggregation
