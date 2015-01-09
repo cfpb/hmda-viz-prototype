@@ -18,7 +18,7 @@ module.exports = function(grunt) {
      */
     loc: {
       src: 'src',
-      dist: 'dist'
+      dist: 'assets'
     },
 
     /**
@@ -68,7 +68,7 @@ module.exports = function(grunt) {
           '!<%= loc.src %>/vendor/cf-*/Gruntfile.js',
           '<%= loc.src %>/static/js/app.js'
         ],
-        dest: '<%= loc.dist %>/static/js/main.js'
+        dest: 'js/main.js'
       }
     },
 
@@ -85,7 +85,7 @@ module.exports = function(grunt) {
           paths: grunt.file.expand('src/vendor/*').concat([])
         },
         files: {
-          '<%= loc.dist %>/static/css/main.css': ['<%= loc.src %>/static/css/main.less']
+          'css/main.css': ['<%= loc.src %>/static/css/main.less']
         }
       }
     },
@@ -104,7 +104,7 @@ module.exports = function(grunt) {
       main: {
         // Prefix `static/css/main.css` and overwrite.
         expand: true,
-        src: ['<%= loc.dist %>/static/css/main.css']
+        src: ['css/main.css']
       },
     },
 
@@ -125,8 +125,8 @@ module.exports = function(grunt) {
       //   dest: 'static/js/html5shiv-printshiv.js'
       // },
       js: {
-        src: ['<%= loc.dist %>/static/js/main.js'],
-        dest: '<%= loc.dist %>/static/js/main.min.js'
+        src: ['js/main.js'],
+        dest: 'js/main.min.js'
       }
     },
 
@@ -151,7 +151,7 @@ module.exports = function(grunt) {
           linebreak: true
         },
         files: {
-          src: ['<%= loc.dist %>/static/css/*.min.css']
+          src: ['css/*.min.css']
         }
       },
       js: {
@@ -161,7 +161,7 @@ module.exports = function(grunt) {
           linebreak: true
         },
         files: {
-          src: ['<%= loc.dist %>/static/js/*.min.js']
+          src: ['js/*.min.js']
         }
       }
     },
@@ -177,7 +177,7 @@ module.exports = function(grunt) {
           processImport: false
         },
         files: {
-          '<%= loc.dist %>/static/css/main.min.css': ['<%= loc.dist %>/static/css/main.css'],
+          'css/main.min.css': ['css/main.css'],
         }
       },
       'ie-alternate': {
@@ -185,7 +185,7 @@ module.exports = function(grunt) {
           processImport: false
         },
         files: {
-          '<%= loc.dist %>/static/css/main.ie.min.css': ['<%= loc.dist %>/static/css/main.ie.css'],
+          'css/main.ie.min.css': ['css/main.ie.css'],
         }
       }
     },
@@ -204,7 +204,7 @@ module.exports = function(grunt) {
           legacyWidth: 60
         },
         files: {
-          '<%= loc.dist %>/static/css/main.ie.css': '<%= loc.dist %>/static/css/main.css'
+          'css/main.ie.css': 'css/main.css'
         }
       }
     },
@@ -217,7 +217,7 @@ module.exports = function(grunt) {
     copy: {
       main: {
         files: [
-          {
+          /*{
             expand: true,
             cwd: '<%= loc.src %>',
             src: [
@@ -225,7 +225,7 @@ module.exports = function(grunt) {
               '*.html',
             ],
             dest: '<%= loc.dist %>'
-          },
+          },*/
           {
             expand: true,
             cwd: '<%= loc.src %>/static',
@@ -233,7 +233,7 @@ module.exports = function(grunt) {
               // Fonts
               'fonts/*'
             ],
-            dest: '<%= loc.dist %>/static'
+            dest: ''
           },
           {
             expand: true,
@@ -243,7 +243,7 @@ module.exports = function(grunt) {
               'vendor/html5shiv/html5shiv-printshiv.min.js',
               'vendor/box-sizing-polyfill/boxsizing.htc'
             ],
-            dest: '<%= loc.dist %>/static'
+            dest: ''
           }
         ]
       }
