@@ -18,7 +18,7 @@ module.exports = function(grunt) {
      */
     loc: {
       src: 'src',
-      dist: 'assets'
+      dist: 'dist'
     },
 
     /**
@@ -56,7 +56,7 @@ module.exports = function(grunt) {
         src: [
           '<%= loc.src %>/vendor/cf-*/*.less',
           '!<%= loc.src %>/vendor/cf-core/*.less',
-          '<%= loc.src %>/vendor/cf-core/cf-core.less'
+          '<%= loc.src %>/vendor/cf-core/cf-core.less',
         ],
         dest: '<%= loc.src %>/static/css/capital-framework.less',
       },
@@ -233,7 +233,7 @@ module.exports = function(grunt) {
               // Fonts
               'fonts/*'
             ],
-            dest: ''
+            dest: 'fonts'
           },
           {
             expand: true,
@@ -294,7 +294,7 @@ module.exports = function(grunt) {
      */
     watch: {
       default: {
-        files: ['Gruntfile.js', '<%= loc.src %>/static/css/**/*.less', '<%= loc.src %>/static/js/**/*.js'],
+        files: ['Gruntfile.js', '<%= loc.src %>/static/css/**/*.less', '<%= loc.src %>/static/css/**/*.css', '<%= loc.src %>/static/js/**/*.js'],
         tasks: ['default']
       }
     }

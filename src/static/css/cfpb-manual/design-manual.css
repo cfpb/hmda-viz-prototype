@@ -1,0 +1,230 @@
+/* ==========================================================================
+CFPB Design Manual
+Header
+========================================================================== */
+/* Mobile-First Defaults: */
+.header {
+border-bottom: 4px solid #2cb34a;
+padding-top: 0.5em;
+width: 100%;
+}
+.header .site-title {
+display: inline-block;
+-webkit-box-sizing: border-box;
+-moz-box-sizing: border-box;
+box-sizing: border-box;
+border: solid transparent;
+border-width: 0 15px;
+margin-right: -0.25em;
+vertical-align: top;
+width: 100%;
+text-align: center;
+}
+.ie .header .site-title {
+margin-right: -0.26em;
+}
+.lt-ie8 .header .site-title {
+display: inline;
+*zoom: 1;
+*behavior: url('/cf-grid/custom-demo/static/css/boxsizing.htc');
+}
+.header .site-title h1 {
+font-size: 1.5em;
+}
+.header .site-title .title-link {
+color: #919395;
+}
+.header .site-title .title-link .site-org {
+color: #75787b;
+font-family: "AvenirNextLTW01-Medium", Arial, sans-serif;
+font-style: normal;
+font-weight: 500;
+}
+.lt-ie9 .header .site-title .title-link .site-org {
+font-weight: normal !important;
+}
+.header .site-title .title-link:visited {
+color: #919395;
+}
+.header .site-logo {
+display: none;
+}
+/* Media Queries
+========================================================================== */
+/* Mobile portrait (320px) */
+/* Mobile landscape (480px) */
+/* Small tablet (600px) */
+@media only screen and (min-width: 37.5em) {
+.header {
+padding: 2em 0 0;
+}
+.header .site-title {
+display: inline-block;
+-webkit-box-sizing: border-box;
+-moz-box-sizing: border-box;
+box-sizing: border-box;
+border: solid transparent;
+border-width: 0 15px;
+margin-right: -0.25em;
+vertical-align: top;
+width: 50%;
+text-align: left;
+}
+.ie .header .site-title {
+margin-right: -0.26em;
+}
+.lt-ie8 .header .site-title {
+display: inline;
+*zoom: 1;
+*behavior: url('/cf-grid/custom-demo/static/css/boxsizing.htc');
+}
+.header .site-title h1 {
+font-size: 1.625em;
+}
+.header .site-logo {
+display: inline-block;
+-webkit-box-sizing: border-box;
+-moz-box-sizing: border-box;
+box-sizing: border-box;
+border: solid transparent;
+border-width: 0 15px;
+margin-right: -0.25em;
+vertical-align: top;
+width: 50%;
+text-align: right;
+}
+.ie .header .site-logo {
+margin-right: -0.26em;
+}
+.lt-ie8 .header .site-logo {
+display: inline;
+*zoom: 1;
+*behavior: url('/cf-grid/custom-demo/static/css/boxsizing.htc');
+}
+.header .site-logo .logo {
+display: inline;
+}
+}
+
+.visually-hidden {
+  border: 0 none;
+  clip: rect(0px, 0px, 0px, 0px);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  width: 1px;
+}
+
+/* Mobile portrait (320px) */
+@media only screen and (min-width: 20em) {
+.main-nav {
+/* The next two lines get rid of the annoying 40px left margin on unordered list in WebKit (-webkit-offset-start: 40px;): */
+margin: 0 0 0.5em;
+padding: 0;
+text-align: center;
+}
+.main-nav li {
+display: inline-block;
+margin: 0 1em 0.5em;
+font-family: "AvenirNextLTW01-Medium", Arial, sans-serif;
+font-style: normal;
+font-weight: 500;
+font-size: 1.125em;
+/* 18px */
+list-style: none;
+}
+.lt-ie9 .main-nav li {
+font-weight: normal !important;
+}
+.main-nav a {
+display: block;
+padding: 0.125em 0;
+border-bottom: 4px solid #ffffff;
+}
+.main-nav a:link,
+.main-nav a:visited {
+color: #75787b;
+}
+.main-nav a:hover,
+.main-nav a:focus {
+border-bottom: 4px solid #dbedd4;
+color: #43484e;
+}
+.main-nav a:active {
+border-bottom: 4px solid #addc91;
+color: #101820;
+}
+.main-nav-active a:link,
+.main-nav-active a:visited,
+.main-nav-active a:hover,
+.main-nav-active a:focus,
+.main-nav-active a:active {
+border-bottom: 4px solid #addc91;
+color: #101820;
+}
+}
+/* Mobile landscape (480px) */
+/* Small tablet (600px) */
+@media only screen and (min-width: 37.5em) {
+.main-nav {
+display: inline-block;
+-webkit-box-sizing: border-box;
+-moz-box-sizing: border-box;
+box-sizing: border-box;
+border: solid transparent;
+border-width: 0 15px;
+margin-right: -0.25em;
+vertical-align: top;
+width: 100%;
+margin-bottom: 0;
+text-align: left;
+}
+.ie .main-nav {
+margin-right: -0.26em;
+}
+.lt-ie8 .main-nav {
+display: inline;
+*zoom: 1;
+*behavior: url('/cf-grid/custom-demo/static/css/boxsizing.htc');
+}
+.main-nav li {
+margin-right: 0;
+margin-bottom: 0;
+margin-left: 2em;
+}
+.main-nav li:first-child {
+margin-left: 0;
+}
+.main-nav a {
+padding-top: 0;
+padding-bottom: 1em;
+border-bottom: none;
+}
+.main-nav a:hover,
+.main-nav a:active {
+margin-bottom: -4px;
+}
+.main-nav-active a:link,
+.main-nav-active a:visited,
+.main-nav-active a:hover,
+.main-nav-active a:focus,
+.main-nav-active a:active {
+margin-bottom: -4px;
+}
+}
+/* Tablet/netbook (768px) */
+@media only screen and (min-width: 48em) {
+.main-nav li {
+font-size: 1.125em;
+/* 18px */
+}
+}
+/* Landscape tablet/netbook/laptop (1024px) */
+@media only screen and (min-width: 64em) {
+.main-nav li {
+/*font-size: 1.375em;*/
+/* 22px */
+}
+}
