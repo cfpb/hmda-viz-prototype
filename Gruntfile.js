@@ -233,7 +233,7 @@ module.exports = function(grunt) {
               // Fonts
               'fonts/*'
             ],
-            dest: 'fonts'
+            dest: ''
           },
           {
             expand: true,
