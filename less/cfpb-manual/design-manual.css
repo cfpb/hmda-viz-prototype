@@ -228,3 +228,29 @@ font-size: 1.125em;
 /* 22px */
 }
 }
+
+.wrap {
+  box-sizing: border-box;
+  clear: both;
+  margin: 0 auto;
+  max-width: 1200px;
+  padding: 0 15px;
+  position: relative;
+}
+
+.content {
+  -moz-border-bottom-colors: none;
+  -moz-border-left-colors: none;
+  -moz-border-right-colors: none;
+  -moz-border-top-colors: none;
+  border-color: transparent;
+  border-image: none;
+  border-style: solid;
+  border-width: 0 15px;
+  box-sizing: border-box;
+  display: inline-block;
+  margin-right: -0.25em;
+  overflow: hidden;
+  vertical-align: top;
+  width: 75%;
+}
