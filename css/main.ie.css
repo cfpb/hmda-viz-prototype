@@ -8554,6 +8554,36 @@ Header
   display: block;
 }
 
+select {
+  font-family: "AvenirNextLTW01-Regular", Arial, sans-serif;
+  font-style: normal;
+  font-weight: normal;
+}
+
+select em,
+select i {
+  font-family: "AvenirNextLTW01-Italic", Arial, sans-serif;
+  font-style: italic;
+  font-weight: normal;
+}
+
+.lt-ie9 select em,
+.lt-ie9 select i {
+  font-style: normal !important;
+}
+
+select strong,
+select b {
+  font-family: "AvenirNextLTW01-Demi", Arial, sans-serif;
+  font-style: normal;
+  font-weight: bold;
+}
+
+.lt-ie9 select strong,
+.lt-ie9 select b {
+  font-weight: normal !important;
+}
+
 .color-demo {
   display: inline-block;
   box-sizing: border-box;
