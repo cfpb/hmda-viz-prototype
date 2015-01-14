@@ -57,20 +57,30 @@
     <script>
     $( document ).ready(function() {
         // make ajax call for json
+        /* TODO: the file to load here should be dynamic
+            based on the url pattern
+            can always load a index.json file at the same directory level
+            or
+            can we use jekyll in here to generate different javascript snippets
+            */
+
+        {% if page.url == '/aggregate/index.html' %}
+            $.get("states.json", function(states) {
+                console.log('we have states');
+                $.each(states, function(val, state) {
+                    $('#states').append('<option value="' + val + '">' + val + ' - ' + state + '</option>');
+                });
+            });
+        {% else %}
         $.get( "3-1.json", function(tabledata) {
-            console.log( "success" );
-            //console.log("Data: " + tabledata.borrowercharacteristics[0].name);
-            //$('#test').html(JSON.stringify(tabledata));
+            console.log('we have data');
             $.get('{{ site.baseurl }}/templates/characteristics.html', function(templates) {
                 var template = $(templates).filter('#borrower').html();
                 var html = Mustache.to_html(template, tabledata);
-                //alert ("yes sir");
-                //$('#test').html("yippe");
-                //$("Yes sir!").appendTo("#test")
-                $('#test').html(html);
-                //$(html).appendTo('#test');
+                $('#table').html(html);
             });
         });
+        {% endif %}
     });
   </script>
 </body>

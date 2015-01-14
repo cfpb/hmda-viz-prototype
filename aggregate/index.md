@@ -26,8 +26,8 @@ Note: This is a listing of all U.S. States and territories for which reports are
 		<option value="1999">1999</option>
 	</select>
 	<label class="form-label-header" for="state">State</label>
-	<select size="10">
-		<option selected="selected" value="00">00 - All States (00)</option>
+	<select id="states" size="10">
+		<!--<option value="00">00 - All States (00)</option>
 		<option value="01">01 - ALABAMA (AL) </option>
 		<option value="02">02 - ALASKA (AK) </option>
 		<option value="04">04 - ARIZONA (AZ) </option>
@@ -79,7 +79,7 @@ Note: This is a listing of all U.S. States and territories for which reports are
 		<option value="54">54 - WEST VIRGINIA (WV) </option>
 		<option value="55">55 - WISCONSIN (WI) </option>
 		<option value="56">56 - WYOMING (WY) </option>
-		<option value="72">72 - PUERTO RICO (PR) </option>
+		<option value="72">72 - PUERTO RICO (PR) </option>-->
 	</select>
 	<br />
 	<a href="{{ site.baseurl }}/aggregate/2013/Alabama/" class="btn">Submit</a>
