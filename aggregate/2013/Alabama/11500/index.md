@@ -60,8 +60,6 @@ Note: This is a listing of all reports for the selected MSA/MD region. Choose a 
 		<option value="B">B Conv Price Info by Incidence and Level</option>
 	</select>
 	<br />
-    <label><input name="type" type="radio" value="PDF" /> PDF</label>
-    <label><input name="type" type="radio" value="Excel" /> Excel</label>
-	
-	<a href="3-1/" class="btn">Select Report</a> {{ page.url }}
+    	
+	<a href="3-1/" class="btn">Select Report</a>
 </form>

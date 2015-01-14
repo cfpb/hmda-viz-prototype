@@ -65,21 +65,24 @@
             */
 
         {% if page.url == '/aggregate/index.html' %}
+            console.log('states?');
             $.get("states.json", function(states) {
                 console.log('we have states');
-                $.each(states, function(val, state) {
-                    $('#states').append('<option value="' + val + '">' + val + ' - ' + state + '</option>');
+                $.get('{{ site.baseurl }}/templates/states.html', function(templates) {
+                    var template = $(templates).filter('#states').html();
+                    var html = Mustache.to_html(template, states);
+                    $('#states').html(html);
                 });
             });
         {% else %}
-        $.get( "3-1.json", function(tabledata) {
-            console.log('we have data');
-            $.get('{{ site.baseurl }}/templates/characteristics.html', function(templates) {
-                var template = $(templates).filter('#borrower').html();
-                var html = Mustache.to_html(template, tabledata);
-                $('#table').html(html);
+            $.get( "3-1.json", function(tabledata) {
+                console.log('we have data');
+                $.get('{{ site.baseurl }}/templates/characteristics.html', function(templates) {
+                    var template = $(templates).filter('#borrower').html();
+                    var html = Mustache.to_html(template, tabledata);
+                    $('#table').html(html);
+                });
             });
-        });
         {% endif %}
     });
   </script>
