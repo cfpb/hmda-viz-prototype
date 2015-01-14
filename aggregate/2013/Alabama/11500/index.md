@@ -63,5 +63,5 @@ Note: This is a listing of all reports for the selected MSA/MD region. Choose a 
     <label><input name="type" type="radio" value="PDF" /> PDF</label>
     <label><input name="type" type="radio" value="Excel" /> Excel</label>
 	
-	<a href="3-1.json" class="btn">Select Report</a>
+	<a href="3-1/" class="btn">Select Report</a> {{ page.url }}
 </form>

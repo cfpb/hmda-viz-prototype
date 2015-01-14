@@ -8202,6 +8202,41 @@ select b {
 .lt-ie9 select b {
   font-weight: normal !important;
 }
+table.report {
+  font-size: 12px;
+  max-width: 100%;
+  width: 100%;
+}
+table.report tbody th {
+  text-align: left;
+}
+table.report td {
+  text-align: right;
+}
+th,
+td {
+  background: #fff;
+}
+th {
+  text-align: center;
+}
+th[colspan="2"] {
+  border-bottom: 1px solid #babbbd;
+}
+tbody td,
+tbody th {
+  border-bottom: 1px solid #e3e4e5;
+}
+tbody th[colspan="19"] {
+  border-bottom: 0 solid #e3e4e5;
+}
+th.characteristic {
+  padding-left: 2em;
+}
+tbody > tr:nth-child(2n+1) > th,
+tbody > tr:nth-child(2n+1) > td {
+  background: #fff;
+}
 .color-demo {
   display: inline-block;
   box-sizing: border-box;
