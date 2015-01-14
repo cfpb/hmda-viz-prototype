@@ -1,6 +1,3 @@
-<div id="test">
-
-</div>
 <footer role="contentinfo" class="footer cf">
         <div class="wrap footer-container">
 
@@ -60,10 +57,19 @@
     <script>
     $( document ).ready(function() {
         // make ajax call for json
-        $.get( "../3-1.json", function(tabledata) {
+        $.get( "3-1.json", function(tabledata) {
             console.log( "success" );
-            console.log("Data: " + tabledata.borrowercharacteristics[0].name);
-            $('#test').html(JSON.stringify(tabledata));
+            //console.log("Data: " + tabledata.borrowercharacteristics[0].name);
+            //$('#test').html(JSON.stringify(tabledata));
+            $.get('{{ site.baseurl }}/templates/characteristics.html', function(templates) {
+                var template = $(templates).filter('#borrower').html();
+                var html = Mustache.to_html(template, tabledata);
+                //alert ("yes sir");
+                //$('#test').html("yippe");
+                //$("Yes sir!").appendTo("#test")
+                $('#test').html(html);
+                //$(html).appendTo('#test');
+            });
         });
     });
   </script>

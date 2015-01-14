@@ -1,0 +1,19 @@
+<script id="borrower" type="text/template">
+	<tr>
+		<th colspan="19">Borrower Characteristics</th>
+	</tr>
+	{{#borrowercharacteristics}}
+		<tr>
+			<th colspan="19">{{name}}</th>
+		</tr>
+		{{#types}}
+			<tr>
+				<th class="characteristic">{{name}}</th>
+				{{#purchasers}}
+				<td>{{count}}</td>
+				<td>{{value}}</td>
+				{{/purchasers}}
+			</tr>
+		{{/types}}
+	{{/borrowercharacteristics}}
+</script>
