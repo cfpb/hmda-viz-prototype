@@ -8713,8 +8713,9 @@ select b {
 
 table.report {
   font-size: 12px;
-  max-width: 100%;
-  width: 100%;
+  margin: 0 1% 2em;
+  max-width: 98%;
+  width: 98%;
 }
 
 table.report tbody th {
@@ -8734,26 +8735,32 @@ th {
   text-align: center;
 }
 
+th h3 {
+  font-weight: bold;
+  margin-bottom: 0;
+}
+
 th[colspan="2"] {
   border-bottom: 1px solid #babbbd;
 }
 
 tbody td,
 tbody th {
-  border-bottom: 1px solid #e3e4e5;
+  border: 1px solid #e3e4e5;
 }
 
 tbody th[colspan="19"] {
   border-bottom: 0 solid #e3e4e5;
 }
 
-th.characteristic {
-  padding-left: 2em;
-}
-
 tbody > tr:nth-child(2n+1) > th,
 tbody > tr:nth-child(2n+1) > td {
   background: #fff;
+}
+
+#table > tr:nth-child(2n+1) > th,
+#table > tr:nth-child(2n+1) > td {
+  background: #f5f5f5;
 }
 
 .color-demo {
