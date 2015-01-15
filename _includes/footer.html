@@ -68,26 +68,25 @@
         console.log ({{ urlsize }});
 
         {% if urlsize == 3 %}
-          $.get("years.json", function(years) {
-              console.log('we have years');
-              $.get('{{ site.baseurl }}/templates/years.html', function(templates) {
-                  var template = $(templates).filter('#years').html();
-                  var html = Mustache.to_html(template, years);
-                  $('#years').html(html);
-                  $('#years').val('#years option:first');
-                  $('#years option:first').attr('selected', 'selected');
-                  // set this here because async
-                  $('.btn').attr('href', $('#years').val() + '/' + $('#states').val().replace(" ", "-").toLowerCase() + '/');
-              });
-          });
           $.get("states.json", function(states) {
               console.log('we have states');
               $.get('{{ site.baseurl }}/templates/states.html', function(templates) {
                   var template = $(templates).filter('#states').html();
                   var html = Mustache.to_html(template, states);
                   $('#states').html(html);
-                  $('#states').val('#states option:first');
+                  $('#states').val($('#states option:first').val());
                   //console.log('states now = ' + $('#states').val());
+              });
+          });
+          $.get("years.json", function(years) {
+              console.log('we have years');
+              $.get('{{ site.baseurl }}/templates/years.html', function(templates) {
+                  var template = $(templates).filter('#years').html();
+                  var html = Mustache.to_html(template, years);
+                  $('#years').html(html);
+                  $('#years').val($('#years option:first').val());
+                  // set this here because async
+                  $('.btn').attr('href', '{{ site.baseurl }}/aggregate/' + $('#years').val() + '/' + $('#states').val().replace(" ", "-").toLowerCase() + '/');
               });
           });
         {% elsif urlsize == 5 %}
