@@ -7,7 +7,7 @@ layout: index
 Note: This is a listing of MSA/MD(s) where institutions have reports. Choose an MSA/MD by clicking a row and pressing select MSA/MD.
 
 <form class="block__bg">
-	<label class="form-label-header" for="year">MSA/MD</label>
+	<label class="form-label-header" for="msa-mds">MSA/MD</label>
 	<select id="msa-mds" size="10">
 	</select>
 	<br />

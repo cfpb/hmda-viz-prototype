@@ -66,50 +66,63 @@
         {% assign urlsplit = page.url | split:"/" %}
         {% assign urlsize = urlsplit | size %}
         console.log ({{ urlsize }});
+
         {% if urlsize == 3 %}
-            $.get("states.json", function(states) {
-                console.log('we have states');
-                $.get('{{ site.baseurl }}/templates/states.html', function(templates) {
-                    var template = $(templates).filter('#states').html();
-                    var html = Mustache.to_html(template, states);
-                    $('#states').html(html);
-                });
-            });
-            $.get("years.json", function(years) {
-                console.log('we have years');
-                $.get('{{ site.baseurl }}/templates/years.html', function(templates) {
-                    var template = $(templates).filter('#years').html();
-                    var html = Mustache.to_html(template, years);
-                    $('#years').html(html);
-                });
-            });
+          $.get("states.json", function(states) {
+              console.log('we have states');
+              $.get('{{ site.baseurl }}/templates/states.html', function(templates) {
+                  var template = $(templates).filter('#states').html();
+                  var html = Mustache.to_html(template, states);
+                  $('#states').html(html);
+                  $('#states').val('All States (00)');
+                  console.log('states now = ' + $('#states').val());
+              });
+          });
+          $.get("years.json", function(years) {
+              console.log('we have years');
+              $.get('{{ site.baseurl }}/templates/years.html', function(templates) {
+                  var template = $(templates).filter('#years').html();
+                  var html = Mustache.to_html(template, years);
+                  $('#years').html(html);
+              });
+          });
         {% elsif urlsize == 5 %}
-            $.get( "msa-mds.json", function(msas) {
-                console.log('we have msas');
-                $.get('{{ site.baseurl }}/templates/msa-mds.html', function(templates) {
-                    var template = $(templates).filter('#msa-mds').html();
-                    var html = Mustache.to_html(template, msas);
-                    $('#msa-mds').html(html);
-                });
-            });
+          $.get( "msa-mds.json", function(msas) {
+              console.log('we have msas');
+              $.get('{{ site.baseurl }}/templates/msa-mds.html', function(templates) {
+                  var template = $(templates).filter('#msa-mds').html();
+                  var html = Mustache.to_html(template, msas);
+                  $('#msa-mds').html(html);
+              });
+          });
         {% elsif urlsize == 6 %}
-            $.get( "tables.json", function(tables) {
-                console.log('we have tables');
-                $.get('{{ site.baseurl }}/templates/tables.html', function(templates) {
-                    var template = $(templates).filter('#tables').html();
-                    var html = Mustache.to_html(template, tables);
-                    $('#tables').html(html);
-                });
-            });
+          $.get( "tables.json", function(tables) {
+              console.log('we have tables');
+              $.get('{{ site.baseurl }}/templates/tables.html', function(templates) {
+                  var template = $(templates).filter('#tables').html();
+                  var html = Mustache.to_html(template, tables);
+                  $('#tables').html(html);
+              });
+          });
         {% elsif urlsize == 7 %}
-            $.get( "3-1.json", function(tabledata) {
-                console.log('we have data');
-                $.get('{{ site.baseurl }}/templates/characteristics.html', function(templates) {
-                    var template = $(templates).filter('#borrower').html();
-                    var html = Mustache.to_html(template, tabledata);
-                    $('#table').html(html);
-                });
+          $.get( "3-1.json", function(tabledata) {
+              console.log('we have data');
+              $.get('{{ site.baseurl }}/templates/characteristics.html', function(templates) {
+                  var template = $(templates).filter('#borrower').html();
+                  var html = Mustache.to_html(template, tabledata);
+                  $('#table').html(html);
+              });
+          });
+        {% endif %}
+
+        {% if urlsize >= 3 %}
+          {% if urlsize == 3 %}
+            $('.btn').click( function() {
+              //event.preventDefault();
+              alert ('year = ' + $('#years').val() + ' and state = ' + $('#states').val());
             });
+            
+          {% endif %}
         {% endif %}
     });
   </script>
