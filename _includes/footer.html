@@ -93,12 +93,12 @@
                 });
             });
         {% elsif urlsize == 6 %}
-            $.get( "reports.json", function(reports) {
-                console.log('we have report types');
-                $.get('{{ site.baseurl }}/templates/reports.html', function(templates) {
-                    var template = $(templates).filter('#reports').html();
-                    var html = Mustache.to_html(template, reports);
-                    $('#reports').html(html);
+            $.get( "tables.json", function(tables) {
+                console.log('we have tables');
+                $.get('{{ site.baseurl }}/templates/tables.html', function(templates) {
+                    var template = $(templates).filter('#tables').html();
+                    var html = Mustache.to_html(template, tables);
+                    $('#tables').html(html);
                 });
             });
         {% elsif urlsize == 7 %}
