@@ -11,5 +11,5 @@ Note: This is a listing of MSA/MD(s) where institutions have reports. Choose an 
 	<select id="msa-mds" size="10">
 	</select>
 	<br />
-	<a href="{{ site.baseurl }}/aggregate/2013/Alabama/Anniston-Oxford/" class="btn">Select MSA/MD</a> <a href="{{ site.baseurl }}/aggregate/state/" class="btn">Select All Tables for MSA/MD</a> <a href="{{ site.baseurl }}/aggregate/state/" class="btn">Select All Tables for MSA/MD - Text File</a>
+	<a href="{{ site.baseurl }}/aggregate/2013/Alabama/Anniston-Oxford/" class="btn" id="js-this-msa">Select MSA/MD</a> <a href="{{ site.baseurl }}/aggregate/state/" class="btn">Select All Tables for MSA/MD</a> <a href="{{ site.baseurl }}/aggregate/state/" class="btn">Select All Tables for MSA/MD - Text File</a>
 </form>

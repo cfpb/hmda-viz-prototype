@@ -12,5 +12,5 @@ Note: This is a listing of all tables for the selected MSA/MD region. Choose a t
 	</select>
 	<br />
     	
-	<a href="3-1/" class="btn">Select Table</a>
+	<a href="" class="btn">Select Table</a>
 </form>

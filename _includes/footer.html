@@ -74,8 +74,8 @@
                   var template = $(templates).filter('#states').html();
                   var html = Mustache.to_html(template, states);
                   $('#states').html(html);
-                  $('#states').val('All States (00)');
-                  console.log('states now = ' + $('#states').val());
+                  $('#states').val('#states option:first');
+                  //console.log('states now = ' + $('#states').val());
               });
           });
           $.get("years.json", function(years) {
@@ -84,6 +84,9 @@
                   var template = $(templates).filter('#years').html();
                   var html = Mustache.to_html(template, years);
                   $('#years').html(html);
+                  $('#years').val('#years option:first');
+                  // set this here because async
+                  $('.btn').attr('href', '{{ site.baseurl }}/aggregate/' + $('#years').val() + '/' + $('#states').val().replace(" ", "-").toLowerCase() + '/');
               });
           });
         {% elsif urlsize == 5 %}
@@ -93,6 +96,9 @@
                   var template = $(templates).filter('#msa-mds').html();
                   var html = Mustache.to_html(template, msas);
                   $('#msa-mds').html(html);
+                  $('#msa-mds').val($('#msa-mds option:first').val());
+                  // set this here because async
+                  $('#js-this-msa').attr('href', $('#msa-mds').val().replace(" ", "-").toLowerCase() + '/');
               });
           });
         {% elsif urlsize == 6 %}
@@ -102,6 +108,9 @@
                   var template = $(templates).filter('#tables').html();
                   var html = Mustache.to_html(template, tables);
                   $('#tables').html(html);
+                  $('#tables').val($('#tables option:first').val());
+                  // set this here because async
+                  $('.btn').attr('href', $('#tables').val().replace(" ", "-").toLowerCase() + '/');
               });
           });
         {% elsif urlsize == 7 %}
@@ -117,11 +126,19 @@
 
         {% if urlsize >= 3 %}
           {% if urlsize == 3 %}
-            $('.btn').click( function() {
-              //event.preventDefault();
-              //alert ('year = ' + $('#years').val() + ' and state = ' + $('#states').val());
+            $('select').click( function() {
+              $('.btn').attr('href', '{{ site.baseurl }}/aggregate/' + $('#years').val() + '/' + $('#states').val().replace(" ", "-").toLowerCase() + '/');
             });
-            
+          {% endif %}
+          {% if urlsize == 5 %}
+            $('select').click( function() {
+              $('#js-this-msa').attr('href', $('#msa-mds').val().replace(" ", "-").toLowerCase() + '/');
+            });
+          {% endif %}
+          {% if urlsize == 6 %}
+            $('select').click( function() {
+              $('.btn').attr('href', $('#tables').val().replace(" ", "-").toLowerCase() + '/');
+            });
           {% endif %}
         {% endif %}
     });
