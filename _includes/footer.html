@@ -67,7 +67,6 @@
         {% assign urlsize = urlsplit | size %}
         console.log ({{ urlsize }});
         {% if urlsize == 3 %}
-            console.log('states?');
             $.get("states.json", function(states) {
                 console.log('we have states');
                 $.get('{{ site.baseurl }}/templates/states.html', function(templates) {
@@ -76,21 +75,29 @@
                     $('#states').html(html);
                 });
             });
+            $.get("years.json", function(years) {
+                console.log('we have years');
+                $.get('{{ site.baseurl }}/templates/years.html', function(templates) {
+                    var template = $(templates).filter('#years').html();
+                    var html = Mustache.to_html(template, years);
+                    $('#years').html(html);
+                });
+            });
         {% elsif urlsize == 5 %}
-            $.get( "msa-mds.json", function(tabledata) {
+            $.get( "msa-mds.json", function(msas) {
                 console.log('we have msas');
                 $.get('{{ site.baseurl }}/templates/msa-mds.html', function(templates) {
                     var template = $(templates).filter('#msa-mds').html();
-                    var html = Mustache.to_html(template, tabledata);
+                    var html = Mustache.to_html(template, msas);
                     $('#msa-mds').html(html);
                 });
             });
         {% elsif urlsize == 6 %}
-            $.get( "reports.json", function(tabledata) {
+            $.get( "reports.json", function(reports) {
                 console.log('we have report types');
                 $.get('{{ site.baseurl }}/templates/reports.html', function(templates) {
                     var template = $(templates).filter('#reports').html();
-                    var html = Mustache.to_html(template, tabledata);
+                    var html = Mustache.to_html(template, reports);
                     $('#reports').html(html);
                 });
             });
