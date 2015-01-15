@@ -63,8 +63,10 @@
             or
             can we use jekyll in here to generate different javascript snippets
             */
-
-        {% if page.url == '/aggregate/index.html' %}
+        {% assign urlsplit = page.url | split:"/" %}
+        {% assign urlsize = urlsplit | size %}
+        console.log ({{ urlsize }});
+        {% if urlsize == 3 %}
             console.log('states?');
             $.get("states.json", function(states) {
                 console.log('we have states');
@@ -74,7 +76,25 @@
                     $('#states').html(html);
                 });
             });
-        {% else %}
+        {% elsif urlsize == 5 %}
+            $.get( "msa-mds.json", function(tabledata) {
+                console.log('we have msas');
+                $.get('{{ site.baseurl }}/templates/msa-mds.html', function(templates) {
+                    var template = $(templates).filter('#msa-mds').html();
+                    var html = Mustache.to_html(template, tabledata);
+                    $('#msa-mds').html(html);
+                });
+            });
+        {% elsif urlsize == 6 %}
+            $.get( "reports.json", function(tabledata) {
+                console.log('we have report types');
+                $.get('{{ site.baseurl }}/templates/reports.html', function(templates) {
+                    var template = $(templates).filter('#reports').html();
+                    var html = Mustache.to_html(template, tabledata);
+                    $('#reports').html(html);
+                });
+            });
+        {% elsif urlsize == 7 %}
             $.get( "3-1.json", function(tabledata) {
                 console.log('we have data');
                 $.get('{{ site.baseurl }}/templates/characteristics.html', function(templates) {
