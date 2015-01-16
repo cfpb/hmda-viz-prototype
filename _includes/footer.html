@@ -1,0 +1,147 @@
+<footer role="contentinfo" class="footer cf">
+        <div class="wrap footer-container">
+
+          <section class="footer-section footer-links">
+              <ul>
+                  <li>
+                      <a href="http://www.consumerfinance.gov/">consumerfinance.gov</a>
+                  </li>
+                  <li>
+                      <a href="http://cfpb.github.io/">CFPB Open Tech</a>
+                  </li>
+                  <li>
+                      <a href="https://github.com/cfpb">github.com/cfpb</a>
+                  </li>
+                  <li>
+                      <a href="http://www.consumerfinance.gov/jobs/technology-innovation-fellows/">Work with us</a>
+                  </li>
+                  <li>
+                      <a href="mailto:tech@consumerfinance.gov">Contact us</a>
+                  </li>
+              </ul>
+          </section>
+
+          <section class="footer-section footer-oss">
+              <h4>Open source</h4>
+              <p>
+                  This project is maintained by <a href="https://cfpb.github.io/">The Consumer Financial Protection Bureau</a>.
+                  The source code is available at 
+                  <a href="https://github.com/cfpb/design-manual">github.com/cfpb/design-manual</a>
+                </p>
+              <p>
+                  As a work of the United States Government, source code released by the CFPB is in the
+                  public domain by default within the United States.
+                  <a href="https://github.com/cfpb/source-code-policy/blob/master/cfpb-source-code-policy.txt">
+                      View our full source code policy.
+                  </a>
+              </p>
+          </section>
+
+          <section class="footer-section footer-standards">
+              <h4>A note about our standards</h4>
+              <p>
+                  These standards reflect our latest thinking and are just beginning to
+                  be incorporated into the CFPB's most recent projects.
+                  See these standards in practice in
+                  <a href="http://www.consumerfinance.gov/eregulations/">eRegs</a>,
+                  <a href="http://www.consumerfinance.gov/complaint/">Consumer Response</a>, and
+                  <a href="http://www.consumerfinance.gov/hmda">HMDA</a>.
+              </p>
+          </section>
+
+        </div>
+    </footer>
+  </div>
+    <script src="{{ site.baseurl }}/js/main.min.js"></script>
+    <script src="{{ site.baseurl }}/js/mustache.min.js"></script>
+    <script>
+    $( document ).ready(function() {
+        // make ajax call for json
+        /* TODO: the file to load here should be dynamic
+            based on the url pattern
+            can always load a index.json file at the same directory level
+            or
+            can we use jekyll in here to generate different javascript snippets
+            */
+        {% assign urlsplit = page.url | split:"/" %}
+        {% assign urlsize = urlsplit | size %}
+        console.log ({{ urlsize }});
+
+        {% if urlsize == 3 %}
+          $.get("states.json", function(states) {
+              console.log('we have states');
+              $.get('{{ site.baseurl }}/templates/states.html', function(templates) {
+                  var template = $(templates).filter('#states').html();
+                  var html = Mustache.to_html(template, states);
+                  $('#states').html(html);
+                  $('#states').val($('#states option:first').val());
+                  //console.log('states now = ' + $('#states').val());
+              });
+          });
+          $.get("years.json", function(years) {
+              console.log('we have years');
+              $.get('{{ site.baseurl }}/templates/years.html', function(templates) {
+                  var template = $(templates).filter('#years').html();
+                  var html = Mustache.to_html(template, years);
+                  $('#years').html(html);
+                  $('#years').val($('#years option:first').val());
+                  // set this here because async
+                  $('.btn').attr('href', '{{ site.baseurl }}/aggregate/' + $('#years').val() + '/' + $('#states').val().replace(" ", "-").toLowerCase() + '/');
+              });
+          });
+        {% elsif urlsize == 5 %}
+          $.get( "msa-mds.json", function(msas) {
+              console.log('we have msas');
+              $.get('{{ site.baseurl }}/templates/msa-mds.html', function(templates) {
+                  var template = $(templates).filter('#msa-mds').html();
+                  var html = Mustache.to_html(template, msas);
+                  $('#msa-mds').html(html);
+                  $('#msa-mds').val($('#msa-mds option:first').val());
+                  // set this here because async
+                  $('#js-this-msa').attr('href', $('#msa-mds').val().replace(" ", "-").toLowerCase() + '/');
+              });
+          });
+        {% elsif urlsize == 6 %}
+          $.get( "tables.json", function(tables) {
+              console.log('we have tables');
+              $.get('{{ site.baseurl }}/templates/tables.html', function(templates) {
+                  var template = $(templates).filter('#tables').html();
+                  var html = Mustache.to_html(template, tables);
+                  $('#tables').html(html);
+                  $('#tables').val($('#tables option:first').val());
+                  // set this here because async
+                  $('.btn').attr('href', $('#tables').val().replace(" ", "-").toLowerCase() + '/');
+              });
+          });
+        {% elsif urlsize == 7 %}
+          $.get( "3-1.json", function(tabledata) {
+              console.log('we have data');
+              $.get('{{ site.baseurl }}/templates/characteristics.html', function(templates) {
+                  var template = $(templates).filter('#borrower').html();
+                  var html = Mustache.to_html(template, tabledata);
+                  $('#table').html(html);
+              });
+          });
+        {% endif %}
+
+        {% if urlsize >= 3 %}
+          {% if urlsize == 3 %}
+            $('select').click( function() {
+              $('.btn').attr('href', '{{ site.baseurl }}/aggregate/' + $('#years').val() + '/' + $('#states').val().replace(" ", "-").toLowerCase() + '/');
+            });
+          {% endif %}
+          {% if urlsize == 5 %}
+            $('select').click( function() {
+              $('#js-this-msa').attr('href', $('#msa-mds').val().replace(" ", "-").toLowerCase() + '/');
+            });
+          {% endif %}
+          {% if urlsize == 6 %}
+            $('select').click( function() {
+              $('.btn').attr('href', $('#tables').val().replace(" ", "-").toLowerCase() + '/');
+            });
+          {% endif %}
+        {% endif %}
+    });
+  </script>
+</body>
+</html>

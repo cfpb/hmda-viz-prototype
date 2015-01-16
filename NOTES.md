@@ -14,6 +14,9 @@ Here are the URL patterns:
 				/report-type
 					- report.json - what i'll use to generate the table (current pdf)
 
+Example:
+/aggregate/2013/Alabama/11500/i.json
+
 the other files along the way, states.json, msa-md.json, etc, are used as the user flows through the front-end to get to the end.
 these will allow us to show only the appropriate options.
 we should also create static.json files for states, msa-mds, and report-types. these could be used in combination with the dynamic ones to show all options but make some unavailable. it's possible that some reports don't exist down certain paths but having options 'grayed-out' (or something else) will show that the report doesn't exist.

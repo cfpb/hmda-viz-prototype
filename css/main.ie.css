@@ -8545,6 +8545,133 @@ Header
   width: 75%;
 }
 
+.footer {
+  background: none repeat scroll 0 0 #f1f2f2;
+  border-top: 2px solid #babbbd;
+  display: table-row;
+  height: 1px;
+  padding: 2em 0;
+  width: 100%;
+}
+
+.footer h4 {
+  font-size: 16px;
+  line-height: 1.5em;
+  margin-top: 0;
+  text-transform: uppercase;
+}
+
+.footer p {
+  font-size: 0.875em;
+  line-height: 1.42857;
+  max-width: 45em;
+}
+
+.footer a,
+.footer a:link,
+.footer a:visited {
+  border-bottom: 1px dotted;
+}
+
+.footer a:hover {
+  border-bottom: 1px dotted #0072ce;
+}
+
+.footer .footer-container {
+  padding-bottom: 2em;
+  padding-top: 2em;
+}
+
+.footer .footer-links ul {
+  list-style: none outside none;
+  margin-top: 0;
+  padding-left: 0;
+}
+
+.footer p {
+  margin: 0.75em 0;
+}
+
+.footer .footer-links ul,
+.footer li {
+  margin-left: 0;
+}
+
+.footer-links {
+  -moz-border-bottom-colors: none;
+  -moz-border-left-colors: none;
+  -moz-border-right-colors: none;
+  -moz-border-top-colors: none;
+  border-color: transparent;
+  -o-border-image: none;
+  border-image: none;
+  border-style: solid;
+  border-width: 0 15px;
+  box-sizing: border-box;
+  display: inline-block;
+  margin-right: -0.25em;
+  vertical-align: top;
+  width: 25%;
+}
+
+.ie .footer-links {
+  margin-right: -0.26em;
+}
+
+.lt-ie8 .footer-links {
+  display: inline;
+}
+
+.footer-oss {
+  -moz-border-bottom-colors: none;
+  -moz-border-left-colors: none;
+  -moz-border-right-colors: none;
+  -moz-border-top-colors: none;
+  border-color: transparent;
+  -o-border-image: none;
+  border-image: none;
+  border-style: solid;
+  border-width: 0 15px;
+  box-sizing: border-box;
+  display: inline-block;
+  margin-right: -0.25em;
+  vertical-align: top;
+  width: 41.6667%;
+}
+
+.ie .footer-oss {
+  margin-right: -0.26em;
+}
+
+.lt-ie8 .footer-oss {
+  display: inline;
+}
+
+.footer-standards {
+  -moz-border-bottom-colors: none;
+  -moz-border-left-colors: none;
+  -moz-border-right-colors: none;
+  -moz-border-top-colors: none;
+  border-color: transparent;
+  -o-border-image: none;
+  border-image: none;
+  border-style: solid;
+  border-width: 0 15px;
+  box-sizing: border-box;
+  display: inline-block;
+  margin-right: -0.25em;
+  vertical-align: top;
+  width: 33.3333%;
+}
+
+.ie .footer-standards {
+  margin-right: -0.26em;
+}
+
+.lt-ie8 .footer-standards {
+  display: inline;
+}
+
 /* ==========================================================================
    HMDA Viz Prototype - additional style to Capital Framework
    HMDA Viz Less file
@@ -8552,6 +8679,88 @@ Header
 
 .header nav {
   display: block;
+}
+
+select {
+  font-family: "AvenirNextLTW01-Regular", Arial, sans-serif;
+  font-style: normal;
+  font-weight: normal;
+}
+
+select em,
+select i {
+  font-family: "AvenirNextLTW01-Italic", Arial, sans-serif;
+  font-style: italic;
+  font-weight: normal;
+}
+
+.lt-ie9 select em,
+.lt-ie9 select i {
+  font-style: normal !important;
+}
+
+select strong,
+select b {
+  font-family: "AvenirNextLTW01-Demi", Arial, sans-serif;
+  font-style: normal;
+  font-weight: bold;
+}
+
+.lt-ie9 select strong,
+.lt-ie9 select b {
+  font-weight: normal !important;
+}
+
+table.report {
+  font-size: 12px;
+  margin: 0 1% 2em;
+  max-width: 98%;
+  width: 98%;
+}
+
+table.report tbody th {
+  text-align: left;
+}
+
+table.report td {
+  text-align: right;
+}
+
+th,
+td {
+  background: #fff;
+}
+
+th {
+  text-align: center;
+}
+
+th h3 {
+  font-weight: bold;
+  margin-bottom: 0;
+}
+
+th[colspan="2"] {
+  border-bottom: 1px solid #babbbd;
+}
+
+tbody td,
+tbody th {
+  border: 1px solid #e3e4e5;
+}
+
+tbody th[colspan="19"] {
+  border-bottom: 0 solid #e3e4e5;
+}
+
+tbody > tr:nth-child(2n+1) > th,
+tbody > tr:nth-child(2n+1) > td {
+  background: #fff;
+}
+
+#table > tr:nth-child(2n+1) > th,
+#table > tr:nth-child(2n+1) > td {
+  background: #f5f5f5;
 }
 
 .color-demo {
