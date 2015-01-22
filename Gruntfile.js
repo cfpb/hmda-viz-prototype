@@ -161,7 +161,7 @@ module.exports = function(grunt) {
           linebreak: true
         },
         files: {
-          src: ['js/*.min.js']
+          src: ['js/*.min.js', '!js/mustache.min.js']
         }
       }
     },
