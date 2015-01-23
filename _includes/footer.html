@@ -55,91 +55,65 @@
     <script src="{{ site.baseurl }}/js/main.min.js"></script>
     <script>
     $( document ).ready(function() {
-        // make ajax call for json
-        /* TODO: the file to load here should be dynamic
-            based on the url pattern
-            can always load a index.json file at the same directory level
-            or
-            can we use jekyll in here to generate different javascript snippets
-            */
-        {% assign urlsplit = page.url | split:"/" %}
-        {% assign urlsize = urlsplit | size %}
-        console.log ({{ urlsize }});
+        jQuery.ajaxSetup({async:false});  // no async!
 
-        {% if urlsize == 3 %}
-          $.get("states.json", function(states) {
-              console.log('we have states');
-              $.get('{{ site.baseurl }}/templates/states.html', function(templates) {
-                  var template = $(templates).filter('#states').html();
-                  var html = Mustache.to_html(template, states);
-                  $('#states').html(html);
-                  $('#states').val($('#states option:first').val());
-                  //console.log('states now = ' + $('#states').val());
-              });
-          });
-          $.get("years.json", function(years) {
-              console.log('we have years');
-              $.get('{{ site.baseurl }}/templates/years.html', function(templates) {
-                  var template = $(templates).filter('#years').html();
-                  var html = Mustache.to_html(template, years);
-                  $('#years').html(html);
-                  $('#years').val($('#years option:first').val());
-                  // set this here because async
-                  $('.btn').attr('href', '{{ site.baseurl }}/aggregate/' + $('#years').val() + '/' + $('#states').val().replace(" ", "-").toLowerCase() + '/');
-              });
-          });
-        {% elsif urlsize == 5 %}
-          $.get( "msa-mds.json", function(msas) {
-              console.log('we have msas');
-              $.get('{{ site.baseurl }}/templates/msa-mds.html', function(templates) {
-                  var template = $(templates).filter('#msa-mds').html();
-                  var html = Mustache.to_html(template, msas);
-                  $('#msa-mds').html(html);
-                  $('#msa-mds').val($('#msa-mds option:first').val());
-                  // set this here because async
-                  $('#js-this-msa').attr('href', $('#msa-mds').val().replace(" ", "-").toLowerCase() + '/');
-              });
-          });
-        {% elsif urlsize == 6 %}
-          $.get( "tables.json", function(tables) {
-              console.log('we have tables');
-              $.get('{{ site.baseurl }}/templates/tables.html', function(templates) {
-                  var template = $(templates).filter('#tables').html();
-                  var html = Mustache.to_html(template, tables);
-                  $('#tables').html(html);
-                  $('#tables').val($('#tables option:first').val());
-                  // set this here because async
-                  $('.btn').attr('href', $('#tables').val().replace(" ", "-").toLowerCase() + '/');
-              });
-          });
-        {% elsif urlsize == 7 %}
-          $.get( "3-1.json", function(tabledata) {
-              console.log('we have data');
-              $.get('{{ site.baseurl }}/templates/characteristics.html', function(templates) {
-                  var template = $(templates).filter('#borrower').html();
-                  var html = Mustache.to_html(template, tabledata);
-                  $('#table').html(html);
-              });
-          });
-        {% endif %}
+        var urlPath = window.location.pathname.split("/");
+        var path = urlPath[urlPath.length-2];
 
-        {% if urlsize >= 3 %}
-          {% if urlsize == 3 %}
-            $('select').click( function() {
-              $('.btn').attr('href', '{{ site.baseurl }}/aggregate/' + $('#years').val() + '/' + $('#states').val().replace(" ", "-").toLowerCase() + '/');
+        if (urlPath.length === 8) {
+          getTableData(path);
+        } else {
+          // fill the select inputs
+          getUIData();
+          // initial set link
+          setLink();
+          // call setlink when new choice is made
+          $('select').click(function() {
+            setLink();
+          });
+        }
+
+        // get data for each select input
+        // call the corresponding mustache template and fill the input
+        // set the first option as selected
+        function getUIData() {
+          $('select').each(function() {
+            console.log('this is value = ' + this.id);
+            var selectID = this.id;
+            $.get(selectID + '.json', function(data) {
+              console.log('this is value = ' + selectID);
+              $.get('{{ site.baseurl }}/templates/' + selectID + '.html', function(templates) {
+                var template = $(templates).filter('#' + selectID).html();
+                var html = Mustache.to_html(template, data);
+                console.log('html element = #' + selectID)
+                $('#' + selectID).html(html);
+                $('#' + selectID + ' option:first').attr('selected', 'selected');
+              });
             });
-          {% endif %}
-          {% if urlsize == 5 %}
-            $('select').click( function() {
-              $('#js-this-msa').attr('href', $('#msa-mds').val().replace(" ", "-").toLowerCase() + '/');
+          });
+        }
+
+        function getTableData(table) {
+          console.log('getting table ' + table);
+          $.get(table + '.json', function(data) {
+            $.get('{{ site.baseurl }}/templates/' + table + '.html', function(templates) {
+              var template = $(templates).filter('#' + table).html();
+              var html = Mustache.to_html(template, data);
+              console.log('html element = #' + table)
+              $('#' + table).html(html);
             });
-          {% endif %}
-          {% if urlsize == 6 %}
-            $('select').click( function() {
-              $('.btn').attr('href', $('#tables').val().replace(" ", "-").toLowerCase() + '/');
-            });
-          {% endif %}
-        {% endif %}
+          });
+        }
+
+        // update the button link
+        function setLink() {
+          var newURL = "";  // needed in on first page, year and state make the url
+          $('select').each(function() {
+            console.log ('select id = ' + $(this).val());
+            newURL += $(this).val().replace(" ", "-").toLowerCase() + '/';
+          });
+          $('.js-btn').attr('href', newURL);
+        }
     });
   </script>
 </body>
