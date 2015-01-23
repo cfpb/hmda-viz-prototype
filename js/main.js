@@ -10712,7 +10712,7 @@ function getTableData(table) {
 // update the button link
 function setLink() {
 	'use strict';
-  //var newURL = '';  // needed on first page, year and state make the url
+  var newURL = '';  // needed on first page, year and state make the url
   $('select').each(function() {
     console.log ('select id = ' + $(this).val());
     newURL += $(this).val().replace(' ', '-').toLowerCase() + '/';
