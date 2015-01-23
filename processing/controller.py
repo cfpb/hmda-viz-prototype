@@ -5,7 +5,7 @@ from geo_aggregator_one import geo_aggregator
 #from report1v2 import report_1_
 #report 3 aggregates 1 census tract from inside an MSA
 #to build a report, loop over all tracts and then sum the appropriate lines
-from report31v2 import report_3_
+from report31 import R3_1
 #credentials read in as variables in the format "'dbname', 'username', 'serverhost', 'password'"
 #comments for which reports require which variables
 with open('/users/roellk/desktop/python/credentials.txt', 'r') as f:
@@ -18,18 +18,18 @@ cred_list = credentials.split(',')
 #controller sends a list of MSAs to the geo_aggregator_one to get a list of all sub geographies
 #passing test will use MSA 36540
 MSA = ['36540']
-
+report_3 = R3_1()
 geo_aggregator = geo_aggregator()
 geo_aggregator.main(cred_list, MSA)
 geo_aggregator.write_geo_dict('geotest.json')
 #geo_aggregator.print_geo_dict()
 
 #create a report 3 object to use functions
-report_3 = report_3_()
+
 
 #return a geography dictionary of all sub geographies from the MSA list
 geography_list = geo_aggregator.return_geo_dict()
-
+geo_aggregator.write_geo_dict('test_geo.json')
 #print geography_list #test print of geography dict
 #set state and county to pass to location tuples, this will be used to generate multiple instances of report 3 (multiple tracts)
 state = geography_list['MSAs'][0]['States'][0]['State name']
@@ -49,11 +49,11 @@ county =geography_list['MSAs'][0]['States'][0]['Counties'][0]['County name']
 for i in range(0, len(geography_list['MSAs'][0]['States'][0]['Counties'][0]['Tracts'])):
 	tract = str(geography_list['MSAs'][0]['States'][0]['Counties'][0]['Tracts'][i]['Tract name'])
 	location = (state, county, tract)
-	print location
+	#print location
 	#create a report 3 object to use functions
-	report_3 = report_3_()
+	report_3 = R3_1()
 	#report3_1 = 'report3_1_' + tract + '.json'
-	report_3.report_3_main(location, cred_list)
+	report_3.main(location, cred_list)
 	#print report_3.table_3
 	#report_3.write_report_3(report3_1)
 	#print geography_list['MSAs'][0]['States'][0]['Counties'][0]['Tracts'][i]

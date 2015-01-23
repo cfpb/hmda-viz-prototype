@@ -16,47 +16,14 @@
 #report_3_main pings the SQL server to get data and uses the other functions to aggregate and write it to the JSON structure
 from JSON_Template_Master import report_3_1_json as r3
 
-class report_3_(object):
-
+class report(object):
 
 	def __init__(self):
 		self.inputs = {} #will hold one row's values for all inputs into the other functions to determine how to aggregate the loan
 		 #JSON object to hold data for tables 3-1, 3-2
 		self.table_3 = r3
-	def set_ethnicity(self):
-		#this function outputs a number code for ethnicity: 0 - hispanic or latino, 1 - not hispanic/latino
-		#2 - joint (1 applicant hispanic/latino 1 not), 3 - ethnicity not available
 
-		#if both ethnicity fields are blank report not available(3)
-		if self.inputs['a ethn'] == ' ' and self.inputs['co ethn'] == ' ':
-			self.inputs['ethnicity'] = 3 #set to not available
-
-		#determine if the loan is joint hispanic/latino and non hispanic/latino(2)
-		elif self.inputs['a ethn'] == '1' and self.inputs['co ethn'] != '1':
-			self.inputs['ethnicity'] = 2 #set to joint
-		elif self.inputs['a ethn'] != '1' and self.inputs['co ethn'] == '1':
-			self.inputs['ethnicity'] = 2 #set to joint
-
-		#determine if loan is of hispanic ethnicity (appplicant is hispanic/latino, no co applicant info or co applicant also hispanic/latino)
-		elif self.inputs['a ethn'] == '1' and self.inputs['co ethn'] == '1':
-			self.inputs['ethnicity'] = 0
-		elif self.inputs['a ethn'] == '1' and (self.inputs['co ethn'] == ' ' or self.inputs['co ethn'] == '3' or self.inputs['co ethn'] == '4' or self.inputs['co ethn']== '5'):
-			self.inputs['ethnicity'] = 0
-		elif (self.inputs['a ethn'] == ' ' or self.inputs['a ethn'] == '3' or self.inputs['a ethn'] == '4' or self.inputs['a ethn'] == '5') and self.inputs['co ethn'] == '1':
-			self.inputs['ethnicity'] = 0
-		#determine if loan is not hispanic or latino
-		elif self.inputs['a ethn'] == '2' and self.inputs['co ethn'] != '1':
-			self.inputs['ethnicity'] = 1
-		elif self.inputs['a ethn'] != '1' and self.inputs['co ethn'] == '2':
-			self.inputs['ethnicity'] = 1
-		elif (self.inputs['a ethn'] == '3' or self.inputs['a ethn'] == '4') and (self.inputs['co ethn'] != '1' and self.inputs['co ethn'] != '2'):
-			self.inputs['ethnicity'] = 3
-		else:
-			print "error setting ethnicity"
-
-		#print self.inputs['a ethn'], 'applicant ethnicity'
-		#print self.inputs['co ethn'], 'co applicant ethnicity'
-		#print self.inputs['ethnicity'], 'ethnicity result'
+class R3_1(report):
 
 	def parse_inputs(self, rows):
 		#parsing inputs for report 3.1
@@ -105,7 +72,40 @@ class report_3_(object):
 				minority_count += 1
 		self.inputs['minority count'] = minority_count
 
+	def set_ethnicity(self):
+		#this function outputs a number code for ethnicity: 0 - hispanic or latino, 1 - not hispanic/latino
+		#2 - joint (1 applicant hispanic/latino 1 not), 3 - ethnicity not available
 
+		#if both ethnicity fields are blank report not available(3)
+		if self.inputs['a ethn'] == ' ' and self.inputs['co ethn'] == ' ':
+			self.inputs['ethnicity'] = 3 #set to not available
+
+		#determine if the loan is joint hispanic/latino and non hispanic/latino(2)
+		elif self.inputs['a ethn'] == '1' and self.inputs['co ethn'] != '1':
+			self.inputs['ethnicity'] = 2 #set to joint
+		elif self.inputs['a ethn'] != '1' and self.inputs['co ethn'] == '1':
+			self.inputs['ethnicity'] = 2 #set to joint
+
+		#determine if loan is of hispanic ethnicity (appplicant is hispanic/latino, no co applicant info or co applicant also hispanic/latino)
+		elif self.inputs['a ethn'] == '1' and self.inputs['co ethn'] == '1':
+			self.inputs['ethnicity'] = 0
+		elif self.inputs['a ethn'] == '1' and (self.inputs['co ethn'] == ' ' or self.inputs['co ethn'] == '3' or self.inputs['co ethn'] == '4' or self.inputs['co ethn']== '5'):
+			self.inputs['ethnicity'] = 0
+		elif (self.inputs['a ethn'] == ' ' or self.inputs['a ethn'] == '3' or self.inputs['a ethn'] == '4' or self.inputs['a ethn'] == '5') and self.inputs['co ethn'] == '1':
+			self.inputs['ethnicity'] = 0
+		#determine if loan is not hispanic or latino
+		elif self.inputs['a ethn'] == '2' and self.inputs['co ethn'] != '1':
+			self.inputs['ethnicity'] = 1
+		elif self.inputs['a ethn'] != '1' and self.inputs['co ethn'] == '2':
+			self.inputs['ethnicity'] = 1
+		elif (self.inputs['a ethn'] == '3' or self.inputs['a ethn'] == '4') and (self.inputs['co ethn'] != '1' and self.inputs['co ethn'] != '2'):
+			self.inputs['ethnicity'] = 3
+		else:
+			print "error setting ethnicity"
+
+		#print self.inputs['a ethn'], 'applicant ethnicity'
+		#print self.inputs['co ethn'], 'co applicant ethnicity'
+		#print self.inputs['ethnicity'], 'ethnicity result'
 
 	def set_joint_status(self):
 		#loop over all elements in both race lists to flag presence of minority race
@@ -161,6 +161,7 @@ class report_3_(object):
 			print self.inputs['co non white flag'], 'co non white flag'
 			#print self.table_3['borrower-characteristics'][2]['types'][self.inputs['minority status']]['purchasers'][self.inputs['purchaser']]['name']
 			print 'record number', self.inputs['sequence']
+
 	def set_race(self): #joint_status is a boolean, inputs is a list
 		#if one white and one minority race are listed, use the minority race
 		#race options are: joint, 1 through 5, 2 minority, not reported
@@ -289,17 +290,13 @@ class report_3_(object):
 		#aggregate loans by race and purchaser
 		#check if the race and the purchaser listed for the loan exists in the data structure, if so, add them to the values in the JSON structure
 		#if not, print 'loan not added'
-
 		if race in self.table_3.table_3_1['borrower-characteristics'][0]['Race'][race_code] and purchaser in self.table_3.table_3_1['borrower-characteristics'][0]['Race'][race_code][race]['purchasers'][self.inputs['purchaser']]:
 			self.table_3.table_3_1['borrower-characteristics'][0]['Race'][race_code][race]['purchasers'][self.inputs['purchaser']][purchaser]['count'] += 1
 			self.table_3.table_3_1['borrower-characteristics'][0]['Race'][race_code][race]['purchasers'][self.inputs['purchaser']][purchaser]['value'] += int(self.inputs['loan value'])
-
 		else:
 			print "loan not added, code not present - race"
 
 		#aggregate loans by ethnicity and purchaser
-		#print ethnicity
-		# r3.table_3_1['borrower-characteristics'][1]['Ethnicity'][eth code]['ethn name]['purchasers'][purchaser code]['purchaser name]['count']
 		if ethnicity in self.table_3.table_3_1['borrower-characteristics'][1]['Ethnicity'][self.inputs['ethnicity']] and purchaser in self.table_3.table_3_1['borrower-characteristics'][1]['Ethnicity'][self.inputs['ethnicity']][ethnicity]['purchasers'][self.inputs['purchaser']]:
 			self.table_3.table_3_1['borrower-characteristics'][1]['Ethnicity'][self.inputs['ethnicity']][ethnicity]['purchasers'][self.inputs['purchaser']][purchaser]['count'] += 1
 			self.table_3.table_3_1['borrower-characteristics'][1]['Ethnicity'][self.inputs['ethnicity']][ethnicity]['purchasers'][self.inputs['purchaser']][purchaser]['value'] += int(self.inputs['loan value'])
@@ -314,9 +311,7 @@ class report_3_(object):
 			#print 'loan added minority status section'
 		else:
 			print "loan not added in minority status"
-			#print self.inputs['minority status'], 'minority status'
-			#print self.inputs['purchaser'], 'purchaser code'
-			#print self.table_3['borrower-characteristics'][2]['types'][self.inputs['minority status']]['purchasers'][self.inputs['purchaser']]['name']
+
 	#Race: American Indian or Alaska NAtive(1), Asian(2), Black(3), Native Hawaiian or Pacific Islander(4), White(5), Not provided(6), Not applicable(7), no co-applicant(8)
 	#joint definition: one minority race and one white
 	#2 minority definition: both applicants of minority race
@@ -326,7 +321,7 @@ class report_3_(object):
 	#Lien status: first lien(1), subordinate lien(2), not secured(3), not applicable purchased loans(4)
 	#purchaser codes: Fannie(1), Ginnie(2), Freddie(3), Farmer(4), Private(5), Commercial(6), Insurance(7), Affiliate(8), Other(9)
 	#hoepa status: hoepa loan(1), non-hoepa loan(2)
-	def report_3_main(self, location, credentials):
+	def main(self, location, credentials):
 		#print "in main report 3"
 		import psycopg2 #to access a SQL database
 		dbname = credentials[0]
