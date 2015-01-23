@@ -14,14 +14,11 @@ $('.feature-list').append(
 function getUIData() {
 	'use strict';
   $('select').each(function() {
-    console.log('this is value = ' + this.id);
     var selectID = this.id;
     $.get(selectID + '.json', function(data) {
-      console.log('this is value = ' + selectID);
       $.get('/hmda-viz-prototype/templates/selects.html', function(templates) {
         var template = $(templates).filter('#' + selectID).html();
         var html = Mustache.to_html(template, data);
-        console.log('html element = #' + selectID);
         $('#' + selectID).html(html);
         $('#' + selectID + ' option:first').attr('selected', 'selected');
       });
@@ -31,12 +28,10 @@ function getUIData() {
 
 function getTableData(table) {
 	'use strict';
-  console.log('getting table ' + table);
   $.get(table + '.json', function(data) {
     $.get('/hmda-viz-prototype/templates/' + table + '.html', function(templates) {
       var template = $(templates).filter('#' + table).html();
       var html = Mustache.to_html(template, data);
-      console.log('html element = #' + table);
       $('#' + table).html(html);
     });
   });
@@ -47,7 +42,6 @@ function setLink() {
 	'use strict';
   var newURL = '';  // needed on first page, year and state make the url
   $('select').each(function() {
-    console.log ('select id = ' + $(this).val());
     newURL += $(this).val().replace(' ', '-').toLowerCase() + '/';
   });
   $('.js-btn').attr('href', newURL);
