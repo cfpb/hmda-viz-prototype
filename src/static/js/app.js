@@ -1,8 +1,8 @@
-/* 
-get data for each select input
-call the corresponding mustache template and fill the input
-set the first option as selected
-*/
+/**
+	* get data for each select input
+	* call the corresponding mustache template and fill the input
+	* set the first option as selected
+	*/
 function getUIData() {
 	'use strict';
   $('select').each(function() {
@@ -21,11 +21,11 @@ function getUIData() {
   });
 }
 
-/* 
-get data for the table
-call the corresponding mustache template and fill the input
-set the first option as selected
-*/
+/**
+	* get data for the table
+	* call the corresponding mustache template and fill the input
+	* set the first option as selected
+	*/
 function getTableData(table) {
 	'use strict';
 	// get <table> data
@@ -39,9 +39,9 @@ function getTableData(table) {
   });
 }
 
-/* 
-update the button link on the form pages
-*/
+/** 
+	* update the button link on the form pages
+	*/
 function setLink() {
 	'use strict';
   var newURL = '';  // needed on first page, year and state make the url
