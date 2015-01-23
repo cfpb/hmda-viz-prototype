@@ -63,10 +63,9 @@ $( document ).ready(function() {
   } else if (urlPath.length === 6) {
     // fill the msa select inputs
     getUIData();
+  }
     // initial set link
     setLink();
-  }
-    
     // call setlink when new choice is made
     $('select').click(function() {
       setLink();
