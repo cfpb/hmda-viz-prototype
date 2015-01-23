@@ -22,6 +22,7 @@ class report(object):
 		self.inputs = {} #will hold one row's values for all inputs into the other functions to determine how to aggregate the loan
 		 #JSON object to hold data for tables 3-1, 3-2
 		self.table_3 = r3
+		self.count = 0
 
 class R3_1(report):
 
@@ -71,6 +72,65 @@ class R3_1(report):
 			if race < 5 and race > 0:
 				minority_count += 1
 		self.inputs['minority count'] = minority_count
+	def set_joint_status(self):
+		#loop over all elements in both race lists to flag presence of minority race
+		#assigning non-white boolean flags for use in joint race status and minority status checks
+		#set boolean flag for white/non-white status for applicant
+		#need to check App A ID2 for race 6
+		for i in range(0,4):
+			if self.inputs['a race'][i] < 5 and self.inputs['a race'][i] != 0:
+				self.inputs['app non white flag'] = True #flag true if applicant listed a minority race
+				break
+			elif self.inputs['a race'][i] == 5:
+				self.inputs['app non white flag'] = False
+
+		for i in range(0,4):
+			if self.inputs['co race'][i] < 5 and self.inputs['co race'][i] != 0:
+				self.inputs['co non white flag'] = True #flag true if co-applicant exists and has a non-white race listed
+				break
+			elif self.inputs['co race'][i] == 5:
+				self.inputs['co non white flag'] = False
+
+		#joint status exists if one borrower is white and one is non-white
+		#check to see if joint status exists
+		if self.inputs['app non white flag'] == False and self.inputs['co non white flag'] == False:
+			self.inputs['joint status'] = False #flag false if both applicant and co-applicant are white
+			self.inputs['joint status'] = False #flag false if both applicant and co-applicant are minority
+		elif self.inputs['app non white flag'] == True and self.inputs['co non white flag'] ==  False:
+			self.inputs['joint status'] = True #flag true if one applicant is minority and one is white
+		elif self.inputs['app non white flag'] == False and self.inputs['co non white flag'] == True:
+			self.inputs['joint status'] = True #flag true if one applicant is minority and one is white
+
+	def set_race(self): #joint_status is a boolean, inputs is a list
+		#if one white and one minority race are listed, use the minority race
+		#race options are: joint, 1 through 5, 2 minority, not reported
+		#if the entry is 'joint' then the loan is aggregated as 'joint'
+		#create a single race item instead of a list to use in comparisons to build aggregates
+
+		if self.inputs['joint status'] == True:
+			self.inputs['race'] = 'joint'
+		#determine if the loan will be filed as 'two or more minority races'
+		#if two minority races are listed, the loan is 'two or more minority races'
+		#if any combination of two or more race fields are minority then 'two or more minority races'
+		elif self.inputs['minority count'] > 1:
+			self.inputs['race'] = '2 minority'
+
+		#if only the first race field is used, use the first filed
+		elif self.inputs['a race'][0] != 0 and self.inputs['a race'][1] == 0 and self.inputs['a race'][2] == 0 and self.inputs['a race'][3] == 0 and self.inputs['a race'][4] == 0:
+			self.inputs['race'] = self.inputs['a race'][0] #if only one race is reported, and joint status and minority status are false, set race to first race
+
+		elif self.inputs['a race'][0] == 0 and self.inputs['a race'][1] == 0 and self.inputs['a race'][2] == 0 and self.inputs['a race'][3] == 0 and self.inputs['a race'][4] == 0:
+			self.inputs['race'] = 'not reported' #if all race fields are blank, set race to 'not reported'
+
+		else:
+			for i in range(1,5):
+				if i in self.inputs['a race']: #check if a minority race is present in the race array
+					self.inputs['race'] = self.inputs['a race'][0]
+					if self.inputs['a race'][0] == 5:
+						for code in self.inputs['a race']:
+							if code < 5 and code != 0: #if first race is white, but a minority race is reported, set race to the first minority reported
+								self.inputs['race'] = code
+								break #exit on first minority race
 
 	def set_ethnicity(self):
 		#this function outputs a number code for ethnicity: 0 - hispanic or latino, 1 - not hispanic/latino
@@ -107,36 +167,6 @@ class R3_1(report):
 		#print self.inputs['co ethn'], 'co applicant ethnicity'
 		#print self.inputs['ethnicity'], 'ethnicity result'
 
-	def set_joint_status(self):
-		#loop over all elements in both race lists to flag presence of minority race
-		#assigning non-white boolean flags for use in joint race status and minority status checks
-		#set boolean flag for white/non-white status for applicant
-		#need to check App A ID2 for race 6
-		for i in range(0,4):
-			if self.inputs['a race'][i] < 5 and self.inputs['a race'][i] != 0:
-				self.inputs['app non white flag'] = True #flag true if applicant listed a minority race
-				break
-			elif self.inputs['a race'][i] == 5:
-				self.inputs['app non white flag'] = False
-
-		for i in range(0,4):
-			if self.inputs['co race'][i] < 5 and self.inputs['co race'][i] != 0:
-				self.inputs['co non white flag'] = True #flag true if co-applicant exists and has a non-white race listed
-				break
-			elif self.inputs['co race'][i] == 5:
-				self.inputs['co non white flag'] = False
-
-		#joint status exists if one borrower is white and one is non-white
-		#check to see if joint status exists
-		if self.inputs['app non white flag'] == False and self.inputs['co non white flag'] == False:
-			self.inputs['joint status'] = False #flag false if both applicant and co-applicant are white
-			self.inputs['joint status'] = False #flag false if both applicant and co-applicant are minority
-		elif self.inputs['app non white flag'] == True and self.inputs['co non white flag'] ==  False:
-			self.inputs['joint status'] = True #flag true if one applicant is minority and one is white
-		elif self.inputs['app non white flag'] == False and self.inputs['co non white flag'] == True:
-			self.inputs['joint status'] = True #flag true if one applicant is minority and one is white
-
-
 	def set_minority_status(self): #inputs is a dictionary, app non white flag and co non white flag are booleans
 		#print 'in minority status set'
 		#determine minority status
@@ -161,37 +191,6 @@ class R3_1(report):
 			print self.inputs['co non white flag'], 'co non white flag'
 			#print self.table_3['borrower-characteristics'][2]['types'][self.inputs['minority status']]['purchasers'][self.inputs['purchaser']]['name']
 			print 'record number', self.inputs['sequence']
-
-	def set_race(self): #joint_status is a boolean, inputs is a list
-		#if one white and one minority race are listed, use the minority race
-		#race options are: joint, 1 through 5, 2 minority, not reported
-		#if the entry is 'joint' then the loan is aggregated as 'joint'
-		#create a single race item instead of a list to use in comparisons to build aggregates
-
-		if self.inputs['joint status'] == True:
-			self.inputs['race'] = 'joint'
-		#determine if the loan will be filed as 'two or more minority races'
-		#if two minority races are listed, the loan is 'two or more minority races'
-		#if any combination of two or more race fields are minority then 'two or more minority races'
-		elif self.inputs['minority count'] > 1:
-			self.inputs['race'] = '2 minority'
-
-		#if only the first race field is used, use the first filed
-		elif self.inputs['a race'][0] != 0 and self.inputs['a race'][1] == 0 and self.inputs['a race'][2] == 0 and self.inputs['a race'][3] == 0 and self.inputs['a race'][4] == 0:
-			self.inputs['race'] = self.inputs['a race'][0] #if only one race is reported, and joint status and minority status are false, set race to first race
-
-		elif self.inputs['a race'][0] == 0 and self.inputs['a race'][1] == 0 and self.inputs['a race'][2] == 0 and self.inputs['a race'][3] == 0 and self.inputs['a race'][4] == 0:
-			self.inputs['race'] = 'not reported' #if all race fields are blank, set race to 'not reported'
-
-		else:
-			for i in range(1,4):
-				if i in self.inputs['a race']: #check if a minority race is present in the race array
-					self.inputs['race'] = self.inputs['a race'][0]
-					if self.inputs['a race'][0] == 5:
-						for code in self.inputs['a race']:
-							if code < 5 and code != 0: #if first race is white, but a minority race is reported, set race to the first minority reported
-								self.inputs['race'] = code
-								break #exit on first minority race
 
 	def table_3_aggregator(self):
 		#convert the race to a text to access the JSON structure to aggregate and store data
@@ -219,7 +218,7 @@ class R3_1(report):
 		elif self.inputs['race'] == 'not reported':
 			race = self.inputs['race']
 		else:
-			print race, 'ERROR'
+			print self.inputs['race'], 'ERROR'
 
 		#set race_code to integers for use in JSON structure lists
 		if self.inputs['race'] == 1:
@@ -281,18 +280,13 @@ class R3_1(report):
 			minority_status = 'White non-hispanic'
 		elif self.inputs['minority status'] == 1:
 			minority_status = 'Others, including Hispanic'
-		#test prints for data validation
-		#print "\n\n", race_code, "race code"
-		#print self.inputs['purchaser'], "purchaser"
-		#print self.inputs['loan value'], "amount "
-		#print self.table_3['borrower-characteristics'][0]['types'][race_code]['purchasers'][self.inputs['purchaser']]
 
 		#aggregate loans by race and purchaser
 		#check if the race and the purchaser listed for the loan exists in the data structure, if so, add them to the values in the JSON structure
-		#if not, print 'loan not added'
 		if race in self.table_3.table_3_1['borrower-characteristics'][0]['Race'][race_code] and purchaser in self.table_3.table_3_1['borrower-characteristics'][0]['Race'][race_code][race]['purchasers'][self.inputs['purchaser']]:
 			self.table_3.table_3_1['borrower-characteristics'][0]['Race'][race_code][race]['purchasers'][self.inputs['purchaser']][purchaser]['count'] += 1
 			self.table_3.table_3_1['borrower-characteristics'][0]['Race'][race_code][race]['purchasers'][self.inputs['purchaser']][purchaser]['value'] += int(self.inputs['loan value'])
+
 		else:
 			print "loan not added, code not present - race"
 
@@ -308,7 +302,7 @@ class R3_1(report):
 		if purchaser in self.table_3.table_3_1['borrower-characteristics'][2]['Minority Status'][self.inputs['minority status']][minority_status]['purchasers'][self.inputs['purchaser']] and minority_status in self.table_3.table_3_1['borrower-characteristics'][2]['Minority Status'][self.inputs['minority status']]:
 			self.table_3.table_3_1['borrower-characteristics'][2]['Minority Status'][self.inputs['minority status']][minority_status]['purchasers'][self.inputs['purchaser']][purchaser]['count'] += 1
 			self.table_3.table_3_1['borrower-characteristics'][2]['Minority Status'][self.inputs['minority status']][minority_status]['purchasers'][self.inputs['purchaser']][purchaser]['value'] += int(self.inputs['loan value'])
-			#print 'loan added minority status section'
+
 		else:
 			print "loan not added in minority status"
 
@@ -330,7 +324,7 @@ class R3_1(report):
 		password = credentials[3]
 		cred = (dbname, user, host, password)
 		connect_string = "dbname=%s user=%s host=%s password=%s" % (dbname, user, host, password)
-		#print cred
+
 		#attempte a connection to the SQL database hosting the LAR information
 		try: #this login information must be set appropriately, it is currently set to localhost with a specified user
 			conn = psycopg2.connect(connect_string)
@@ -339,9 +333,9 @@ class R3_1(report):
 			print "I am unable to connect to the database"
 		#create a cursor object to use with the SQL database
 		cur = conn.cursor()
-		#location = ('31', '155', '9685.00')
+
 		#count the number of rows to be selected for the geography
-		SQL = "SELECT COUNT(statecode) FROM hmda_lar_public_final_2012 WHERE statecode = %s and countycode = %s and censustractnumber = %s;"
+		SQL = "SELECT COUNT(msaofproperty) FROM hmda_lar_public_final_2012 WHERE msaofproperty = %s;"
 		cur.execute(SQL, location) #location is a list passed in from the controller object. The list order must match the variable order in the SQL string
 		#produces a tuple that is a count of the number of records in the selected geography
 		rows_selected = cur.fetchone()
@@ -356,12 +350,12 @@ class R3_1(report):
 			coapplicantrace1, coapplicantrace2, coapplicantrace3, coapplicantrace4,	coapplicantrace5,
 			applicantethnicity, coapplicantethnicity, applicantincome, ratespeed, lienstatus, hoepastatus,
 			purchasertype, loanamount,sequencenumber, asofdate, statecode, censustractnumber, countycode
-		FROM hmda_lar_public_final_2012 WHERE statecode = %s and countycode = %s and censustractnumber = %s; '''
+		FROM hmda_lar_public_final_2012 WHERE msaofproperty = %s; '''
 
 		cur.execute(SQL, location)
 
 		for i in range(0, count):
-			#print "in query loop"
+
 			#pull one record from the database query
 			rows = cur.fetchone()
 			#parse the selected row and rename for readability
@@ -392,11 +386,8 @@ class R3_1(report):
 			#counts loans and aggregates values by race and purchaser
 			self.table_3_aggregator()
 
-		#self.print_report_3()
-		name = 'report_3_1_' + location[0] + '_' + location[1] +'_' + location[2] + '.json'
+		name = 'report_3_1_' + location[0] + '.json'
 		self.write_report_3(name)
-		#self.print_report_3()
-		#print self.table_3
 
 	def print_report_3(self): #prints the JSON structure to the terminal
 		for i in range(0, 10):

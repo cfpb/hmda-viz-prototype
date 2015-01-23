@@ -17,23 +17,23 @@ cred_list = credentials.split(',')
 #pass cred_list to geo_aggregator for SQL login
 #controller sends a list of MSAs to the geo_aggregator_one to get a list of all sub geographies
 #passing test will use MSA 36540
-MSA = ['36540']
+MSA = '36540'
 report_3 = R3_1()
-geo_aggregator = geo_aggregator()
-geo_aggregator.main(cred_list, MSA)
-geo_aggregator.write_geo_dict('geotest.json')
+#geo_aggregator = geo_aggregator()
+#geo_aggregator.main(cred_list, MSA)
+#geo_aggregator.write_geo_dict('geotest.json')
 #geo_aggregator.print_geo_dict()
 
 #create a report 3 object to use functions
 
 
 #return a geography dictionary of all sub geographies from the MSA list
-geography_list = geo_aggregator.return_geo_dict()
-geo_aggregator.write_geo_dict('test_geo.json')
+#geography_list = geo_aggregator.return_geo_dict()
+#geo_aggregator.write_geo_dict('test_geo.json')
 #print geography_list #test print of geography dict
 #set state and county to pass to location tuples, this will be used to generate multiple instances of report 3 (multiple tracts)
-state = geography_list['MSAs'][0]['States'][0]['State name']
-county =geography_list['MSAs'][0]['States'][0]['Counties'][0]['County name']
+#state = geography_list['MSAs'][0]['States'][0]['State name']
+#county =geography_list['MSAs'][0]['States'][0]['Counties'][0]['County name']
 #tract = geography_list['MSAs'][0]['States'][0]['Counties'][0]['Tracts'][0]['Tract name']
 #location = (state, county, tract)
 
@@ -46,14 +46,14 @@ county =geography_list['MSAs'][0]['States'][0]['Counties'][0]['County name']
 
 
 
-for i in range(0, len(geography_list['MSAs'][0]['States'][0]['Counties'][0]['Tracts'])):
-	tract = str(geography_list['MSAs'][0]['States'][0]['Counties'][0]['Tracts'][i]['Tract name'])
-	location = (state, county, tract)
+#for i in range(0, len(geography_list['MSAs'][0]['States'][0]['Counties'][0]['Tracts'])):
+#	tract = str(geography_list['MSAs'][0]['States'][0]['Counties'][0]['Tracts'][i]['Tract name'])
+location = (MSA,)
 	#print location
 	#create a report 3 object to use functions
-	report_3 = R3_1()
+	#report_3 = R3_1()
 	#report3_1 = 'report3_1_' + tract + '.json'
-	report_3.main(location, cred_list)
+report_3.main(location, cred_list)
 	#print report_3.table_3
 	#report_3.write_report_3(report3_1)
 	#print geography_list['MSAs'][0]['States'][0]['Counties'][0]['Tracts'][i]
