@@ -10685,7 +10685,7 @@ function getUIData() {
     var selectID = this.id;
     $.get(selectID + '.json', function(data) {
       console.log('this is value = ' + selectID);
-      $.get('/hmda-viz-prototype/templates/' + selectID + '.html', function(templates) {
+      $.get('/hmda-viz-prototype/templates/selects.html', function(templates) {
         var template = $(templates).filter('#' + selectID).html();
         var html = Mustache.to_html(template, data);
         console.log('html element = #' + selectID);
