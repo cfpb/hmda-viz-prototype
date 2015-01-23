@@ -14,5 +14,5 @@ Note: This is a listing of all U.S. States and territories for which reports are
 	<select id="states" size="10">
 	</select>
 	<br />
-	<a href="{{ site.baseurl }}/aggregate/2013/Alabama/" class="btn">Submit</a>
+	<a href="" class="btn js-btn">Submit</a>
 </form>

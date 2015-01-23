@@ -66,7 +66,8 @@ module.exports = function(grunt) {
           '<%= loc.src %>/vendor/jquery.easing/jquery.easing.js',
           '<%= loc.src %>/vendor/cf-*/*.js',
           '!<%= loc.src %>/vendor/cf-*/Gruntfile.js',
-          '<%= loc.src %>/static/js/app.js'
+          '<%= loc.src %>/static/js/app.js',
+          '<%= loc.src %>/static/js/mustache.min.js'
         ],
         dest: 'js/main.js'
       }
