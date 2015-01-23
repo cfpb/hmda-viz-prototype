@@ -57,17 +57,18 @@ $( document ).ready(function() {
 
   var urlPath = window.location.pathname.split('/');
   var path = urlPath[urlPath.length-2];
-
+  console.log('length = ' + urlPath.length);
   if (urlPath.length === 8) {
     getTableData(path);
-  } else {
-    // fill the select inputs
+  } else if (urlPath.length === 6) {
+    // fill the msa select inputs
     getUIData();
     // initial set link
     setLink();
+  }
+    
     // call setlink when new choice is made
     $('select').click(function() {
       setLink();
     });
-  }
 });
