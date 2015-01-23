@@ -14,926 +14,21 @@
 #print_report_3 prints the JSON structure to the terminal
 #write_report_3 write sthe JSON object to a file
 #report_3_main pings the SQL server to get data and uses the other functions to aggregate and write it to the JSON structure
+from JSON_Template_Master import report_3_1_json as r3
+
 class report_3_(object):
 
 
 	def __init__(self):
 		self.inputs = {} #will hold one row's values for all inputs into the other functions to determine how to aggregate the loan
 		 #JSON object to hold data for tables 3-1, 3-2
-		self.table_3 = {
-		"table": "3-1",
-		"type": "aggregate",
-		"desc": "Loans sold, by characteristics of borrower and of census tract in which property is located and by type of purchaser (includes originations and purchased loans",
-		"year": "",
-		"msa-md": {
-			"id": "",
-			"name": "",
-			"state": ""
-		},
-		"borrower-characteristics": [
-			{
-				"name": "Race",
-				"types": [
-					{
-						"name": "American Indian/Alaska Native",
-						"purchasers": [
-							{
-								"name": "Loan was not originated or purchased in calendar year",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Fannie Mae",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Ginnie Mae",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Freddie Mac",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Farmer Mac",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Private securitization",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Commercial bank",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Insurance co., Credit Union, Mortgage Bank or Finance co.",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Affiliate Institution",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Other purchaser",
-								"count": 0,
-								"value": 0
-							}
-						]
-					},
-					{
-						"name": "Asian",
-						"purchasers": [
-							{
-								"name": "Loan was not originated or purchased in calendar year",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Fannie Mae",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Ginnie Mae",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Freddie Mac",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Farmer Mac",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Private securitization",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Commercial bank",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Insurance co., Credit Union, Mortgage Bank or Finance co.",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Affiliate Institution",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Other purchaser",
-								"count": 0,
-								"value": 0
-							}
-						]
-					},
-					{
-						"name": "Black",
-						"purchasers": [
-							{
-								"name": "Loan was not originated or purchased in calendar year",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Fannie Mae",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Ginnie Mae",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Freddie Mac",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Farmer Mac",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Private securitization",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Commercial bank",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Insurance co., Credit Union, Mortgage Bank or Finance co.",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Affiliate Institution",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Other purchaser",
-								"count": 0,
-								"value": 0
-							}
-						]
-					},
-					{
-						"name": "Pacific Islander",
-						"purchasers": [
-							{
-								"name": "Loan was not originated or purchased in calendar year",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Fannie Mae",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Ginnie Mae",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Freddie Mac",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Farmer Mac",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Private securitization",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Commercial bank",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Insurance co., Credit Union, Mortgage Bank or Finance co.",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Affiliate Institution",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Other purchaser",
-								"count": 0,
-								"value": 0
-							}
-						]
-					},
-					{
-						"name": "White",
-						"purchasers": [
-							{
-								"name": "Loan was not originated or purchased in calendar year",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Fannie Mae",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Ginnie Mae",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Freddie Mac",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Farmer Mac",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Private securitization",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Commercial bank",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Insurance co., Credit Union, Mortgage Bank or Finance co.",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Affiliate Institution",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Other purchaser",
-								"count": 0,
-								"value": 0
-							}
-						]
-					},
-					{
-						"name": "Not Provided",
-						"purchasers": [
-							{
-								"name": "Loan was not originated or purchased in calendar year",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Fannie Mae",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Ginnie Mae",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Freddie Mac",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Farmer Mac",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Private securitization",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Commercial bank",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Insurance co., Credit Union, Mortgage Bank or Finance co.",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Affiliate Institution",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Other purchaser",
-								"count": 0,
-								"value": 0
-							}
-						]
-					},
-					{
-						"name": "Not Applicable",
-						"purchasers": [
-							{
-								"name": "Loan was not originated or purchased in calendar year",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Fannie Mae",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Ginnie Mae",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Freddie Mac",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Farmer Mac",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Private securitization",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Commercial bank",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Insurance co., Credit Union, Mortgage Bank or Finance co.",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Affiliate Institution",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Other purchaser",
-								"count": 0,
-								"value": 0
-							}
-						]
-					},
-					{
-						"name": "2 minority",
-						"purchasers": [
-							{
-								"name": "Loan was not originated or purchased in calendar year",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Fannie Mae",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Ginnie Mae",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Freddie Mac",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Farmer Mac",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Private securitization",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Commercial bank",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Insurance co., Credit Union, Mortgage Bank or Finance co.",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Affiliate Institution",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Other purchaser",
-								"count": 0,
-								"value": 0
-							}
-						]
-					},
-					{
-						"name": "joint",
-						"purchasers": [
-							{
-								"name": "Loan was not originated or purchased in calendar year",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Fannie Mae",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Ginnie Mae",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Freddie Mac",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Farmer Mac",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Private securitization",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Commercial bank",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Insurance co., Credit Union, Mortgage Bank or Finance co.",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Affiliate Institution",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Other purchaser",
-								"count": 0,
-								"value": 0
-							}
-						]
-					},
-					{
-						"name": "not reported",
-						"purchasers": [
-							{
-								"name": "Loan was not originated or purchased in calendar year",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Fannie Mae",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Ginnie Mae",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Freddie Mac",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Farmer Mac",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Private securitization",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Commercial bank",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Insurance co., Credit Union, Mortgage Bank or Finance co.",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Affiliate Institution",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Other purchaser",
-								"count": 0,
-								"value": 0
-							}
-						]
-					}
-				]
-			},
-			{
-				"name": "Ethnicity",
-				"types": [
-					{
-						"name": "Hispanic or Latino",
-						"purchasers": [
-							{
-								"name": "Loan was not originated or purchased in calendar year",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Fannie Mae",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Ginnie Mae",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Freddie Mac",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Farmer Mac",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Private securitization",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Commercial bank",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Insurance co., Credit Union, Mortgage Bank or Finance co.",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Affiliate Institution",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Other purchaser",
-								"count": 0,
-								"value": 0
-							}
-						]
-					},
-					{
-						"name": "Not Hispanic or Latino",
-						"purchasers": [
-							{
-								"name": "Loan was not originated or purchased in calendar year",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Fannie Mae",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Ginnie Mae",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Freddie Mac",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Farmer Mac",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Private securitization",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Commercial bank",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Insurance co., Credit Union, Mortgage Bank or Finance co.",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Affiliate Institution",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Other purchaser",
-								"count": 0,
-								"value": 0
-							}
-						]
-					},
-					{
-						"name": "Joint",
-						"purchasers": [
-							{
-								"name": "Loan was not originated or purchased in calendar year",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Fannie Mae",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Ginnie Mae",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Freddie Mac",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Farmer Mac",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Private securitization",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Commercial bank",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Insurance co., Credit Union, Mortgage Bank or Finance co.",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Affiliate Institution",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Other purchaser",
-								"count": 0,
-								"value": 0
-							}
-						]
-					},
-					{
-						"name": "Ethnicity not available",
-						"purchasers": [
-							{
-								"name": "Loan was not originated or purchased in calendar year",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Fannie Mae",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Ginnie Mae",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Freddie Mac",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Farmer Mac",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Private securitization",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Commercial bank",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Insurance co., Credit Union, Mortgage Bank or Finance co.",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Affiliate Institution",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Other purchaser",
-								"count": 0,
-								"value": 0
-							}
-						]
-					}
-				]
-			},
-			{
-				"name": "Minority Status",
-				"types": [
-					{
-						"name": "White non-hispanic",
-						"purchasers": [
-							{
-								"name": "Loan was not originated or purchased in calendar year",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Fannie Mae",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Ginnie Mae",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Freddie Mac",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Faermer Mac",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Private securitization",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Commercial bank",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Insurance co., Credit Union, Mortgage Bank or Finance co.",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Affiliate Institution",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Other purchaser",
-								"count": 0,
-								"value": 0
-							}
-						]
-					},
-					{
-						"name": "Others, including Hispanic",
-						"purchasers": [
-							{
-								"name": "Loan was not originated or purchased in calendar year",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Fannie Mae",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Ginnie Mae",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Freddie Mac",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Faermer Mac",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Private securitization",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Commercial bank",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Insurance co., Credit Union, Mortgage Bank or Finance co.",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Affiliate Institution",
-								"count": 0,
-								"value": 0
-							},
-							{
-								"name": "Other purchaser",
-								"count": 0,
-								"value": 0
-							}
-						]
-					}
-				]
-			}
-		]
-	}
-
+		self.table_3 = r3
 	def set_ethnicity(self):
 		#this function outputs a number code for ethnicity: 0 - hispanic or latino, 1 - not hispanic/latino
 		#2 - joint (1 applicant hispanic/latino 1 not), 3 - ethnicity not available
+
 		#if both ethnicity fields are blank report not available(3)
-		if self.inputs['a ethn'] == ' ' and self.inputs['co ethn']:
+		if self.inputs['a ethn'] == ' ' and self.inputs['co ethn'] == ' ':
 			self.inputs['ethnicity'] = 3 #set to not available
 
 		#determine if the loan is joint hispanic/latino and non hispanic/latino(2)
@@ -941,16 +36,19 @@ class report_3_(object):
 			self.inputs['ethnicity'] = 2 #set to joint
 		elif self.inputs['a ethn'] != '1' and self.inputs['co ethn'] == '1':
 			self.inputs['ethnicity'] = 2 #set to joint
+
 		#determine if loan is of hispanic ethnicity (appplicant is hispanic/latino, no co applicant info or co applicant also hispanic/latino)
 		elif self.inputs['a ethn'] == '1' and self.inputs['co ethn'] == '1':
 			self.inputs['ethnicity'] = 0
-		elif self.inputs['a ethn'] == '1' and (self.inputs['co ethn'] == ' ' or self.inputs['co ethn'] == '3' or self.inputs['co ethn'] == '4' or self.inputs['co ethn']) == '5':
+		elif self.inputs['a ethn'] == '1' and (self.inputs['co ethn'] == ' ' or self.inputs['co ethn'] == '3' or self.inputs['co ethn'] == '4' or self.inputs['co ethn']== '5'):
 			self.inputs['ethnicity'] = 0
-
+		elif (self.inputs['a ethn'] == ' ' or self.inputs['a ethn'] == '3' or self.inputs['a ethn'] == '4' or self.inputs['a ethn'] == '5') and self.inputs['co ethn'] == '1':
+			self.inputs['ethnicity'] = 0
 		#determine if loan is not hispanic or latino
 		elif self.inputs['a ethn'] == '2' and self.inputs['co ethn'] != '1':
 			self.inputs['ethnicity'] = 1
-
+		elif self.inputs['a ethn'] != '1' and self.inputs['co ethn'] == '2':
+			self.inputs['ethnicity'] = 1
 		elif (self.inputs['a ethn'] == '3' or self.inputs['a ethn'] == '4') and (self.inputs['co ethn'] != '1' and self.inputs['co ethn'] != '2'):
 			self.inputs['ethnicity'] = 3
 		else:
@@ -1032,7 +130,6 @@ class report_3_(object):
 		#check to see if joint status exists
 		if self.inputs['app non white flag'] == False and self.inputs['co non white flag'] == False:
 			self.inputs['joint status'] = False #flag false if both applicant and co-applicant are white
-		elif self.inputs['app non white flag'] == True and self.inputs['co non white flag'] == True:
 			self.inputs['joint status'] = False #flag false if both applicant and co-applicant are minority
 		elif self.inputs['app non white flag'] == True and self.inputs['co non white flag'] ==  False:
 			self.inputs['joint status'] = True #flag true if one applicant is minority and one is white
@@ -1049,11 +146,21 @@ class report_3_(object):
 			self.inputs['minority status'] = 1
 
 		#if both applicants reported white race and non-hispanic/latino ethnicity then minority status is false
-		elif self.inputs['app non white flag'] == False and self.inputs['co non white flag'] == False and self.inputs['a ethn']  == '2' and self.inputs['co ethn'] == '2':
+		elif self.inputs['app non white flag'] != True and self.inputs['co non white flag'] != True and self.inputs['a ethn']  != '1' and self.inputs['co ethn'] != '1':
 			self.inputs['minority status'] = 0
 		else:
 			self.inputs['minority status'] = 0
-
+			print 'else level minority status'
+			print self.inputs['minority status'], 'minority status'
+			print self.inputs['purchaser'], 'purchaser code'
+			print self.inputs['co race'], 'co race'
+			print self.inputs['a race'], 'a race'
+			print self.inputs['a ethn'], 'app ethn'
+			print self.inputs['co ethn'], 'co ethn'
+			print self.inputs['app non white flag'], 'app non white flag'
+			print self.inputs['co non white flag'], 'co non white flag'
+			#print self.table_3['borrower-characteristics'][2]['types'][self.inputs['minority status']]['purchasers'][self.inputs['purchaser']]['name']
+			print 'record number', self.inputs['sequence']
 	def set_race(self): #joint_status is a boolean, inputs is a list
 		#if one white and one minority race are listed, use the minority race
 		#race options are: joint, 1 through 5, 2 minority, not reported
@@ -1168,6 +275,11 @@ class report_3_(object):
 			ethnicity = 'Joint'
 		elif self.inputs['ethnicity'] == 3:
 			ethnicity = 'Ethnicity not available'
+
+		if self.inputs['minority status'] == 0:
+			minority_status = 'White non-hispanic'
+		elif self.inputs['minority status'] == 1:
+			minority_status = 'Others, including Hispanic'
 		#test prints for data validation
 		#print "\n\n", race_code, "race code"
 		#print self.inputs['purchaser'], "purchaser"
@@ -1177,29 +289,34 @@ class report_3_(object):
 		#aggregate loans by race and purchaser
 		#check if the race and the purchaser listed for the loan exists in the data structure, if so, add them to the values in the JSON structure
 		#if not, print 'loan not added'
-		if race in self.table_3['borrower-characteristics'][0]['types'][race_code]['name'] and purchaser in self.table_3['borrower-characteristics'][0]['types'][race_code]['purchasers'][self.inputs['purchaser']]['name']:
-			self.table_3['borrower-characteristics'][0]['types'][race_code]['purchasers'][self.inputs['purchaser']]['count'] += 1
-			self.table_3['borrower-characteristics'][0]['types'][race_code]['purchasers'][self.inputs['purchaser']]['value'] += int(self.inputs['loan value'])
+
+		if race in self.table_3.table_3_1['borrower-characteristics'][0]['Race'][race_code] and purchaser in self.table_3.table_3_1['borrower-characteristics'][0]['Race'][race_code][race]['purchasers'][self.inputs['purchaser']]:
+			self.table_3.table_3_1['borrower-characteristics'][0]['Race'][race_code][race]['purchasers'][self.inputs['purchaser']][purchaser]['count'] += 1
+			self.table_3.table_3_1['borrower-characteristics'][0]['Race'][race_code][race]['purchasers'][self.inputs['purchaser']][purchaser]['value'] += int(self.inputs['loan value'])
 
 		else:
 			print "loan not added, code not present - race"
 
 		#aggregate loans by ethnicity and purchaser
 		#print ethnicity
-		if ethnicity in self.table_3['borrower-characteristics'][1]['types'][self.inputs['ethnicity']]['name'] and purchaser in self.table_3['borrower-characteristics'][1]['types'][self.inputs['ethnicity']]['purchasers'][self.inputs['purchaser']]['name']:
-			self.table_3['borrower-characteristics'][1]['types'][self.inputs['ethnicity']]['purchasers'][self.inputs['purchaser']]['count'] += 1
-			self.table_3['borrower-characteristics'][1]['types'][self.inputs['ethnicity']]['purchasers'][self.inputs['purchaser']]['value'] += int(self.inputs['loan value'])
+		# r3.table_3_1['borrower-characteristics'][1]['Ethnicity'][eth code]['ethn name]['purchasers'][purchaser code]['purchaser name]['count']
+		if ethnicity in self.table_3.table_3_1['borrower-characteristics'][1]['Ethnicity'][self.inputs['ethnicity']] and purchaser in self.table_3.table_3_1['borrower-characteristics'][1]['Ethnicity'][self.inputs['ethnicity']][ethnicity]['purchasers'][self.inputs['purchaser']]:
+			self.table_3.table_3_1['borrower-characteristics'][1]['Ethnicity'][self.inputs['ethnicity']][ethnicity]['purchasers'][self.inputs['purchaser']][purchaser]['count'] += 1
+			self.table_3.table_3_1['borrower-characteristics'][1]['Ethnicity'][self.inputs['ethnicity']][ethnicity]['purchasers'][self.inputs['purchaser']][purchaser]['value'] += int(self.inputs['loan value'])
 		else:
 			print "loan not added, code not present - ethnicity"
 
 		#aggregate loans by minority status and purchaser
-		#print self.inputs['minority status'], 'minority status'
-		if self.inputs['minority status'] in self.table_3['borrower-characteristics'][2]['types'] and purchaser in self.table_3['borrower-characteristics'][2]['types'][self.inputs['minority status']]['purchasers'][self.inputs['purchaser']]['name']:
-			self.table_3['borrower-characteristics'][2]['types'][self.inputs['minority status']]['purchasers'][self.inputs['purchaser']]['count'] += 1
-			self.table_3['borrower-characteristics'][2]['types'][self.inputs['minority status']]['purchasers'][self.inputs['purchaser']]['value'] += int(self.inputs['loan value'])
+		#add a secondary logic filter off a string from the 'name' key and not from the list index
+		if purchaser in self.table_3.table_3_1['borrower-characteristics'][2]['Minority Status'][self.inputs['minority status']][minority_status]['purchasers'][self.inputs['purchaser']] and minority_status in self.table_3.table_3_1['borrower-characteristics'][2]['Minority Status'][self.inputs['minority status']]:
+			self.table_3.table_3_1['borrower-characteristics'][2]['Minority Status'][self.inputs['minority status']][minority_status]['purchasers'][self.inputs['purchaser']][purchaser]['count'] += 1
+			self.table_3.table_3_1['borrower-characteristics'][2]['Minority Status'][self.inputs['minority status']][minority_status]['purchasers'][self.inputs['purchaser']][purchaser]['value'] += int(self.inputs['loan value'])
+			#print 'loan added minority status section'
 		else:
 			print "loan not added in minority status"
-
+			#print self.inputs['minority status'], 'minority status'
+			#print self.inputs['purchaser'], 'purchaser code'
+			#print self.table_3['borrower-characteristics'][2]['types'][self.inputs['minority status']]['purchasers'][self.inputs['purchaser']]['name']
 	#Race: American Indian or Alaska NAtive(1), Asian(2), Black(3), Native Hawaiian or Pacific Islander(4), White(5), Not provided(6), Not applicable(7), no co-applicant(8)
 	#joint definition: one minority race and one white
 	#2 minority definition: both applicants of minority race
@@ -1255,10 +372,10 @@ class report_3_(object):
 			#parse the selected row and rename for readability
 			#all data is stored in the inputs dictionary
 			self.parse_inputs(rows)
-			self.table_3['year'] = self.inputs['year'] #set the year of the report
-			self.table_3['msa-md']['id'] = self.inputs['census tract'] #set MSA-MD ID to tract number
-			self.table_3['msa-md']['name'] = self.inputs['county code'] #set count name. This will need a dictionary of county names and codes
-			self.table_3['msa-md']['state'] = self.inputs['state code'] #set the state code. This will need a dictionary of state names and codes
+			self.table_3.table_3_1['year'] = self.inputs['year'] #set the year of the report
+			self.table_3.table_3_1['msa-md']['id'] = self.inputs['census tract'] #set MSA-MD ID to tract number
+			self.table_3.table_3_1['msa-md']['name'] = self.inputs['county code'] #set count name. This will need a dictionary of county names and codes
+			self.table_3.table_3_1['msa-md']['state'] = self.inputs['state code'] #set the state code. This will need a dictionary of state names and codes
 
 			#joint status indicates that one borrower is white and the other is non-white
 			self.set_joint_status()
@@ -1298,5 +415,5 @@ class report_3_(object):
 	def write_report_3(self, name): #writes the JSON structure to a file
 		import json
 		with open(name, 'w') as outfile:
-			 json.dump(self.table_3, outfile, sort_keys = True, indent = 4, ensure_ascii=False)
+			 json.dump(self.table_3.table_3_1, outfile, sort_keys = True, indent = 4, ensure_ascii=False)
 

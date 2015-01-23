@@ -5,7 +5,7 @@ from geo_aggregator_one import geo_aggregator
 #from report1v2 import report_1_
 #report 3 aggregates 1 census tract from inside an MSA
 #to build a report, loop over all tracts and then sum the appropriate lines
-from report31 import report_3_
+from report31v2 import report_3_
 #credentials read in as variables in the format "'dbname', 'username', 'serverhost', 'password'"
 #comments for which reports require which variables
 with open('/users/roellk/desktop/python/credentials.txt', 'r') as f:

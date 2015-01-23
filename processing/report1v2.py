@@ -3,7 +3,7 @@
 # 1) loan originated, 2)loan not accepted, 3) application denied, 4) applicatoin withdrawn, 5)incomplete, 6)loan purchased (for report 2)
 class report_1_(object):
 	def __init__(self):
-		
+
 		import psycopg2
 
 		self.inputs = {}
@@ -11,7 +11,7 @@ class report_1_(object):
         user = credentials[1]
         host = credentials[2]
         password = credentials[3]
-        
+
         connect_string = "dbname=%s user=%s host=%s password=%s" % (dbname, user, host, password)
 		#attempte a connection to the SQL database hosting the LAR information
 		conn = psycopg2.connect("dbname='hmdamaster' user='roellk' host='localhost' password=''")
@@ -21,7 +21,7 @@ class report_1_(object):
 	#set the type by user filter in the controller object or fork and have 2 dictionaries
 	#year and MSA information all need to be set in the controller object
 		self.table_1 = {
-		"action": { 
+		"action": {
 			"originated": {
 				"GS count": 0,
 				"GS value": 0,
@@ -84,9 +84,9 @@ class report_1_(object):
 				"non-occupant count": 0,
 				"non-occupant value": 0,
 				"manufactured count": 0,
-				"manufactured value": 0		
+				"manufactured value": 0
 		},
-			"incomplete": { 
+			"incomplete": {
 				"GS count": 0,
 				"GS value": 0,
 				"conventional count": 0,
@@ -100,7 +100,7 @@ class report_1_(object):
 				"non-occupant count": 0,
 				"non-occupant value": 0,
 				"manufactured count": 0,
-				"manufactured value": 0	
+				"manufactured value": 0
 		},
 			"purchased": {
 				"GS count": 0,
@@ -116,7 +116,7 @@ class report_1_(object):
 				"non-occupant count": 0,
 				"non-occupant value": 0,
 				"manufactured count": 0,
-				"manufactured value": 0	
+				"manufactured value": 0
 			}
 			}
 		}
@@ -124,7 +124,7 @@ class report_1_(object):
 	def parse_inputs(self, row):
 			#splits the tuples into word variables for easy reading
 		self.inputs['census_tract'] = row[0]
-		self.inputs['loan_type'] = row[1] 
+		self.inputs['loan_type'] = row[1]
 		self.inputs['occupancy_status'] = row[2]
 		self.inputs['loan_amount'] = row[3]
 		self.inputs['action_type'] = row[4]
@@ -184,7 +184,7 @@ class report_1_(object):
 		property_type_value = prop + ' value'
 		loan_purpose_count = purpose + ' count'
 		loan_purpose_value = purpose + ' value'
-		
+
 
 		if action in self.table_1['action'] and loan_type_count in self.table_1['action'][action] and prop == '1-4 family' or prop == 'manufactured':
 			if purpose == 'purchase' and prop != 'multifamly':
@@ -236,10 +236,10 @@ class report_1_(object):
 	def write_report_1_json(self, name):
 		import json
 		with open(name, 'w') as outfile:
-		     json.dump(self.table_1, outfile, sort_keys = True, indent = 4, ensure_ascii=False)
+		     json.dump(self.table_1, outfile, sort_\keys = True, indent = 4, ensure_ascii=False)
 
 
-	
+
 	#tables 1 and 2 require using: geocode, loanpurpose, occupancy, actiontype, loanvalue
 	#census_tract is the 11 digit state/county/tract number for the address of the loan
 	#loantype is conventional(1), FHA(2), VA(3), FSA/RHS(4)
@@ -249,26 +249,26 @@ class report_1_(object):
 	#loanvalue is the amount of the loan
 	#propertytype determines 1-4 family(1),manufactured housing(2), or multifamily(3)
 	def report_1_main(self, location):
-		
-		
+
+
 		SQL = """SELECT count(censustractnumber) FROM HMDA_LAR_PUBLIC_FINAL_2012 WHERE statecode = %s and countycode = %s and censustractnumber = %s; """
 		self.cur.execute(SQL, location)
 		#cur.execute("""SELECT count(censustractnumber) FROM HMDA_LAR_PUBLIC_FINAL_2012 WHERE statecode = '31' and countycode = '153' and censustractnumber = '0105.02'; """)
 
 		rows = self.cur.fetchone()
 		count = rows[0]
-		
+
 		print count
-		SQL = """SELECT 
-			censustractnumber, loantype, occupancy, loanamount, actiontype, loanpurpose, propertytype, 
+		SQL = """SELECT
+			censustractnumber, loantype, occupancy, loanamount, actiontype, loanpurpose, propertytype,
 			statecode, countycode
-		 FROM HMDA_LAR_PUBLIC_FINAL_2012 
+		 FROM HMDA_LAR_PUBLIC_FINAL_2012
 		 where statecode = %s and countycode = %s and censustractnumber = %s; """
 		self.cur.execute(SQL, location)
-		#cur.execute("""SELECT 
-		#	censustractnumber, loantype, occupancy, loanamount, actiontype, loanpurpose, propertytype, 
+		#cur.execute("""SELECT
+		#	censustractnumber, loantype, occupancy, loanamount, actiontype, loanpurpose, propertytype,
 		#	statecode, countycode
-		 #FROM HMDA_LAR_PUBLIC_FINAL_2012 
+		 #FROM HMDA_LAR_PUBLIC_FINAL_2012
 		 #where statecode = '31' and countycode = '153' and censustractnumber = '0105.02'; """)
 
 		for i in range(0, count):
@@ -276,7 +276,7 @@ class report_1_(object):
 			row = self.cur.fetchone() # fetches all the rows with census_tracts matching the passed value
 			#how many rows were returned?
 			#what if no rows are returned? -- all values stay at 0
-			#what if more than 1 row is returned -- this code returns all rows in a loop and parses the tuples into the 
+			#what if more than 1 row is returned -- this code returns all rows in a loop and parses the tuples into the
 			#appropriate filters
 
 			#splits the tuples into word variables for easy reading
@@ -293,9 +293,9 @@ class report_1_(object):
 
 			#columns 1 and 2 on table 1
 			#Government sponsored home purchase
-			#home purchase, FHA RSA or VA loan, on 1-4 family, originated 
-			
-	#output check 
+			#home purchase, FHA RSA or VA loan, on 1-4 family, originated
+
+	#output check
 	#location = ('31', '153', '0105.02' )
 	#main(location)
 
