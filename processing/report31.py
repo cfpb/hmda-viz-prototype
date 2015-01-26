@@ -77,14 +77,14 @@ class R3_1(report):
 		#assigning non-white boolean flags for use in joint race status and minority status checks
 		#set boolean flag for white/non-white status for applicant
 		#need to check App A ID2 for race 6
-		for i in range(0,4):
+		for i in range(0,5):
 			if self.inputs['a race'][i] < 5 and self.inputs['a race'][i] != 0:
 				self.inputs['app non white flag'] = True #flag true if applicant listed a minority race
 				break
 			elif self.inputs['a race'][i] == 5:
 				self.inputs['app non white flag'] = False
 
-		for i in range(0,4):
+		for i in range(0,5):
 			if self.inputs['co race'][i] < 5 and self.inputs['co race'][i] != 0:
 				self.inputs['co non white flag'] = True #flag true if co-applicant exists and has a non-white race listed
 				break
@@ -305,7 +305,8 @@ class R3_1(report):
 
 		else:
 			print "loan not added in minority status"
-
+		self.table_3.table_3_1['total']['purchasers'][self.inputs['purchaser']][purchaser]['count'] +=1
+		self.table_3.table_3_1['total']['purchasers'][self.inputs['purchaser']][purchaser]['value'] += int(self.inputs['loan value'])
 	#Race: American Indian or Alaska NAtive(1), Asian(2), Black(3), Native Hawaiian or Pacific Islander(4), White(5), Not provided(6), Not applicable(7), no co-applicant(8)
 	#joint definition: one minority race and one white
 	#2 minority definition: both applicants of minority race
