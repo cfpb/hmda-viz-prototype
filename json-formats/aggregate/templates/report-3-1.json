@@ -1,0 +1,57 @@
+{
+	"table": "3-1",
+	"type": "aggregate",
+	"desc": "Loans sold. By characteristics of borrower and census tract in which property is located and by type of purchaser (includes originations and purchased loans). ",
+	"year": "2013",
+	"msa-md": {
+		"id": "11500",
+		"name": "Anniston-Oxford",
+		"state": "AL"
+	},
+	"borrower-characteristics": [
+		{
+			"Race": [
+				{
+					"American Indian/Alaska Native": {
+						"purchasers": [
+							{
+								"Fannie Mae": {
+									"count": 3,
+									"value": 316
+								},
+							}
+						]
+					}
+				}
+			]
+		}
+	],
+	"census-characteristics": [
+		{
+			"Racial/Ethnic Composition": [
+				{
+					"Less than 10% Minority": {
+						"purchasers": [
+							{
+								"purchaser": {
+									"count": 35,
+									"value": 2453
+								},
+							}
+						]
+					}
+				}
+			]
+		}
+	],
+	"total": {
+		"purchasers": [
+			{
+				"purchaser": {
+					"count": 542,
+					"value": 68638
+				}
+			}
+		]
+	}
+}

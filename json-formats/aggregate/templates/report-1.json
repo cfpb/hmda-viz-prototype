@@ -1,0 +1,69 @@
+{
+	"table": "1",
+	"type": "aggregate",
+	"desc": "Disposition of Loan Applications. By location of property and type of loan.",
+	"year": "2013",
+	"msa-md": {
+		"id": "11500",
+		"name": "Anniston-Oxford",
+		"state": "AL"
+	},
+	"tracts": [
+		{
+			"AL/Calhoun County/0002.00": {
+				"% min pop": 60,
+				"median income as % of msa/md": 71,
+				"loan dispositions": [
+					{
+						"Loan Originated": {
+							"loan types": [
+								{
+									"FHA, FSA/RHS & VA": {
+										"count": 7,
+										"value": 365
+									},
+								}
+							]
+						},
+					},
+				]
+			},
+		},
+	],
+	"msa-md-totals": {
+		"% min pop": 0,
+		"median income as % of msa/md": 0,
+		"loan dispositions": [
+			{
+				"Loan Originated": {
+					"loan types": [
+						{
+							"FHA, FSA/RHS & VA": {
+								"count": 334,
+								"value": 41967
+							},
+						}
+					]
+				},
+			},
+		]
+	},
+	"invalid-geo": {
+		"% min pop": 0,
+		"median income as % of msa/md": 0,
+		"loan dispositions": [
+			{
+				"Loan Originated": {
+					"loan types": [
+						{
+							"FHA, FSA/RHS & VA": {
+								"count": ,
+								"value": 
+							},
+						}
+					]
+				},
+			},
+		]
+	}
+}
