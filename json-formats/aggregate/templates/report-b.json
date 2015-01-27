@@ -10,24 +10,31 @@
 	},
 	"types of dwellings": [
 		{
-			"1- to 4-family Owner Occupied Dwellings (Excludes Manufacture Homes)": {
-				"Incidience of Pricing": {
-					"pricing-information": [
+			"type": "1- to 4-family Owner Occupied Dwellings (Excludes Manufacture Homes)",
+			"incidiences-of-pricing": [
+				{
+					"incidience": "No Pricing Reported",
+					"loan-uses": [
 						{
-							"No Pricing Reported": {
-								"loan-uses": [
-									{
-										"Home Purchase": {
-											"first-lien": 0,
-											"junior-lien": 0
-										}
-									}
-								]
-							}
+							"use": "Home Purchase",
+							"first-lien": 0,
+							"junior-lien": 0
 						}
 					]
 				}
-			}
+			],
+			"hoepa-status": [
+				{
+					"status": "HOEPA Loan",
+					"loan-uses": [
+						{
+							"use": "Home Purchase",
+							"first-lien": 0,
+							"junior-lien": 0
+						}
+					]
+				}
+			]
 		}
 	]
 }
