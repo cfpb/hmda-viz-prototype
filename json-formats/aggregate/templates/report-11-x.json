@@ -10,42 +10,32 @@
 	},
 	"borrower-characteristics": [
 		{
-			"Race": [
+			"characteristic": "Race",
+			"races": [
 				{
-					"American Indian/Alaska Native": [
+					"race": "American Indian/Alaska Native",
+					"pricing-data": [
 						{
-							"pricing data": [
-								{
-									"No Reported Pricing Data": {
-										"count": ,
-										"value": 
-									},
-								}
-							]
+							"pricing": "No Reported Pricing Data",
+							"count": ,
+							"value": 
 						}
 					]
-				},
+				}
 			]
 		},
 	],
 	"census-characteristics": [
 		{
-			"Racial/Ethnic Composition": [
+			"characteristic": "Racial/Ethnic Composition",
+			"race": "Less than 10% Minority",
+			"pricing-data": [
 				{
-					"Less than 10% Minority": [
-						{
-							"pricing data": [
-								{
-									"No Reported Pricing Data": {
-										"count": 8,
-										"value":
-									},
-								}
-							]
-						}
-					]
-				},
+					"pricing": "No Reported Pricing Data",
+					"count": 8,
+					"value":
+				}
 			]
-		},
+		}
 	]
 }
