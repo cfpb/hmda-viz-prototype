@@ -283,30 +283,38 @@ class R3_1(report):
 
 		#aggregate loans by race and purchaser
 		#check if the race and the purchaser listed for the loan exists in the data structure, if so, add them to the values in the JSON structure
-		if race in self.table_3.table_3_1['borrower-characteristics'][0]['Race'][race_code] and purchaser in self.table_3.table_3_1['borrower-characteristics'][0]['Race'][race_code][race]['purchasers'][self.inputs['purchaser']]:
-			self.table_3.table_3_1['borrower-characteristics'][0]['Race'][race_code][race]['purchasers'][self.inputs['purchaser']][purchaser]['count'] += 1
-			self.table_3.table_3_1['borrower-characteristics'][0]['Race'][race_code][race]['purchasers'][self.inputs['purchaser']][purchaser]['value'] += int(self.inputs['loan value'])
+		if race in self.table_3.table_3_1['borrower-characteristics'][0]['races'][race_code]['race'] and purchaser in self.table_3.table_3_1['borrower-characteristics'][0]['races'][race_code]['purchasers'][self.inputs['purchaser']]['name']:
+			self.table_3.table_3_1['borrower-characteristics'][0]['races'][race_code]['purchasers'][self.inputs['purchaser']]['count'] += 1
+			self.table_3.table_3_1['borrower-characteristics'][0]['races'][race_code]['purchasers'][self.inputs['purchaser']]['value'] += int(self.inputs['loan value'])
+
 
 		else:
 			print "loan not added, code not present - race"
 
 		#aggregate loans by ethnicity and purchaser
-		if ethnicity in self.table_3.table_3_1['borrower-characteristics'][1]['Ethnicity'][self.inputs['ethnicity']] and purchaser in self.table_3.table_3_1['borrower-characteristics'][1]['Ethnicity'][self.inputs['ethnicity']][ethnicity]['purchasers'][self.inputs['purchaser']]:
-			self.table_3.table_3_1['borrower-characteristics'][1]['Ethnicity'][self.inputs['ethnicity']][ethnicity]['purchasers'][self.inputs['purchaser']][purchaser]['count'] += 1
-			self.table_3.table_3_1['borrower-characteristics'][1]['Ethnicity'][self.inputs['ethnicity']][ethnicity]['purchasers'][self.inputs['purchaser']][purchaser]['value'] += int(self.inputs['loan value'])
+		if ethnicity in self.table_3.table_3_1['borrower-characteristics'][1]['ethnicities'][self.inputs['ethnicity']]['ethnicity']and purchaser in self.table_3.table_3_1['borrower-characteristics'][1]['ethnicities'][self.inputs['ethnicity']]['purchasers'][self.inputs['purchaser']]['name']:
+			self.table_3.table_3_1['borrower-characteristics'][1]['ethnicities'][self.inputs['ethnicity']]['purchasers'][self.inputs['purchaser']]['count'] #+= 1
+			self.table_3.table_3_1['borrower-characteristics'][1]['ethnicities'][self.inputs['ethnicity']]['purchasers'][self.inputs['purchaser']]['value'] += int(self.inputs['loan value'])
 		else:
 			print "loan not added, code not present - ethnicity"
 
 		#aggregate loans by minority status and purchaser
 		#add a secondary logic filter off a string from the 'name' key and not from the list index
-		if purchaser in self.table_3.table_3_1['borrower-characteristics'][2]['Minority Status'][self.inputs['minority status']][minority_status]['purchasers'][self.inputs['purchaser']] and minority_status in self.table_3.table_3_1['borrower-characteristics'][2]['Minority Status'][self.inputs['minority status']]:
-			self.table_3.table_3_1['borrower-characteristics'][2]['Minority Status'][self.inputs['minority status']][minority_status]['purchasers'][self.inputs['purchaser']][purchaser]['count'] += 1
-			self.table_3.table_3_1['borrower-characteristics'][2]['Minority Status'][self.inputs['minority status']][minority_status]['purchasers'][self.inputs['purchaser']][purchaser]['value'] += int(self.inputs['loan value'])
+                #not to self - cannot check boolean true/false on a list index being present in the dictionary
+		if purchaser in self.table_3.table_3_1['borrower-characteristics'][2]['minority statuses'][self.inputs['minority status']]['purchasers'][self.inputs['purchaser']]['name']:
+			self.table_3.table_3_1['borrower-characteristics'][2]['minority statuses'][self.inputs['minority status']]['purchasers'][self.inputs['purchaser']]['count'] += 1
+			self.table_3.table_3_1['borrower-characteristics'][2]['minority statuses'][self.inputs['minority status']]['purchasers'][self.inputs['purchaser']]['value']+= int(self.inputs['loan value'])
 
 		else:
 			print "loan not added in minority status"
-		self.table_3.table_3_1['total']['purchasers'][self.inputs['purchaser']][purchaser]['count'] +=1
-		self.table_3.table_3_1['total']['purchasers'][self.inputs['purchaser']][purchaser]['value'] += int(self.inputs['loan value'])
+
+
+                    #aggregate loans by MS/MD median incom
+                    #aggregate loans by MSA racial/ethnic composition
+                    #aggregate loans by MSA income classification
+                        #aggregate total loans in MSA
+		self.table_3.table_3_1['total']['purchasers'][self.inputs['purchaser']]['count'] +=1
+		self.table_3.table_3_1['total']['purchasers'][self.inputs['purchaser']]['value'] += int(self.inputs['loan value'])
 	#Race: American Indian or Alaska NAtive(1), Asian(2), Black(3), Native Hawaiian or Pacific Islander(4), White(5), Not provided(6), Not applicable(7), no co-applicant(8)
 	#joint definition: one minority race and one white
 	#2 minority definition: both applicants of minority race
