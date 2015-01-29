@@ -472,6 +472,7 @@ class R3_1(report):
 			self.table_3_aggregator()
 
 		name = 'report_3_1_' + location[0] + '.json'
+		#print name
 		self.write_report_3(name)
 
 	def print_report_3(self): #prints the JSON structure to the terminal
@@ -485,6 +486,7 @@ class R3_1(report):
 
 	def write_report_3(self, name): #writes the JSON structure to a file
 		import json
+		print 'testing', name
 		with open(name, 'w') as outfile:
 			 json.dump(self.table_3.table_3_1, outfile, indent = 4, ensure_ascii=False)
 

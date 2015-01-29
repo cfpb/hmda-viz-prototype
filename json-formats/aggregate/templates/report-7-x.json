@@ -10,51 +10,42 @@
 	},
 	"Racial/Ethnic Composition": [
 		{
-			"Less than 10% Minority": {
-				"dispositions": [
-					{
-						"Applications Received": {
-							"count": 55,
-							"value": 7403
-						},
-					},
-				]
-			}
+			"race": "Less than 10% Minority",
+			"dispositions": [
+				{
+					"disposition": "Applications Received",
+					"count": 55,
+					"value": 7403
+				}
+			]
 		}
 	],
 	"Income Characteristics": [
 		{
-			"Low Income": {
-				"dispositions": [
-					{
-						"Applications Received": {
-							"count": 1,
-							"value": 93
-						},
-					},
-				]
-			}
+			"income": "Low Income",
+			"dispositions": [
+				{
+					"disposition": "Applications Received",
+					"count": 55,
+					"value": 7403
+				}
+			]
 		}
 	],
 	"Income & Racial/Ethic Comp": [
 		{
 			"incomes": [
 				{
-					"Low Income": [
+					"income": "Low Income",
+					"Racial/Ethnic Composition": [
 						{
-							"Racial/Ethnic Composition": [
+							"race": "Less than 10% Minority",
+							"dispositions": [
 								{
-									"Less than 10% Minority": {
-										"dispositions": [
-											{
-												"Applications Received": {
-													"count": ,
-													"value": 
-												},
-											},
-										]
-									}
-								}
+									"disposition": "Applications Received",
+									"count": ,
+									"value": 
+								},
 							]
 						}
 					]
@@ -65,31 +56,28 @@
 	"small county": {
 		"dispositions": [
 			{
-				"Applications Received": {
-					"count": 0,
-					"value": 0
-				},
-			},
+				"disposition": "Applications Received",
+				"count": 0,
+				"value": 0
+			}
 		]
 	},
 	"all other tracts": {
 		"dispositions": [
 			{
-				"Applications Received": {
-					"count": 0,
-					"value": 0
-				},
-			},
+				"disposition": "Applications Received",
+				"count": 0,
+				"value": 0
+			}
 		]
 	},
 	"total": {
 		"dispositions": [
 			{
-				"Applications Received": {
-					"count": 0,
-					"value": 0
-				},
-			},
+				"disposition": "Applications Received",
+				"count": 0,
+				"value": 0
+			}
 		]
 	}
 }

@@ -10,36 +10,34 @@
 	},
 	"borrower-characteristics": [
 		{
-			"Race": [
+			"characteristic": "Race",
+			"races": [
 				{
-					"American Indian/Alaska Native": {
-						"purchasers": [
-							{
-								"Fannie Mae": {
-									"count": 3,
-									"value": 316
-								},
-							}
-						]
-					}
+					"race": "American Indian/Alaska Native",
+					"purchasers": [
+						{
+							"name": "Fannie Mae",
+							"count": 3,
+							"value": 316
+						}
+					]
 				}
 			]
 		}
 	],
 	"census-characteristics": [
 		{
-			"Racial/Ethnic Composition": [
+			"characteristic": "Racial/Ethnic Composition",
+			"races": [
 				{
-					"Less than 10% Minority": {
-						"purchasers": [
-							{
-								"purchaser": {
-									"count": 35,
-									"value": 2453
-								},
-							}
-						]
-					}
+					"race": "Less than 10% Minority",
+					"purchasers": [
+						{
+							"name": "purchaser",
+							"count": 35,
+							"value": 2453
+						}
+					]
 				}
 			]
 		}
@@ -47,10 +45,9 @@
 	"total": {
 		"purchasers": [
 			{
-				"purchaser": {
-					"count": 542,
-					"value": 68638
-				}
+				"name": "purchaser",
+				"count": 542,
+				"value": 68638
 			}
 		]
 	}
