@@ -10,22 +10,19 @@
 	},
 	"dispositions": [
 		{
-			"Total Applications": {
-				"loan types": [
-					{
-						"Conventional": {
-							"loan-uses": [
-								{
-									"Home Purchase": {
-										"first-lien": 0,
-										"junior-lien": 0
-									}
-								}
-							]
-						},
-					}
-				]
-			},
+			"disposition": "Total Applications",
+			"loan types": [
+				{
+					"type": "Conventional",
+					"loan-uses": [
+						{
+							"use": "Home Purchase",
+							"first-lien": 0,
+							"junior-lien": 0
+						}
+					]
+				}
+			]
 		}
 	]
 }

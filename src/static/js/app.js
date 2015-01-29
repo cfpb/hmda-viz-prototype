@@ -32,6 +32,7 @@ function getTableData(table) {
   $.get(table + '.json', function(data) {
   	// get template
     $.get('/hmda-viz-prototype/templates/' + table + '.html', function(templates) {
+    	//var template = $(templates).filter('#' + table + '-new').html();
       var template = $(templates).filter('#' + table).html();
       var html = Mustache.to_html(template, data);
       $('#' + table).html(html);
