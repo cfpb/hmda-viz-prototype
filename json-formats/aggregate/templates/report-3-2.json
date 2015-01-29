@@ -8,44 +8,52 @@
 		"name": "Anniston-Oxford",
 		"state": "AL"
 	},
-	"no reported pricing data": {
-		"purchasers": [
-			{
-				"name": "Fannie Mae",
-				"first-lien-count": 352,
-				"junior-lien-count": 
-			}
-		]
-	},
-	"reported pricing data": {
-		"purchasers": [
-			{
-				"name": "Fannie Mae",
-				"first-lien-count": 352,
-				"junior-lien-count": 
-			}
-		]
-	},
-	"percentage points above average prime offer rate: only includes loans with APR above the threshold": [
+	"pricing-information": [
 		{
-			"points": "1.50 - 1.99" {
-				"purchasers": [
-					{
-						"name": "Fannie Mae",
-						"first-lien-count": 352,
-						"junior-lien-count": 
+			"pricing": "no reported pricing data",
+			"purchasers": [
+				{
+					"name": "Fannie Mae",
+					"first-lien-count": 352,
+					"junior-lien-count": 
+				}
+			]
+		},
+		{
+			"pricing": "reported pricing data",
+			"purchasers": [
+				{
+					"name": "Fannie Mae",
+					"first-lien-count": 352,
+					"junior-lien-count": 
+				}
+			]
+		},
+		{
+			"pricing": "percentage points above average prime offer rate: only includes loans with APR above the threshold",
+			"points": [
+				{
+					"point": "1.50 - 1.99" {
+						"purchasers": [
+							{
+								"name": "Fannie Mae",
+								"first-lien-count": 352,
+								"junior-lien-count": 
+							}
+						]
 					}
-				]
-			}
+				}
+			]
+		},
+		{
+			"pricing": "hoepa loans",
+			"purchasers": [
+				{
+					"name": "Fannie Mae",
+					"first-lien-count": 352,
+					"junior-lien-count": 
+				}
+			]
 		}
-	],
-	"hoepa loans": {
-		"purchasers": [
-			{
-				"name": "Fannie Mae",
-				"first-lien-count": 352,
-				"junior-lien-count": 
-			}
-		]
-	}
+	]
 }
