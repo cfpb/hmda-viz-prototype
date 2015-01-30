@@ -48,9 +48,11 @@ SQL = queries.table_3_1()
 cur.execute(SQL, location)
 
 row = cur.fetchone()
-print row
+#print row
 parsed = parse()
 parsed.parse_t31(row)
 print parsed.inputs
+print parsed.inputs['app non white flag'], 'app non flag'
+print parsed.inputs['co non white flag'], 'co flag'
 #print row['censustractnumber']
 #parse inputs function construction

@@ -43,68 +43,91 @@ class parse_inputs(AD_report):
         co_race = [int(race) for race in co_race]
 
         #add data elements to dictionary
-        self.inputs['a ethn'] = rows[11]
-        self.inputs['co ethn'] = rows[12]
-        self.inputs['income'] = rows[13]
-        self.inputs['rate spread'] = rows[14]
-        self.inputs['lien status'] = rows[15]
-        self.inputs['hoepa flag'] = rows[16]
-        self.inputs['purchaser'] = int(rows[17])
-        self.inputs['loan value'] = float(rows[18])
-        self.inputs['a race'] = a_race
-        self.inputs['co race']= co_race
-        self.inputs['joint status'] = ''
+        self.inputs['a ethn'] = rows['applicantethnicity']
+        self.inputs['co ethn'] = rows['co_applicantethnicity']
+        self.inputs['income'] = rows['applicantincome']
+        self.inputs['rate spread'] = rows['ratespread']
+        self.inputs['lien status'] = rows['lienstatus']
+        self.inputs['hoepa flag'] = rows['hoepastatus']
+        self.inputs['purchaser'] = int(rows['purchasertype'])
+        self.inputs['loan value'] = float(rows['loanamount'])
+        self.inputs['a race'] = a_race #change to the function
+        self.inputs['co race']= co_race #change to the function
         self.inputs['race'] = ''
-        self.inputs['app non white flag'] = ''
-        self.inputs['co non white flag'] = ''
-        self.inputs['sequence'] = rows[19] # the sequence number to track loans in error checking
-        self.inputs['year'] = rows[20]
-        self.inputs['state code'] = rows[21]
-        self.inputs['state name'] = rows[22]
-        self.inputs['census tract'] = rows[0] # this is currently the 7 digit tract used by the FFIEC, it includes a decimal prior to the last two digits
-        self.inputs['county code'] = rows[23]
-        self.inputs['county name'] = rows[24]
+        self.inputs['app non white flag'] = self.set_non_white(a_race)
+        self.inputs['co non white flag'] = self.set_non_white(co_race)
+        self.inputs['joint status'] = self.set_joint(self.inputs)
+        self.inputs['sequence'] = rows['sequencenumber'] # the sequence number to track loans in error checking
+        self.inputs['year'] = rows['asofdate']
+        self.inputs['state code'] = rows['statecode']
+        self.inputs['state name'] = rows['statname']
+        self.inputs['census tract'] = rows['censustractnumber'] # this is currently the 7 digit tract used by the FFIEC, it includes a decimal prior to the last two digits
+        self.inputs['county code'] = rows['countycode']
+        self.inputs['county name'] = rows['countyname']
         self.inputs['minority status'] = ' '
-        self.inputs['MSA median income'] = rows[25]
-        self.inputs['minority percent'] = rows[26]
-        self.inputs['tract to MSA income'] = rows[27]
+        self.inputs['MSA median income'] = rows['ffiec_median_family_income']
+        self.inputs['minority percent'] = rows['minoritypopulationpct']
+        self.inputs['tract to MSA income'] = rows['tract_to_msa_md_income']
 
-
-class set_joint_status(AD_report):
     #loop over all elements in both race lists to flag presence of minority race
     #assigning non-white boolean flags for use in joint race status and minority status checks
     #set boolean flag for white/non-white status for applicant
     #need to check App A ID2 for race 6
-    def set_joint(inputs): #takes a dictionary 'inputs' which is held in the controller(?) object and used to process each loan row
-        for i in range(0,5):
-            if self.inputs['a race'][i] < 5 and self.inputs['a race'][i] != 0:
-                self.inputs['app non white flag'] = True #flag true if applicant listed a minority race
-                break
-            elif self.inputs['a race'][i] == 5:
-                self.inputs['app non white flag'] = False
 
+    def set_non_white(self, race_list): #pass in a list of length 5, return a boolean
         for i in range(0,5):
-            if self.inputs['co race'][i] < 5 and self.inputs['co race'][i] != 0:
-                self.inputs['co non white flag'] = True #flag true if co-applicant exists and has a non-white race listed
+            if race_list[i] < 5 and race_list[i] != 0:
+                return True #flag true if applicant listed a minority race
                 break
-            elif self.inputs['co race'][i] == 5:
-                self.inputs['co non white flag'] = False
+            elif race_list[i] == 5:
+                return False #flag false if the only race listed was white (5)
 
+    def set_joint(self, inputs): #takes a dictionary 'inputs' which is held in the controller(?) object and used to process each loan row
         #joint status exists if one borrower is white and one is non-white
         #check to see if joint status exists
         if self.inputs['app non white flag'] == False and self.inputs['co non white flag'] == False:
-            self.inputs['joint status'] = False #flag false if both applicant and co-applicant are white
-            self.inputs['joint status'] = False #flag false if both applicant and co-applicant are minority
+            return False #flag false if both applicant and co-applicant are white
+        elif self.inputs['app non white flag'] == True and self.inputs['co non white flag'] == True:
+            return False #flag false if both applicant and co-applicant are minority
         elif self.inputs['app non white flag'] == True and self.inputs['co non white flag'] ==  False:
-            self.inputs['joint status'] = True #flag true if one applicant is minority and one is white
+            return True #flag true if one applicant is minority and one is white
         elif self.inputs['app non white flag'] == False and self.inputs['co non white flag'] == True:
-            self.inputs['joint status'] = True #flag true if one applicant is minority and one is white
+            return True #flag true if one applicant is minority and one is white
 
 class set_minority_status(AD_report):
     pass
 
 class set_ethnicity(AD_report):
-    pass
+    #this function outputs a number code for ethnicity: 0 - hispanic or latino, 1 - not hispanic/latino
+    #2 - joint (1 applicant hispanic/latino 1 not), 3 - ethnicity not available
+    def set_loan_ethn(self, inputs):
+        #if both ethnicity fields are blank report not available(3)
+        if self.inputs['a ethn'] == ' ' and self.inputs['co ethn'] == ' ':
+            self.inputs['ethnicity'] = 3 #set to not available
+
+        #determine if the loan is joint hispanic/latino and non hispanic/latino(2)
+        elif self.inputs['a ethn'] == '1' and self.inputs['co ethn'] != '1':
+            self.inputs['ethnicity'] = 2 #set to joint
+        elif self.inputs['a ethn'] != '1' and self.inputs['co ethn'] == '1':
+            self.inputs['ethnicity'] = 2 #set to joint
+
+        #determine if loan is of hispanic ethnicity (appplicant is hispanic/latino, no co applicant info or co applicant also hispanic/latino)
+        elif self.inputs['a ethn'] == '1' and self.inputs['co ethn'] == '1':
+            self.inputs['ethnicity'] = 0
+        elif self.inputs['a ethn'] == '1' and (self.inputs['co ethn'] == ' ' or self.inputs['co ethn'] == '3' or self.inputs['co ethn'] == '4' or self.inputs['co ethn']== '5'):
+            self.inputs['ethnicity'] = 0
+        elif (self.inputs['a ethn'] == ' ' or self.inputs['a ethn'] == '3' or self.inputs['a ethn'] == '4' or self.inputs['a ethn'] == '5') and self.inputs['co ethn'] == '1':
+            self.inputs['ethnicity'] = 0
+        #determine if loan is not hispanic or latino
+        elif self.inputs['a ethn'] == '2' and self.inputs['co ethn'] != '1':
+            self.inputs['ethnicity'] = 1
+        elif self.inputs['a ethn'] != '1' and self.inputs['co ethn'] == '2':
+            self.inputs['ethnicity'] = 1
+        elif (self.inputs['a ethn'] == '3' or self.inputs['a ethn'] == '4') and (self.inputs['co ethn'] != '1' and self.inputs['co ethn'] != '2'):
+            self.inputs['ethnicity'] = 3
+        else:
+            print "error setting ethnicity"
+
 
 class build_JSON(AD_report):
     pass

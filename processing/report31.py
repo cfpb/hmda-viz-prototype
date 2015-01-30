@@ -150,6 +150,7 @@ class R3_1(report):
 		#check to see if joint status exists
 		if self.inputs['app non white flag'] == False and self.inputs['co non white flag'] == False:
 			self.inputs['joint status'] = False #flag false if both applicant and co-applicant are white
+		elif self.inputs['app non white flag'] == True and self.inputs['co non white flag'] == True:
 			self.inputs['joint status'] = False #flag false if both applicant and co-applicant are minority
 		elif self.inputs['app non white flag'] == True and self.inputs['co non white flag'] ==  False:
 			self.inputs['joint status'] = True #flag true if one applicant is minority and one is white
