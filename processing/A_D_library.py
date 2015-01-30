@@ -28,7 +28,7 @@ class parse_inputs(AD_report):
         #parsing inputs for report 3.1
         #self.inputs will be returned to for use in the aggregation function
         #instantiate classes to set loan variables
-        MSA_index = MSA_income_index()
+        MSA_index = MSA_info()
         demo=demographics()
         #race lists will hold 5 integers
         a_race = []
@@ -57,6 +57,7 @@ class parse_inputs(AD_report):
         self.inputs['minority percent'] = row['minoritypopulationpct']
         self.inputs['tract to MSA income'] = row['tract_to_msa_md_income']
         self.inputs['income bracket'] = MSA_index.app_income_to_MSA(self.inputs)
+        self.inputs['minority percent'] = MSA_index.minority_percent(self.inputs)
         self.inputs['tract income index'] = MSA_index.tract_to_MSA(self.inputs)
         self.inputs['app non white flag'] = demo.set_non_white(a_race)
         self.inputs['co non white flag'] = demo.set_non_white(co_race)
@@ -239,7 +240,7 @@ class connect_DB(AD_report):
         cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
 
-class MSA_income_index(AD_report):
+class MSA_info(AD_report):
 
     def tract_to_MSA(self, inputs):
         #set census MSA income level: low, moderate, middle, upper
@@ -277,6 +278,21 @@ class MSA_income_index(AD_report):
                 return 4
             else:
                 print 'error setting percent MSA income bracket for index'
+
+    def minority_percent(self, inputs):
+        #set index codes for minority population percent
+        if inputs['minority percent'] == '      ' or inputs['minority percent'] == 'NA    ':
+            return  4
+        elif float(inputs['minority percent']) < 10:
+            return  0
+        elif float(inputs['minority percent'])  <= 49:
+            return  1
+        elif float(inputs['minority percent'])  <= 79:
+            return  2
+        elif float(inputs['minority percent'])  <= 1:
+            return  3
+        else:
+            print "minority percent index not set"
 
 class queries(AD_report):
 

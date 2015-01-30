@@ -108,7 +108,7 @@ class R3_1(report):
 
 		#set index codes for minority population percent
 		if self.inputs['minority percent'] == '      ' or self.inputs['minority percent'] == 'NA    ':
-			self.inputs['minority percent'] = 4
+			self.inputs['minority pct index'] = 4
 		elif float(self.inputs['minority percent']) < 10:
 			self.inputs['minority pct index'] = 0
 		elif float(self.inputs['minority percent'])  <= 49:
