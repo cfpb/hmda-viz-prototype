@@ -95,13 +95,13 @@ class R3_1(report):
 				print 'error setting percent MSA income bracket for index'
 
 		#set census MSA income level: low, moderate, middle, upper
-		if self.inputs['tract to MSA income'] < .5:
+		if self.inputs['tract to MSA income'] < 50:
 			self.inputs['tract income index'] = 0
-		elif self.inputs['tract to MSA income'] < .8:
+		elif self.inputs['tract to MSA income'] < 80:
 			self.inputs['tract income index'] = 1
-		elif self.inputs['tract to MSA income'] < 1.2:
+		elif self.inputs['tract to MSA income'] < 120:
 			self.inputs['tract income index'] = 2
-		elif self.inputs['tract to MSA income'] >=1.2:
+		elif self.inputs['tract to MSA income'] >=120:
 			self.inputs['tract income index'] = 3
 		else:
 			print "error setting tract to MSA income index"
@@ -236,16 +236,7 @@ class R3_1(report):
 			self.inputs['minority status'] = 0
 		else:
 			print 'minority status not set'
-			print self.inputs['minority status'], 'minority status'
-			print self.inputs['purchaser'], 'purchaser code'
-			print self.inputs['co race'], 'co race'
-			print self.inputs['a race'], 'a race'
-			print self.inputs['a ethn'], 'app ethn'
-			print self.inputs['co ethn'], 'co ethn'
-			print self.inputs['app non white flag'], 'app non white flag'
-			print self.inputs['co non white flag'], 'co non white flag'
-			#print self.table_3['borrower-characteristics'][2]['types'][self.inputs['minority status']]['purchasers'][self.inputs['purchaser']]['name']
-			print 'record number', self.inputs['sequence']
+
 
 	def table_3_aggregator(self):
 		#convert the race to a text to access the JSON structure to aggregate and store data

@@ -27,7 +27,8 @@ class parse_inputs(AD_report):
     def parse_t31(self, row): #takes a row from a table 3-1 query and parses it to the inputs dictionary (28 tuples)
         #parsing inputs for report 3.1
         #self.inputs will be returned to for use in the aggregation function
-        #instantiate demographics class to set loan variables
+        #instantiate classes to set loan variables
+        MSA_index = MSA_income_index()
         demo=demographics()
         #race lists will hold 5 integers
         a_race = []
@@ -45,8 +46,6 @@ class parse_inputs(AD_report):
         self.inputs['hoepa flag'] = row['hoepastatus']
         self.inputs['purchaser'] = int(row['purchasertype'])
         self.inputs['loan value'] = float(row['loanamount'])
-        #self.inputs['a race'] = a_race #change to the function
-        #self.inputs['co race']= co_race #change to the function
         self.inputs['sequence'] = row['sequencenumber'] # the sequence number to track loans in error checking
         self.inputs['year'] = row['asofdate']
         self.inputs['state code'] = row['statecode']
@@ -57,6 +56,8 @@ class parse_inputs(AD_report):
         self.inputs['MSA median income'] = row['ffiec_median_family_income']
         self.inputs['minority percent'] = row['minoritypopulationpct']
         self.inputs['tract to MSA income'] = row['tract_to_msa_md_income']
+        self.inputs['income bracket'] = MSA_index.app_income_to_MSA(self.inputs)
+        self.inputs['tract income index'] = MSA_index.tract_to_MSA(self.inputs)
         self.inputs['app non white flag'] = demo.set_non_white(a_race)
         self.inputs['co non white flag'] = demo.set_non_white(co_race)
         self.inputs['joint status'] = demo.set_joint(self.inputs) #requires non white status flags be set prior to running set_joint
@@ -238,8 +239,44 @@ class connect_DB(AD_report):
         cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
 
-class set_MSA_income_index(AD_report):
-    pass
+class MSA_income_index(AD_report):
+
+    def tract_to_MSA(self, inputs):
+        #set census MSA income level: low, moderate, middle, upper
+        if inputs['tract to MSA income'] < 50:
+            return 0
+        elif inputs['tract to MSA income'] < 80:
+            return 1
+        elif inputs['tract to MSA income'] < 120:
+            return 2
+        elif inputs['tract to MSA income'] >=120:
+            return 3
+        else:
+            print "error setting tract to MSA income index"
+
+    def app_income_to_MSA(self, inputs):
+        #set income bracket index
+        if inputs['income'] != 'NA  ' or inputs['income'] != '    ':
+            inputs['income bracket'] = 5
+        elif inputs['MSA median income'] != 'NA      ' and inputs['MSA median income'] != '        ' :
+            inputs['income bracket'] = 6 #placeholder for MSA median income unavailable
+        else:
+            inputs['percent MSA income'] = float(inputs['income']) / float(inputs['MSA median income'] )
+            #determine income bracket for use as an index in the JSON object
+            #move this somewhere else
+            #check logic on math to make sure all is inclusive - set a rounding function on line 71
+            if inputs['percent MSA income'] < 50:
+                return 0
+            elif inputs['percent MSA income'] <= 79:
+                return 1
+            elif inputs['percent MSA income'] <= 99:
+                return 2
+            elif inputs['percent MSA income'] <= 119:
+                return 3
+            elif inputs['percent MSA income'] >= 120:
+                return 4
+            else:
+                print 'error setting percent MSA income bracket for index'
 
 class queries(AD_report):
 

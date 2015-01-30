@@ -52,7 +52,7 @@ row = cur.fetchone()
 parsed = parse()
 parsed.parse_t31(row)
 print parsed.inputs
-print parsed.inputs['ethnicity'], 'ethnicity'
+
 
 #print row['censustractnumber']
 #parse inputs function construction
