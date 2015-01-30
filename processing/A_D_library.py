@@ -47,10 +47,6 @@ class parse_inputs(AD_report):
         self.inputs['loan value'] = float(row['loanamount'])
         #self.inputs['a race'] = a_race #change to the function
         #self.inputs['co race']= co_race #change to the function
-        self.inputs['race'] = ''
-        self.inputs['app non white flag'] = demo.set_non_white(a_race)
-        self.inputs['co non white flag'] = demo.set_non_white(co_race)
-        self.inputs['joint status'] = demo.set_joint(self.inputs)
         self.inputs['sequence'] = row['sequencenumber'] # the sequence number to track loans in error checking
         self.inputs['year'] = row['asofdate']
         self.inputs['state code'] = row['statecode']
@@ -58,11 +54,15 @@ class parse_inputs(AD_report):
         self.inputs['census tract'] = row['censustractnumber'] # this is currently the 7 digit tract used by the FFIEC, it includes a decimal prior to the last two digits
         self.inputs['county code'] = row['countycode']
         self.inputs['county name'] = row['countyname']
-        self.inputs['minority status'] = demo.set_minority_status(self.inputs)
         self.inputs['MSA median income'] = row['ffiec_median_family_income']
         self.inputs['minority percent'] = row['minoritypopulationpct']
         self.inputs['tract to MSA income'] = row['tract_to_msa_md_income']
-        self.inputs['ethnicity'] = demo.set_loan_ethn(self.inputs)
+        self.inputs['app non white flag'] = demo.set_non_white(a_race)
+        self.inputs['co non white flag'] = demo.set_non_white(co_race)
+        self.inputs['joint status'] = demo.set_joint(self.inputs) #requires non white status flags be set prior to running set_joint
+        self.inputs['minority status'] = demo.set_minority_status(self.inputs) #requires non white flags be set prior to running set_minority_status
+        self.inputs['ethnicity'] = demo.set_loan_ethn(self.inputs) #requires  ethnicity be parsed prior to running set_loan_ethn
+        self.inputs['race'] = demo.set_race(self.inputs, a_race, co_race) #requires joint status be set prior to running set_race
     #loop over all elements in both race lists to flag presence of minority race
     #assigning non-white boolean flags for use in joint race status and minority status checks
     #set boolean flag for white/non-white status for applicant
@@ -70,6 +70,26 @@ class parse_inputs(AD_report):
 
 class demographics(AD_report):
     #holds all the functions for setting race, minority status, and ethnicity for FFIEC A&D reports
+
+    #set race_code to integers for use in JSON structure lists
+    #American Indian/Alaska Native or 1 indexed at 0
+    #Asian or 2 indexed at 1
+    #Black or 3 indexed at 2
+    #Pacific Islander or 4 indexed at 3
+    #White or 5 indexed at 4
+    #Not Provided indexed at 5
+    #Not Applicable indexed at 6
+    #2 minority indexed 7
+    #joint indexed 8
+    #not reported indexed 9
+    def minority_count(self, a_race):
+        #the minority count is the count of minority races listed for the primary applicant
+        minority_count = 0
+        for race in a_race:
+            if race < 5 and race > 0:
+                minority_count += 1
+        return minority_count
+
     def set_non_white(self, race_list): #pass in a list of length 5, return a boolean
         for i in range(0,5):
             if race_list[i] < 5 and race_list[i] != 0:
@@ -131,20 +151,6 @@ class demographics(AD_report):
         else:
             print "error setting ethnicity"
 
-
-        #set race_code to integers for use in JSON structure lists
-        #American Indian/Alaska Native or 1 indexed at 0
-        #Asian or 2 indexed at 1
-        #Black or 3 indexed at 2
-        #Pacific Islander or 4 indexed at 3
-        #White or 5 indexed at 4
-        #Not Provided indexed at 5
-        #Not Applicable indexed at 6
-        #2 minority indexed 7
-        #joint indexed 8
-        #not reported indexed 9
-
-
     def a_race_list(self, row):
         #filling the loan applicant race code lists (5 codes per applicant)
         a_race = [race for race in row[1:6]]
@@ -165,7 +171,9 @@ class demographics(AD_report):
         #convert string entries to int for easier comparison and loan aggregation
 
         return [int(race) for race in co_race]
-    def set_race(self, inputs, row):
+
+    def set_race(self, inputs, a_race, co_race):
+        #inputs is a dictionary, a_race and co_race are 5 element integer lists
         #if one white and one minority race are listed, use the minority race
         #race options are: joint, 1 through 5, 2 minority, not reported
         #if the entry is 'joint' then the loan is aggregated as 'joint'
@@ -176,7 +184,7 @@ class demographics(AD_report):
         #determine if the loan will be filed as 'two or more minority races'
         #if two minority races are listed, the loan is 'two or more minority races'
         #if any combination of two or more race fields are minority then 'two or more minority races'
-        elif inputs['minority count'] > 1:
+        elif self.minority_count(a_race) > 1:
             return  7
 
         #if only the first race field is used, use the first filed
