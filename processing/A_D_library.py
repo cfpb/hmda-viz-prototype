@@ -11,11 +11,8 @@ class set_race(AD_report):
     pass
     #store FFIEC codes
 
-class set_income_bracket(AD_report):
-    pass
 
-class pct_MSA_median(AD_report):
-    pass
+
 
 class parse_inputs(AD_report):
     #needs to take all the variables used in all the reports
@@ -56,9 +53,10 @@ class parse_inputs(AD_report):
         self.inputs['MSA median income'] = row['ffiec_median_family_income']
         self.inputs['minority percent'] = row['minoritypopulationpct']
         self.inputs['tract to MSA income'] = row['tract_to_msa_md_income']
+        self.inputs['tract income index'] = MSA_index.tract_to_MSA_income(self.inputs)
         self.inputs['income bracket'] = MSA_index.app_income_to_MSA(self.inputs)
         self.inputs['minority percent'] = MSA_index.minority_percent(self.inputs)
-        self.inputs['tract income index'] = MSA_index.tract_to_MSA(self.inputs)
+        self.inputs['tract income index'] = MSA_index.tract_to_MSA_income(self.inputs)
         self.inputs['app non white flag'] = demo.set_non_white(a_race)
         self.inputs['co non white flag'] = demo.set_non_white(co_race)
         self.inputs['joint status'] = demo.set_joint(self.inputs) #requires non white status flags be set prior to running set_joint
@@ -242,19 +240,6 @@ class connect_DB(AD_report):
 
 class MSA_info(AD_report):
 
-    def tract_to_MSA(self, inputs):
-        #set census MSA income level: low, moderate, middle, upper
-        if inputs['tract to MSA income'] < 50:
-            return 0
-        elif inputs['tract to MSA income'] < 80:
-            return 1
-        elif inputs['tract to MSA income'] < 120:
-            return 2
-        elif inputs['tract to MSA income'] >=120:
-            return 3
-        else:
-            print "error setting tract to MSA income index"
-
     def app_income_to_MSA(self, inputs):
         #set income bracket index
         if inputs['income'] != 'NA  ' or inputs['income'] != '    ':
@@ -293,6 +278,19 @@ class MSA_info(AD_report):
             return  3
         else:
             print "minority percent index not set"
+
+    def tract_to_MSA_income(self, inputs):
+        #set census MSA income level: low, moderate, middle, upper
+        if inputs['tract to MSA income'] < 50:
+            return 0
+        elif inputs['tract to MSA income'] < 80:
+            return 1
+        elif inputs['tract to MSA income'] < 120:
+            return 2
+        elif inputs['tract to MSA income'] >=120:
+            return 3
+        else:
+            print "error setting tract to MSA income index"
 
 class queries(AD_report):
 
