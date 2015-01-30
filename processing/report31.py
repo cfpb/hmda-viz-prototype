@@ -235,8 +235,7 @@ class R3_1(report):
 		elif self.inputs['app non white flag'] != True and self.inputs['co non white flag'] != True and self.inputs['a ethn']  != '1' and self.inputs['co ethn'] != '1':
 			self.inputs['minority status'] = 0
 		else:
-			self.inputs['minority status'] = 0
-			print 'else level minority status'
+			print 'minority status not set'
 			print self.inputs['minority status'], 'minority status'
 			print self.inputs['purchaser'], 'purchaser code'
 			print self.inputs['co race'], 'co race'

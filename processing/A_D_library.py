@@ -64,11 +64,13 @@ class parse_inputs(AD_report):
         self.inputs['census tract'] = rows['censustractnumber'] # this is currently the 7 digit tract used by the FFIEC, it includes a decimal prior to the last two digits
         self.inputs['county code'] = rows['countycode']
         self.inputs['county name'] = rows['countyname']
-        self.inputs['minority status'] = ' '
+        self.inputs['minority status'] = self.set_minority_status()
         self.inputs['MSA median income'] = rows['ffiec_median_family_income']
         self.inputs['minority percent'] = rows['minoritypopulationpct']
         self.inputs['tract to MSA income'] = rows['tract_to_msa_md_income']
-
+        #instantiate the ethnicity class and then set loan ethnicity
+        ethn = set_ethnicity()
+        self.inputs['ethnicity'] = ethn.set_loan_ethn(self.inputs)
     #loop over all elements in both race lists to flag presence of minority race
     #assigning non-white boolean flags for use in joint race status and minority status checks
     #set boolean flag for white/non-white status for applicant
@@ -94,37 +96,45 @@ class parse_inputs(AD_report):
         elif self.inputs['app non white flag'] == False and self.inputs['co non white flag'] == True:
             return True #flag true if one applicant is minority and one is white
 
-class set_minority_status(AD_report):
-    pass
+    def set_minority_status(self):
+        #determine minority status
+        #if either applicant reported a non-white race or an ethinicity of hispanic or latino then minority status is true
+        if self.inputs['app non white flag'] == True or self.inputs['co non white flag'] == True or self.inputs['a ethn'] == '1' or self.inputs['co ethn'] == '1':
+            return  1
+        #if both applicants reported white race and non-hispanic/latino ethnicity then minority status is false
+        elif self.inputs['app non white flag'] != True and self.inputs['co non white flag'] != True and self.inputs['a ethn']  != '1' and self.inputs['co ethn'] != '1':
+            return 0
+        else:
+            print 'minority status not set'
 
 class set_ethnicity(AD_report):
     #this function outputs a number code for ethnicity: 0 - hispanic or latino, 1 - not hispanic/latino
     #2 - joint (1 applicant hispanic/latino 1 not), 3 - ethnicity not available
     def set_loan_ethn(self, inputs):
         #if both ethnicity fields are blank report not available(3)
-        if self.inputs['a ethn'] == ' ' and self.inputs['co ethn'] == ' ':
-            self.inputs['ethnicity'] = 3 #set to not available
+        if inputs['a ethn'] == ' ' and inputs['co ethn'] == ' ':
+            return  3 #set to not available
 
         #determine if the loan is joint hispanic/latino and non hispanic/latino(2)
-        elif self.inputs['a ethn'] == '1' and self.inputs['co ethn'] != '1':
-            self.inputs['ethnicity'] = 2 #set to joint
-        elif self.inputs['a ethn'] != '1' and self.inputs['co ethn'] == '1':
-            self.inputs['ethnicity'] = 2 #set to joint
+        elif inputs['a ethn'] == '1' and inputs['co ethn'] != '1':
+            return  2 #set to joint
+        elif inputs['a ethn'] != '1' and inputs['co ethn'] == '1':
+            return  2 #set to joint
 
         #determine if loan is of hispanic ethnicity (appplicant is hispanic/latino, no co applicant info or co applicant also hispanic/latino)
-        elif self.inputs['a ethn'] == '1' and self.inputs['co ethn'] == '1':
-            self.inputs['ethnicity'] = 0
-        elif self.inputs['a ethn'] == '1' and (self.inputs['co ethn'] == ' ' or self.inputs['co ethn'] == '3' or self.inputs['co ethn'] == '4' or self.inputs['co ethn']== '5'):
-            self.inputs['ethnicity'] = 0
-        elif (self.inputs['a ethn'] == ' ' or self.inputs['a ethn'] == '3' or self.inputs['a ethn'] == '4' or self.inputs['a ethn'] == '5') and self.inputs['co ethn'] == '1':
-            self.inputs['ethnicity'] = 0
+        elif inputs['a ethn'] == '1' and inputs['co ethn'] == '1':
+            return  0
+        elif inputs['a ethn'] == '1' and (inputs['co ethn'] == ' ' or inputs['co ethn'] == '3' or inputs['co ethn'] == '4' or inputs['co ethn']== '5'):
+            return  0
+        elif (inputs['a ethn'] == ' ' or inputs['a ethn'] == '3' or inputs['a ethn'] == '4' or inputs['a ethn'] == '5') and inputs['co ethn'] == '1':
+            return  0
         #determine if loan is not hispanic or latino
-        elif self.inputs['a ethn'] == '2' and self.inputs['co ethn'] != '1':
-            self.inputs['ethnicity'] = 1
-        elif self.inputs['a ethn'] != '1' and self.inputs['co ethn'] == '2':
-            self.inputs['ethnicity'] = 1
-        elif (self.inputs['a ethn'] == '3' or self.inputs['a ethn'] == '4') and (self.inputs['co ethn'] != '1' and self.inputs['co ethn'] != '2'):
-            self.inputs['ethnicity'] = 3
+        elif inputs['a ethn'] == '2' and inputs['co ethn'] != '1':
+            return  1
+        elif inputs['a ethn'] != '1' and inputs['co ethn'] == '2':
+            return  1
+        elif (inputs['a ethn'] == '3' or inputs['a ethn'] == '4') and (inputs['co ethn'] != '1' and inputs['co ethn'] != '2'):
+            return  3
         else:
             print "error setting ethnicity"
 
