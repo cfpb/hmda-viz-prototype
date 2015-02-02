@@ -200,7 +200,33 @@ class demographics(AD_report):
 
 
 class build_JSON(AD_report):
-    pass
+    from collections import OrderedDict
+    container = OrderedDict({})
+    container['table'] = ''
+    container['type'] = ''
+    container['desc'] = ''
+    container['year'] = ''
+
+    msa = OrderedDict({})
+    msa['id'] = ''
+    msa['name'] = ''
+    msa['state'] = ''
+    container['msa'] = msa
+
+    def report_3_1_header(self, inputs, MSA):
+        self.container['table'] = '3-1'
+        self.container['type'] = 'aggregate'
+        self.container['desc'] = 'Loans sold. By characteristics of borrower and census tract in which property is located and by type of purchaser (includes originations and purchased loans).'
+        self.container['year'] = inputs['year']
+        self.msa['id'] = MSA
+        #self.msa['name'] = inputs['MSA name'] #need to add MSA names to a database or read-in file
+        self.msa['state'] = inputs['state name']
+
+    def fill_header(self, inputs):
+        #change report type A or D
+        #add FI
+
+        pass
 
 class connect_DB(AD_report):
 #I'm not sure how to pass the cursor object back to the controller object

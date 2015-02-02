@@ -49,11 +49,8 @@ container['msa'] = msa
 
 borrowercharacteristcs = []
 
-rows = cur.fetchone()
+rows = cur.fetchall()
 for index, row in enumerate(rows):
-    print rows
-    print "index", index
-    print "row", row
     holding = {}
 
     purchasers = []
