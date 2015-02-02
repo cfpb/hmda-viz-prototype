@@ -7,13 +7,6 @@ class AD_report(object):
 class report_selector(AD_report):
     pass
 
-class set_race(AD_report):
-    pass
-    #store FFIEC codes
-
-
-
-
 class parse_inputs(AD_report):
     #needs to take all the variables used in all the reports
     #use if exists logic to pass in a row and parse it to a dictionary
@@ -235,7 +228,7 @@ class connect_DB(AD_report):
         except:
             print "I am unable to connect to the database"
 
-        cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+        return conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
 
 class MSA_info(AD_report):

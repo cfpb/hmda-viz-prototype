@@ -5,6 +5,7 @@ from collections import OrderedDict
 
 with open('/Users/roellk/Desktop/python/credentials.txt', 'r') as f:
     credentials = f.read()
+
 cred_list = credentials.split(',')
 dbname = cred_list[0]
 user = cred_list[1]

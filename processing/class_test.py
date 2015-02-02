@@ -5,8 +5,11 @@ from collections import OrderedDict
 #import the parse_inputs class to store the 'inputs' dictionary
 
 from A_D_library import parse_inputs as parse
+from A_D_library import connect_DB as connect
 
-
+connection = connect()
+cur = connection.connect()
+'''
 with open('/Users/roellk/Desktop/python/credentials.txt', 'r') as f:
     credentials = f.read()
 
@@ -27,7 +30,7 @@ except:
     print "I am unable to connect to the database"
 
 cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
-
+'''
 
 #get MSA from read file, may need a loop here to pass single tuples to psycopg2
 #for msa in list, pass each MSA to location for use in psycop
