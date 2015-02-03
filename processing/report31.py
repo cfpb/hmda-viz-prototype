@@ -424,7 +424,7 @@ class R3_1(report):
 			censustractnumber, applicantrace1, applicantrace2, applicantrace3, applicantrace4, applicantrace5,
 			coapplicantrace1, coapplicantrace2, coapplicantrace3, coapplicantrace4, coapplicantrace5,
 			applicantethnicity, co_applicantethnicity, applicantincome, ratespread, lienstatus, hoepastatus,
-			purchasertype, loanamount, sequencenumber, asofdate, statecode, statname, countycode, countyname,
+			purchasertype, loanamount, sequencenumber, asofdate, statecode, statename, countycode, countyname,
 			ffiec_median_family_income, minoritypopulationpct, tract_to_msa_md_income
 			FROM hmdapub2012 WHERE msaofproperty = %s;'''
 

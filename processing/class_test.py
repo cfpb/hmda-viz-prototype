@@ -7,11 +7,14 @@ from collections import OrderedDict
 from A_D_library import parse_inputs as parse
 from A_D_library import connect_DB as connect
 from A_D_library import build_JSON as build
-
+from A_D_library import aggregate
+from A_D_library import queries
 #instantiate library functions
 parsed = parse()
 connection = connect()
 build = build()
+queries = queries()
+
 #set cursor object
 cur = connection.connect()
 
@@ -22,25 +25,25 @@ MSA = '36540'
 #store MSAs as tuples for psycopg2
 location = (MSA,)
 
-#pull SQL from report query class
-#use read file to specify which queries, may need a loop to execute multiple report types
-#load queries class and instantiate it
-from A_D_library import queries
-queries = queries()
+
+
 #if report 3-1 is selected: need a function to read in report generation parameters
 SQL = queries.table_3_1()
-
-
-
 cur.execute(SQL, location)
-
+#fetch one row from the LAR
 row = cur.fetchone()
 
-#print row
-
+#parse the row and store in the inputs dictionary - parse_inputs.inputs
 parsed.parse_t31(row)
+#build the report JSON object
 build.set_header(parsed.inputs, MSA)
 build.build_JSON(parsed.inputs, MSA)
+#print JSON
+build.print_JSON()
+#write JSON file
+build.write_JSON('test_report')
+aggregate.by_race(build.container, parsed.inputs)
+
 #build.container['year'] = parsed.inputs['year']
 #print "\nparsed\n", "*"*20, "\n", parsed.inputs
 #print "\ncontainer\n", "*"*20, "\n", build.container

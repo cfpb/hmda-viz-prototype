@@ -8,7 +8,7 @@ from geo_aggregator_one import geo_aggregator
 from report31 import R3_1
 #credentials read in as variables in the format "'dbname', 'username', 'serverhost', 'password'"
 #comments for which reports require which variables
-with open('/Users/roellk/Desktop/roellk/python/credentials.txt', 'r') as f:
+with open('/Users/roellk/Desktop/python/credentials.txt', 'r') as f:
 	credentials = f.read()
 
 cred_list = credentials.split(',')
