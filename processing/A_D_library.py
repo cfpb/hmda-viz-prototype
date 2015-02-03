@@ -204,8 +204,6 @@ class build_JSON(AD_report):
 	def __init__(self):
 		from collections import OrderedDict
 		import json
-
-	#fix headers!!!!!!
 		self.container = OrderedDict({})
 		self.msa = OrderedDict({})
 
@@ -222,17 +220,6 @@ class build_JSON(AD_report):
 	def build_JSON(self, inputs, MSA):
 		from collections import OrderedDict
 		import json
-		#container = OrderedDict({})
-		#container['table'] = ''
-		#container['type'] = 'aggregate'
-		#container['desc'] = 'Loans sold. By characteristics of borrower and census tract in which property is located and by type of purchaser (includes originations and purchased loans).'
-		#container['year'] = ''
-
-		#msa = OrderedDict({})
-		#msa['id'] = '11500'
-		#msa['name'] = 'Anniston-Oxford'
-		#msa['state'] = 'AL'
-		#self.container['msa'] = msa
 
 		purchaser_names = ['Loan was not originated or was not sold in calendar year', 'Fannie Mae', 'Ginnie Mae', 'Freddie Mac', 'Farmer Mac', 'Private Securitization', 'Commercial bank, savings bank or association', 'Life insurance co., credit union, finance co.', 'Affiliate institution', 'Other']
 		race_names = ['American Indian/Alaska Native', 'Asian', 'Black or African American', 'Native Hawaiian or Pacific Islander', 'White', 'Not Provided', 'Not Applicable', 'No co-applicant']
@@ -265,12 +252,6 @@ class build_JSON(AD_report):
 
 		borrowercharacteristics.append(top)
 		self.container['borrower characteristics'] = borrowercharacteristics
-
-		print json.dumps(self.container, indent=4)
-
-
-
-
 
 class connect_DB(AD_report):
 #I'm not sure how to pass the cursor object back to the controller object
