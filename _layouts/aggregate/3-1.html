@@ -1,11 +1,14 @@
 {% include head.html %}
 {% include header.html %}
+
 <div style="margin: 2em 1em;">
 	<h4>Aggregate Table 3-1: Loans Sold, by Characteristics of Borrower and of Census Tract in Which Property is Located and by Type of Purchaser (Includes Originations and Purchased Loans), 2013</h4>
 	<h5>MSA/MD: 11500 - ANNISTON-OXFORD, AL</h5>
 	<br />
-	<h5>Downloads</h5>
-	<a href="3-1.json" class="btn">JSON</a> <a href="#csv" class="btn">CSV</a> <a href="#pdf" class="btn">PDF</a>
+	<div class="downloads">
+		<h5>Downloads</h5>
+		<a href="3-1.json" class="btn">JSON</a> <a href="#csv" class="btn">CSV</a> <button id="print" class="btn">Print</button>
+	</div>
 </div>
 <!--<table>
 	<tr>
@@ -61,4 +64,5 @@
 	<tfoot>
 	</tfoot>
 </table>
+
 {% include footer.html %}

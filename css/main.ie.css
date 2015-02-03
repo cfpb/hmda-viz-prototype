@@ -8763,6 +8763,15 @@ tbody > tr:nth-child(2n+1) > td {
   background: #f5f5f5;
 }
 
+@media print {
+  .wrapper,
+  .footer,
+  .downloads,
+  .content_wrapper {
+    display: none;
+  }
+}
+
 .color-demo {
   display: inline-block;
   box-sizing: border-box;
