@@ -3,38 +3,6 @@ import psycopg2
 import psycopg2.extras
 from collections import OrderedDict
 
-with open('/Users/roellk/Desktop/python/credentials.txt', 'r') as f:
-    credentials = f.read()
-cred_list = credentials.split(',')
-dbname = cred_list[0]
-user = cred_list[1]
-host = cred_list[2]
-password = cred_list[3]
-
-#set a string for connection to SQL
-connect_string = "dbname=%s user=%s host=%s password =%s" %(dbname, user, host, password)
-
-try:
-    conn = psycopg2.connect(connect_string)
-    print "i'm connected"
-#if database connection results in an error print the following
-except:
-    print "I am unable to connect to the database"
-
-cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
-
-SQL = '''SELECT
-            censustractnumber, applicantrace1, applicantrace2, applicantrace3, applicantrace4, applicantrace5,
-            coapplicantrace1, coapplicantrace2, coapplicantrace3, coapplicantrace4, coapplicantrace5,
-            applicantethnicity, coapplicantethnicity, applicantincome, ratespeed, lienstatus, hoepastatus,
-            purchasertype, loanamount,sequencenumber, asofdate, statecode, censustractnumber, countycode
-        FROM hmda_lar_public_final_2012 WHERE msaofproperty = %s limit 10; '''
-
-
-MSA = '36540'
-location = (MSA,)
-cur.execute(SQL, location)
-
 container = OrderedDict({})
 container['table'] = '3-1'
 container['type'] = 'aggregate'
@@ -47,37 +15,37 @@ msa['name'] = 'Anniston-Oxford'
 msa['state'] = 'AL'
 container['msa'] = msa
 
-borrowercharacteristcs = []
+purchaser_names = ['Loan was not originated or was not sold in calendar year', 'Fannie Mae', 'Ginnie Mae', 'Freddie Mac', 'Farmer Mac', 'Private Securitization', 'Commercial bank, savings bank or association', 'Life insurance co., credit union, finance co.', 'Affiliate institution', 'Other']
+race_names = ['American Indian/Alaska Native', 'Asian', 'Black or African American', 'Native Hawaiian or Pacific Islander', 'White', 'Not Provided', 'Not Applicable', 'No co-applicant']
 
-rows = cur.fetchone()
-for index, row in enumerate(rows):
-    print rows
-    print "index", index
-    print "row", row
-    holding = {}
+borrowercharacteristics = []
+purchasers = []
 
-    purchasers = []
-    purchasersholding = OrderedDict({})
-    purchasersholding['name'] = "{} {}".format("name", index)
-    purchasersholding['count'] = index
-    purchasersholding['value'] = index+100
+for purchaser in purchaser_names:
+    purchasersholding =OrderedDict({})
+    purchasersholding['name'] = "{}".format(purchaser)
+    purchasersholding['count'] = 0
+    purchasersholding['value'] = 0
     purchasers.append(purchasersholding)
 
-    races = []
-    racesholding = OrderedDict({})
-    racesholding['race'] = "{} {}".format("race", index)
-    racesholding['purchasers'] = purchasers
-    races.append(racesholding)
+races = []
+temp = {}
+Header = True
+top = OrderedDict({})
+for race in race_names:
+    holding = OrderedDict({})
 
-    holding['characteristic'] = "{} {}".format("Race", index)
-    holding['races'] = races
+    if Header == True:
+        top['Characteristic'] = 'Race'
+        top['Races'] = []
+    Header = False
 
-    borrowercharacteristcs.append(holding)
+    holding['Race']= "{}".format(race) #race is overwritten each pass of the loop (keys are unique in dictionaries)
+    holding['Purchasers'] = [purchasers] #purchasers is overwritten each pass in the holding dictionary
+    top['Races'].append(holding)
 
-container['borrower characteristcs'] = borrowercharacteristcs
+borrowercharacteristics.append(top)
+container['borrower characteristics'] = borrowercharacteristics
 
 print json.dumps(container, indent=4)
-
-
-
 

@@ -1,31 +1,9 @@
---------
--- SUBJECT:  HMDA A&D DATA LOAD
--- DESCRIPTION:  SQL SCRIPT TO CREATE DATA TABLES AND LOAD (1) 2009-2013 LAR DATA
+﻿drop table hmdapub2009;
+drop table hmdapub2010;
+drop table hmdapub2011;
+drop table hmdapub2012;
+drop table hmdapub2013;
 
--- DATE:  1/25/2015
--- BY:  David Roell, adapted from work by PAUL SALASZNYK
---------
-
---------
--- PRE-REQUISITES:  Transfer the following files to your local machine (from HMDA Pilot Google Drive)
---------
--- (1) Data -> 2009-2013 HMDA Data:
-	 HMDAPub2009.txt
-	 HMDAPub2010.txt
-	 HMDAPub2011.txt
-	 HMDAPub2012.txt
-	 HMDAPub2013.txt
-
-
---------
--- STEP 1:  Search for “/users/roellk/desktop/HMDA/data2/“ in this code and replace with path where you saved the data files listed above
-
---------
--- STEP 2:  Run the code below in PGAdmin
---------
---------
-—— CREATE 2009 through 2013 HMDA LAR DATA TABLES with Census/HUD data
---------
 
 CREATE TABLE HMDApub2009
 (
@@ -300,16 +278,6 @@ CREATE TABLE HMDApub2013
 	Longitude decimal(18,8)
 );
 
---------
--- LOAD DATA INTO TABLES CREATED ABOVE 
---------
--- LAR Data -- 
-SET CLIENT_ENCODING = 'LATIN1';
-copy HMDAPub2009 from '/users/roellk/desktop/HMDA/data2/HMDA2009Pub.txt' csv delimiter '|'; commit;  
-copy HMDAPub2010 from '/Users/roellk/Desktop/HMDA/data2/HMDA2010Pub.txt' csv delimiter '|'; commit; 
-copy HMDAPub2011 from '/users/roellk/desktop/HMDA/data2/HMDA2011Pub.txt' csv delimiter '|'; commit;  
-copy HMDAPub2012 from '/Users/roellk/Desktop/HMDA/data2/HMDA2012Pub.txt' csv delimiter '|'; commit; 
-copy HMDAPub2013 from '/users/roellk/desktop/HMDA/data2/HMDA2013Pub.txt' csv delimiter '|'; commit;  
 
 
 

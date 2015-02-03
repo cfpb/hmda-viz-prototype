@@ -39,10 +39,11 @@ row = cur.fetchone()
 #print row
 
 parsed.parse_t31(row)
-build.report_3_1_header(parsed.inputs, MSA)
+build.set_header(parsed.inputs, MSA)
+build.build_JSON(parsed.inputs, MSA)
 #build.container['year'] = parsed.inputs['year']
-print "\nparsed\n", "*"*20, "\n", parsed.inputs
-print "\ncontainer\n", "*"*20, "\n", build.container
+#print "\nparsed\n", "*"*20, "\n", parsed.inputs
+#print "\ncontainer\n", "*"*20, "\n", build.container
 
 
 #print row['censustractnumber']
