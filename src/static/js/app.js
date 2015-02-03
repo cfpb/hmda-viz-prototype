@@ -76,4 +76,38 @@ $( document ).ready(function() {
   $('#print').click(function() {
     window.print();
   });
+
+  // to csv
+  // get the number of columns
+  var colCount = 0;
+  var theCSV = '';
+  $('.report thead tr:first-child th').each(function () { // shouldn't rely on thead being there
+    console.log ('im in');
+    if ($(this).attr('colspan')) {
+      colCount += +$(this).attr('colspan');
+    } else {
+      colCount++;
+    }
+  });
+  console.log (colCount);
+
+  // loop through each thead row
+  $('.report thead tr th, .report thead tr td, .report tbody tr td').each(function () {
+      theCSV = theCSV + ('"' + $(this).text() + '"'); // put the content in first
+      if ($(this).attr('colspan')) {
+        for (var i = 0; i < +$(this).attr('colspan')-1; i++) {  // add extra columns
+          theCSV = theCSV + ',';
+        }
+      }
+      if ($(this).is(':last-child')) {
+        theCSV = theCSV + '\n';
+      } else {
+        theCSV = theCSV + ',';
+      }
+  });
+  console.log(theCSV);
+
+  $('#csv').click(function() {
+    window.open('data:text/csv;charset=utf-8,' + escape(theCSV));
+  });
 });

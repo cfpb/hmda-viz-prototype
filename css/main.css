@@ -8321,18 +8321,38 @@ table.report {
   max-width: 98%;
   width: 98%;
 }
+table.report th.msa {
+  text-align: right;
+}
+table.report h4,
+table.report h5 {
+  margin: 0;
+}
+table.report h5 {
+  font-size: 1em;
+}
 table.report tbody th {
   text-align: left;
 }
 table.report td {
   text-align: right;
 }
+table.report td.characteristic {
+  text-align: left;
+}
+tr.heading th,
+tr.heading td {
+  text-align: center;
+  vertical-align: bottom;
+}
 th,
 td {
   background: #fff;
 }
-th {
-  text-align: center;
+thead th,
+thead td {
+  background: #fff;
+  color: #101820;
 }
 th h3 {
   font-weight: bold;

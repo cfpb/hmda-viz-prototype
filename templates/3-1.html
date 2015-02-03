@@ -1,11 +1,14 @@
 <script id="3-1" type="text/template">
+	<tr>
+		<td class="characteristic" colspan="19" align="left"><h5>Borrower Characteristics</h5></td>
+	</tr>
 	{{#borrowercharacteristics}}
 		<tr>
-			<th colspan="19"><h3>{{name}}</h3></th>
+			<td class="characteristic" colspan="19"><h5>{{name}}</h5></td>
 		</tr>
 		{{#types}}
 			<tr>
-				<th class="characteristic">{{name}}</th>
+				<td class="characteristic">{{name}}</td>
 				{{#purchasers}}
 				<td>{{count}}</td>
 				<td>{{value}}</td>
@@ -13,21 +16,4 @@
 			</tr>
 		{{/types}}
 	{{/borrowercharacteristics}}
-</script>
-
-<script id="3-1-new" type="text/template">
-	{{#borrower-characteristics}}
-		<tr>
-			<th colspan="19"><h3>Race - {{ key }}</h3></th>
-		</tr>
-		{{#Race}}
-			<tr>
-				<th class="characteristic">American Indian/Alaska Native</th>
-				{{#American Indian/Alaska Native.purchasers}}
-				<td>{{count}}</td>
-				<td>{{value}}</td>
-				{{/American Indian/Alaska Native.purchasers}}
-			</tr>
-		{{/Race}}
-	{{/borrower-characteristics}}
 </script>
