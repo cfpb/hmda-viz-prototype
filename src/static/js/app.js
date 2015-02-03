@@ -91,7 +91,7 @@ $( document ).ready(function() {
   });
   console.log (colCount);
 
-  // loop through each thead row
+  // loop through each row
   $('.report thead tr th, .report thead tr td, .report tbody tr td').each(function () {
       theCSV = theCSV + ('"' + $(this).text() + '"'); // put the content in first
       if ($(this).attr('colspan')) {
