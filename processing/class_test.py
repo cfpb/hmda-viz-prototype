@@ -7,14 +7,14 @@ from collections import OrderedDict
 from A_D_library import parse_inputs as parse
 from A_D_library import connect_DB as connect
 from A_D_library import build_JSON as build
-from A_D_library import aggregate
+from A_D_library import aggregate as agg
 from A_D_library import queries
 #instantiate library functions
 parsed = parse()
 connection = connect()
 build = build()
 queries = queries()
-
+agg = agg()
 #set cursor object
 cur = connection.connect()
 
@@ -39,11 +39,13 @@ parsed.parse_t31(row)
 build.set_header(parsed.inputs, MSA)
 build.build_JSON(parsed.inputs, MSA)
 #print JSON
-build.print_JSON()
+#build.print_JSON()
 #write JSON file
-build.write_JSON('test_report')
-aggregate.by_race(build.container, parsed.inputs)
 
+agg.by_race(build.container, parsed.inputs)
+agg.by_ethnicity(build.container, parsed.inputs)
+agg.by_minority_status(build.container, parsed.inputs)
+build.write_JSON('test_report')
 #build.container['year'] = parsed.inputs['year']
 #print "\nparsed\n", "*"*20, "\n", parsed.inputs
 #print "\ncontainer\n", "*"*20, "\n", build.container

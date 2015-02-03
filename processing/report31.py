@@ -346,7 +346,7 @@ class R3_1(report):
 
 		#aggregate loans by minority status and purchaser
 		#add a secondary logic filter off a string from the 'name' key and not from the list index
-				#not to self - cannot check boolean true/false on a list index being present in the dictionary
+		#not to self - cannot check boolean true/false on a list index being present in the dictionary
 		if purchaser in self.table_3.table_3_1['borrower-characteristics'][2]['minority statuses'][self.inputs['minority status']]['purchasers'][self.inputs['purchaser']]['name']:
 			self.table_3.table_3_1['borrower-characteristics'][2]['minority statuses'][self.inputs['minority status']]['purchasers'][self.inputs['purchaser']]['count'] += 1
 			self.table_3.table_3_1['borrower-characteristics'][2]['minority statuses'][self.inputs['minority status']]['purchasers'][self.inputs['purchaser']]['value']+= int(self.inputs['loan value'])

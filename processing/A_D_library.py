@@ -347,9 +347,9 @@ class build_JSON(AD_report):
 		holding = OrderedDict({})
 		totals['puchasers'] = purchasers
 
-		container['borrowercharacteristics'] = borrowercharacteristics
-		container['censuscharacteristics'] = censuscharacteristics
-		container['total'] = totals
+		self.container['borrowercharacteristics'] = borrowercharacteristics
+		self.container['censuscharacteristics'] = censuscharacteristics
+		self.container['total'] = totals
 
 	def print_JSON(self):
 		import json
@@ -358,7 +358,6 @@ class build_JSON(AD_report):
 	def write_JSON(self, name):
 		#writes the JSON structure to a file
 		import json
-		print 'testing', name
 		with open(name, 'w') as outfile:
 		 json.dump(self.container, outfile, indent = 4, ensure_ascii=False)
 
@@ -459,13 +458,32 @@ class queries(AD_report):
 		return SQL
 
 class aggregate(AD_report):
-
+	def __init__(self):
+		pass
 	def by_race(self, container, inputs):
 	#aggregates loans by race category
-		if race in container['borrower-characteristics'][0]['races'][race_code]['race'] and purchaser in container['borrower-characteristics'][0]['races'][race_code]['purchasers'][self.inputs['purchaser']]['name']:
-			container['borrower-characteristics'][0]['races'][race_code]['purchasers'][self.inputs['purchaser']]['count'] += 1
-			container['borrower-characteristics'][0]['races'][race_code]['purchasers'][self.inputs['purchaser']]['value'] += self.inputs['loan value']
+		#if race in container['borrower-characteristics'][0]['races'][race_code]['race'] and purchaser in container['borrower-characteristics'][0]['races'][race_code]['purchasers'][self.inputs['purchaser']]['name']:
+		container['borrowercharacteristics'][0]['races'][inputs['race']]['purchasers'][inputs['purchaser']]['count'] += 1
+		container['borrowercharacteristics'][0]['races'][inputs['race']]['purchasers'][inputs['purchaser']]['value'] += inputs['loan value']
 
+	def by_ethnicity(self, container, inputs):
+		#if ethnicity in self.table_3.table_3_1['borrower-characteristics'][1]['ethnicities'][self.inputs['ethnicity']]['ethnicity']and purchaser in self.table_3.table_3_1['borrower-characteristics'][1]['ethnicities'][self.inputs['ethnicity']]['purchasers'][self.inputs['purchaser']]['name']:
+		container['borrowercharacteristics'][1]['ethnicities'][inputs['ethnicity']]['purchasers'][inputs['purchaser']]['count'] #+= 1
+		container['borrowercharacteristics'][1]['ethnicities'][inputs['ethnicity']]['purchasers'][inputs['purchaser']]['value'] += int(inputs['loan value'])
 
-		else:
-			print "loan not added, code not present - race"
+	def by_minority_status(self, container, inputs):
+		#if purchaser in self.table_3.table_3_1['borrower-characteristics'][2]['minority statuses'][self.inputs['minority status']]['purchasers'][self.inputs['purchaser']]['name']:
+		container['borrowercharacteristics'][2]['minority statuses'][inputs['minoritystatus']]['purchasers'][inputs['purchaser']]['count'] += 1
+		container['borrowercharacteristics'][2]['minority statuses'][inputs['minoritystatus']]['purchasers'][inputs['purchaser']]['value']+= int(inputs['loan value'])
+
+	def by_applicant_income(self, container, inputs):
+		pass
+		#if purchaser in self.table_3.table_3_1['borrower-characteristics'][3]['income brackets'][self.inputs['income bracket']]['purchasers'][self.inputs['purchaser']]['name']:
+		#contianer['borrower-characteristics'][3]['income brackets'][self.inputs['income bracket']]['purchasers'][self.inputs['purchaser']]['count'] += 1
+		#self.table_3.table_3_1['borrower-characteristics'][3]['income brackets'][self.inputs['income bracket']]['purchasers'][self.inputs['purchaser']]['value'] += int(self.inputs['loan value'])
+	def by_minority_composition(self, container, inputs):
+		pass
+	def by_tract_income(self, container, inputs):
+		pass
+	def totals(self, container, inputs):
+		pass
