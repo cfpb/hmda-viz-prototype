@@ -473,17 +473,24 @@ class aggregate(AD_report):
 
 	def by_minority_status(self, container, inputs):
 		#if purchaser in self.table_3.table_3_1['borrower-characteristics'][2]['minority statuses'][self.inputs['minority status']]['purchasers'][self.inputs['purchaser']]['name']:
-		container['borrowercharacteristics'][2]['minority statuses'][inputs['minoritystatus']]['purchasers'][inputs['purchaser']]['count'] += 1
-		container['borrowercharacteristics'][2]['minority statuses'][inputs['minoritystatus']]['purchasers'][inputs['purchaser']]['value']+= int(inputs['loan value'])
+		container['borrowercharacteristics'][2]['minoritystatuses'][inputs['minority status']]['purchasers'][inputs['purchaser']]['count'] += 1
+		container['borrowercharacteristics'][2]['minoritystatuses'][inputs['minority status']]['purchasers'][inputs['purchaser']]['value']+= int(inputs['loan value'])
 
 	def by_applicant_income(self, container, inputs):
-		pass
 		#if purchaser in self.table_3.table_3_1['borrower-characteristics'][3]['income brackets'][self.inputs['income bracket']]['purchasers'][self.inputs['purchaser']]['name']:
-		#contianer['borrower-characteristics'][3]['income brackets'][self.inputs['income bracket']]['purchasers'][self.inputs['purchaser']]['count'] += 1
-		#self.table_3.table_3_1['borrower-characteristics'][3]['income brackets'][self.inputs['income bracket']]['purchasers'][self.inputs['purchaser']]['value'] += int(self.inputs['loan value'])
+		container['borrowercharacteristics'][3]['appincome'][inputs['income bracket']]['purchasers'][inputs['purchaser']]['count'] += 1
+		container['borrowercharacteristics'][3]['appincome'][inputs['income bracket']]['purchasers'][inputs['purchaser']]['value'] += int(inputs['loan value'])
+
 	def by_minority_composition(self, container, inputs):
-		pass
+		#if purchaser in  self.table_3.table_3_1['census-characteristics'][0]['compositions'][self.inputs['minority pct index']]['purchasers'][self.inputs['purchaser']]['name']:
+		container['censuscharacteristics'][0]['tractpctminority'][inputs['minority pct index']]['purchasers'][inputs['purchaser']]['count'] += 1
+		container['censuscharacteristics'][0]['tractpctminority'][inputs['minority pct index']]['purchasers'][inputs['purchaser']]['value'] += int(inputs['loan value'])
+
 	def by_tract_income(self, container, inputs):
-		pass
+		#if purchaser in self.table_3.table_3_1['census-characteristics'][1]['income categories'][self.inputs['tract income index']]['purchasers'][self.inputs['purchaser']]['name']:
+		container['censuscharacteristics'][1]['income categories'][inputs['tract income index']]['purchasers'][inputs['purchaser']]['count'] +=1
+		container['censuscharacteristics'][1]['income categories'][inputs['tract income index']]['purchasers'][inputs['purchaser']]['value'] += int(inputs['loan value'])
+
 	def totals(self, container, inputs):
-		pass
+		container['total']['purchasers'][inputs['purchaser']]['count'] +=1
+		container['total']['purchasers'][inputs['purchaser']]['value'] += int(inputs['loan value'])
