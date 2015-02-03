@@ -242,19 +242,20 @@ class build_JSON(AD_report):
 			holding = OrderedDict({})
 
 			if Header == True:
-				top['Characteristic'] = 'Race'
-				top['Races'] = []
+				top['characteristic'] = 'Race'
+				top['races'] = []
 			Header = False
 
-			holding['Race']= "{}".format(race) #race is overwritten each pass of the loop (keys are unique in dictionaries)
-			holding['Purchasers'] = [purchasers] #purchasers is overwritten each pass in the holding dictionary
-			top['Races'].append(holding)
+			holding['race']= "{}".format(race) #race is overwritten each pass of the loop (keys are unique in dictionaries)
+			holding['purchasers'] = purchasers #purchasers is overwritten each pass in the holding dictionary
+			top['races'].append(holding)
 
 		borrowercharacteristics.append(top)
-		self.container['borrower characteristics'] = borrowercharacteristics
+		self.container['borrowercharacteristics'] = borrowercharacteristics
+		print json.dumps(self.container, indent=4)
 
 class connect_DB(AD_report):
-#I'm not sure how to pass the cursor object back to the controller object
+
 	def connect(self):
 		import psycopg2
 		import psycopg2.extras

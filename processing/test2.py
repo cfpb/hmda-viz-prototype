@@ -36,16 +36,16 @@ for race in race_names:
     holding = OrderedDict({})
 
     if Header == True:
-        top['Characteristic'] = 'Race'
-        top['Races'] = []
+        top['characteristic'] = 'Race'
+        top['races'] = []
     Header = False
 
-    holding['Race']= "{}".format(race) #race is overwritten each pass of the loop (keys are unique in dictionaries)
-    holding['Purchasers'] = [purchasers] #purchasers is overwritten each pass in the holding dictionary
-    top['Races'].append(holding)
+    holding['race']= "{}".format(race) #race is overwritten each pass of the loop (keys are unique in dictionaries)
+    holding['purchasers'] = purchasers #purchasers is overwritten each pass in the holding dictionary
+    top['races'].append(holding)
 
 borrowercharacteristics.append(top)
-container['borrower characteristics'] = borrowercharacteristics
+container['borrower-characteristics'] = borrowercharacteristics
 
 print json.dumps(container, indent=4)
 
