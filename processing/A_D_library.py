@@ -345,7 +345,7 @@ class build_JSON(AD_report):
 		#build totals
 		top = OrderedDict({})
 		holding = OrderedDict({})
-		totals['puchasers'] = purchasers
+		totals['purchasers'] = purchasers
 
 		self.container['borrowercharacteristics'] = borrowercharacteristics
 		self.container['censuscharacteristics'] = censuscharacteristics
@@ -420,16 +420,17 @@ class MSA_info(AD_report):
 		#set index codes for minority population percent
 		if inputs['minority percent'] == '      ' or inputs['minority percent'] == 'NA    ':
 			return  4
-		elif float(inputs['minority percent']) < 10:
+		elif float(inputs['minority percent']) < 10.0:
 			return  0
-		elif float(inputs['minority percent'])  <= 49:
+		elif float(inputs['minority percent'])  <= 49.0:
 			return  1
-		elif float(inputs['minority percent'])  <= 79:
+		elif float(inputs['minority percent'])  <= 79.0:
 			return  2
-		elif float(inputs['minority percent'])  <= 1:
+		elif float(inputs['minority percent'])  <= 100.0:
 			return  3
 		else:
 			print "minority percent index not set"
+			print "value of", float(inputs['minority percent'])
 
 	def tract_to_MSA_income(self, inputs):
 		#set census MSA income level: low, moderate, middle, upper
@@ -472,7 +473,7 @@ class aggregate(AD_report):
 
 	def by_ethnicity(self, container, inputs):
 		#if ethnicity in self.table_3.table_3_1['borrower-characteristics'][1]['ethnicities'][self.inputs['ethnicity']]['ethnicity']and purchaser in self.table_3.table_3_1['borrower-characteristics'][1]['ethnicities'][self.inputs['ethnicity']]['purchasers'][self.inputs['purchaser']]['name']:
-		container['borrowercharacteristics'][1]['ethnicities'][inputs['ethnicity']]['purchasers'][inputs['purchaser']]['count'] #+= 1
+		container['borrowercharacteristics'][1]['ethnicities'][inputs['ethnicity']]['purchasers'][inputs['purchaser']]['count'] += 1
 		container['borrowercharacteristics'][1]['ethnicities'][inputs['ethnicity']]['purchasers'][inputs['purchaser']]['value'] += int(inputs['loan value'])
 
 	def by_minority_status(self, container, inputs):

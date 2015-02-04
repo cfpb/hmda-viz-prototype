@@ -138,7 +138,7 @@ censuscharacteristics.append(top)
 #build totals
 top = OrderedDict({})
 holding = OrderedDict({})
-totals['puchasers'] = purchasers
+totals['purchasers'] = purchasers
 
 container['borrowercharacteristics'] = borrowercharacteristics
 container['censuscharacteristics'] = censuscharacteristics

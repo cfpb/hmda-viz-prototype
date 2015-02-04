@@ -22,32 +22,35 @@ cur = connection.connect()
 #set MSA list
 MSA = '36540'
 location = (MSA,)
-
+'''
 #get count for looping over rows in the MSA
 SQL = queries.count_rows_2012() #get query text for getting count of loans for the MSA
 cur.execute(SQL, location) #ping the database for numbers!
 count = cur.fetchone() #get cont of rows for the MSA
 end = int(count[0]) #set count to an integer from a list of long type
 print end
+'''
 #if report 3-1 is selected: need a function to read in report generation parameters
 SQL = queries.table_3_1()
 cur.execute(SQL, location)
 
 print "headed into loop"
-for num in range(0,end):
+#for num in range(0,end):
+for num in range(0,1):
     #fetch one row from the LAR
     row = cur.fetchone()
     parsed.parse_t31(row) #parse the row and store in the inputs dictionary - parse_inputs.inputs
+    print parsed.inputs
     if num == 0:
         #build the report JSON object
         build.set_header(parsed.inputs, MSA)
         build.build_JSON(parsed.inputs, MSA)
-
+       # build.print_JSON()
     #aggregate the loan into appropriate rows for the table
     agg.by_race(build.container, parsed.inputs) #aggregate loan by race
     agg.by_ethnicity(build.container, parsed.inputs) #aggregate loan by ethnicity
     agg.by_minority_status(build.container, parsed.inputs) #aggregate loan by minority status
-
+    agg.totals(build.container, parsed.inputs) #aggregate totals for each purchaser
 build.write_JSON('test_report')
 build.print_JSON()
 
