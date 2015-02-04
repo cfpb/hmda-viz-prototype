@@ -217,6 +217,7 @@ class build_JSON(AD_report):
 		#self.msa['name'] = inputs['MSA name'] #need to add MSA names to a database or read-in file
 		self.msa['state'] = inputs['state name']
 		self.container['msa'] = self.msa
+
 	def set_purchasers(self):
 		from collections import OrderedDict
 		purchasers = []
@@ -229,6 +230,7 @@ class build_JSON(AD_report):
 			purchasers.append(purchasersholding)
 		#print "purchasrs in functions", purchasers
 		return purchasers
+
 	def build_JSON(self, inputs, MSA):
 		from collections import OrderedDict
 		import json
