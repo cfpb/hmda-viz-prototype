@@ -52,7 +52,7 @@ class R3_1(report):
 		self.inputs['lien status'] = rows[15]
 		self.inputs['hoepa flag'] = rows[16]
 		self.inputs['purchaser'] = int(rows[17])
-		self.inputs['loan value'] = rows[18]
+		self.inputs['loan value'] = float(rows[18])
 		self.inputs['a race'] = a_race
 		self.inputs['co race']= co_race
 		self.inputs['joint status'] = ''
@@ -62,9 +62,63 @@ class R3_1(report):
 		self.inputs['sequence'] = rows[19] # the sequence number to track loans in error checking
 		self.inputs['year'] = rows[20]
 		self.inputs['state code'] = rows[21]
-		self.inputs['census tract'] = rows[22]
+		self.inputs['state name'] = rows[22]
+		self.inputs['census tract'] = rows[0] # this is currently the 7 digit tract used by the FFIEC, it includes a decimal prior to the last two digits
 		self.inputs['county code'] = rows[23]
+		self.inputs['county name'] = rows[24]
 		self.inputs['minority status'] = ' '
+		self.inputs['MSA median income'] = rows[25]
+		self.inputs['minority percent'] = rows[26]
+		self.inputs['tract to MSA income'] = rows[27]
+
+		#set income bracket index
+		if self.inputs['income'] != 'NA  ' or self.inputs['income'] != '    ':
+			self.inputs['income bracket'] = 5
+		elif self.inputs['MSA median income'] != 'NA      ' and self.inputs['MSA median income'] != '        ' :
+			self.inputs['income bracket'] = 6 #placeholder for MSA median income unavailable
+		else:
+			self.inputs['percent MSA income'] = float(self.inputs['income']) / float(self.inputs['MSA median income'] )
+			#determine income bracket for use as an index in the JSON object
+			#move this somewhere else
+			#check logic on math to make sure all is inclusive - set a rounding function on line 71
+			if self.inputs['percent MSA income'] < 50:
+				self.inputs['income bracket'] = 0
+			elif self.inputs['percent MSA income'] <= 79:
+				self.inputs['income bracket'] = 1
+			elif self.inputs['percent MSA income'] <= 99:
+				self.inputs['income bracket'] = 2
+			elif self.inputs['percent MSA income'] <= 119:
+				self.inputs['income bracket'] = 3
+			elif self.inputs['percent MSA income'] >= 120:
+				self.inputs['income bracket']  = 4
+			else:
+				print 'error setting percent MSA income bracket for index'
+
+		#set census MSA income level: low, moderate, middle, upper
+		if self.inputs['tract to MSA income'] < 50:
+			self.inputs['tract income index'] = 0
+		elif self.inputs['tract to MSA income'] < 80:
+			self.inputs['tract income index'] = 1
+		elif self.inputs['tract to MSA income'] < 120:
+			self.inputs['tract income index'] = 2
+		elif self.inputs['tract to MSA income'] >=120:
+			self.inputs['tract income index'] = 3
+		else:
+			print "error setting tract to MSA income index"
+
+		#set index codes for minority population percent
+		if self.inputs['minority percent'] == '      ' or self.inputs['minority percent'] == 'NA    ':
+			self.inputs['minority pct index'] = 4
+		elif float(self.inputs['minority percent']) < 10:
+			self.inputs['minority pct index'] = 0
+		elif float(self.inputs['minority percent'])  <= 49:
+			self.inputs['minority pct index'] = 1
+		elif float(self.inputs['minority percent'])  <= 79:
+			self.inputs['minority pct index'] = 2
+		elif float(self.inputs['minority percent'])  <= 1:
+			self.inputs['minority pct index'] = 3
+		else:
+			print "minority percent index not set"
 
 		#the minority count is the count of minority races listed for the primary applicant
 		minority_count = 0
@@ -72,6 +126,7 @@ class R3_1(report):
 			if race < 5 and race > 0:
 				minority_count += 1
 		self.inputs['minority count'] = minority_count
+
 	def set_joint_status(self):
 		#loop over all elements in both race lists to flag presence of minority race
 		#assigning non-white boolean flags for use in joint race status and minority status checks
@@ -95,6 +150,7 @@ class R3_1(report):
 		#check to see if joint status exists
 		if self.inputs['app non white flag'] == False and self.inputs['co non white flag'] == False:
 			self.inputs['joint status'] = False #flag false if both applicant and co-applicant are white
+		elif self.inputs['app non white flag'] == True and self.inputs['co non white flag'] == True:
 			self.inputs['joint status'] = False #flag false if both applicant and co-applicant are minority
 		elif self.inputs['app non white flag'] == True and self.inputs['co non white flag'] ==  False:
 			self.inputs['joint status'] = True #flag true if one applicant is minority and one is white
@@ -179,18 +235,8 @@ class R3_1(report):
 		elif self.inputs['app non white flag'] != True and self.inputs['co non white flag'] != True and self.inputs['a ethn']  != '1' and self.inputs['co ethn'] != '1':
 			self.inputs['minority status'] = 0
 		else:
-			self.inputs['minority status'] = 0
-			print 'else level minority status'
-			print self.inputs['minority status'], 'minority status'
-			print self.inputs['purchaser'], 'purchaser code'
-			print self.inputs['co race'], 'co race'
-			print self.inputs['a race'], 'a race'
-			print self.inputs['a ethn'], 'app ethn'
-			print self.inputs['co ethn'], 'co ethn'
-			print self.inputs['app non white flag'], 'app non white flag'
-			print self.inputs['co non white flag'], 'co non white flag'
-			#print self.table_3['borrower-characteristics'][2]['types'][self.inputs['minority status']]['purchasers'][self.inputs['purchaser']]['name']
-			print 'record number', self.inputs['sequence']
+			print 'minority status not set'
+
 
 	def table_3_aggregator(self):
 		#convert the race to a text to access the JSON structure to aggregate and store data
@@ -283,30 +329,58 @@ class R3_1(report):
 
 		#aggregate loans by race and purchaser
 		#check if the race and the purchaser listed for the loan exists in the data structure, if so, add them to the values in the JSON structure
-		if race in self.table_3.table_3_1['borrower-characteristics'][0]['Race'][race_code] and purchaser in self.table_3.table_3_1['borrower-characteristics'][0]['Race'][race_code][race]['purchasers'][self.inputs['purchaser']]:
-			self.table_3.table_3_1['borrower-characteristics'][0]['Race'][race_code][race]['purchasers'][self.inputs['purchaser']][purchaser]['count'] += 1
-			self.table_3.table_3_1['borrower-characteristics'][0]['Race'][race_code][race]['purchasers'][self.inputs['purchaser']][purchaser]['value'] += int(self.inputs['loan value'])
+		if race in self.table_3.table_3_1['borrower-characteristics'][0]['races'][race_code]['race'] and purchaser in self.table_3.table_3_1['borrower-characteristics'][0]['races'][race_code]['purchasers'][self.inputs['purchaser']]['name']:
+			self.table_3.table_3_1['borrower-characteristics'][0]['races'][race_code]['purchasers'][self.inputs['purchaser']]['count'] += 1
+			self.table_3.table_3_1['borrower-characteristics'][0]['races'][race_code]['purchasers'][self.inputs['purchaser']]['value'] += self.inputs['loan value']
+
 
 		else:
 			print "loan not added, code not present - race"
 
 		#aggregate loans by ethnicity and purchaser
-		if ethnicity in self.table_3.table_3_1['borrower-characteristics'][1]['Ethnicity'][self.inputs['ethnicity']] and purchaser in self.table_3.table_3_1['borrower-characteristics'][1]['Ethnicity'][self.inputs['ethnicity']][ethnicity]['purchasers'][self.inputs['purchaser']]:
-			self.table_3.table_3_1['borrower-characteristics'][1]['Ethnicity'][self.inputs['ethnicity']][ethnicity]['purchasers'][self.inputs['purchaser']][purchaser]['count'] += 1
-			self.table_3.table_3_1['borrower-characteristics'][1]['Ethnicity'][self.inputs['ethnicity']][ethnicity]['purchasers'][self.inputs['purchaser']][purchaser]['value'] += int(self.inputs['loan value'])
+		if ethnicity in self.table_3.table_3_1['borrower-characteristics'][1]['ethnicities'][self.inputs['ethnicity']]['ethnicity']and purchaser in self.table_3.table_3_1['borrower-characteristics'][1]['ethnicities'][self.inputs['ethnicity']]['purchasers'][self.inputs['purchaser']]['name']:
+			self.table_3.table_3_1['borrower-characteristics'][1]['ethnicities'][self.inputs['ethnicity']]['purchasers'][self.inputs['purchaser']]['count'] #+= 1
+			self.table_3.table_3_1['borrower-characteristics'][1]['ethnicities'][self.inputs['ethnicity']]['purchasers'][self.inputs['purchaser']]['value'] += int(self.inputs['loan value'])
 		else:
 			print "loan not added, code not present - ethnicity"
 
 		#aggregate loans by minority status and purchaser
 		#add a secondary logic filter off a string from the 'name' key and not from the list index
-		if purchaser in self.table_3.table_3_1['borrower-characteristics'][2]['Minority Status'][self.inputs['minority status']][minority_status]['purchasers'][self.inputs['purchaser']] and minority_status in self.table_3.table_3_1['borrower-characteristics'][2]['Minority Status'][self.inputs['minority status']]:
-			self.table_3.table_3_1['borrower-characteristics'][2]['Minority Status'][self.inputs['minority status']][minority_status]['purchasers'][self.inputs['purchaser']][purchaser]['count'] += 1
-			self.table_3.table_3_1['borrower-characteristics'][2]['Minority Status'][self.inputs['minority status']][minority_status]['purchasers'][self.inputs['purchaser']][purchaser]['value'] += int(self.inputs['loan value'])
+		#not to self - cannot check boolean true/false on a list index being present in the dictionary
+		if purchaser in self.table_3.table_3_1['borrower-characteristics'][2]['minority statuses'][self.inputs['minority status']]['purchasers'][self.inputs['purchaser']]['name']:
+			self.table_3.table_3_1['borrower-characteristics'][2]['minority statuses'][self.inputs['minority status']]['purchasers'][self.inputs['purchaser']]['count'] += 1
+			self.table_3.table_3_1['borrower-characteristics'][2]['minority statuses'][self.inputs['minority status']]['purchasers'][self.inputs['purchaser']]['value']+= int(self.inputs['loan value'])
 
 		else:
 			print "loan not added in minority status"
-		self.table_3.table_3_1['total']['purchasers'][self.inputs['purchaser']][purchaser]['count'] +=1
-		self.table_3.table_3_1['total']['purchasers'][self.inputs['purchaser']][purchaser]['value'] += int(self.inputs['loan value'])
+
+
+		#aggregate loans by borrower income to MS/MD median income
+		if purchaser in self.table_3.table_3_1['borrower-characteristics'][3]['income brackets'][self.inputs['income bracket']]['purchasers'][self.inputs['purchaser']]['name']:
+			self.table_3.table_3_1['borrower-characteristics'][3]['income brackets'][self.inputs['income bracket']]['purchasers'][self.inputs['purchaser']]['count'] += 1
+			self.table_3.table_3_1['borrower-characteristics'][3]['income brackets'][self.inputs['income bracket']]['purchasers'][self.inputs['purchaser']]['value'] += int(self.inputs['loan value'])
+		else:
+			print "loan not added in MS/MD median income"
+
+
+		#aggregate loans by MSA racial/ethnic composition
+		print self.inputs['minority pct index'], "pct index"
+		print self.inputs['minority percent'], "percent number"
+		if purchaser in  self.table_3.table_3_1['census-characteristics'][0]['compositions'][self.inputs['minority pct index']]['purchasers'][self.inputs['purchaser']]['name']:
+			self.table_3.table_3_1['census-characteristics'][0]['compositions'][self.inputs['minority pct index']]['purchasers'][self.inputs['purchaser']]['count'] += 1
+			self.table_3.table_3_1['census-characteristics'][0]['compositions'][self.inputs['minority pct index']]['purchasers'][self.inputs['purchaser']]['value'] += int(self.inputs['loan value'])
+		else:
+			print "loan not added in MSA racial composition"
+
+		#aggregate loans by MSA income classification
+		if purchaser in self.table_3.table_3_1['census-characteristics'][1]['income categories'][self.inputs['tract income index']]['purchasers'][self.inputs['purchaser']]['name']:
+			self.table_3.table_3_1['census-characteristics'][1]['income categories'][self.inputs['tract income index']]['purchasers'][self.inputs['purchaser']]['count'] +=1
+			self.table_3.table_3_1['census-characteristics'][1]['income categories'][self.inputs['tract income index']]['purchasers'][self.inputs['purchaser']]['value'] += int(self.inputs['loan value'])
+		else:
+			print "loan not added in tract to MSA income classification"
+		#aggregate total loans in MSA
+		self.table_3.table_3_1['total']['purchasers'][self.inputs['purchaser']]['count'] +=1
+		self.table_3.table_3_1['total']['purchasers'][self.inputs['purchaser']]['value'] += int(self.inputs['loan value'])
 	#Race: American Indian or Alaska NAtive(1), Asian(2), Black(3), Native Hawaiian or Pacific Islander(4), White(5), Not provided(6), Not applicable(7), no co-applicant(8)
 	#joint definition: one minority race and one white
 	#2 minority definition: both applicants of minority race
@@ -336,7 +410,7 @@ class R3_1(report):
 		cur = conn.cursor()
 
 		#count the number of rows to be selected for the geography
-		SQL = "SELECT COUNT(msaofproperty) FROM hmda_lar_public_final_2012 WHERE msaofproperty = %s;"
+		SQL = "SELECT COUNT(msaofproperty) FROM hmdapub2012 WHERE msaofproperty = %s;"
 		cur.execute(SQL, location) #location is a list passed in from the controller object. The list order must match the variable order in the SQL string
 		#produces a tuple that is a count of the number of records in the selected geography
 		rows_selected = cur.fetchone()
@@ -348,10 +422,11 @@ class R3_1(report):
 		#set the SQL statement to select the needed fields to aggregate loans for the table_3 JSON structure
 		SQL = '''SELECT
 			censustractnumber, applicantrace1, applicantrace2, applicantrace3, applicantrace4, applicantrace5,
-			coapplicantrace1, coapplicantrace2, coapplicantrace3, coapplicantrace4,	coapplicantrace5,
-			applicantethnicity, coapplicantethnicity, applicantincome, ratespeed, lienstatus, hoepastatus,
-			purchasertype, loanamount,sequencenumber, asofdate, statecode, censustractnumber, countycode
-		FROM hmda_lar_public_final_2012 WHERE msaofproperty = %s; '''
+			coapplicantrace1, coapplicantrace2, coapplicantrace3, coapplicantrace4, coapplicantrace5,
+			applicantethnicity, co_applicantethnicity, applicantincome, ratespread, lienstatus, hoepastatus,
+			purchasertype, loanamount, sequencenumber, asofdate, statecode, statename, countycode, countyname,
+			ffiec_median_family_income, minoritypopulationpct, tract_to_msa_md_income
+			FROM hmdapub2012 WHERE msaofproperty = %s;'''
 
 		cur.execute(SQL, location)
 
@@ -404,5 +479,5 @@ class R3_1(report):
 		import json
 		print 'testing', name
 		with open(name, 'w') as outfile:
-			 json.dump(self.table_3.table_3_1, outfile, sort_keys = True, indent = 4, ensure_ascii=False)
+			 json.dump(self.table_3.table_3_1, outfile, indent = 4, ensure_ascii=False)
 

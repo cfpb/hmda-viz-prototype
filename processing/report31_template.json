@@ -1,12 +1,4 @@
-#This file has the master template objects that are used in the report generators
-#each report JSON object is its own class object
-
-class JSON_Template(object):
-	def __init__(self):
-		pass
-
-class report_3_1_json(JSON_Template):
-	table_3_1 =   {
+{
     "table": "",
     "type": "aggregate",
     "year": "",
