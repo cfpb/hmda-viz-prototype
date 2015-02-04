@@ -468,60 +468,21 @@ class queries(AD_report):
 class aggregate(AD_report):
 	def __init__(self):
 		pass
-	def set_race_names(self, inputs):
-		#set names of race codes to screen aggregation
-		'''purchaser_names = ['Loan was not originated or was not sold in calendar year', 'Fannie Mae', 'Ginnie Mae', 'Freddie Mac', 'Farmer Mac', 'Private Securitization', 'Commercial bank, savings bank or association', 'Life insurance co., credit union, finance co.', 'Affiliate institution', 'Other']
-		race_names = ['American Indian/Alaska Native', 'Asian', 'Black or African American', 'Native Hawaiian or Pacific Islander', 'White', '2 or more minority races', 'Joint', 'Not Provided', 'Not Applicable', 'No co-applicant']
-		ethnicity_names = ['Hispanic or Latino', 'Not Hispanic or Latino', 'Not provided', 'Not applicable', 'No co-applicant']
-		minority_statuses = ['White Non-Hispanic', 'Others, Including Hispanic']
-		applicant_income_bracket = ['Less than 50% of MSA/MD median', '50-79% of MSA/MD median', '80-99% of MSA/MD median', '100-119% of MSA/MD median', '120% or more of MSA/MD median', 'income not available']
-		tract_pct_minority = ['Less than 10% minority', '10-19% minority', '20-49% minority', '50-79% minority', '80-100% minority']
-		tract_income = ['Low income', 'Moderate income', 'Middle income', 'Upper income']'''
-		if inputs['race'] == 0:
-			self.race = 'American Indian/Alaska Native'
-		elif inputs['race'] == 1:
-			self.race = 'Asian'
-		elif inputs['race'] == 2:
-			self.race = 'Black or African American'
-		elif inputs['race'] == 3:
-			self.race = 'Native Hawaiian or Pacific Islander'
-		elif inputs['race'] == 4:
-			self.race = 'White'
-		elif inputs['race'] == 5:
-			self.race = '2 or more minority races'
-		elif inputs['race'] == 6:
-			self.race = 'Joint'
-		elif inputs['race'] == 7:
-			self.race = 'Not Provided'
-		elif inputs['race'] == 8:
-			self.race = 'Not Applicable'
-		elif inputs['race'] == 9:
-			self.race = 'No co-applicant'
 
 	def by_race(self, container, inputs):
 	#aggregates loans by race category
-		#import json
-		self.set_race_names(inputs)
-		#print json.dumps(container, indent=4)
-		#print container['borrowercharacteristics'][0]['characteristic']
-		#print container['borrowercharacteristics'][1]['characteristic']
-		#print container['borrowercharacteristics'][0]['races'][inputs['race']]['purchasers'][inputs['purchaser']]['count'], "count before"
-		if self.race in container['borrowercharacteristics'][0]['races'][inputs['race']]['race']:# and purchaser in container['borrowercharacteristics'][0]['races'][inputs['race']]['purchasers'][inputs['purchaser']]['name']:
-			container['borrowercharacteristics'][0]['races'][inputs['race']]['purchasers'][inputs['purchaser']]['count'] += 1
-			container['borrowercharacteristics'][0]['races'][inputs['race']]['purchasers'][inputs['purchaser']]['value'] += inputs['loan value']
+		container['borrowercharacteristics'][0]['races'][inputs['race']]['purchasers'][inputs['purchaser']]['count'] += 1
+		container['borrowercharacteristics'][0]['races'][inputs['race']]['purchasers'][inputs['purchaser']]['value'] += inputs['loan value']
 			#print container['borrowercharacteristics'][0]['races'][inputs['race']]['purchasers'][inputs['purchaser']]['count'], "count after"
 	def by_ethnicity(self, container, inputs):
-		#if ethnicity in self.table_3.table_3_1['borrower-characteristics'][1]['ethnicities'][self.inputs['ethnicity']]['ethnicity']and purchaser in self.table_3.table_3_1['borrower-characteristics'][1]['ethnicities'][self.inputs['ethnicity']]['purchasers'][self.inputs['purchaser']]['name']:
 		container['borrowercharacteristics'][1]['ethnicities'][inputs['ethnicity']]['purchasers'][inputs['purchaser']]['count'] += 1
 		container['borrowercharacteristics'][1]['ethnicities'][inputs['ethnicity']]['purchasers'][inputs['purchaser']]['value'] += int(inputs['loan value'])
 
 	def by_minority_status(self, container, inputs):
-		#if purchaser in self.table_3.table_3_1['borrower-characteristics'][2]['minority statuses'][self.inputs['minority status']]['purchasers'][self.inputs['purchaser']]['name']:
 		container['borrowercharacteristics'][2]['minoritystatuses'][inputs['minority status']]['purchasers'][inputs['purchaser']]['count'] += 1
 		container['borrowercharacteristics'][2]['minoritystatuses'][inputs['minority status']]['purchasers'][inputs['purchaser']]['value']+= int(inputs['loan value'])
 
 	def by_applicant_income(self, container, inputs):
-		#if purchaser in self.table_3.table_3_1['borrower-characteristics'][3]['income brackets'][self.inputs['income bracket']]['purchasers'][self.inputs['purchaser']]['name']:
 		if inputs['income bracket'] > 4:
 			pass
 		else:
@@ -530,7 +491,6 @@ class aggregate(AD_report):
 
 	def by_minority_composition(self, container, inputs):
 		#add a drop loan from aggregation filter at top if census information is not available
-		#if purchaser in  self.table_3.table_3_1['census-characteristics'][0]['compositions'][self.inputs['minority pct index']]['purchasers'][self.inputs['purchaser']]['name']:
 		if inputs['minority percent'] == 4:
 			pass
 		else:
@@ -538,7 +498,6 @@ class aggregate(AD_report):
 			container['censuscharacteristics'][0]['tractpctminority'][inputs['minority percent']]['purchasers'][inputs['purchaser']]['value'] += int(inputs['loan value'])
 
 	def by_tract_income(self, container, inputs):
-		#if purchaser in self.table_3.table_3_1['census-characteristics'][1]['income categories'][self.inputs['tract income index']]['purchasers'][self.inputs['purchaser']]['name']:
 		container['censuscharacteristics'][1]['incomelevel'][inputs['tract income index']]['purchasers'][inputs['purchaser']]['count'] +=1
 		container['censuscharacteristics'][1]['incomelevel'][inputs['tract income index']]['purchasers'][inputs['purchaser']]['value'] += int(inputs['loan value'])
 

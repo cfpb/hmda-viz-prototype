@@ -34,25 +34,14 @@ print end
 SQL = queries.table_3_1()
 cur.execute(SQL, location)
 
-#with open('JSON_out.json', 'r') as infile:
-#	cont = infile.read()
 json_data = open('JSON_out.json')
 cont = OrderedDict(json.load(json_data))
-#for num in range(0,end):
-#cont = OrderedDict({})
+
 for num in range(0,end):
 	#print "in loop"
 	#fetch one row from the LAR
 	row = cur.fetchone()
 	parsed.parse_t31(row) #parse the row and store in the inputs dictionary - parse_inputs.inputs
-	#print parsed.inputs
-
-	if num == 0:
-		#build the report JSON object
-		print "in conditional area"
-		#cont = build.build_JSON(parsed.inputs, MSA)
-
-		#build.print_JSON()
 
 	#aggregate the loan into appropriate rows for the table
 	agg.by_race(cont, parsed.inputs) #aggregate loan by race
@@ -62,11 +51,10 @@ for num in range(0,end):
 	agg.by_minority_composition(cont, parsed.inputs)
 	agg.by_tract_income(cont, parsed.inputs)
 	agg.totals(cont, parsed.inputs) #aggregate totals for each purchaser
-#build.write_JSON('test_report')
+
 print "out of loop"
 print json.dumps(cont, indent=4)
 name = 'sample.json'
-with open(name, 'w') as outfile:
-	 json.dump(cont, outfile, indent = 4, ensure_ascii=False)
+build.write_JSON(name)
 
 
