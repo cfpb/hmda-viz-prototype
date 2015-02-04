@@ -30,4 +30,15 @@ minority_status = 'White non-hispanic'
 #r3.table_3_1['year'] = '2013'
 #print r3.table_3_1['year']
 #print type(r3.table_3_1)
-print r3.table_3_1['total']['purchasers'][inputs['purchaser']][purchaser]['count']
+#print r3.table_3_1['total']['purchasers'][inputs['purchaser']][purchaser]['count']
+
+#print r3.table_3_1['borrower-characteristics'][2]['minority statuses'][inputs['minority status']]['purchasers'][inputs['purchaser']]['count']
+#print ethnicity
+#print r3.table_3_1['borrower-characteristics'][1]['ethnicities'][inputs['ethnicity']]['ethnicity']
+#print ethnicity in r3.table_3_1['borrower-characteristics'][1]['ethnicities'][inputs['ethnicity']]['ethnicity']['purchasers']
+#print purchaser in  r3.table_3_1['borrower-characteristics'][2]['minority statuses'][inputs['minority status']]['purchasers'][inputs['purchaser']]['name']
+
+
+print r3.table_3_1['borrower-characteristics'][1]['ethnicities'][inputs['ethnicity']]['purchasers'][inputs['purchaser']['name']
+
+#print r3.table_3_1['borrower-characteristics'][1]['ethnicities'][inputs['ethnicity']]['purchasers'][inputs['purchaser']]['count'] += 1
