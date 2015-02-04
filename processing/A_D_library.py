@@ -446,16 +446,19 @@ class MSA_info(AD_report):
 
 	def tract_to_MSA_income(self, inputs):
 		#set census MSA income level: low, moderate, middle, upper
-		if inputs['tract to MSA income'] < 50:
+		if inputs['tract to MSA income'] == '      ' or inputs['tract to MSA income'] == 'NA    ':
+			return 4
+		elif float(inputs['tract to MSA income']) < 50.0:
 			return 0
-		elif inputs['tract to MSA income'] < 80:
+		elif float(inputs['tract to MSA income']) <= 79.0:
 			return 1
-		elif inputs['tract to MSA income'] < 120:
+		elif float(inputs['tract to MSA income']) <= 119.0:
 			return 2
-		elif inputs['tract to MSA income'] >=120:
+		elif float(inputs['tract to MSA income']) >= 119.0:
 			return 3
 		else:
 			print "error setting tract to MSA income index"
+			print inputs['tract to MSA income']
 
 class queries(AD_report):
 	def count_rows_2012(self):
@@ -507,8 +510,11 @@ class aggregate(AD_report):
 			container['censuscharacteristics'][0]['tractpctminority'][inputs['minority percent']]['purchasers'][inputs['purchaser']]['value'] += int(inputs['loan value'])
 
 	def by_tract_income(self, container, inputs):
-		container['censuscharacteristics'][1]['incomelevel'][inputs['tract income index']]['purchasers'][inputs['purchaser']]['count'] +=1
-		container['censuscharacteristics'][1]['incomelevel'][inputs['tract income index']]['purchasers'][inputs['purchaser']]['value'] += int(inputs['loan value'])
+		if inputs['tract income index'] > 3:
+			pass
+		else:
+			container['censuscharacteristics'][1]['incomelevel'][inputs['tract income index']]['purchasers'][inputs['purchaser']]['count'] +=1
+			container['censuscharacteristics'][1]['incomelevel'][inputs['tract income index']]['purchasers'][inputs['purchaser']]['value'] += int(inputs['loan value'])
 
 	def totals(self, container, inputs):
 		container['total']['purchasers'][inputs['purchaser']]['count'] +=1
