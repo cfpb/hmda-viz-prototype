@@ -228,7 +228,20 @@ class build_JSON(AD_report):
 			purchasersholding['count'] = 0
 			purchasersholding['value'] = 0
 			purchasers.append(purchasersholding)
-		#print "purchasrs in functions", purchasers
+		return purchasers
+
+	def set_purchasers32(self):
+		from collections import OrderedDict
+		purchasers = []
+		purchaser_names = ['Loan was not originated or was not sold in calendar year', 'Fannie Mae', 'Ginnie Mae', 'Freddie Mac', 'Farmer Mac', 'Private Securitization', 'Commercial bank, savings bank or association', 'Life insurance co., credit union, finance co.', 'Affiliate institution', 'Other']
+		for item in purchaser_names:
+			purchasersholding = OrderedDict({})
+			purchasersholding['name'] = "{}".format(item)
+			purchasersholding['first lien count'] = 0
+			purchasersholding['first lien value'] = 0
+			purchasersholding['junior lien count'] = 0
+			purchasersholding['junior lien value'] = 0
+		purchasers.append(purchasersholding)
 		return purchasers
 
 	def build_JSON(self, inputs, MSA):
