@@ -14,10 +14,12 @@ from A_D_library import connect_DB as connect
 from A_D_library import build_JSON as build
 from A_D_library import aggregate as agg
 from A_D_library import queries
+
 #instantiate library functions
 parsed = parse()
 connection = connect()
-build = build()
+build31 = build()
+build32 = build()
 queries = queries()
 agg = agg()
 
@@ -25,9 +27,14 @@ agg = agg()
 cur = connection.connect()
 
 #set MSA list
-MSA = '36540'
+MSA = '36540' #this will be a list that comes from the input file
+table_31 = '3-1'
+table_32 = '3-1'
+report_desc32 = build32.table_headers(table_31) #this will come from the input file
+report_desc31 = build31.table_headers(table_32)
 location = (MSA,)
 
+table_type = 'aggregate' #this will be in the input file
 #get count for looping over rows in the MSA
 SQL = queries.count_rows_2012() #get query text for getting count of loans for the MSA
 cur.execute(SQL, location) #ping the database for numbers!
@@ -42,7 +49,8 @@ cur.execute(SQL, location)
 
 #json_data = open('JSON_out.json')
 #cont = OrderedDict(json.load(json_data))
-cont = build.build_JSON(parsed.inputs, MSA)
+table31 = build31.build_JSON()
+table32 = build32.build_JSON32()
 #print cont
 #print json.dumps(cont, indent=4)
 for num in range(0, end):
@@ -50,19 +58,23 @@ for num in range(0, end):
     #fetch one row from the LAR
     row = cur.fetchone()
     parsed.parse_t31(row) #parse the row and store in the inputs dictionary - parse_inputs.inputs
-
-    #aggregate the loan into appropriate rows for the table
-    agg.by_race(cont, parsed.inputs) #aggregate loan by race
-    agg.by_ethnicity(cont, parsed.inputs) #aggregate loan by ethnicity
-    agg.by_minority_status(cont, parsed.inputs) #aggregate loan by minority status
-    agg.by_applicant_income(cont, parsed.inputs)
-    agg.by_minority_composition(cont, parsed.inputs)
-    agg.by_tract_income(cont, parsed.inputs)
-    agg.totals(cont, parsed.inputs) #aggregate totals for each purchaser
-
-build.set_header(parsed.inputs, MSA)
-print json.dumps(cont, indent=4)
-name = 'sample1.json'
-build.write_JSON(name)
+    if num == 0:
+        build31.set_header32(parsed.inputs, MSA, report_desc31, table_type, table_31)
+        build32.set_header32(parsed.inputs, MSA, report_desc32, table_type, table_32)
+    else:
+        #aggregate the loan into appropriate rows for the table
+        agg.by_race(table31, parsed.inputs) #aggregate loan by race
+        agg.by_ethnicity(table31, parsed.inputs) #aggregate loan by ethnicity
+        agg.by_minority_status(table31, parsed.inputs) #aggregate loan by minority status
+        agg.by_applicant_income(table31, parsed.inputs)
+        agg.by_minority_composition(table31, parsed.inputs)
+        agg.by_tract_income(table31, parsed.inputs)
+        agg.totals(table31, parsed.inputs) #aggregate totals for each purchaser
 
 
+print json.dumps(table32, indent=4)
+name = 'report31.json'
+build31.write_JSON(name, table31)
+name2 = 'report32.json'
+build32.write_JSON(name2, table32)
+#build.set_header32(self, inputs, MSA, desc, table_type, table_num)

@@ -1,5 +1,7 @@
 #this file holds the classes used to create the A&D reports using the HMDA LAR files combined with Census demographic information
-
+import psycopg2
+import psycopg2.extras
+from collections import OrderedDict
 class AD_report(object):
 	pass
 
@@ -203,12 +205,15 @@ class demographics(AD_report):
 class build_JSON(AD_report):
 
 	def __init__(self):
-		from collections import OrderedDict
-		import json
 		self.container = OrderedDict({})
 		self.msa = OrderedDict({})
+	def table_headers(self, table_num): #holds table descriptions
+		if table_num == '3-1':
+			return 'Loans sold. By characteristics of borrower and census tract in which property is located and by type of purchaser (includes originations and purchased loans).'
+		elif table_num =='3-2':
+			return 'Pricing Information for First and Junio Lien Loans Sold by Type of Purchaser (includes originations only).'
 
-	def set_header(self, inputs, MSA):
+	def set_header(self, inputs, MSA): #add a variable for desc_string
 		self.container['table'] = '3-1'
 		self.container['type'] = 'aggregate'
 		self.container['desc'] = 'Loans sold. By characteristics of borrower and census tract in which property is located and by type of purchaser (includes originations and purchased loans).'
@@ -217,6 +222,18 @@ class build_JSON(AD_report):
 		#self.msa['name'] = inputs['MSA name'] #need to add MSA names to a database or read-in file
 		self.msa['state'] = inputs['state name']
 		self.container['msa'] = self.msa
+
+	def set_header32(self, inputs, MSA, desc, table_type, table_num): #add a variable for desc_string
+		msa = OrderedDict({})
+		self.container['table'] = table_num
+		self.container['type'] = table_type
+		self.container['desc'] = desc
+		self.container['year'] = inputs['year']
+		self.msa['id'] = MSA
+		#self.msa['name'] = inputs['MSA name'] #need to add MSA names to a database or read-in file
+		self.msa['state'] = inputs['state name']
+		self.container['msa'] = self.msa
+		return self.container
 
 	def set_purchasers(self):
 		from collections import OrderedDict
@@ -241,10 +258,35 @@ class build_JSON(AD_report):
 			purchasersholding['first lien value'] = 0
 			purchasersholding['junior lien count'] = 0
 			purchasersholding['junior lien value'] = 0
-		purchasers.append(purchasersholding)
+			purchasers.append(purchasersholding)
 		return purchasers
 
-	def build_JSON(self, inputs, MSA):
+	def build_JSON32(self):
+		pricinginformation = []
+		categories = ['No reported pricing data', 'pricing data reported', 'percentage points above average prime offer rate: only includes loans with APR above the threshold', 'mean', 'median', 'HOEPA Loans']
+
+		for cat in categories:
+			holding = OrderedDict({})
+			holding['pricing']= "{}".format(cat) #race is overwritten each pass of the loop (keys are unique in dictionaries)
+			if cat == 'percentage points above average prime offer rate: only includes loans with APR above the threshold':
+				holding['points'] = self.build_rate_spreads()
+			else:
+				holding['purchasers']  = self.set_purchasers32() #purchasers is overwritten each pass in the holding dictionary
+			pricinginformation.append(holding)
+		self.container['pricinginformation'] = pricinginformation
+		return self.container
+
+	def build_rate_spreads(self):
+		 spreads = []
+		 rate_spreads = ['3 - 3.99', '4 - 4.99', '5 - 5.99', '6 - 6.99', '7 - 7.99', '8 - 8.99', '9 - 9.99', '10 or more']
+		 for rate in rate_spreads:
+			 holding = OrderedDict({})
+			 holding['point'] = "{}".format(rate)
+			 holding['purchasers'] = self.set_purchasers32()
+			 spreads.append(holding)
+		 return spreads
+
+	def build_JSON(self):
 		from collections import OrderedDict
 		import json
 		#rewrite this as a function
@@ -380,11 +422,11 @@ class build_JSON(AD_report):
 		import json
 		print json.dumps(self.container, indent=4)
 
-	def write_JSON(self, name):
+	def write_JSON(self, name, data):
 		#writes the JSON structure to a file
 		import json
 		with open(name, 'w') as outfile:
-		 json.dump(self.container, outfile, indent = 4, ensure_ascii=False)
+		 json.dump(data, outfile, indent = 4, ensure_ascii=False)
 
 class connect_DB(AD_report):
 
