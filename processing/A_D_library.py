@@ -34,8 +34,8 @@ class parse_inputs(AD_report):
 		self.inputs['income'] = row['applicantincome']
 		self.inputs['rate spread'] = row['ratespread']
 		self.inputs['lien status'] = row['lienstatus']
-		self.inputs['hoepa flag'] = row['hoepastatus']
-		self.inputs['purchaser'] = int(row['purchasertype'])
+		self.inputs['hoepa flag'] = int(row['hoepastatus'])
+		self.inputs['purchaser'] = int(row['purchasertype']) -1 #adjust purchaser index down 1 to match JSON
 		self.inputs['loan value'] = float(row['loanamount'])
 		self.inputs['sequence'] = row['sequencenumber'] # the sequence number to track loans in error checking
 		self.inputs['year'] = row['asofdate']
@@ -58,6 +58,7 @@ class parse_inputs(AD_report):
 		self.inputs['ethnicity'] = demo.set_loan_ethn(self.inputs) #requires  ethnicity be parsed prior to running set_loan_ethn
 		self.inputs['race'] = demo.set_race(self.inputs, a_race, co_race) #requires joint status be set prior to running set_race
 		self.inputs['minority count'] = demo.minority_count(a_race)
+		self.inputs['rate spread index'] = demo.rate_spread_index(self.inputs['rate spread'])
 	#loop over all elements in both race lists to flag presence of minority race
 	#assigning non-white boolean flags for use in joint race status and minority status checks
 	#set boolean flag for white/non-white status for applicant
@@ -78,6 +79,28 @@ class demographics(AD_report):
 	#2 minority indexed 7
 	#joint indexed 8
 	#not reported indexed 9
+
+
+	def rate_spread_index(self, rate):
+		if rate == 'NA   ' or rate == '     ':
+			return 7
+		elif float(rate) >= 1.5 and float(rate) <= 1.99:
+			return 0
+		elif float(rate) >= 2.00 and float(rate) <= 2.49:
+			return 1
+		elif float(rate) >= 2.50 and float(rate) <= 2.99:
+			return 2
+		elif float(rate) >= 3.00 and float(rate) <= 3.49:
+			return 3
+		elif float(rate) >= 3.50 and float(rate) <= 4.49:
+			return 4
+		elif float(rate) >= 4.50 and float(rate) <= 5.49:
+			return 5
+		elif float(rate) >= 5.50  and float(rate) <= 6.49:
+			return 6
+		elif float(rate) >= 6.50:
+			return 6
+
 	def minority_count(self, a_race):
 		#the minority count is the count of minority races listed for the primary applicant
 		minority_count = 0
@@ -207,12 +230,16 @@ class build_JSON(AD_report):
 	def __init__(self):
 		self.container = OrderedDict({})
 		self.msa = OrderedDict({})
+		self.table32_cats = ['No reported pricing data', 'pricing data reported', 'percentage points above average prime offer rate: only includes loans with APR above the threshold', 'mean', 'median', 'HOEPA Loans']
+		self.table32_rates = ['3 - 3.99', '4 - 4.99', '5 - 5.99', '6 - 6.99', '7 - 7.99', '8 - 8.99', '9 - 9.99', '10 or more']
+
 	def table_headers(self, table_num): #holds table descriptions
 		if table_num == '3-1':
 			return 'Loans sold. By characteristics of borrower and census tract in which property is located and by type of purchaser (includes originations and purchased loans).'
 		elif table_num =='3-2':
 			return 'Pricing Information for First and Junio Lien Loans Sold by Type of Purchaser (includes originations only).'
-
+	'''
+	this is the old function - remove?
 	def set_header(self, inputs, MSA): #add a variable for desc_string
 		self.container['table'] = '3-1'
 		self.container['type'] = 'aggregate'
@@ -222,6 +249,7 @@ class build_JSON(AD_report):
 		#self.msa['name'] = inputs['MSA name'] #need to add MSA names to a database or read-in file
 		self.msa['state'] = inputs['state name']
 		self.container['msa'] = self.msa
+	'''
 
 	def set_header32(self, inputs, MSA, desc, table_type, table_num): #add a variable for desc_string
 		msa = OrderedDict({})
@@ -238,7 +266,7 @@ class build_JSON(AD_report):
 	def set_purchasers(self):
 		from collections import OrderedDict
 		purchasers = []
-		purchaser_names = ['Loan was not originated or was not sold in calendar year', 'Fannie Mae', 'Ginnie Mae', 'Freddie Mac', 'Farmer Mac', 'Private Securitization', 'Commercial bank, savings bank or association', 'Life insurance co., credit union, finance co.', 'Affiliate institution', 'Other']
+		purchaser_names = ['Fannie Mae', 'Ginnie Mae', 'Freddie Mac', 'Farmer Mac', 'Private Securitization', 'Commercial bank, savings bank or association', 'Life insurance co., credit union, finance co.', 'Affiliate institution', 'Other']
 		for item in purchaser_names:
 			purchasersholding = OrderedDict({})
 			purchasersholding['name'] = "{}".format(item)
@@ -250,7 +278,7 @@ class build_JSON(AD_report):
 	def set_purchasers32(self):
 		from collections import OrderedDict
 		purchasers = []
-		purchaser_names = ['Loan was not originated or was not sold in calendar year', 'Fannie Mae', 'Ginnie Mae', 'Freddie Mac', 'Farmer Mac', 'Private Securitization', 'Commercial bank, savings bank or association', 'Life insurance co., credit union, finance co.', 'Affiliate institution', 'Other']
+		purchaser_names = ['Fannie Mae', 'Ginnie Mae', 'Freddie Mac', 'Farmer Mac', 'Private Securitization', 'Commercial bank, savings bank or association', 'Life insurance co., credit union, finance co.', 'Affiliate institution', 'Other']
 		for item in purchaser_names:
 			purchasersholding = OrderedDict({})
 			purchasersholding['name'] = "{}".format(item)
@@ -278,8 +306,8 @@ class build_JSON(AD_report):
 
 	def build_rate_spreads(self):
 		 spreads = []
-		 rate_spreads = ['3 - 3.99', '4 - 4.99', '5 - 5.99', '6 - 6.99', '7 - 7.99', '8 - 8.99', '9 - 9.99', '10 or more']
-		 for rate in rate_spreads:
+		 rate_spreads = ['1.50 - 1.99', '2.00 - 2.49', '2.50 - 2.99', '3.00 - 3.49', '3.50 - 4.49', '4.50 - 5.49', '5.50 - 6.49', '6.5 or more']
+		 for rate in rate_spreads: #change to self.table32_rates
 			 holding = OrderedDict({})
 			 holding['point'] = "{}".format(rate)
 			 holding['purchasers'] = self.set_purchasers32()
@@ -291,6 +319,7 @@ class build_JSON(AD_report):
 		import json
 		#rewrite this as a function
 		#FFIEC report 3-1 labels
+		#move these lists to a self. area or use a function area to return lists
 		purchaser_names = ['Loan was not originated or was not sold in calendar year', 'Fannie Mae', 'Ginnie Mae', 'Freddie Mac', 'Farmer Mac', 'Private Securitization', 'Commercial bank, savings bank or association', 'Life insurance co., credit union, finance co.', 'Affiliate institution', 'Other']
 		race_names = ['American Indian/Alaska Native', 'Asian', 'Black or African American', 'Native Hawaiian or Pacific Islander', 'White', '2 or more minority races', 'Joint', 'Not Provided', 'Not Applicable', 'No co-applicant']
 		ethnicity_names = ['Hispanic or Latino', 'Not Hispanic or Latino', 'Not provided', 'Not applicable', 'No co-applicant']
@@ -500,7 +529,7 @@ class MSA_info(AD_report):
 			print "value of", float(inputs['minority percent'])
 
 	def tract_to_MSA_income(self, inputs):
-		#set census MSA income level: low, moderate, middle, upper
+		#set census MSA income level: low, moderatde, middle, upper
 		if inputs['tract to MSA income'] == '      ' or inputs['tract to MSA income'] == 'NA    ':
 			return 4
 		elif float(inputs['tract to MSA income']) < 50.0:
@@ -516,6 +545,7 @@ class MSA_info(AD_report):
 			print inputs['tract to MSA income']
 
 class queries(AD_report):
+	#can I decompose these query parts into lists and concatenate them prior to passing to the cursor?
 	def count_rows_2012(self):
 		SQL = '''SELECT COUNT(msaofproperty) FROM hmdapub2012 WHERE msaofproperty = %s;'''
 		return SQL
@@ -535,6 +565,13 @@ class queries(AD_report):
 class aggregate(AD_report):
 	def __init__(self):
 		pass
+
+	def index_list(self, item, listless):
+		#returns the index of a an item in a list
+		if item in listless:
+			return listless.index(item)
+		else:
+			print "oops, your value is not in that list"
 
 	def by_race(self, container, inputs):
 	#aggregates loans by race category
@@ -557,7 +594,6 @@ class aggregate(AD_report):
 			container['borrowercharacteristics'][3]['applicantincome'][inputs['income bracket']]['purchasers'][inputs['purchaser']]['value'] += int(inputs['loan value'])
 
 	def by_minority_composition(self, container, inputs):
-		#add a drop loan from aggregation filter at top if census information is not available
 		if inputs['minority percent'] == 4:
 			pass
 		else:
@@ -574,3 +610,44 @@ class aggregate(AD_report):
 	def totals(self, container, inputs):
 		container['total']['purchasers'][inputs['purchaser']]['count'] +=1
 		container['total']['purchasers'][inputs['purchaser']]['value'] += int(inputs['loan value'])
+
+	def by_pricing_status(self, container, inputs):
+		if inputs['rate spread index'] == 7 and inputs['lien status'] == '1':
+			container['pricinginformation'][0]['purchasers'][inputs['purchaser']]['first lien count'] +=1
+			container['pricinginformation'][0]['purchasers'][inputs['purchaser']]['first lien value'] += int(inputs['loan value'])
+		elif inputs['rate spread index'] == 7 and inputs['lien status'] == '2':
+			container['pricinginformation'][0]['purchasers'][inputs['purchaser']]['junior lien count'] +=1
+			container['pricinginformation'][0]['purchasers'][inputs['purchaser']]['junior lien value'] += int(inputs['loan value'])
+		else:
+			if inputs['lien status'] == '1':
+				container['pricinginformation'][1]['purchasers'][inputs['purchaser']]['first lien count'] +=1
+				container['pricinginformation'][1]['purchasers'][inputs['purchaser']]['first lien value'] += int(inputs['loan value'])
+			elif inputs['lien status'] == '2':
+				container['pricinginformation'][1]['purchasers'][inputs['purchaser']]['junior lien count'] += 1
+				container['pricinginformation'][1]['purchasers'][inputs['purchaser']]['junior lien value'] += int(inputs['loan value'])
+
+	def by_rate_spread(self, container, inputs):
+		if inputs['lien status'] == '1':
+			container['pricinginformation'][2]['points'][inputs['rate spread index']]['purchasers'][inputs['purchaser']]['first lien count'] +=1
+			container['pricinginformation'][2]['points'][inputs['rate spread index']]['purchasers'][inputs['purchaser']]['first lien value'] += int(inputs['loan value'])
+
+		elif inputs['lien status'] == '2':
+			container['pricinginformation'][2]['points'][inputs['rate spread index']]['purchasers'][inputs['purchaser']]['junior lien count'] +=1
+			container['pricinginformation'][2]['points'][inputs['rate spread index']]['purchasers'][inputs['purchaser']]['junior lien value'] += int(inputs['loan value'])
+
+	def by_hoepa_status(self, container, inputs):
+		if inputs['hoepa flag'] == 1:
+			if inputs['lien status'] == 1:
+				container['pricinginformation'][5]['purchasers'][inputs['purchaser']]['first lien count'] +=1
+				container['pricinginformation'][5]['purchasers'][inputs['purchaser']]['first lien value'] +=int(inputs['loan value'])
+			elif inputs['lien status'] == 1:
+				container['pricinginformation'][5]['purchasers'][inputs['purchaser']]['junior lien count'] +=1
+				container['pricinginformation'][5]['purchasers'][inputs['purchaser']]['junior lien value'] +=int(inputs['loan value'])
+			else:
+				print "invalid hoepa flag, oops"
+		elif inputs['hoepa flag'] == 2:
+			pass
+		else:
+			print "HOEPA flag not present or outside parameters"
+
+
