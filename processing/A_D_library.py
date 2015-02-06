@@ -218,6 +218,19 @@ class build_JSON(AD_report):
 		self.msa['state'] = inputs['state name']
 		self.container['msa'] = self.msa
 
+	def set_purchasers(self):
+		from collections import OrderedDict
+		purchasers = []
+		purchaser_names = ['Loan was not originated or was not sold in calendar year', 'Fannie Mae', 'Ginnie Mae', 'Freddie Mac', 'Farmer Mac', 'Private Securitization', 'Commercial bank, savings bank or association', 'Life insurance co., credit union, finance co.', 'Affiliate institution', 'Other']
+		for item in purchaser_names:
+			purchasersholding = OrderedDict({})
+			purchasersholding['name'] = "{}".format(item)
+			purchasersholding['count'] = 0
+			purchasersholding['value'] = 0
+			purchasers.append(purchasersholding)
+		#print "purchasrs in functions", purchasers
+		return purchasers
+
 	def build_JSON(self, inputs, MSA):
 		from collections import OrderedDict
 		import json
@@ -240,16 +253,6 @@ class build_JSON(AD_report):
 		#totals sums all the loan counts and values for each purchaser
 		totals = {}
 
-		#build purchaser dictionaries inside a list
-		for purchaser in purchaser_names:
-			purchasersholding = OrderedDict({})
-			purchasersholding['name'] = "{}".format(purchaser)
-			purchasersholding['count'] = 0
-			purchasersholding['value'] = 0
-			purchasers.append(purchasersholding)
-
-		#races = []
-		#temp = {}
 		Header = True
 		top = OrderedDict({})
 		for race in race_names:
@@ -261,6 +264,7 @@ class build_JSON(AD_report):
 			Header = False
 
 			holding['race']= "{}".format(race) #race is overwritten each pass of the loop (keys are unique in dictionaries)
+			purchasers = self.set_purchasers()
 			holding['purchasers'] = purchasers #purchasers is overwritten each pass in the holding dictionary
 			top['races'].append(holding)
 
@@ -278,6 +282,7 @@ class build_JSON(AD_report):
 			Header = False
 
 			holding['ethnicity'] = "{}".format(ethnicity)
+			purchasers = self.set_purchasers()
 			holding['purchasers'] = purchasers
 			top['ethnicities'].append(holding)
 
@@ -295,6 +300,7 @@ class build_JSON(AD_report):
 			Header = False
 
 			holding['minoritystatus'] = "{}".format(status)
+			purchasers = self.set_purchasers()
 			holding['purchasers'] = purchasers
 			top['minoritystatuses'].append(holding)
 		borrowercharacteristics.append(top)
@@ -305,12 +311,13 @@ class build_JSON(AD_report):
 		for bracket in applicant_income_bracket:
 			holding = OrderedDict({})
 			if Header == True:
-				top['characteristic'] = 'Income'
-				top['appincome'] = []
+				top['characteristic'] = 'Applicant Income'
+				top['applicantincome'] = []
 			Header = False
-			holding['applicantincome'] = "{}".format(bracket)
+			holding['applicantincomes'] = "{}".format(bracket)
+			#purchasers = self.set_purchasers()
 			holding['purchasers'] = purchasers
-			top['appincome'].append(holding)
+			top['applicantincome'].append(holding)
 		borrowercharacteristics.append(top)
 
 		#build census characateristics
@@ -324,6 +331,7 @@ class build_JSON(AD_report):
 				top['tractpctminority'] = []
 			Header = False
 			holding['tractpctminority'] = "{}".format(pct)
+			purchasers = self.set_purchasers()
 			holding['purchasers'] = purchasers
 			top['tractpctminority'].append(holding)
 		censuscharacteristics.append(top)
@@ -338,6 +346,7 @@ class build_JSON(AD_report):
 				top['incomelevel'] = []
 			Header = False
 			holding['incomelevel'] = "{}".format(level)
+			purchasers = self.set_purchasers()
 			holding['purchasers'] = purchasers
 			top['incomelevel'].append(holding)
 		censuscharacteristics.append(top)
@@ -345,11 +354,14 @@ class build_JSON(AD_report):
 		#build totals
 		top = OrderedDict({})
 		holding = OrderedDict({})
+		purchasers = self.set_purchasers()
 		totals['purchasers'] = purchasers
 
 		self.container['borrowercharacteristics'] = borrowercharacteristics
 		self.container['censuscharacteristics'] = censuscharacteristics
 		self.container['total'] = totals
+		#self.write_JSON('JSON_out.json')
+		return self.container
 
 	def print_JSON(self):
 		import json
@@ -395,9 +407,9 @@ class MSA_info(AD_report):
 	def app_income_to_MSA(self, inputs):
 		#set income bracket index
 		if inputs['income'] != 'NA  ' or inputs['income'] != '    ':
-			inputs['income bracket'] = 5
+			return 5
 		elif inputs['MSA median income'] != 'NA      ' and inputs['MSA median income'] != '        ' :
-			inputs['income bracket'] = 6 #placeholder for MSA median income unavailable
+			return 6 #placeholder for MSA median income unavailable
 		else:
 			inputs['percent MSA income'] = float(inputs['income']) / float(inputs['MSA median income'] )
 			#determine income bracket for use as an index in the JSON object
@@ -434,16 +446,19 @@ class MSA_info(AD_report):
 
 	def tract_to_MSA_income(self, inputs):
 		#set census MSA income level: low, moderate, middle, upper
-		if inputs['tract to MSA income'] < 50:
+		if inputs['tract to MSA income'] == '      ' or inputs['tract to MSA income'] == 'NA    ':
+			return 4
+		elif float(inputs['tract to MSA income']) < 50.0:
 			return 0
-		elif inputs['tract to MSA income'] < 80:
+		elif float(inputs['tract to MSA income']) <= 79.0:
 			return 1
-		elif inputs['tract to MSA income'] < 120:
+		elif float(inputs['tract to MSA income']) <= 119.0:
 			return 2
-		elif inputs['tract to MSA income'] >=120:
+		elif float(inputs['tract to MSA income']) >= 119.0:
 			return 3
 		else:
 			print "error setting tract to MSA income index"
+			print inputs['tract to MSA income']
 
 class queries(AD_report):
 	def count_rows_2012(self):
@@ -465,36 +480,41 @@ class queries(AD_report):
 class aggregate(AD_report):
 	def __init__(self):
 		pass
+
 	def by_race(self, container, inputs):
 	#aggregates loans by race category
-		#if race in container['borrower-characteristics'][0]['races'][race_code]['race'] and purchaser in container['borrower-characteristics'][0]['races'][race_code]['purchasers'][self.inputs['purchaser']]['name']:
 		container['borrowercharacteristics'][0]['races'][inputs['race']]['purchasers'][inputs['purchaser']]['count'] += 1
 		container['borrowercharacteristics'][0]['races'][inputs['race']]['purchasers'][inputs['purchaser']]['value'] += inputs['loan value']
-
+			#print container['borrowercharacteristics'][0]['races'][inputs['race']]['purchasers'][inputs['purchaser']]['count'], "count after"
 	def by_ethnicity(self, container, inputs):
-		#if ethnicity in self.table_3.table_3_1['borrower-characteristics'][1]['ethnicities'][self.inputs['ethnicity']]['ethnicity']and purchaser in self.table_3.table_3_1['borrower-characteristics'][1]['ethnicities'][self.inputs['ethnicity']]['purchasers'][self.inputs['purchaser']]['name']:
 		container['borrowercharacteristics'][1]['ethnicities'][inputs['ethnicity']]['purchasers'][inputs['purchaser']]['count'] += 1
 		container['borrowercharacteristics'][1]['ethnicities'][inputs['ethnicity']]['purchasers'][inputs['purchaser']]['value'] += int(inputs['loan value'])
 
 	def by_minority_status(self, container, inputs):
-		#if purchaser in self.table_3.table_3_1['borrower-characteristics'][2]['minority statuses'][self.inputs['minority status']]['purchasers'][self.inputs['purchaser']]['name']:
 		container['borrowercharacteristics'][2]['minoritystatuses'][inputs['minority status']]['purchasers'][inputs['purchaser']]['count'] += 1
 		container['borrowercharacteristics'][2]['minoritystatuses'][inputs['minority status']]['purchasers'][inputs['purchaser']]['value']+= int(inputs['loan value'])
 
 	def by_applicant_income(self, container, inputs):
-		#if purchaser in self.table_3.table_3_1['borrower-characteristics'][3]['income brackets'][self.inputs['income bracket']]['purchasers'][self.inputs['purchaser']]['name']:
-		container['borrowercharacteristics'][3]['appincome'][inputs['income bracket']]['purchasers'][inputs['purchaser']]['count'] += 1
-		container['borrowercharacteristics'][3]['appincome'][inputs['income bracket']]['purchasers'][inputs['purchaser']]['value'] += int(inputs['loan value'])
+		if inputs['income bracket'] > 4:
+			pass
+		else:
+			container['borrowercharacteristics'][3]['applicantincome'][inputs['income bracket']]['purchasers'][inputs['purchaser']]['count'] += 1
+			container['borrowercharacteristics'][3]['applicantincome'][inputs['income bracket']]['purchasers'][inputs['purchaser']]['value'] += int(inputs['loan value'])
 
 	def by_minority_composition(self, container, inputs):
-		#if purchaser in  self.table_3.table_3_1['census-characteristics'][0]['compositions'][self.inputs['minority pct index']]['purchasers'][self.inputs['purchaser']]['name']:
-		container['censuscharacteristics'][0]['tractpctminority'][inputs['minority pct index']]['purchasers'][inputs['purchaser']]['count'] += 1
-		container['censuscharacteristics'][0]['tractpctminority'][inputs['minority pct index']]['purchasers'][inputs['purchaser']]['value'] += int(inputs['loan value'])
+		#add a drop loan from aggregation filter at top if census information is not available
+		if inputs['minority percent'] == 4:
+			pass
+		else:
+			container['censuscharacteristics'][0]['tractpctminority'][inputs['minority percent']]['purchasers'][inputs['purchaser']]['count'] += 1
+			container['censuscharacteristics'][0]['tractpctminority'][inputs['minority percent']]['purchasers'][inputs['purchaser']]['value'] += int(inputs['loan value'])
 
 	def by_tract_income(self, container, inputs):
-		#if purchaser in self.table_3.table_3_1['census-characteristics'][1]['income categories'][self.inputs['tract income index']]['purchasers'][self.inputs['purchaser']]['name']:
-		container['censuscharacteristics'][1]['income categories'][inputs['tract income index']]['purchasers'][inputs['purchaser']]['count'] +=1
-		container['censuscharacteristics'][1]['income categories'][inputs['tract income index']]['purchasers'][inputs['purchaser']]['value'] += int(inputs['loan value'])
+		if inputs['tract income index'] > 3:
+			pass
+		else:
+			container['censuscharacteristics'][1]['incomelevel'][inputs['tract income index']]['purchasers'][inputs['purchaser']]['count'] +=1
+			container['censuscharacteristics'][1]['incomelevel'][inputs['tract income index']]['purchasers'][inputs['purchaser']]['value'] += int(inputs['loan value'])
 
 	def totals(self, container, inputs):
 		container['total']['purchasers'][inputs['purchaser']]['count'] +=1
