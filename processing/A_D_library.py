@@ -348,8 +348,8 @@ class build_JSON(AD_report):
 			Header = False
 
 			holding['race']= "{}".format(race) #race is overwritten each pass of the loop (keys are unique in dictionaries)
-			purchasers = self.set_purchasers()
-			holding['purchasers'] = purchasers #purchasers is overwritten each pass in the holding dictionary
+			#purchasers = self.set_purchasers()
+			holding['purchasers'] = self.set_purchasers() #purchasers is overwritten each pass in the holding dictionary
 			top['races'].append(holding)
 
 		borrowercharacteristics.append(top)
@@ -366,8 +366,8 @@ class build_JSON(AD_report):
 			Header = False
 
 			holding['ethnicity'] = "{}".format(ethnicity)
-			purchasers = self.set_purchasers()
-			holding['purchasers'] = purchasers
+			#purchasers = self.set_purchasers()
+			holding['purchasers'] = self.set_purchasers()
 			top['ethnicities'].append(holding)
 
 		borrowercharacteristics.append(top)
@@ -384,8 +384,7 @@ class build_JSON(AD_report):
 			Header = False
 
 			holding['minoritystatus'] = "{}".format(status)
-			purchasers = self.set_purchasers()
-			holding['purchasers'] = purchasers
+			holding['purchasers'] = self.set_purchasers()
 			top['minoritystatuses'].append(holding)
 		borrowercharacteristics.append(top)
 
@@ -400,7 +399,7 @@ class build_JSON(AD_report):
 			Header = False
 			holding['applicantincomes'] = "{}".format(bracket)
 			#purchasers = self.set_purchasers()
-			holding['purchasers'] = purchasers
+			holding['purchasers'] = self.set_purchasers()
 			top['applicantincome'].append(holding)
 		borrowercharacteristics.append(top)
 
@@ -415,8 +414,8 @@ class build_JSON(AD_report):
 				top['tractpctminority'] = []
 			Header = False
 			holding['tractpctminority'] = "{}".format(pct)
-			purchasers = self.set_purchasers()
-			holding['purchasers'] = purchasers
+			#purchasers = self.set_purchasers()
+			holding['purchasers'] = self.set_purchasers()
 			top['tractpctminority'].append(holding)
 		censuscharacteristics.append(top)
 
@@ -430,16 +429,16 @@ class build_JSON(AD_report):
 				top['incomelevel'] = []
 			Header = False
 			holding['incomelevel'] = "{}".format(level)
-			purchasers = self.set_purchasers()
-			holding['purchasers'] = purchasers
+			#purchasers = self.set_purchasers()
+			holding['purchasers'] = self.set_purchasers()
 			top['incomelevel'].append(holding)
 		censuscharacteristics.append(top)
 
 		#build totals
 		top = OrderedDict({})
 		holding = OrderedDict({})
-		purchasers = self.set_purchasers()
-		totals['purchasers'] = purchasers
+		#purchasers = self.set_purchasers()
+		totals['purchasers'] = self.set_purchasers()
 
 		self.container['borrowercharacteristics'] = borrowercharacteristics
 		self.container['censuscharacteristics'] = censuscharacteristics
@@ -587,7 +586,7 @@ class aggregate(AD_report):
 		container['borrowercharacteristics'][2]['minoritystatuses'][inputs['minority status']]['purchasers'][inputs['purchaser']]['value']+= int(inputs['loan value'])
 
 	def by_applicant_income(self, container, inputs):
-		if inputs['income bracket'] > 4:
+		if inputs['income bracket'] > 5:
 			pass
 		else:
 			container['borrowercharacteristics'][3]['applicantincome'][inputs['income bracket']]['purchasers'][inputs['purchaser']]['count'] += 1
@@ -640,7 +639,7 @@ class aggregate(AD_report):
 			if inputs['lien status'] == 1:
 				container['pricinginformation'][5]['purchasers'][inputs['purchaser']]['first lien count'] +=1
 				container['pricinginformation'][5]['purchasers'][inputs['purchaser']]['first lien value'] +=int(inputs['loan value'])
-			elif inputs['lien status'] == 1:
+			elif inputs['lien status'] == 2:
 				container['pricinginformation'][5]['purchasers'][inputs['purchaser']]['junior lien count'] +=1
 				container['pricinginformation'][5]['purchasers'][inputs['purchaser']]['junior lien value'] +=int(inputs['loan value'])
 			else:
@@ -650,4 +649,6 @@ class aggregate(AD_report):
 		else:
 			print "HOEPA flag not present or outside parameters"
 
+	def mean(self, container, inputs):
+		pass
 
