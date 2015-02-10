@@ -27,7 +27,7 @@ agg = agg()
 cur = connection.connect()
 
 #set MSA list
-MSA = '11500' #this will be a list that comes from the input file
+MSA = '36540' #this will be a list that comes from the input file
 table_31 = '3-1'
 table_32 = '3-2'
 report_desc32 = build32.table_headers(table_31) #this will come from the input file
@@ -76,9 +76,11 @@ for num in range(0, end):
             agg.by_pricing_status(table32, parsed.inputs) #aggregate count by lien status
             agg.by_rate_spread(table32, parsed.inputs)
             agg.by_hoepa_status(table32, parsed.inputs)
+            agg.rate_sum(table32, parsed.inputs)
     else:
         #aggregate the subsequent loan into appropriate rows for the table
         #table 3-1
+
         if parsed.inputs['purchaser'] >= 0:
             agg.by_race(table31, parsed.inputs) #aggregate loan by race
             agg.by_ethnicity(table31, parsed.inputs) #aggregate loan by ethnicity
@@ -91,9 +93,11 @@ for num in range(0, end):
             agg.by_pricing_status(table32, parsed.inputs) #aggregate count by lien status
             agg.by_rate_spread(table32, parsed.inputs)
             agg.by_hoepa_status(table32, parsed.inputs)
-print json.dumps(table32, indent=4)
-name = 'report31.json'
+            agg.rate_sum(table32, parsed.inputs)
+agg.by_mean(table32, parsed.inputs)
+#print json.dumps(table32, indent=4)
+name = 'report31_' + MSA + '.json'
 build31.write_JSON(name, table31)
-name2 = 'report32.json'
+name2 = 'report32_' + MSA + '.json'
 build32.write_JSON(name2, table32)
 #build.set_header32(self, inputs, MSA, desc, table_type, table_num)

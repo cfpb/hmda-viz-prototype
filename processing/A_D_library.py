@@ -14,7 +14,37 @@ class parse_inputs(AD_report):
 	#does this require standardization of the SQL query to return the same string?
 	#check the psycopg2.extras docs on dictcursor
 	inputs = {}
+	def __init__(self):
+		#initialize rate spread sum variables
+		self.inputs['Fannie Mae first rates'] =0
+		self.inputs['Ginnie Mae first rates'] =0
+		self.inputs['Freddie Mac first rates'] =0
+		self.inputs['Farmer Mac first rates'] =0
+		self.inputs['Private Securitization first rates'] =0
+		self.inputs['Commercial bank, savings bank or association first rates'] =0
+		self.inputs['Life insurance co., credit union, finance co. first rates'] =0
+		self.inputs['Affiliate institution first rates'] = 0
+		self.inputs['Other first rates'] =0
 
+		self.inputs['Fannie Mae junior rates'] =0
+		self.inputs['Ginnie Mae junior rates'] =0
+		self.inputs['Freddie Mac junior rates'] =0
+		self.inputs['Farmer Mac junior rates'] =0
+		self.inputs['Private Securitization junior rates'] =0
+		self.inputs['Commercial bank, savings bank or association junior rates'] =0
+		self.inputs['Life insurance co., credit union, finance co. junior rates'] =0
+		self.inputs['Affiliate institution junior rates'] = 0
+		self.inputs['Other junior rates'] =0
+
+		self.inputs['Fannie Mae rate spread list'] = []
+		self.inputs['Ginnie Mae rate spread list'] = []
+		self.inputs['Freddie Mac rate spread list'] = []
+		self.inputs['Farmer Mac rate spread list'] = []
+		self.inputs['Private Securitization rate spread list'] = []
+		self.inputs['Commercial bank, savings bank or association rate spread list'] = []
+		self.inputs['Life insurance co., credit union, finance co. rate spread list'] = []
+		self.inputs['Affiliate institution rate spread list'] = []
+		self.inputs['Otherrate spread list'] = []
 	def parse_t31(self, row): #takes a row from a table 3-1 query and parses it to the inputs dictionary (28 tuples)
 		#parsing inputs for report 3.1
 		#self.inputs will be returned to for use in the aggregation function
@@ -59,6 +89,7 @@ class parse_inputs(AD_report):
 		self.inputs['race'] = demo.set_race(self.inputs, a_race, co_race) #requires joint status be set prior to running set_race
 		self.inputs['minority count'] = demo.minority_count(a_race)
 		self.inputs['rate spread index'] = demo.rate_spread_index(self.inputs['rate spread'])
+
 	#loop over all elements in both race lists to flag presence of minority race
 	#assigning non-white boolean flags for use in joint race status and minority status checks
 	#set boolean flag for white/non-white status for applicant
@@ -83,7 +114,7 @@ class demographics(AD_report):
 
 	def rate_spread_index(self, rate):
 		if rate == 'NA   ' or rate == '     ':
-			return 7
+			return 8
 		elif float(rate) >= 1.5 and float(rate) <= 1.99:
 			return 0
 		elif float(rate) >= 2.00 and float(rate) <= 2.49:
@@ -99,7 +130,7 @@ class demographics(AD_report):
 		elif float(rate) >= 5.50  and float(rate) <= 6.49:
 			return 6
 		elif float(rate) >= 6.50:
-			return 6
+			return 7
 
 	def minority_count(self, a_race):
 		#the minority count is the count of minority races listed for the primary applicant
@@ -489,12 +520,12 @@ class MSA_info(AD_report):
 
 	def app_income_to_MSA(self, inputs):
 		#set income bracket index
-		if inputs['income'] != 'NA  ' or inputs['income'] != '    ':
+		if inputs['income'] == 'NA  ' or inputs['income'] == '    ':
 			return 5
-		elif inputs['MSA median income'] != 'NA      ' and inputs['MSA median income'] != '        ' :
+		elif inputs['MSA median income'] == 'NA      ' or inputs['MSA median income'] == '        ' :
 			return 6 #placeholder for MSA median income unavailable
 		else:
-			inputs['percent MSA income'] = float(inputs['income']) / float(inputs['MSA median income'] )
+			inputs['percent MSA income'] = (float(inputs['income']) / (float(inputs['MSA median income'] )/1000)) *100
 			#determine income bracket for use as an index in the JSON object
 			#move this somewhere else
 			#check logic on math to make sure all is inclusive - set a rounding function on line 71
@@ -611,26 +642,26 @@ class aggregate(AD_report):
 		container['total']['purchasers'][inputs['purchaser']]['value'] += int(inputs['loan value'])
 
 	def by_pricing_status(self, container, inputs):
-		if inputs['rate spread index'] == 7 and inputs['lien status'] == '1':
+		if inputs['rate spread index'] == 8 and inputs['lien status'] == '1':
 			container['pricinginformation'][0]['purchasers'][inputs['purchaser']]['first lien count'] +=1
 			container['pricinginformation'][0]['purchasers'][inputs['purchaser']]['first lien value'] += int(inputs['loan value'])
-		elif inputs['rate spread index'] == 7 and inputs['lien status'] == '2':
+		elif inputs['rate spread index'] == 8 and inputs['lien status'] == '2':
 			container['pricinginformation'][0]['purchasers'][inputs['purchaser']]['junior lien count'] +=1
 			container['pricinginformation'][0]['purchasers'][inputs['purchaser']]['junior lien value'] += int(inputs['loan value'])
 		else:
-			if inputs['lien status'] == '1':
+			if inputs['lien status'] == '1' and inputs['rate spread index'] < 8:
 				container['pricinginformation'][1]['purchasers'][inputs['purchaser']]['first lien count'] +=1
 				container['pricinginformation'][1]['purchasers'][inputs['purchaser']]['first lien value'] += int(inputs['loan value'])
-			elif inputs['lien status'] == '2':
+			elif inputs['lien status'] == '2' and inputs['rate spread index'] < 8:
 				container['pricinginformation'][1]['purchasers'][inputs['purchaser']]['junior lien count'] += 1
 				container['pricinginformation'][1]['purchasers'][inputs['purchaser']]['junior lien value'] += int(inputs['loan value'])
 
 	def by_rate_spread(self, container, inputs):
-		if inputs['lien status'] == '1':
+		if inputs['lien status'] == '1' and inputs['rate spread index'] < 8:
 			container['pricinginformation'][2]['points'][inputs['rate spread index']]['purchasers'][inputs['purchaser']]['first lien count'] +=1
 			container['pricinginformation'][2]['points'][inputs['rate spread index']]['purchasers'][inputs['purchaser']]['first lien value'] += int(inputs['loan value'])
 
-		elif inputs['lien status'] == '2':
+		elif inputs['lien status'] == '2' and inputs['rate spread index'] <8:
 			container['pricinginformation'][2]['points'][inputs['rate spread index']]['purchasers'][inputs['purchaser']]['junior lien count'] +=1
 			container['pricinginformation'][2]['points'][inputs['rate spread index']]['purchasers'][inputs['purchaser']]['junior lien value'] += int(inputs['loan value'])
 
@@ -649,6 +680,79 @@ class aggregate(AD_report):
 		else:
 			print "HOEPA flag not present or outside parameters"
 
-	def mean(self, container, inputs):
-		pass
+	def rate_sum(self, container, inputs):
+		if inputs['rate spread'] != 'NA   ' and inputs['rate spread'] != '     ':
+			#lien status 1 - first liens
+			if inputs['purchaser'] == 0 and inputs['lien status'] == '1':
+				inputs['Fannie Mae first rates'] += float(inputs['rate spread'])
+			elif inputs['purchaser'] == 1 and  inputs['lien status'] == '1':
+				inputs['Ginnie Mae first rates'] +=float(inputs['rate spread'])
+			elif inputs['purchaser'] == 2 and  inputs['lien status'] == '1':
+				inputs['Freddie Mac first rates'] += float(inputs['rate spread'])
+			elif inputs['purchaser'] == 3 and  inputs['lien status'] == '1':
+				inputs['Farmer Mac first rates'] += float(inputs['rate spread'])
+			elif inputs['purchaser'] == 4 and  inputs['lien status'] == '1':
+				inputs['Private Securitization first rates'] += float(inputs['rate spread'])
+			elif inputs['purchaser'] == 5 and  inputs['lien status'] == '1':
+				inputs['Commercial bank, savings bank or association first rates'] += float(inputs['rate spread'])
+			elif inputs['purchaser'] == 6 and  inputs['lien status'] == '1':
+				inputs['Life insurance co., credit union, finance co. first rates'] += float(inputs['rate spread'])
+			elif inputs['purchaser'] == 7 and  inputs['lien status'] == '1':
+				inputs['Affiliate institution first rates'] += float(inputs['rate spread'])
+			elif inputs['purchaser'] == 8 and  inputs['lien status'] == '1':
+				inputs['Other first rates'] += float(inputs['rate spread'])
+			#lien status 2 - junior liens
+			elif inputs['purchaser'] == 0 and inputs['lien status'] == '2':
+				inputs['Fannie Mae junior rates'] += float(inputs['rate spread'])
+			elif inputs['purchaser'] == 1 and  inputs['lien status'] == '2':
+				inputs['Ginnie Mae junior rates'] +=float(inputs['rate spread'])
+			elif inputs['purchaser'] == 2 and  inputs['lien status'] == '2':
+				inputs['Freddie Mac junior rates'] += float(inputs['rate spread'])
+			elif inputs['purchaser'] == 3 and  inputs['lien status'] == '2':
+				inputs['Farmer Mac junior rates'] += float(inputs['rate spread'])
+			elif inputs['purchaser'] == 4 and  inputs['lien status'] == '2':
+				inputs['Private Securitization junior rates'] += float(inputs['rate spread'])
+			elif inputs['purchaser'] == 5 and  inputs['lien status'] == '2':
+				inputs['Commercial bank, savings bank or association junior rates'] += float(inputs['rate spread'])
+			elif inputs['purchaser'] == 6 and  inputs['lien status'] == '2':
+				inputs['Life insurance co., credit union, finance co. junior rates'] += float(inputs['rate spread'])
+			elif inputs['purchaser'] == 7 and  inputs['lien status'] == '2':
+				inputs['Affiliate institution junior rates'] += float(inputs['rate spread'])
+			elif inputs['purchaser'] == 8 and  inputs['lien status'] == '2':
+				inputs['Other purchaser junior rates'] += float(inputs['rate spread'])
+
+		else:
+			pass
+
+	def by_mean(self, container, inputs):
+		first_lien_purchasers = ['Fannie Mae first rates', 'Ginnie Mae first rates', 'Freddie Mac first rates', 'Farmer Mac first rates', 'Private Securitization first rates', 'Commercial bank, savings bank or association first rates', 'Life insurance co., credit union, finance co. first rates', 'Affiliate institution first rates', 'Other first rates']
+		junior_lien_purchasers = ['Fannie Mae junior rates', 'Ginnie Mae junior rates', 'Freddie Mac junior rates', 'Farmer Mac junior rates', 'Private Securitization junior rates', 'Commercial bank, savings bank or association junior rates', 'Life insurance co., credit union, finance co. junior rates', 'Affiliate institution junior rates', 'Other junior rates']
+		for n in range(0,9):
+			if inputs['lien status'] == '1':
+				print inputs[first_lien_purchasers[n]], "purchaser count"
+				print float(container['pricinginformation'][1]['purchasers'][n]['first lien count']), "first lien count"
+				#print float(container['pricinginformation'][1]['purchasers'][n]['first lien count']), "count"
+				if float(container['pricinginformation'][1]['purchasers'][n]['first lien count']) > 0 and inputs[first_lien_purchasers[n]] > 0: #bug fix for divide by 0 errors
+					#print inputs[n], "rate spread total for purchaser n"
+					#print container['pricinginformation'][1]['purchasers'][n]['first lien count'], "first lien count"
+					container['pricinginformation'][3]['purchasers'][n]['first lien count'] = round(inputs[first_lien_purchasers[n]]/float(container['pricinginformation'][1]['purchasers'][n]['first lien count']),2)
+				elif float(container['pricinginformation'][1]['purchasers'][n]['first lien count']) == 0:
+					container['pricinginformation'][3]['purchasers'][n]['first lien count'] = 0
+			elif inputs['lien status'] == '2':
+				for n in range(0,9):
+					if inputs['lien status'] == '1':
+						print inputs[junior_lien_purchasers[n]], "purchaser count"
+						print float(container['pricinginformation'][1]['purchasers'][n]['junior lien count']), "junior lien count"
+						#print float(container['pricinginformation'][1]['purchasers'][n]['junior lien count']), "count"
+						if float(container['pricinginformation'][1]['purchasers'][n]['junior lien count']) > 0 and inputs[junior_lien_purchasers[n]] > 0: #bug fix for divide by 0 errors
+							#print inputs[n], "rate spread total for purchaser n"
+							#print container['pricinginformation'][1]['purchasers'][n]['junior lien count'], "junior lien count"
+							container['pricinginformation'][3]['purchasers'][n]['junior lien count'] = round(inputs[junior_lien_purchasers[n]]/float(container['pricinginformation'][1]['purchasers'][n]['junior lien count']),2)
+						elif float(container['pricinginformation'][1]['purchasers'][n]['junior lien count']) == 0:
+							container['pricinginformation'][3]['purchasers'][n]['junior lien count'] = 0
+
+
+
+
+
 
