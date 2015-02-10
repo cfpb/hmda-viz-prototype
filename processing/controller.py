@@ -2,13 +2,10 @@ import json
 import psycopg2
 import psycopg2.extras
 from collections import OrderedDict
-
-
 import psycopg2
 import psycopg2.extras
 from collections import OrderedDict
 #import the parse_inputs class to store the 'inputs' dictionary
-
 from A_D_library import parse_inputs as parse
 from A_D_library import connect_DB as connect
 from A_D_library import build_JSON as build
@@ -41,10 +38,8 @@ SQL = queries.count_rows_2012() #get query text for getting count of loans for t
 cur.execute(SQL, location) #ping the database for numbers!
 count = cur.fetchone() #get cont of rows for the MSA
 end = int(count[0]) #set count to an integer from a list of long type
-
 #end = 5
 print end
-
 
 #if report 3-1 is selected: need a function to read in report generation parameters
 SQL = queries.table_3_1()
@@ -77,6 +72,7 @@ for num in range(0, end):
             agg.by_rate_spread(table32, parsed.inputs)
             agg.by_hoepa_status(table32, parsed.inputs)
             agg.rate_sum(table32, parsed.inputs)
+            agg.fill_median_lists(parsed.inputs)
     else:
         #aggregate the subsequent loan into appropriate rows for the table
         #table 3-1
@@ -94,10 +90,15 @@ for num in range(0, end):
             agg.by_rate_spread(table32, parsed.inputs)
             agg.by_hoepa_status(table32, parsed.inputs)
             agg.rate_sum(table32, parsed.inputs)
-agg.by_mean(table32, parsed.inputs)
-#print json.dumps(table32, indent=4)
+            agg.fill_median_lists(parsed.inputs)
+
+agg.by_median(table32, parsed.inputs) #this stays outside the loop
+agg.by_mean(table32, parsed.inputs) #this stays outside the loop
+
+#write reports in json format
 name = 'report31_' + MSA + '.json'
 build31.write_JSON(name, table31)
 name2 = 'report32_' + MSA + '.json'
 build32.write_JSON(name2, table32)
+
 #build.set_header32(self, inputs, MSA, desc, table_type, table_num)

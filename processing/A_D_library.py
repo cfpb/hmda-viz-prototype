@@ -36,15 +36,24 @@ class parse_inputs(AD_report):
 		self.inputs['Affiliate institution junior rates'] = 0
 		self.inputs['Other junior rates'] =0
 
-		self.inputs['Fannie Mae rate spread list'] = []
-		self.inputs['Ginnie Mae rate spread list'] = []
-		self.inputs['Freddie Mac rate spread list'] = []
-		self.inputs['Farmer Mac rate spread list'] = []
-		self.inputs['Private Securitization rate spread list'] = []
-		self.inputs['Commercial bank, savings bank or association rate spread list'] = []
-		self.inputs['Life insurance co., credit union, finance co. rate spread list'] = []
-		self.inputs['Affiliate institution rate spread list'] = []
-		self.inputs['Otherrate spread list'] = []
+		self.inputs['Fannie Mae first lien list'] = []
+		self.inputs['Ginnie Mae first lien list'] = []
+		self.inputs['Freddie Mac first lien list'] = []
+		self.inputs['Farmer Mac first lien list'] = []
+		self.inputs['Private Securitization first lien list'] = []
+		self.inputs['Commercial bank, savings bank or association first lien list'] = []
+		self.inputs['Life insurance co., credit union, finance co. first lien list'] = []
+		self.inputs['Affiliate institution first lien list'] = []
+		self.inputs['Other first lien list'] = []
+		self.inputs['Fannie Mae junior lien list'] = []
+		self.inputs['Ginnie Mae junior lien list'] = []
+		self.inputs['Freddie Mac junior lien list'] = []
+		self.inputs['Farmer Mac junior lien list'] = []
+		self.inputs['Private Securitization junior lien list'] = []
+		self.inputs['Commercial bank, savings bank or association junior lien list'] = []
+		self.inputs['Life insurance co., credit union, finance co. junior lien list'] = []
+		self.inputs['Affiliate institution junior lien list'] = []
+		self.inputs['Other junior lien list'] = []
 	def parse_t31(self, row): #takes a row from a table 3-1 query and parses it to the inputs dictionary (28 tuples)
 		#parsing inputs for report 3.1
 		#self.inputs will be returned to for use in the aggregation function
@@ -729,8 +738,8 @@ class aggregate(AD_report):
 		junior_lien_purchasers = ['Fannie Mae junior rates', 'Ginnie Mae junior rates', 'Freddie Mac junior rates', 'Farmer Mac junior rates', 'Private Securitization junior rates', 'Commercial bank, savings bank or association junior rates', 'Life insurance co., credit union, finance co. junior rates', 'Affiliate institution junior rates', 'Other junior rates']
 		for n in range(0,9):
 			if inputs['lien status'] == '1':
-				print inputs[first_lien_purchasers[n]], "purchaser count"
-				print float(container['pricinginformation'][1]['purchasers'][n]['first lien count']), "first lien count"
+				#print inputs[first_lien_purchasers[n]], "purchaser count"
+				#print float(container['pricinginformation'][1]['purchasers'][n]['first lien count']), "first lien count"
 				#print float(container['pricinginformation'][1]['purchasers'][n]['first lien count']), "count"
 				if float(container['pricinginformation'][1]['purchasers'][n]['first lien count']) > 0 and inputs[first_lien_purchasers[n]] > 0: #bug fix for divide by 0 errors
 					#print inputs[n], "rate spread total for purchaser n"
@@ -749,10 +758,30 @@ class aggregate(AD_report):
 							#print container['pricinginformation'][1]['purchasers'][n]['junior lien count'], "junior lien count"
 							container['pricinginformation'][3]['purchasers'][n]['junior lien count'] = round(inputs[junior_lien_purchasers[n]]/float(container['pricinginformation'][1]['purchasers'][n]['junior lien count']),2)
 						elif float(container['pricinginformation'][1]['purchasers'][n]['junior lien count']) == 0:
-							container['pricinginformation'][3]['purchasers'][n]['junior lien count'] = 0
+							container['pricinginformation'][3]['purchasers'][n]['junior lien count'] = 0 #set mean to 0 if no loans had pricing information reported
 
 
+	def fill_median_lists(self, inputs):
+		purchaser_first_lien_rates = ['Fannie Mae first lien list', 'Ginnie Mae first lien list', 'Freddie Mac first lien list', 'Farmer Mac first lien list', 'Private Securitization first lien list', 'Commercial bank, savings bank or association first lien list', 'Life insurance co., credit union, finance co. first lien list', 'Affiliate institution first lien list', 'Other first lien list']
+		purchaser_junior_lien_rates = ['Fannie Mae junior lien list', 'Ginnie Mae junior lien list', 'Freddie Mac junior lien list', 'Farmer Mac junior lien list', 'Private Securitization junior lien list', 'Commercial bank, savings bank or association junior lien list', 'Life insurance co., credit union, finance co. junior lien list', 'Affiliate institution junior lien list', 'Other junior lien list']
+		if inputs['rate spread'] == 'NA   ' or inputs['rate spread'] == '     ':
+			pass
+		elif inputs['lien status'] == '1':
+			inputs[purchaser_first_lien_rates[inputs['purchaser']]].append(float(inputs['rate spread']))
+		elif inputs['lien status'] == '2':
+			inputs[purchaser_junior_lien_rates[inputs['purchaser']]].append(float(inputs['rate spread']))
 
+	def by_median(self, container, inputs):
+		import numpy
+		#retrun numpy.median(numpy.array(lst))
+		purchaser_first_lien_rates = ['Fannie Mae first lien list', 'Ginnie Mae first lien list', 'Freddie Mac first lien list', 'Farmer Mac first lien list', 'Private Securitization first lien list', 'Commercial bank, savings bank or association first lien list', 'Life insurance co., credit union, finance co. first lien list', 'Affiliate institution first lien list', 'Other first lien list']
+		for n in range(0,9):
+			if inputs['lien status'] == '1' and len(inputs[purchaser_first_lien_rates[n]]) > 0:
+				container['pricinginformation'][4]['purchasers'][n]['first lien count'] = round(numpy.median(numpy.array(inputs[purchaser_first_lien_rates[n]])),2)
+			elif inputs['lien status'] == '1' and len(inputs[purchaser_first_lien_rates[n]]) <= 0:
+				container['pricinginformation'][4]['purchasers'][n]['first lien count'] = 0 #should this be NA to reflect a 0 count?
+			elif inputs['lien status'] == '2' and len(inputs[purchaser_junior_lien_rates[n]]) > 0:
+				container['pricinginformation'][4]['purchasers'][n]['junior lien count'] = round(numpy.median(numpy.array(inputs[purchaser_junior_lien_rates[n]])),2)
 
 
 
