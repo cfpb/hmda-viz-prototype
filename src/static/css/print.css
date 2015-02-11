@@ -1,0 +1,9 @@
+/* set to allow printing of the tables */
+@media print {
+	.wrapper, .footer, .downloads {
+		display: none;
+	}
+	th, td {
+		padding: .25em;
+	}
+}

@@ -65,10 +65,54 @@ $( document ).ready(function() {
     // fill the msa select inputs
     getUIData();
   }
-    // initial set link
+
+  // initial set link
+  setLink();
+  // call setlink when new choice is made
+  $('select').click(function() {
     setLink();
-    // call setlink when new choice is made
-    $('select').click(function() {
-      setLink();
-    });
+  });
+
+  $('#print').click(function() {
+    window.print();
+  });
+
+  // to csv
+  // get the number of columns
+  var colCount = 0;
+  var theCSV = '';
+  $('.report thead tr:first-child th').each(function () { // shouldn't rely on thead being there
+    console.log ('im in');
+    if ($(this).attr('colspan')) {
+      colCount += +$(this).attr('colspan');
+    } else {
+      colCount++;
+    }
+  });
+  console.log (colCount);
+
+  // loop through each row
+  $('.report thead tr th, .report thead tr td, .report tbody tr td').each(function () {
+      theCSV = theCSV + ('"' + $(this).text() + '"'); // put the content in first
+      if ($(this).attr('colspan')) {
+        for (var i = 0; i < +$(this).attr('colspan')-1; i++) {  // add extra columns
+          theCSV = theCSV + ',';
+        }
+      }
+      if ($(this).is(':last-child')) {
+        theCSV = theCSV + '\n';
+      } else {
+        theCSV = theCSV + ',';
+      }
+  });
+  console.log(theCSV);
+
+  $('#csv').click(function() {
+    if (navigator.msSaveBlob) { // IE 10+
+      var blob = new Blob([theCSV],{type: 'text/csv;charset=utf-8;'});
+      navigator.msSaveBlob(blob, 'download.csv');
+    } else {
+      window.open('data:text/csv;charset=utf-8,' + escape(theCSV));
+    }
+  });
 });
