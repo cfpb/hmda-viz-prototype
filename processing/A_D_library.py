@@ -45,6 +45,7 @@ class parse_inputs(AD_report):
 		self.inputs['Life insurance co., credit union, finance co. first lien list'] = []
 		self.inputs['Affiliate institution first lien list'] = []
 		self.inputs['Other first lien list'] = []
+
 		self.inputs['Fannie Mae junior lien list'] = []
 		self.inputs['Ginnie Mae junior lien list'] = []
 		self.inputs['Freddie Mac junior lien list'] = []
@@ -54,6 +55,7 @@ class parse_inputs(AD_report):
 		self.inputs['Life insurance co., credit union, finance co. junior lien list'] = []
 		self.inputs['Affiliate institution junior lien list'] = []
 		self.inputs['Other junior lien list'] = []
+
 	def parse_t31(self, row): #takes a row from a table 3-1 query and parses it to the inputs dictionary (28 tuples)
 		#parsing inputs for report 3.1
 		#self.inputs will be returned to for use in the aggregation function
@@ -270,26 +272,15 @@ class build_JSON(AD_report):
 	def __init__(self):
 		self.container = OrderedDict({})
 		self.msa = OrderedDict({})
-		self.table32_cats = ['No reported pricing data', 'pricing data reported', 'percentage points above average prime offer rate: only includes loans with APR above the threshold', 'mean', 'median', 'HOEPA Loans']
-		self.table32_rates = ['3 - 3.99', '4 - 4.99', '5 - 5.99', '6 - 6.99', '7 - 7.99', '8 - 8.99', '9 - 9.99', '10 or more']
+		#self.table32_cats = ['No reported pricing data', 'pricing data reported', 'percentage points above average prime offer rate: only includes loans with APR above the threshold', 'mean', 'median', 'HOEPA Loans']
+		self.table32_cats = ['pricing-information', 'points', 'mean', 'median', 'hoepa']
+		self.table32_rates = ['1.50 - 1.99', '2.00 - 2.49', '2.50 - 2.99', '3.00 - 3.49', '3.50 - 4.49', '4.50 - 5.49', '5.50 - 6.49', '6.5 or more']
 
 	def table_headers(self, table_num): #holds table descriptions
 		if table_num == '3-1':
 			return 'Loans sold. By characteristics of borrower and census tract in which property is located and by type of purchaser (includes originations and purchased loans).'
 		elif table_num =='3-2':
 			return 'Pricing Information for First and Junio Lien Loans Sold by Type of Purchaser (includes originations only).'
-	'''
-	this is the old function - remove?
-	def set_header(self, inputs, MSA): #add a variable for desc_string
-		self.container['table'] = '3-1'
-		self.container['type'] = 'aggregate'
-		self.container['desc'] = 'Loans sold. By characteristics of borrower and census tract in which property is located and by type of purchaser (includes originations and purchased loans).'
-		self.container['year'] = inputs['year']
-		self.msa['id'] = MSA
-		#self.msa['name'] = inputs['MSA name'] #need to add MSA names to a database or read-in file
-		self.msa['state'] = inputs['state name']
-		self.container['msa'] = self.msa
-	'''
 
 	def set_header32(self, inputs, MSA, desc, table_type, table_num): #add a variable for desc_string
 		msa = OrderedDict({})
@@ -329,30 +320,49 @@ class build_JSON(AD_report):
 			purchasers.append(purchasersholding)
 		return purchasers
 
+	def set_purchasers32v2(self): #this function is used for the 'mean' and 'median' sections as they do not have loan value sections
+		from collections import OrderedDict
+		purchasers = []
+		purchaser_names = ['Fannie Mae', 'Ginnie Mae', 'Freddie Mac', 'Farmer Mac', 'Private Securitization', 'Commercial bank, savings bank or association', 'Life insurance co., credit union, finance co.', 'Affiliate institution', 'Other']
+		for item in purchaser_names:
+			purchasersholding = OrderedDict({})
+			purchasersholding['name'] = "{}".format(item)
+			purchasersholding['first lien'] = 0
+			purchasersholding['junior lien'] = 0
+			purchasers.append(purchasersholding)
+		return purchasers
 	def build_JSON32(self):
 		pricinginformation = []
-		categories = ['No reported pricing data', 'pricing data reported', 'percentage points above average prime offer rate: only includes loans with APR above the threshold', 'mean', 'median', 'HOEPA Loans']
-
+		categories = ['No reported pricing data', 'reported pricing data']
 		for cat in categories:
 			holding = OrderedDict({})
 			holding['pricing']= "{}".format(cat) #race is overwritten each pass of the loop (keys are unique in dictionaries)
-			if cat == 'percentage points above average prime offer rate: only includes loans with APR above the threshold':
-				holding['points'] = self.build_rate_spreads()
-			else:
-				holding['purchasers']  = self.set_purchasers32() #purchasers is overwritten each pass in the holding dictionary
+			holding['purchasers']  = self.set_purchasers32() #purchasers is overwritten each pass in the holding dictionary
 			pricinginformation.append(holding)
 		self.container['pricinginformation'] = pricinginformation
+
+		holding = OrderedDict({})
+		points = self.build_rate_spreads()
+		self.container['points'] = points
+
+		hoepa = OrderedDict({})
+		hoepa['pricing'] = 'hoepa loans'
+		hoepa['purchasers'] = self.set_purchasers32()
+		self.container['hoepa'] = hoepa
 		return self.container
 
 	def build_rate_spreads(self):
-		 spreads = []
-		 rate_spreads = ['1.50 - 1.99', '2.00 - 2.49', '2.50 - 2.99', '3.00 - 3.49', '3.50 - 4.49', '4.50 - 5.49', '5.50 - 6.49', '6.5 or more']
-		 for rate in rate_spreads: #change to self.table32_rates
+		spreads = []
+		rate_spreads = ['1.50 - 1.99', '2.00 - 2.49', '2.50 - 2.99', '3.00 - 3.49', '3.50 - 4.49', '4.50 - 5.49', '5.50 - 6.49', '6.5 or more', 'mean', 'median']
+		for rate in rate_spreads:
 			 holding = OrderedDict({})
 			 holding['point'] = "{}".format(rate)
-			 holding['purchasers'] = self.set_purchasers32()
+			 if rate_spreads.index(rate) < 8:
+				holding['purchasers'] = self.set_purchasers32()
+			 else:
+				holding['purchasers'] = self.set_purchasers32v2()
 			 spreads.append(holding)
-		 return spreads
+		return spreads
 
 	def build_JSON(self):
 		from collections import OrderedDict
@@ -368,27 +378,20 @@ class build_JSON(AD_report):
 		tract_pct_minority = ['Less than 10% minority', '10-19% minority', '20-49% minority', '50-79% minority', '80-100% minority']
 		tract_income = ['Low income', 'Moderate income', 'Middle income', 'Upper income']
 
-		#borrowercharacterisitics holds all the lists and dicts for the applicant portion table
-		borrowercharacteristics = []
-		#censuscharacteristics holds all the lists and dicts for the census portion of the table
-		censuscharacteristics = []
-		#purchasers holds the dictionary of all purchasers, values and counts for use in the JSON object
-		purchasers = []
-		#totals sums all the loan counts and values for each purchaser
-		totals = {}
+		borrowercharacteristics = [] #borrowercharacterisitics holds all the lists and dicts for the applicant portion table
+		censuscharacteristics = [] #censuscharacteristics holds all the lists and dicts for the census portion of the table
+		purchasers = [] #purchasers holds the dictionary of all purchasers, values and counts for use in the JSON object
+		totals = {} #totals sums all the loan counts and values for each purchaser
 
 		Header = True
 		top = OrderedDict({})
 		for race in race_names:
 			holding = OrderedDict({})
-
 			if Header == True:
 				top['characteristic'] = 'Race'
 				top['races'] = []
 			Header = False
-
 			holding['race']= "{}".format(race) #race is overwritten each pass of the loop (keys are unique in dictionaries)
-			#purchasers = self.set_purchasers()
 			holding['purchasers'] = self.set_purchasers() #purchasers is overwritten each pass in the holding dictionary
 			top['races'].append(holding)
 
@@ -399,14 +402,11 @@ class build_JSON(AD_report):
 		Header = True
 		for ethnicity in ethnicity_names:
 			holding = OrderedDict({})
-
 			if Header == True:
 				top['characteristic'] = 'Ethnicity'
 				top['ethnicities'] = []
 			Header = False
-
 			holding['ethnicity'] = "{}".format(ethnicity)
-			#purchasers = self.set_purchasers()
 			holding['purchasers'] = self.set_purchasers()
 			top['ethnicities'].append(holding)
 
@@ -417,12 +417,10 @@ class build_JSON(AD_report):
 		Header = True
 		for status in minority_statuses:
 			holding = OrderedDict({})
-
 			if Header == True:
 				top['characteristic'] = 'Minority Status'
 				top['minoritystatuses'] = []
 			Header = False
-
 			holding['minoritystatus'] = "{}".format(status)
 			holding['purchasers'] = self.set_purchasers()
 			top['minoritystatuses'].append(holding)
@@ -438,7 +436,6 @@ class build_JSON(AD_report):
 				top['applicantincome'] = []
 			Header = False
 			holding['applicantincomes'] = "{}".format(bracket)
-			#purchasers = self.set_purchasers()
 			holding['purchasers'] = self.set_purchasers()
 			top['applicantincome'].append(holding)
 		borrowercharacteristics.append(top)
@@ -454,7 +451,6 @@ class build_JSON(AD_report):
 				top['tractpctminority'] = []
 			Header = False
 			holding['tractpctminority'] = "{}".format(pct)
-			#purchasers = self.set_purchasers()
 			holding['purchasers'] = self.set_purchasers()
 			top['tractpctminority'].append(holding)
 		censuscharacteristics.append(top)
@@ -469,7 +465,6 @@ class build_JSON(AD_report):
 				top['incomelevel'] = []
 			Header = False
 			holding['incomelevel'] = "{}".format(level)
-			#purchasers = self.set_purchasers()
 			holding['purchasers'] = self.set_purchasers()
 			top['incomelevel'].append(holding)
 		censuscharacteristics.append(top)
@@ -477,7 +472,6 @@ class build_JSON(AD_report):
 		#build totals
 		top = OrderedDict({})
 		holding = OrderedDict({})
-		#purchasers = self.set_purchasers()
 		totals['purchasers'] = self.set_purchasers()
 
 		self.container['borrowercharacteristics'] = borrowercharacteristics
@@ -536,8 +530,6 @@ class MSA_info(AD_report):
 		else:
 			inputs['percent MSA income'] = (float(inputs['income']) / (float(inputs['MSA median income'] )/1000)) *100
 			#determine income bracket for use as an index in the JSON object
-			#move this somewhere else
-			#check logic on math to make sure all is inclusive - set a rounding function on line 71
 			if inputs['percent MSA income'] < 50:
 				return 0
 			elif inputs['percent MSA income'] <= 79:
@@ -667,21 +659,21 @@ class aggregate(AD_report):
 
 	def by_rate_spread(self, container, inputs):
 		if inputs['lien status'] == '1' and inputs['rate spread index'] < 8:
-			container['pricinginformation'][2]['points'][inputs['rate spread index']]['purchasers'][inputs['purchaser']]['first lien count'] +=1
-			container['pricinginformation'][2]['points'][inputs['rate spread index']]['purchasers'][inputs['purchaser']]['first lien value'] += int(inputs['loan value'])
+			container['points'][inputs['rate spread index']]['purchasers'][inputs['purchaser']]['first lien count'] +=1
+			container['points'][inputs['rate spread index']]['purchasers'][inputs['purchaser']]['first lien value'] += int(inputs['loan value'])
 
 		elif inputs['lien status'] == '2' and inputs['rate spread index'] <8:
-			container['pricinginformation'][2]['points'][inputs['rate spread index']]['purchasers'][inputs['purchaser']]['junior lien count'] +=1
-			container['pricinginformation'][2]['points'][inputs['rate spread index']]['purchasers'][inputs['purchaser']]['junior lien value'] += int(inputs['loan value'])
+			container['points'][inputs['rate spread index']]['purchasers'][inputs['purchaser']]['junior lien count'] +=1
+			container['points'][inputs['rate spread index']]['purchasers'][inputs['purchaser']]['junior lien value'] += int(inputs['loan value'])
 
 	def by_hoepa_status(self, container, inputs):
 		if inputs['hoepa flag'] == 1:
 			if inputs['lien status'] == 1:
-				container['pricinginformation'][5]['purchasers'][inputs['purchaser']]['first lien count'] +=1
-				container['pricinginformation'][5]['purchasers'][inputs['purchaser']]['first lien value'] +=int(inputs['loan value'])
+				container['hoepa']['purchasers'][inputs['purchaser']]['first lien count'] +=1
+				container['hoepa']['purchasers'][inputs['purchaser']]['first lien value'] +=int(inputs['loan value'])
 			elif inputs['lien status'] == 2:
-				container['pricinginformation'][5]['purchasers'][inputs['purchaser']]['junior lien count'] +=1
-				container['pricinginformation'][5]['purchasers'][inputs['purchaser']]['junior lien value'] +=int(inputs['loan value'])
+				container['hoepa']['purchasers'][inputs['purchaser']]['junior lien count'] +=1
+				container['hoepa']['purchasers'][inputs['purchaser']]['junior lien value'] +=int(inputs['loan value'])
 			else:
 				print "invalid hoepa flag, oops"
 		elif inputs['hoepa flag'] == 2:
@@ -737,29 +729,11 @@ class aggregate(AD_report):
 		first_lien_purchasers = ['Fannie Mae first rates', 'Ginnie Mae first rates', 'Freddie Mac first rates', 'Farmer Mac first rates', 'Private Securitization first rates', 'Commercial bank, savings bank or association first rates', 'Life insurance co., credit union, finance co. first rates', 'Affiliate institution first rates', 'Other first rates']
 		junior_lien_purchasers = ['Fannie Mae junior rates', 'Ginnie Mae junior rates', 'Freddie Mac junior rates', 'Farmer Mac junior rates', 'Private Securitization junior rates', 'Commercial bank, savings bank or association junior rates', 'Life insurance co., credit union, finance co. junior rates', 'Affiliate institution junior rates', 'Other junior rates']
 		for n in range(0,9):
-			if inputs['lien status'] == '1':
-				#print inputs[first_lien_purchasers[n]], "purchaser count"
-				#print float(container['pricinginformation'][1]['purchasers'][n]['first lien count']), "first lien count"
-				#print float(container['pricinginformation'][1]['purchasers'][n]['first lien count']), "count"
-				if float(container['pricinginformation'][1]['purchasers'][n]['first lien count']) > 0 and inputs[first_lien_purchasers[n]] > 0: #bug fix for divide by 0 errors
-					#print inputs[n], "rate spread total for purchaser n"
-					#print container['pricinginformation'][1]['purchasers'][n]['first lien count'], "first lien count"
-					container['pricinginformation'][3]['purchasers'][n]['first lien count'] = round(inputs[first_lien_purchasers[n]]/float(container['pricinginformation'][1]['purchasers'][n]['first lien count']),2)
-				elif float(container['pricinginformation'][1]['purchasers'][n]['first lien count']) == 0:
-					container['pricinginformation'][3]['purchasers'][n]['first lien count'] = 0
-			elif inputs['lien status'] == '2':
-				for n in range(0,9):
-					if inputs['lien status'] == '1':
-						print inputs[junior_lien_purchasers[n]], "purchaser count"
-						print float(container['pricinginformation'][1]['purchasers'][n]['junior lien count']), "junior lien count"
-						#print float(container['pricinginformation'][1]['purchasers'][n]['junior lien count']), "count"
-						if float(container['pricinginformation'][1]['purchasers'][n]['junior lien count']) > 0 and inputs[junior_lien_purchasers[n]] > 0: #bug fix for divide by 0 errors
-							#print inputs[n], "rate spread total for purchaser n"
-							#print container['pricinginformation'][1]['purchasers'][n]['junior lien count'], "junior lien count"
-							container['pricinginformation'][3]['purchasers'][n]['junior lien count'] = round(inputs[junior_lien_purchasers[n]]/float(container['pricinginformation'][1]['purchasers'][n]['junior lien count']),2)
-						elif float(container['pricinginformation'][1]['purchasers'][n]['junior lien count']) == 0:
-							container['pricinginformation'][3]['purchasers'][n]['junior lien count'] = 0 #set mean to 0 if no loans had pricing information reported
+			if float(container['pricinginformation'][1]['purchasers'][n]['first lien count']) > 0 and inputs[first_lien_purchasers[n]] > 0: #bug fix for divide by 0 errors
+				container['points'][8]['purchasers'][n]['first lien'] = round(inputs[first_lien_purchasers[n]]/float(container['pricinginformation'][1]['purchasers'][n]['first lien count']),2)
 
+			if float(container['pricinginformation'][1]['purchasers'][n]['junior lien count']) > 0 and inputs[junior_lien_purchasers[n]] > 0: #bug fix for divide by 0 errors
+				container['points'][8]['purchasers'][n]['junior lien'] = round(inputs[junior_lien_purchasers[n]]/float(container['pricinginformation'][1]['purchasers'][n]['junior lien count']),2)
 
 	def fill_median_lists(self, inputs):
 		purchaser_first_lien_rates = ['Fannie Mae first lien list', 'Ginnie Mae first lien list', 'Freddie Mac first lien list', 'Farmer Mac first lien list', 'Private Securitization first lien list', 'Commercial bank, savings bank or association first lien list', 'Life insurance co., credit union, finance co. first lien list', 'Affiliate institution first lien list', 'Other first lien list']
@@ -773,15 +747,13 @@ class aggregate(AD_report):
 
 	def by_median(self, container, inputs):
 		import numpy
-		#retrun numpy.median(numpy.array(lst))
 		purchaser_first_lien_rates = ['Fannie Mae first lien list', 'Ginnie Mae first lien list', 'Freddie Mac first lien list', 'Farmer Mac first lien list', 'Private Securitization first lien list', 'Commercial bank, savings bank or association first lien list', 'Life insurance co., credit union, finance co. first lien list', 'Affiliate institution first lien list', 'Other first lien list']
+		purchaser_junior_lien_rates = ['Fannie Mae junior lien list', 'Ginnie Mae junior lien list', 'Freddie Mac junior lien list', 'Farmer Mac junior lien list', 'Private Securitization junior lien list', 'Commercial bank, savings bank or association junior lien list', 'Life insurance co., credit union, finance co. junior lien list', 'Affiliate institution junior lien list', 'Other junior lien list']
 		for n in range(0,9):
-			if inputs['lien status'] == '1' and len(inputs[purchaser_first_lien_rates[n]]) > 0:
-				container['pricinginformation'][4]['purchasers'][n]['first lien count'] = round(numpy.median(numpy.array(inputs[purchaser_first_lien_rates[n]])),2)
-			elif inputs['lien status'] == '1' and len(inputs[purchaser_first_lien_rates[n]]) <= 0:
-				container['pricinginformation'][4]['purchasers'][n]['first lien count'] = 0 #should this be NA to reflect a 0 count?
-			elif inputs['lien status'] == '2' and len(inputs[purchaser_junior_lien_rates[n]]) > 0:
-				container['pricinginformation'][4]['purchasers'][n]['junior lien count'] = round(numpy.median(numpy.array(inputs[purchaser_junior_lien_rates[n]])),2)
+			#first lien median block
+			if len(inputs[purchaser_first_lien_rates[n]]) > 0:
+				container['points'][9]['purchasers'][n]['first lien'] = round(numpy.median(numpy.array(inputs[purchaser_first_lien_rates[n]])),2)
 
-
-
+			#junior lien median block
+			if len(inputs[purchaser_junior_lien_rates[n]]) > 0:
+				container['points'][9]['purchasers'][n]['junior lien'] = round(numpy.median(numpy.array(inputs[purchaser_junior_lien_rates[n]])),2)
