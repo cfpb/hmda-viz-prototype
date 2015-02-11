@@ -272,15 +272,24 @@ class build_JSON(AD_report):
 	def __init__(self):
 		self.container = OrderedDict({})
 		self.msa = OrderedDict({})
+		self.borrowercharacteristics = []
+		self.censuscharacteristics = [] #censuscharacteristics holds all the lists and dicts for the census portion of the table
 		#self.table32_cats = ['No reported pricing data', 'pricing data reported', 'percentage points above average prime offer rate: only includes loans with APR above the threshold', 'mean', 'median', 'HOEPA Loans']
-		self.table32_cats = ['pricing-information', 'points', 'mean', 'median', 'hoepa']
-		self.table32_rates = ['1.50 - 1.99', '2.00 - 2.49', '2.50 - 2.99', '3.00 - 3.49', '3.50 - 4.49', '4.50 - 5.49', '5.50 - 6.49', '6.5 or more']
+		self.table32_categories = ['pricinginformation', 'points', 'hoepa']
+		self.table32_rates = ['1.50 - 1.99', '2.00 - 2.49', '2.50 - 2.99', '3.00 - 3.49', '3.50 - 4.49', '4.50 - 5.49', '5.50 - 6.49', '6.5 or more', 'mean', 'median']
+		self.purchaser_names = ['Fannie Mae', 'Ginnie Mae', 'Freddie Mac', 'Farmer Mac', 'Private Securitization', 'Commercial bank, savings bank or association', 'Life insurance co., credit union, finance co.', 'Affiliate institution', 'Other']
+		self.race_names = ['American Indian/Alaska Native', 'Asian', 'Black or African American', 'Native Hawaiian or Pacific Islander', 'White', '2 or more minority races', 'Joint', 'Not Provided', 'Not Applicable', 'No co-applicant']
+		self.ethnicity_names = ['Hispanic or Latino', 'Not Hispanic or Latino', 'Not provided', 'Not applicable', 'No co-applicant']
+		self.minority_statuses = ['White Non-Hispanic', 'Others, Including Hispanic']
+		self.applicant_income_bracket = ['Less than 50% of MSA/MD median', '50-79% of MSA/MD median', '80-99% of MSA/MD median', '100-119% of MSA/MD median', '120% or more of MSA/MD median', 'income not available']
+		self.tract_pct_minority = ['Less than 10% minority', '10-19% minority', '20-49% minority', '50-79% minority', '80-100% minority']
+		self.tract_income = ['Low income', 'Moderate income', 'Middle income', 'Upper income']
 
 	def table_headers(self, table_num): #holds table descriptions
 		if table_num == '3-1':
 			return 'Loans sold. By characteristics of borrower and census tract in which property is located and by type of purchaser (includes originations and purchased loans).'
 		elif table_num =='3-2':
-			return 'Pricing Information for First and Junio Lien Loans Sold by Type of Purchaser (includes originations only).'
+			return 'Pricing Information for First and Junior Lien Loans Sold by Type of Purchaser (includes originations only).'
 
 	def set_header32(self, inputs, MSA, desc, table_type, table_num): #add a variable for desc_string
 		msa = OrderedDict({})
@@ -331,6 +340,7 @@ class build_JSON(AD_report):
 			purchasersholding['junior lien'] = 0
 			purchasers.append(purchasersholding)
 		return purchasers
+
 	def build_JSON32(self):
 		pricinginformation = []
 		categories = ['No reported pricing data', 'reported pricing data']
@@ -353,131 +363,59 @@ class build_JSON(AD_report):
 
 	def build_rate_spreads(self):
 		spreads = []
-		rate_spreads = ['1.50 - 1.99', '2.00 - 2.49', '2.50 - 2.99', '3.00 - 3.49', '3.50 - 4.49', '4.50 - 5.49', '5.50 - 6.49', '6.5 or more', 'mean', 'median']
-		for rate in rate_spreads:
+		for rate in self.table32_rates:
 			 holding = OrderedDict({})
 			 holding['point'] = "{}".format(rate)
-			 if rate_spreads.index(rate) < 8:
+			 if self.table32_rates.index(rate) < 8:
 				holding['purchasers'] = self.set_purchasers32()
 			 else:
 				holding['purchasers'] = self.set_purchasers32v2()
 			 spreads.append(holding)
 		return spreads
+	def table_31_borrower_characteristics(self, characteristic, container_name, item_list):
+		#container_name = characteristic.lower()+'s'
+		#borrowercharacteristics = []
+		Header = True
+		top = OrderedDict({})
+		for item in item_list:
+			holding = OrderedDict({})
+			if Header == True:
+				top['characteristic'] = characteristic
+				top[container_name] = []
+			Header = False
+			holding[container_name[:-1]] = "{}".format(item)
+			holding['purchasers'] = self.set_purchasers()
+			top[container_name].append(holding)
+		self.borrowercharacteristics.append(top)
 
-	def build_JSON(self):
-		from collections import OrderedDict
-		import json
-		#rewrite this as a function
-		#FFIEC report 3-1 labels
-		#move these lists to a self. area or use a function area to return lists
-		purchaser_names = ['Loan was not originated or was not sold in calendar year', 'Fannie Mae', 'Ginnie Mae', 'Freddie Mac', 'Farmer Mac', 'Private Securitization', 'Commercial bank, savings bank or association', 'Life insurance co., credit union, finance co.', 'Affiliate institution', 'Other']
-		race_names = ['American Indian/Alaska Native', 'Asian', 'Black or African American', 'Native Hawaiian or Pacific Islander', 'White', '2 or more minority races', 'Joint', 'Not Provided', 'Not Applicable', 'No co-applicant']
-		ethnicity_names = ['Hispanic or Latino', 'Not Hispanic or Latino', 'Not provided', 'Not applicable', 'No co-applicant']
-		minority_statuses = ['White Non-Hispanic', 'Others, Including Hispanic']
-		applicant_income_bracket = ['Less than 50% of MSA/MD median', '50-79% of MSA/MD median', '80-99% of MSA/MD median', '100-119% of MSA/MD median', '120% or more of MSA/MD median', 'income not available']
-		tract_pct_minority = ['Less than 10% minority', '10-19% minority', '20-49% minority', '50-79% minority', '80-100% minority']
-		tract_income = ['Low income', 'Moderate income', 'Middle income', 'Upper income']
+	def table_31_census_characteristics(self, characteristic, container_name, item_list):
+		Header = True
+		top = OrderedDict({})
+		for item in item_list:
+			holding = OrderedDict({})
+			if Header == True:
+				top['characteristic'] = characteristic
+				top[container_name] = []
+			Header = False
+			holding[container_name[:-1]] = "{}".format(item)
+			holding['purchasers'] = self.set_purchasers()
+			top[container_name].append(holding)
+		self.censuscharacteristics.append(top)
 
-		borrowercharacteristics = [] #borrowercharacterisitics holds all the lists and dicts for the applicant portion table
-		censuscharacteristics = [] #censuscharacteristics holds all the lists and dicts for the census portion of the table
-		purchasers = [] #purchasers holds the dictionary of all purchasers, values and counts for use in the JSON object
+	def table_31_builder(self):
+		self.table_31_borrower_characteristics('Race', 'races', self.race_names)
+		self.table_31_borrower_characteristics('Ethnicity', 'ethnicities', self.ethnicity_names)
+		self.table_31_borrower_characteristics('Minority Status', 'minoritystatuses', self.minority_statuses)
+		self.table_31_borrower_characteristics('Applicant Income', 'applicantincomes', self.applicant_income_bracket)
+		self.table_31_census_characteristics('Racial/Ethnic Composition', 'tractpctminority', self.tract_pct_minority)
+		self.table_31_census_characteristics('Income', 'incomelevel', self.tract_income)
+		self.container['borrowercharacteristics'] = self.borrowercharacteristics
+		self.container['censuscharacteristics'] = self.censuscharacteristics
 		totals = {} #totals sums all the loan counts and values for each purchaser
-
-		Header = True
-		top = OrderedDict({})
-		for race in race_names:
-			holding = OrderedDict({})
-			if Header == True:
-				top['characteristic'] = 'Race'
-				top['races'] = []
-			Header = False
-			holding['race']= "{}".format(race) #race is overwritten each pass of the loop (keys are unique in dictionaries)
-			holding['purchasers'] = self.set_purchasers() #purchasers is overwritten each pass in the holding dictionary
-			top['races'].append(holding)
-
-		borrowercharacteristics.append(top)
-
-		#build ethnicity
-		top = OrderedDict({})
-		Header = True
-		for ethnicity in ethnicity_names:
-			holding = OrderedDict({})
-			if Header == True:
-				top['characteristic'] = 'Ethnicity'
-				top['ethnicities'] = []
-			Header = False
-			holding['ethnicity'] = "{}".format(ethnicity)
-			holding['purchasers'] = self.set_purchasers()
-			top['ethnicities'].append(holding)
-
-		borrowercharacteristics.append(top)
-
-		#build minority status
-		top = OrderedDict({})
-		Header = True
-		for status in minority_statuses:
-			holding = OrderedDict({})
-			if Header == True:
-				top['characteristic'] = 'Minority Status'
-				top['minoritystatuses'] = []
-			Header = False
-			holding['minoritystatus'] = "{}".format(status)
-			holding['purchasers'] = self.set_purchasers()
-			top['minoritystatuses'].append(holding)
-		borrowercharacteristics.append(top)
-
-		#build applicant income to MSA/MD income brackets
-		top = OrderedDict({})
-		Header = True
-		for bracket in applicant_income_bracket:
-			holding = OrderedDict({})
-			if Header == True:
-				top['characteristic'] = 'Applicant Income'
-				top['applicantincome'] = []
-			Header = False
-			holding['applicantincomes'] = "{}".format(bracket)
-			holding['purchasers'] = self.set_purchasers()
-			top['applicantincome'].append(holding)
-		borrowercharacteristics.append(top)
-
-		#build census characateristics
-		#build racial ethnic composition of tracts
-		top = OrderedDict({})
-		Header = True
-		for pct in tract_pct_minority:
-			holding = OrderedDict({})
-			if Header == True:
-				top['characteristic'] = 'Racial/Ethnic Composition'
-				top['tractpctminority'] = []
-			Header = False
-			holding['tractpctminority'] = "{}".format(pct)
-			holding['purchasers'] = self.set_purchasers()
-			top['tractpctminority'].append(holding)
-		censuscharacteristics.append(top)
-
-		#build tract income level
-		top = OrderedDict({})
-		Header = True
-		for level in tract_income:
-			holding = OrderedDict({})
-			if Header == True:
-				top['characteristic'] = 'Income'
-				top['incomelevel'] = []
-			Header = False
-			holding['incomelevel'] = "{}".format(level)
-			holding['purchasers'] = self.set_purchasers()
-			top['incomelevel'].append(holding)
-		censuscharacteristics.append(top)
-
-		#build totals
 		top = OrderedDict({})
 		holding = OrderedDict({})
 		totals['purchasers'] = self.set_purchasers()
-
-		self.container['borrowercharacteristics'] = borrowercharacteristics
-		self.container['censuscharacteristics'] = censuscharacteristics
 		self.container['total'] = totals
-		#self.write_JSON('JSON_out.json')
 		return self.container
 
 	def print_JSON(self):
@@ -621,8 +559,8 @@ class aggregate(AD_report):
 		if inputs['income bracket'] > 5:
 			pass
 		else:
-			container['borrowercharacteristics'][3]['applicantincome'][inputs['income bracket']]['purchasers'][inputs['purchaser']]['count'] += 1
-			container['borrowercharacteristics'][3]['applicantincome'][inputs['income bracket']]['purchasers'][inputs['purchaser']]['value'] += int(inputs['loan value'])
+			container['borrowercharacteristics'][3]['applicantincomes'][inputs['income bracket']]['purchasers'][inputs['purchaser']]['count'] += 1
+			container['borrowercharacteristics'][3]['applicantincomes'][inputs['income bracket']]['purchasers'][inputs['purchaser']]['value'] += int(inputs['loan value'])
 
 	def by_minority_composition(self, container, inputs):
 		if inputs['minority percent'] == 4:
