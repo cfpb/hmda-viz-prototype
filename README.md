@@ -1,21 +1,52 @@
-# Hmda viz prototype
+# Hmda Viz Prototype
 
-Prototype for HMDA aggregate and disclosure reports
+This is a **prototype** for HMDA aggregate and disclosure reports.
+
+This project has 2 parts:
+1. the front-end for the reports, including the process of navigating the forms to generate the tables,
+2. along with the processing of the data to generate the json files.
 
 ![Screenshot](screenshot.png)
 
-
 ## Dependencies
 
-Describe any dependencies that must be installed for this software to work. 
-This includes programming languages, databases or other storage mechanisms, build tools, frameworks, and so forth.
-If specific versions of other software are required, or known not to work, call that out.
+### Front-end
 
-## Installation
+- Ruby - for installing Jekyll
+- [Jekyll](jekyllrb.com/)
+- Node - for managing front-end dependencies
+- Bower
+- Grunt
+- [Capital Framework](http://cfpb.github.io/capital-framework/)
 
-Detailed instructions on how to install, configure, and get the project running.
-This should be frequently tested to ensure reliability. Alternatively, a link to
-another page is fine, but it's important that this works.
+### Processing
+ - Python
+ - PostgreSQL
+ - TBD
+
+## Front-end Installation
+
+We use [homebrew](http://brew.sh/) on Mac OSX to manage installation of software. To install the project dependencies using homebrew, navigate to this project's root directory and enter the following:
+
+```shell
+$ brew install ruby
+$ brew install node
+$ gem install jekyll
+$ npm install
+```
+
+After installation you'll need to build Capital Framework by running:
+```shell
+$ grunt
+```
+
+To launch the site, enter:
+
+```shell
+$ jekyll serve
+```
+
+The site should now be live at `http://localhost:4000/capital-framework/`.
 
 ## Configuration
 
@@ -23,34 +54,25 @@ If the software is configurable, describe it in detail, either here or in other 
 
 ## Usage
 
-Show users how to use the software. 
-Be specific. 
-Use appropriate formatting when showing code snippets.
+Currently only one "path" works in the forms. You have to chose the "Aggregate" report type. Then you have to select:
 
-## How to test the software
+- "2013" and "Alabama" in the first form and click "Submit" then,
+- "11500 - Anniston-Oxford" and click "Select MSA/MD" then,
+- "3-1 - Loans Sold by Tract" and click "Select Table".
 
-If the software includes automated tests, detail how to run those tests.
+You should now see an HTML table with options to download the json, csv and print.
 
 ## Known issues
 
-Document any known significant shortcomings with the software.
+We are still in the prototyping phase so there is a lot of work happening on both the front-end and processing sides. One obvious issue is that only one "path" currently works for the forms.
 
 ## Getting help
 
-Instruct users how to get help with this software; this might include links to an issue tracker, wiki, mailing list, etc.
-
-**Example**
-
-If you have questions, concerns, bug reports, etc, please file an issue in this repository's Issue Tracker.
+If you have questions, concerns, bug reports, etc, please file an issue in this repository's [Issue Tracker](https://github.com/cfpb/hmda-viz-prototype/issues).
 
 ## Getting involved
 
-This section should detail why people should get involved and describe key areas you are
-currently focusing on; e.g., trying to get feedback on features, fixing certain bugs, building
-important pieces, etc.
-
-General instructions on _how_ to contribute should be stated with a link to [CONTRIBUTING](CONTRIBUTING.md).
-
+TBD
 
 ----
 
@@ -64,6 +86,4 @@ General instructions on _how_ to contribute should be stated with a link to [CON
 
 ## Credits and references
 
-1. Projects that inspired you
-2. Related projects
-3. Books, papers, talks, or other sources that have meaniginful impact or influence on this project 
+1. [FFIEC](http://www.ffiec.gov/HmdaAdWebReport/AggWelcome.aspx)
