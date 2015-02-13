@@ -304,7 +304,7 @@ class build_JSON(AD_report):
 		elif table_num =='3-2':
 			return 'Pricing Information for First and Junior Lien Loans Sold by Type of Purchaser (includes originations only).'
 
-	def set_header32(self, inputs, MSA, desc, table_type, table_num): #add a variable for desc_string
+	def set_header(self, inputs, MSA, desc, table_type, table_num): #add a variable for desc_string
 		msa = OrderedDict({})
 		self.container['table'] = table_num
 		self.container['type'] = table_type
@@ -353,7 +353,7 @@ class build_JSON(AD_report):
 			purchasers.append(purchasersholding)
 		return purchasers
 
-	def build_JSON32(self):
+	def table_32_builder(self):
 		pricinginformation = []
 		categories = ['No reported pricing data', 'reported pricing data']
 		for cat in categories:
@@ -535,6 +535,18 @@ class queries(AD_report):
 			FROM hmdapub2012 WHERE msaofproperty = %s;'''
 		return SQL
 
+	def table_3_2(self):
+		#create an index in PostGres to speed up this query
+		#set the SQL statement to select the needed fields to aggregate loans for the table_3 JSON structure
+		SQL = '''SELECT
+			censustractnumber, applicantrace1, applicantrace2, applicantrace3, applicantrace4, applicantrace5,
+			coapplicantrace1, coapplicantrace2, coapplicantrace3, coapplicantrace4, coapplicantrace5,
+			applicantethnicity, co_applicantethnicity, applicantincome, ratespread, lienstatus, hoepastatus,
+			purchasertype, loanamount, sequencenumber, asofdate, statecode, statename, countycode, countyname,
+			ffiec_median_family_income, minoritypopulationpct, tract_to_msa_md_income
+			FROM hmdapub2012 WHERE msaofproperty = %s;'''
+		return SQL
+
 class aggregate(AD_report):
 	def __init__(self):
 		pass
@@ -698,3 +710,27 @@ class aggregate(AD_report):
 			#junior lien median block
 			if len(inputs[purchaser_junior_lien_rates[n]]) > 0:
 				container['points'][9]['purchasers'][n]['junior lien'] = round(numpy.median(numpy.array(inputs[purchaser_junior_lien_rates[n]])),2)
+
+	def build_report_31(self, table31, inputs):  #calls aggregation functions to fill JSON object for table 3-1
+		self.by_race(table31, inputs) #aggregate loan by race
+		self.by_ethnicity(table31, inputs) #aggregate loan by ethnicity
+		self.by_minority_status(table31, inputs) #aggregate loan by minority status (binary determined by race and ethnicity)
+		self.by_applicant_income(table31, inputs) #aggregates by ratio of appicant income to tract median income (census)
+		self.by_minority_composition(table31, inputs) #aggregates loans by percent of minority residents (census)
+		self.by_tract_income(table31, inputs) #aggregates loans by census tract income rating - low/moderate/middle/upper
+		self.totals(table31, inputs) #aggregate totals for each purchaser
+		return table31
+
+	def build_report_32(self, table32, inputs): #calls aggregation functions to fill JSON object for table 3-2
+		self.by_pricing_status(table32, inputs) #aggregate count by lien status
+		self.by_rate_spread(table32, inputs) #aggregate loans by percentage points above APOR as ##.##%
+		self.by_hoepa_status(table32, inputs) #aggregates loans by presence of HOEPA flag
+		self.rate_sum(table32, inputs) #sums spreads above APOR for each loan purchaser, used to determine medians
+		self.fill_median_lists(inputs) #fills the median rate spread for each purchaser
+		#mean and median functions are not called here
+		#mean and median function must be called outside the control loop
+		return table32
+
+
+
+
