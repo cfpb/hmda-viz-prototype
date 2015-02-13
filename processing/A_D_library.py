@@ -1,7 +1,10 @@
 #this file holds the classes used to create the A&D reports using the HMDA LAR files combined with Census demographic information
+import numpy
 import psycopg2
 import psycopg2.extras
 from collections import OrderedDict
+import json
+import os
 class AD_report(object):
 	pass
 
@@ -15,7 +18,7 @@ class parse_inputs(AD_report):
 	#check the psycopg2.extras docs on dictcursor
 	inputs = {}
 	def __init__(self):
-		#initialize rate spread sum variables
+		#initialize rate spread sum variables for first liens
 		self.inputs['Fannie Mae first rates'] =0
 		self.inputs['Ginnie Mae first rates'] =0
 		self.inputs['Freddie Mac first rates'] =0
@@ -25,7 +28,7 @@ class parse_inputs(AD_report):
 		self.inputs['Life insurance co., credit union, finance co. first rates'] =0
 		self.inputs['Affiliate institution first rates'] = 0
 		self.inputs['Other first rates'] =0
-
+		#initialize rate spread sum variables for junior liens
 		self.inputs['Fannie Mae junior rates'] =0
 		self.inputs['Ginnie Mae junior rates'] =0
 		self.inputs['Freddie Mac junior rates'] =0
@@ -35,7 +38,7 @@ class parse_inputs(AD_report):
 		self.inputs['Life insurance co., credit union, finance co. junior rates'] =0
 		self.inputs['Affiliate institution junior rates'] = 0
 		self.inputs['Other junior rates'] =0
-
+		#initialize lists to hold rates for determining the median first lien rate
 		self.inputs['Fannie Mae first lien list'] = []
 		self.inputs['Ginnie Mae first lien list'] = []
 		self.inputs['Freddie Mac first lien list'] = []
@@ -45,7 +48,7 @@ class parse_inputs(AD_report):
 		self.inputs['Life insurance co., credit union, finance co. first lien list'] = []
 		self.inputs['Affiliate institution first lien list'] = []
 		self.inputs['Other first lien list'] = []
-
+		#initialize lists to hold rates for determining the median junior lien rate
 		self.inputs['Fannie Mae junior lien list'] = []
 		self.inputs['Ginnie Mae junior lien list'] = []
 		self.inputs['Freddie Mac junior lien list'] = []
@@ -121,8 +124,6 @@ class demographics(AD_report):
 	#2 minority indexed 7
 	#joint indexed 8
 	#not reported indexed 9
-
-
 	def rate_spread_index(self, rate):
 		if rate == 'NA   ' or rate == '     ':
 			return 8
@@ -270,10 +271,10 @@ class demographics(AD_report):
 class build_JSON(AD_report):
 
 	def __init__(self):
-		self.container = OrderedDict({})
-		self.msa = OrderedDict({})
-		self.borrowercharacteristics = []
-		self.censuscharacteristics = [] #censuscharacteristics holds all the lists and dicts for the census portion of the table
+		self.container = OrderedDict({}) #master container for the JSON structure
+		self.msa = OrderedDict({}) #stores header information for the MSA
+		self.borrowercharacteristics = [] #holds all the borrower lists and dicts for the borrower portion of table 3-1
+		self.censuscharacteristics = [] #censuscharacteristics holds all the lists and dicts for the census portion of the table 3-1
 		#self.table32_cats = ['No reported pricing data', 'pricing data reported', 'percentage points above average prime offer rate: only includes loans with APR above the threshold', 'mean', 'median', 'HOEPA Loans']
 		self.table32_categories = ['pricinginformation', 'points', 'hoepa']
 		self.table32_rates = ['1.50 - 1.99', '2.00 - 2.49', '2.50 - 2.99', '3.00 - 3.49', '3.50 - 4.49', '4.50 - 5.49', '5.50 - 6.49', '6.5 or more', 'mean', 'median']
@@ -284,7 +285,18 @@ class build_JSON(AD_report):
 		self.applicant_income_bracket = ['Less than 50% of MSA/MD median', '50-79% of MSA/MD median', '80-99% of MSA/MD median', '100-119% of MSA/MD median', '120% or more of MSA/MD median', 'income not available']
 		self.tract_pct_minority = ['Less than 10% minority', '10-19% minority', '20-49% minority', '50-79% minority', '80-100% minority']
 		self.tract_income = ['Low income', 'Moderate income', 'Middle income', 'Upper income']
-
+		self.state_names = {'AL': 'Alabama', 'AK': 'Alaska', 'AZ': 'Arizona', 'AR': 'Arkansas', 'CA': 'California', 'CO': 'Colorado', 'CT': 'Connecticut', 'DE':'Delaware',
+			'FL':'Florida', 'GA':'Georgia', 'HI':'Hawaii', 'ID':'Idaho', 'IL':'Illinois', 'IN':'Indiana', 'IA':'Iowa', 'KS':'Kansas', 'KY': 'Kentucky', 'LA':'Louisiana', 'ME': 'Maine', 'MD':'Maryland',
+			'MA':'Massachusetts', 'MI':'Michigan', 'MN': 'Minnesota', 'MS': 'Mississippi', 'MO': 'Missouri', 'MT': 'Montana', 'NE':'Nebraska', 'NV':'Nevada', 'NH':'New Hampshire', 'NJ':'New Jersey', 'NM':'New Mexico',
+			'NY':'New York', 'NC':'North Carolina', 'ND':'North Dakota', 'OH': 'Ohio', 'OK': 'Oklahoma', 'OR':'Oregon','PA':'Pennsylvania', 'RI':'Rhode Island', 'SC':'South Carolina',
+			'SD':'South Dakota', 'TN':'Tensessee', 'TX':'Texas', 'UT':'Utah', 'VT':'Vermont', 'VA':'Virginia', 'WA': 'Washington', 'WV':'West Virginia', 'WI':'Wisconsin', 'WY':'Wyoming', 'PR':'Puerto Rico', 'VI':'Virgin Islands'}
+	def get_state_name(self, abbrev):
+		state_names = {'AL': 'Alabama', 'AK': 'Alaska', 'AZ': 'Arizona', 'AR': 'Arkansas', 'CA': 'California', 'CO': 'Colorado', 'CT': 'Connecticut', 'DE':'Delaware',
+				'FL':'Florida', 'GA':'Georgia', 'HI':'Hawaii', 'ID':'Idaho', 'IL':'Illinois', 'IN':'Indiana', 'IA':'Iowa', 'KS':'Kansas', 'KY': 'Kentucky', 'LA':'Louisiana', 'ME': 'Maine', 'MD':'Maryland',
+				'MA':'Massachusetts', 'MI':'Michigan', 'MN': 'Minnesota', 'MS': 'Mississippi', 'MO': 'Missouri', 'MT': 'Montana', 'NE':'Nebraska', 'NV':'Nevada', 'NH':'New Hampshire', 'NJ':'New Jersey', 'NM':'New Mexico',
+				'NY':'New York', 'NC':'North Carolina', 'ND':'North Dakota', 'OH': 'Ohio', 'OK': 'Oklahoma', 'OR':'Oregon','PA':'Pennsylvania', 'RI':'Rhode Island', 'SC':'South Carolina',
+				'SD':'South Dakota', 'TN':'Tensessee', 'TX':'Texas', 'UT':'Utah', 'VT':'Vermont', 'VA':'Virginia', 'WA': 'Washington', 'WV':'West Virginia', 'WI':'Wisconsin', 'WY':'Wyoming', 'PR':'Puerto Rico', 'VI':'Virgin Islands'}
+		return state_names[abbrev]
 	def table_headers(self, table_num): #holds table descriptions
 		if table_num == '3-1':
 			return 'Loans sold. By characteristics of borrower and census tract in which property is located and by type of purchaser (includes originations and purchased loans).'
@@ -300,11 +312,11 @@ class build_JSON(AD_report):
 		self.msa['id'] = MSA
 		#self.msa['name'] = inputs['MSA name'] #need to add MSA names to a database or read-in file
 		self.msa['state'] = inputs['state name']
+		self.msa['state_name'] = self.state_names[self.msa['state']]
 		self.container['msa'] = self.msa
 		return self.container
 
 	def set_purchasers(self):
-		from collections import OrderedDict
 		purchasers = []
 		purchaser_names = ['Fannie Mae', 'Ginnie Mae', 'Freddie Mac', 'Farmer Mac', 'Private Securitization', 'Commercial bank, savings bank or association', 'Life insurance co., credit union, finance co.', 'Affiliate institution', 'Other']
 		for item in purchaser_names:
@@ -316,7 +328,6 @@ class build_JSON(AD_report):
 		return purchasers
 
 	def set_purchasers32(self):
-		from collections import OrderedDict
 		purchasers = []
 		purchaser_names = ['Fannie Mae', 'Ginnie Mae', 'Freddie Mac', 'Farmer Mac', 'Private Securitization', 'Commercial bank, savings bank or association', 'Life insurance co., credit union, finance co.', 'Affiliate institution', 'Other']
 		for item in purchaser_names:
@@ -372,6 +383,7 @@ class build_JSON(AD_report):
 				holding['purchasers'] = self.set_purchasers32v2()
 			 spreads.append(holding)
 		return spreads
+
 	def table_31_borrower_characteristics(self, characteristic, container_name, item_list):
 		#container_name = characteristic.lower()+'s'
 		#borrowercharacteristics = []
@@ -422,40 +434,31 @@ class build_JSON(AD_report):
 		import json
 		print json.dumps(self.container, indent=4)
 
-	def write_JSON(self, name, data):
-		#writes the JSON structure to a file
-		import json
-		with open(name, 'w') as outfile:
-		 json.dump(data, outfile, indent = 4, ensure_ascii=False)
+	def write_JSON(self, name, data, path):
+		#with open(name, 'w') as outfile:
+		#	json.dump(data, outfile, indent = 4, ensure_ascii=False)
+		with open(os.path.join(path, name), 'w') as outfile: #writes the JSON structure to a file for the path named by report's header structure
+			json.dump(data, outfile, indent=4, ensure_ascii = False)
 
 class connect_DB(AD_report):
 
 	def connect(self):
-		import psycopg2
-		import psycopg2.extras
-		from collections import OrderedDict
-
 		with open('/Users/roellk/Desktop/python/credentials.txt', 'r') as f:
 			credentials = f.read()
-
 		cred_list = credentials.split(',')
 		dbname = cred_list[0]
 		user = cred_list[1]
 		host = cred_list[2]
 		password = cred_list[3]
 
-		#set a string for connection to SQL
-		connect_string = "dbname=%s user=%s host=%s password =%s" %(dbname, user, host, password)
-
+		connect_string = "dbname=%s user=%s host=%s password =%s" %(dbname, user, host, password) #set a string for connection to SQL
 		try:
 			conn = psycopg2.connect(connect_string)
 			print "i'm connected"
 		#if database connection results in an error print the following
 		except:
 			print "I am unable to connect to the database"
-
 		return conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
-
 
 class MSA_info(AD_report):
 
@@ -684,7 +687,6 @@ class aggregate(AD_report):
 			inputs[purchaser_junior_lien_rates[inputs['purchaser']]].append(float(inputs['rate spread']))
 
 	def by_median(self, container, inputs):
-		import numpy
 		purchaser_first_lien_rates = ['Fannie Mae first lien list', 'Ginnie Mae first lien list', 'Freddie Mac first lien list', 'Farmer Mac first lien list', 'Private Securitization first lien list', 'Commercial bank, savings bank or association first lien list', 'Life insurance co., credit union, finance co. first lien list', 'Affiliate institution first lien list', 'Other first lien list']
 		purchaser_junior_lien_rates = ['Fannie Mae junior lien list', 'Ginnie Mae junior lien list', 'Freddie Mac junior lien list', 'Farmer Mac junior lien list', 'Private Securitization junior lien list', 'Commercial bank, savings bank or association junior lien list', 'Life insurance co., credit union, finance co. junior lien list', 'Affiliate institution junior lien list', 'Other junior lien list']
 		for n in range(0,9):
