@@ -5,11 +5,35 @@ import psycopg2.extras
 from collections import OrderedDict
 import json
 import os
+import csv
 class AD_report(object):
 	pass
 
 class report_selector(AD_report):
-	pass
+	def __init__(self):
+		self.report_list = {} #fill this dictionary with the headers in the CSV as dict keys
+		#how best inialize lists to avoid errors? key errors?
+
+	def initalize_lists(self, infile):
+		with open(infile, 'r') as csvfile:
+			msareader = csv.DictReader(csvfile, delimiter = ',', quotechar='"')
+			for row in msareader:
+				for key in row:
+					self.report_list[key] = []
+
+	def get_report_lists(self, infile):
+		#file will have MSA list (entire population)
+		#list of FIs in MSA to generate reports for?
+		#open the controller file that tells which reports to generate
+		self.initalize_lists(infile) #initialize all reports lists
+		with open(infile, 'r') as csvfile:
+			msareader = csv.DictReader(csvfile, delimiter = ',', quotechar='"')
+			for row in msareader:
+				for key in row: # scan through keys to check all report flags in a row
+					if row[key] == '1':
+						self.report_list[key].append(row['MSA number']) #if an MSA has a report flagged as '1' add it to the generation list
+
+		#need to find a work around to add lists for disclosure reports that will return lists of FIs and not flags
 
 class parse_inputs(AD_report):
 	#needs to take all the variables used in all the reports
@@ -73,16 +97,12 @@ class parse_inputs(AD_report):
 		co_race = demo.a_race_list(row)
 
 		#add data elements to dictionary
-		self.inputs['a ethn'] = row['applicantethnicity']
-		self.inputs['co ethn'] = row['co_applicantethnicity']
-		self.inputs['income'] = row['applicantincome']
-		self.inputs['rate spread'] = row['ratespread']
-		self.inputs['lien status'] = row['lienstatus']
-		self.inputs['hoepa flag'] = int(row['hoepastatus'])
+		self.inputs['a ethn'] = row['applicantethnicity'] #ethnicity of the applicant
+		self.inputs['co ethn'] = row['co_applicantethnicity'] #ethnicity of the co-applicant
+		self.inputs['income'] = row['applicantincome'] #relied upon income rounded to the nearest thousand
 		self.inputs['purchaser'] = int(row['purchasertype']) -1 #adjust purchaser index down 1 to match JSON
-		self.inputs['loan value'] = float(row['loanamount'])
-		self.inputs['sequence'] = row['sequencenumber'] # the sequence number to track loans in error checking
-		self.inputs['year'] = row['asofdate']
+		self.inputs['loan value'] = float(row['loanamount']) #loan value rounded to the nearest thousand
+		self.inputs['year'] = row['asofdate'] #year or application or origination
 		self.inputs['state code'] = row['statecode']
 		self.inputs['state name'] = row['statename']
 		self.inputs['census tract'] = row['censustractnumber'] # this is currently the 7 digit tract used by the FFIEC, it includes a decimal prior to the last two digits
@@ -95,19 +115,31 @@ class parse_inputs(AD_report):
 		self.inputs['income bracket'] = MSA_index.app_income_to_MSA(self.inputs)
 		self.inputs['minority percent'] = MSA_index.minority_percent(self.inputs)
 		self.inputs['tract income index'] = MSA_index.tract_to_MSA_income(self.inputs)
-		self.inputs['app non white flag'] = demo.set_non_white(a_race)
-		self.inputs['co non white flag'] = demo.set_non_white(co_race)
+		self.inputs['app non white flag'] = demo.set_non_white(a_race) #flags the applicant as non-white if true, used in setting minority status and race
+		self.inputs['co non white flag'] = demo.set_non_white(co_race) #flags the co applicant as non-white if true, used in setting minority status and race
 		self.inputs['joint status'] = demo.set_joint(self.inputs) #requires non white status flags be set prior to running set_joint
 		self.inputs['minority status'] = demo.set_minority_status(self.inputs) #requires non white flags be set prior to running set_minority_status
 		self.inputs['ethnicity'] = demo.set_loan_ethn(self.inputs) #requires  ethnicity be parsed prior to running set_loan_ethn
 		self.inputs['race'] = demo.set_race(self.inputs, a_race, co_race) #requires joint status be set prior to running set_race
 		self.inputs['minority count'] = demo.minority_count(a_race)
-		self.inputs['rate spread index'] = demo.rate_spread_index(self.inputs['rate spread'])
 
-	#loop over all elements in both race lists to flag presence of minority race
-	#assigning non-white boolean flags for use in joint race status and minority status checks
-	#set boolean flag for white/non-white status for applicant
-	#need to check App A ID2 for race 6
+	def parse_t32(self, row): #takes a row from a table 3-1 query and parses it to the inputs dictionary (28 tuples)
+		#parsing inputs for report 3.1
+		#self.inputs will be returned to for use in the aggregation function
+		#instantiate classes to set loan variables
+		demo=demographics()
+		#add data elements to dictionary
+		self.inputs['rate spread'] = row['ratespread']
+		self.inputs['lien status'] = row['lienstatus']
+		self.inputs['hoepa flag'] = int(row['hoepastatus'])
+		self.inputs['purchaser'] = int(row['purchasertype']) -1 #adjust purchaser index down 1 to match JSON
+		self.inputs['year'] = row['asofdate']
+		self.inputs['state code'] = row['statecode']
+		self.inputs['state name'] = row['statename']
+		self.inputs['census tract'] = row['censustractnumber'] # this is currently the 7 digit tract used by the FFIEC, it includes a decimal prior to the last two digits
+		self.inputs['county code'] = row['countycode']
+		self.inputs['county name'] = row['countyname']
+		self.inputs['rate spread index'] = demo.rate_spread_index(self.inputs['rate spread'])
 
 class demographics(AD_report):
 	#holds all the functions for setting race, minority status, and ethnicity for FFIEC A&D reports
@@ -529,8 +561,8 @@ class queries(AD_report):
 		SQL = '''SELECT
 			censustractnumber, applicantrace1, applicantrace2, applicantrace3, applicantrace4, applicantrace5,
 			coapplicantrace1, coapplicantrace2, coapplicantrace3, coapplicantrace4, coapplicantrace5,
-			applicantethnicity, co_applicantethnicity, applicantincome, ratespread, lienstatus, hoepastatus,
-			purchasertype, loanamount, sequencenumber, asofdate, statecode, statename, countycode, countyname,
+			applicantethnicity, co_applicantethnicity, applicantincome, hoepastatus,
+			purchasertype, loanamount, asofdate, statecode, statename, countycode, countyname,
 			ffiec_median_family_income, minoritypopulationpct, tract_to_msa_md_income
 			FROM hmdapub2012 WHERE msaofproperty = %s;'''
 		return SQL
@@ -539,11 +571,8 @@ class queries(AD_report):
 		#create an index in PostGres to speed up this query
 		#set the SQL statement to select the needed fields to aggregate loans for the table_3 JSON structure
 		SQL = '''SELECT
-			censustractnumber, applicantrace1, applicantrace2, applicantrace3, applicantrace4, applicantrace5,
-			coapplicantrace1, coapplicantrace2, coapplicantrace3, coapplicantrace4, coapplicantrace5,
-			applicantethnicity, co_applicantethnicity, applicantincome, ratespread, lienstatus, hoepastatus,
-			purchasertype, loanamount, sequencenumber, asofdate, statecode, statename, countycode, countyname,
-			ffiec_median_family_income, minoritypopulationpct, tract_to_msa_md_income
+			censustractnumber,  ratespread, lienstatus, hoepastatus,
+			purchasertype, asofdate, statecode, statename, countycode, countyname
 			FROM hmdapub2012 WHERE msaofproperty = %s;'''
 		return SQL
 

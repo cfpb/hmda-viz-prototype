@@ -1,35 +1,18 @@
 import csv
-'''
-with open('MSAinputs.csv', 'r') as csvfile:
-    msareader = csv.DictReader(csvfile)
-    for row in msareader:
-        MSA = row['MSA number']
-'''
-command_rows = []
-report31_list = []
-report32_list = []
-with open('MSAinputs.csv', 'r') as csvfile:
-    msareader = csv.reader(csvfile, delimiter = ',', quotechar='"')
-    for row in msareader:
-        #print row
-        print row[4]
-        if row[4] =='1':
-            report31_list.append(row[0])
-        #command_rows.append(row)
-        if row[5] == '1':
-            report32_list.append(row[0])
-print report31_list
-print report32_list
-'''
-#print command_rows[1:]
-for i in range(1, len(command_rows)):
-    MSA = command_rows[i][0]
-    if command_rows[i][1] == '1':
-        print MSA
-        print 'do aggregate report 3-1'
-    if command_rows[i][3] == '1':
-        print MSA
-        print 'do aggregate report 3-2'
+report_list = {} #fill this dictionary with the headers in the CSV as dict keys
+
+def get_report_lists():
+    #file has MSA list (entire population)
+    #flag for aggregate
+    #flag for each aggregate report (1 print, 0 don't print)
+    #list of FIs in MSA to generate reports for?
+    #open the controller file that tells which reports to generate
+    with open('MSAinputs.csv', 'r') as csvfile:
+        msareader = csv.DictReader(csvfile, delimiter = ',', quotechar='"')
+        for row in msareader:
+            for key in row:
+                report_list[key] = []
 
 
-'''
+get_report_lists()
+print report_list

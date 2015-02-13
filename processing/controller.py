@@ -10,7 +10,7 @@ from A_D_library import connect_DB as connect
 from A_D_library import build_JSON as build
 from A_D_library import aggregate as agg
 from A_D_library import queries
-
+from A_D_library import report_selector as selector
 #instantiate library functions
 parsed = parse() #for parsing inputs from rows
 connection = connect() #connects to the DB
@@ -18,49 +18,11 @@ build31 = build() #table 3-1 build object
 build32 = build() #table 3-2 build object
 queries = queries() #query text for all tables
 agg = agg() #aggregation functions for all tables
+selector = selector() #holds lists of reports to be generated for each MSA
 cur = connection.connect() #creates cursor object connected to HMDAPub2012 sql database, locally hosted postgres
+selector.get_report_lists('MSAinputs.csv') #fills the dictionary of lists of reports to be generated
 
-def build_report_31(num):
-	#aggregate loans by types
-	agg.by_race(table31, parsed.inputs) #aggregate loan by race
-	agg.by_ethnicity(table31, parsed.inputs) #aggregate loan by ethnicity
-	agg.by_minority_status(table31, parsed.inputs) #aggregate loan by minority status (binary determined by race and ethnicity)
-	agg.by_applicant_income(table31, parsed.inputs) #aggregates by ratio of appicant income to tract median income (census)
-	agg.by_minority_composition(table31, parsed.inputs) #aggregates loans by percent of minority residents (census)
-	agg.by_tract_income(table31, parsed.inputs) #aggregates loans by census tract income rating - low/moderate/middle/upper
-	agg.totals(table31, parsed.inputs) #aggregate totals for each purchaser
-	return table31
-
-def build_report_32(num):
-	table_type = 'aggregate' #this will be in the input file
-
-	#aggregate loans by types
-	agg.by_pricing_status(table32, parsed.inputs) #aggregate count by lien status
-	agg.by_rate_spread(table32, parsed.inputs) #aggregate loans by percentage points above APOR as ##.##%
-	agg.by_hoepa_status(table32, parsed.inputs) #aggregates loans by presence of HOEPA flag
-	agg.rate_sum(table32, parsed.inputs) #sums spreads above APOR for each loan purchaser, used to determine medians
-	agg.fill_median_lists(parsed.inputs) #fills the median rate spread for each purchaser
-	return table32
-
-report31_list = [] #holds the list of MSAs that will have report 3-1 built
-report32_list = [] #holds the list of MSAs that will have report 3-2 built
-
-#file has MSA list (entire population)
-#flag for aggregate
-#flag for each aggregate report (1 print, 0 don't print)
-#list of FIs in MSA to generate reports for?
-#open the controller file that tells which reports to generate
-with open('MSAinputs.csv', 'r') as csvfile:
-    msareader = csv.reader(csvfile, delimiter = ',', quotechar='"')
-    for row in msareader:
-        if row[4] =='1':
-            report31_list.append(row[0])
-        #command_rows.append(row)
-        if row[5] == '1':
-            report32_list.append(row[0])
-#for disclosure reports pass a list of FIs and MSAs to the control loop (does this need to be a separate control loop? can there be an optional parameter for FI?)
-
-for MSA in report31_list:
+for MSA in selector.report_list['A 3-1']:
 	location = (MSA,)
 	SQL = queries.count_rows_2012() #get query text for getting count of loans for the MSA
 	cur.execute(SQL, location) #ping the database for numbers!
@@ -85,8 +47,7 @@ for MSA in report31_list:
 		os.makedirs(path) #if path not present, create it
 	build31.write_JSON('3_1.json', table31, path)
 
-
-for MSA in report32_list: #loop over all MSAs that had report 3-2 flagged for creation
+for MSA in selector.report_list['A 3-2']: #loop over all MSAs that had report 3-2 flagged for creation
 	location = (MSA,)
 	SQL = queries.count_rows_2012()
 	cur.execute(SQL, location) #Query the database for number of rows in the LAR in the MSA
@@ -98,7 +59,7 @@ for MSA in report32_list: #loop over all MSAs that had report 3-2 flagged for cr
 
 	for num in range(0,end):
 		row = cur.fetchone() #pull a single row for parsing and aggregation
-		parsed.parse_t31(row) #parse the row into a dictionary
+		parsed.parse_t32(row) #parse the row into a dictionary
 		if num == 0:
 			build32.set_header(parsed.inputs, MSA, build32.table_headers('3-2'), 'aggregate', '3-2') #set the header information for the report
 			table32 = build32.table_32_builder() #build the JSON object for the report
