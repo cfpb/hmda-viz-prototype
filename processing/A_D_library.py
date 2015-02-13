@@ -297,6 +297,7 @@ class build_JSON(AD_report):
 				'NY':'New York', 'NC':'North Carolina', 'ND':'North Dakota', 'OH': 'Ohio', 'OK': 'Oklahoma', 'OR':'Oregon','PA':'Pennsylvania', 'RI':'Rhode Island', 'SC':'South Carolina',
 				'SD':'South Dakota', 'TN':'Tensessee', 'TX':'Texas', 'UT':'Utah', 'VT':'Vermont', 'VA':'Virginia', 'WA': 'Washington', 'WV':'West Virginia', 'WI':'Wisconsin', 'WY':'Wyoming', 'PR':'Puerto Rico', 'VI':'Virgin Islands'}
 		return state_names[abbrev]
+
 	def table_headers(self, table_num): #holds table descriptions
 		if table_num == '3-1':
 			return 'Loans sold. By characteristics of borrower and census tract in which property is located and by type of purchaser (includes originations and purchased loans).'
@@ -609,10 +610,10 @@ class aggregate(AD_report):
 
 	def by_hoepa_status(self, container, inputs):
 		if inputs['hoepa flag'] == 1:
-			if inputs['lien status'] == 1:
+			if inputs['lien status'] == '1':
 				container['hoepa']['purchasers'][inputs['purchaser']]['first lien count'] +=1
 				container['hoepa']['purchasers'][inputs['purchaser']]['first lien value'] +=int(inputs['loan value'])
-			elif inputs['lien status'] == 2:
+			elif inputs['lien status'] == '2':
 				container['hoepa']['purchasers'][inputs['purchaser']]['junior lien count'] +=1
 				container['hoepa']['purchasers'][inputs['purchaser']]['junior lien value'] +=int(inputs['loan value'])
 			else:

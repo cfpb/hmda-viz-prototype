@@ -19,15 +19,24 @@ queries = queries()
 agg = agg()
 
 #set cursor object
-cur = connection.connect()
+cur = connection.connect() #connects to HMDAPub2012 sql database, locally hosted postgres
+
+#read in file here
+#file has MSA list (entire population)
+#flag for aggregate
+#flag for each aggregate report (1 print, 0 don't print)
+#list of FIs in MSA to generate reports for?
 
 #set MSA list
-MSA_list = ['36540', '11500'] #this list will come from the in put file and be populated by all MSAs that have report x.x flagged true
+MSA_list = ['36540', '11500'] #this list will come from the input file and be populated by all MSAs that have report x.x flagged true
 
 table_31 = '3-1'
 table_32 = '3-2'
 report_desc32 = build32.table_headers(table_31) #this will come from the input file
 report_desc31 = build31.table_headers(table_32)
+#create a control loop for each report
+#pass a list of MSAs to each control loop
+#for disclosure reports pass a list of FIs and MSAs to the control loop (does this need to be a separate control loop? can there be an optional parameter for FI?)
 for MSA in MSA_list:
 	location = (MSA,)
 
@@ -55,37 +64,34 @@ for MSA in MSA_list:
 			table31 = build31.table_31_builder()
 			table32 = build32.build_JSON32()
 			#aggregate the first loan into appropriate rows for the table
-			if parsed.inputs['purchaser'] >=0:
-				agg.by_race(table31, parsed.inputs) #aggregate loan by race
-				agg.by_ethnicity(table31, parsed.inputs) #aggregate loan by ethnicity
-				agg.by_minority_status(table31, parsed.inputs) #aggregate loan by minority status
-				agg.by_applicant_income(table31, parsed.inputs)
-				agg.by_minority_composition(table31, parsed.inputs)
-				agg.by_tract_income(table31, parsed.inputs)
-				agg.totals(table31, parsed.inputs) #aggregate totals for each purchaser
-				agg.by_pricing_status(table32, parsed.inputs) #aggregate count by lien status
-				agg.by_rate_spread(table32, parsed.inputs)
-				agg.by_hoepa_status(table32, parsed.inputs)
-				agg.rate_sum(table32, parsed.inputs)
-				agg.fill_median_lists(parsed.inputs)
+			agg.by_race(table31, parsed.inputs) #aggregate loan by race
+			agg.by_ethnicity(table31, parsed.inputs) #aggregate loan by ethnicity
+			agg.by_minority_status(table31, parsed.inputs) #aggregate loan by minority status
+			agg.by_applicant_income(table31, parsed.inputs)
+			agg.by_minority_composition(table31, parsed.inputs)
+			agg.by_tract_income(table31, parsed.inputs)
+			agg.totals(table31, parsed.inputs) #aggregate totals for each purchaser
+			agg.by_pricing_status(table32, parsed.inputs) #aggregate count by lien status
+			agg.by_rate_spread(table32, parsed.inputs)
+			agg.by_hoepa_status(table32, parsed.inputs)
+			agg.rate_sum(table32, parsed.inputs)
+			agg.fill_median_lists(parsed.inputs)
 		else:
 			#aggregate the subsequent loan into appropriate rows for the table
 			#table 3-1
-
-			if parsed.inputs['purchaser'] >= 0:
-				agg.by_race(table31, parsed.inputs) #aggregate loan by race
-				agg.by_ethnicity(table31, parsed.inputs) #aggregate loan by ethnicity
-				agg.by_minority_status(table31, parsed.inputs) #aggregate loan by minority status
-				agg.by_applicant_income(table31, parsed.inputs)
-				agg.by_minority_composition(table31, parsed.inputs)
-				agg.by_tract_income(table31, parsed.inputs)
-				agg.totals(table31, parsed.inputs) #aggregate totals for each purchaser
-				#table 3-2
-				agg.by_pricing_status(table32, parsed.inputs) #aggregate count by lien status
-				agg.by_rate_spread(table32, parsed.inputs)
-				agg.by_hoepa_status(table32, parsed.inputs)
-				agg.rate_sum(table32, parsed.inputs)
-				agg.fill_median_lists(parsed.inputs)
+			agg.by_race(table31, parsed.inputs) #aggregate loan by race
+			agg.by_ethnicity(table31, parsed.inputs) #aggregate loan by ethnicity
+			agg.by_minority_status(table31, parsed.inputs) #aggregate loan by minority status
+			agg.by_applicant_income(table31, parsed.inputs)
+			agg.by_minority_composition(table31, parsed.inputs)
+			agg.by_tract_income(table31, parsed.inputs)
+			agg.totals(table31, parsed.inputs) #aggregate totals for each purchaser
+			#table 3-2
+			agg.by_pricing_status(table32, parsed.inputs) #aggregate count by lien status
+			agg.by_rate_spread(table32, parsed.inputs)
+			agg.by_hoepa_status(table32, parsed.inputs)
+			agg.rate_sum(table32, parsed.inputs)
+			agg.fill_median_lists(parsed.inputs)
 
 	agg.by_median(table32, parsed.inputs) #this stays outside the loop
 	agg.by_mean(table32, parsed.inputs) #this stays outside the loop
@@ -97,7 +103,7 @@ for MSA in MSA_list:
 	#path = 'json/aggregate/2012/nebraska/council bluffs'
 	if not os.path.exists(path):
 		os.makedirs(path)
-	name31 = '3_1' +'.json'
+	name31 = '3_1.json'
 	name32 = '3_2.json'
 	build31.write_JSON(name31, table31, path)
 	build32.write_JSON(name32, table32, path)
