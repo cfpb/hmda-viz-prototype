@@ -1,3 +1,3 @@
 ---
-layout: aggregate/3-1
+layout: aggregate/table
 ---

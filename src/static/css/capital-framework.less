@@ -4,14 +4,37 @@
    ========================================================================== */
 
 /* topdoc
-    name: Less notes
+    name: Theme variables
     family: cf-buttons
+    notes:
+      - "The following color and sizing variables are exposed, allowing you to
+         easily override them before compiling."
     patterns:
-    - name: Variables
+    - name: Colors
       codenotes:
-        - "@btn-font-size: 14px;"
-        - "@btn-v-padding: 9px;"
-        - "@btn-v-padding-modifier-ie: .8;"
+        - |
+          @btn-text
+          @btn-bg
+          @btn-bg-hover
+          @btn-bg-active
+          @btn__secondary-text
+          @btn__secondary-bg
+          @btn__secondary-bg-hover
+          @btn__secondary-bg-active
+          @btn__warning-text
+          @btn__warning-bg
+          @btn__warning-bg-hover
+          @btn__warning-bg-active
+          @btn__disabled-text
+          @btn__disabled-bg
+          @btn__disabled-outline
+    - name: Sizing
+      codenotes:
+        - |
+          @btn-font-size
+          @btn-v-padding
+          @btn-v-padding-modifier-ie
+          @super-btn-font-size
       notes:
         - "@btn-v-padding-modifier-ie is used to fix the vertical padding bug in
            IE for <button>'s and <inputs>'s across various .btn styles.
@@ -22,13 +45,40 @@
     - less
 */
 
-// Used across the various .btn styles
-@btn-font-size: 14px;
-@btn-v-padding: 8px;
+// Color variables 
 
-// Used to fix the vertical padding bug in IE for <button>'s and <inputs>'s
-// across various .btn styles
-@btn-v-padding-modifier-ie: .8;
+// .btn
+@btn-text:                      #fff;
+@btn-bg:                        #c7336e;
+@btn-bg-hover:                  darken(@btn-bg, 10%);
+@btn-bg-active:                 darken(@btn-bg, 15%);
+
+// .btn__secondary
+@btn__secondary-text:           #fff;
+@btn__secondary-bg:             #895983;
+@btn__secondary-bg-hover:       darken(@btn__secondary-bg, 10%);
+@btn__secondary-bg-active:      darken(@btn__secondary-bg, 15%);
+
+// .btn__warning
+@btn__warning-text:             #fff;
+@btn__warning-bg:               #ea130b;
+@btn__warning-bg-hover:         darken(@btn__warning-bg, 10%);
+@btn__warning-bg-active:        darken(@btn__warning-bg, 15%);
+
+// .btn__disabled
+@btn__disabled-text:            darken(greyscale(#c7336e), 10%);
+@btn__disabled-bg:              lighten(greyscale(#c7336e), 40%);
+@btn__disabled-outline:         greyscale(#c7336e);
+
+// Sizing variables 
+
+// .btn
+@btn-font-size:                 14px;
+@btn-v-padding:                 8px;
+@btn-v-padding-modifier-ie:     .8;
+
+// .btn__super
+@super-btn-font-size:           18px;
 
 
 /* topdoc
@@ -87,19 +137,19 @@
     &,
     &:link,
     &:visited {
-        background-color: @pacific;
-        color: @white;
+        background-color: @btn-bg;
+        color: @btn-text;
     }
 
     &:hover,
     &.hover {
-        background-color: @pacific-80;
+        background-color: @btn-bg-hover;
     }
 
     &:focus,
     &.focus {
-        background-color: @pacific-80;
-        outline: 1px dotted @pacific;
+        background-color: @btn-bg-hover;
+        outline: 1px dotted @btn-bg;
         // outline-offset is not supported everywhere but it adds a nice touch
         // in browsers where it is.
         outline-offset: 1px;
@@ -107,7 +157,7 @@
 
     &:active,
     &.active {
-        background-color: @navy-80;
+        background-color: @btn-bg-active;
     }
 
     button&::-moz-focus-inner,
@@ -131,7 +181,6 @@
     }
 
     // Fixes button and input sizes in IE7
-    // Note that the "2" below is a magic number
     button.btn,
     input.btn {
         overflow: visible;
@@ -178,24 +227,24 @@
     &,
     &:link,
     &:visited {
-        background-color: @gray;
-        color: @white;
+        background-color: @btn__secondary-bg;
+        color: @btn__secondary-text;
     }
 
     &:hover,
     &.hover {
-        background-color: @gray-80;
+        background-color: @btn__secondary-bg-hover;
     }
 
     &:focus,
     &.focus {
-        background-color: @gray-80;
-        outline-color: @gray;
+        background-color: @btn__secondary-bg-hover;
+        outline-color: @btn__secondary-bg;
     }
 
     &:active,
     &.active {
-        background-color: @darkgray;
+        background-color: @btn__secondary-bg-active;
     }
 
 }
@@ -293,24 +342,24 @@
     &,
     &:link,
     &:visited {
-        background-color: @redorange;
-        color: @white;
+        background-color: @btn__warning-bg;
+        color: @btn__warning-text;
     }
 
     &:hover,
     &.hover {
-        background-color: @redorange-80;
+        background-color: @btn__warning-bg-hover;
     }
 
     &:focus,
     &.focus {
-        background-color: @redorange-80;
-        outline-color: @redorange;
+        background-color: @btn__warning-bg-hover;
+        outline-color: @btn__warning-bg;
     }
 
     &:active,
     &.active {
-        background-color: @dark-redorange;
+        background-color: @btn__warning-bg-active;
     }
 
 }
@@ -320,14 +369,11 @@
     name: Disabled button
     family: cf-buttons
     notes:
-      - "Note that the .visited, .hover, .focus, .active classes are for
-         demonstration purposes only and should not be used in production."
+      - "Disabled buttons do not contain separate hover and active states since
+         they should not be interacted with."
+      - "Note that the .focus class is for demonstration purposes only and
+         should not be used in production."
     patterns:
-    - name: Default/hovered/focused/active state
-      markup: |
-        <a href="#" class="btn btn__disabled">Anchor Tag</a>
-        <button class="btn btn__disabled">Button Tag</button>
-        <input type="submit" value="Input Tag" class="btn btn__disabled">
     - name: Default/hovered/active state
       markup: |
         <a href="#" class="btn btn__disabled">Anchor Tag</a>
@@ -353,15 +399,15 @@
     &.focus,
     &:active,
     &.active {
-        background-color: @gray-20;
-        color: @gray;
+        background-color: @btn__disabled-bg;
+        color: @btn__disabled-text;
         cursor: default; // Fallback for IE/Opera
         cursor: not-allowed;
     }
 
     &:focus,
     &.focus {
-        outline-color: @gray;
+        outline-color: @btn__disabled-outline;
     }
 
 }
@@ -394,8 +440,6 @@
     tags:
     - cf-buttons
 */
-
-@super-btn-font-size: 18px;
 
 .btn__super {
 
@@ -437,6 +481,36 @@
             <span class="btn_icon__left cf-icon cf-icon-left"></span>
             Button Tag
         </button>
+        <br>
+        <br>
+        <a href="#" class="btn btn__secondary">
+            <span class="btn_icon__left cf-icon cf-icon-left"></span>
+            Anchor Tag
+        </a>
+        <button class="btn btn__secondary">
+            <span class="btn_icon__left cf-icon cf-icon-left"></span>
+            Button Tag
+        </button>
+        <br>
+        <br>
+        <a href="#" class="btn btn__warning">
+            <span class="btn_icon__left cf-icon cf-icon-left"></span>
+            Anchor Tag
+        </a>
+        <button class="btn btn__warning">
+            <span class="btn_icon__left cf-icon cf-icon-left"></span>
+            Button Tag
+        </button>
+        <br>
+        <br>
+        <a href="#" class="btn btn__disabled">
+            <span class="btn_icon__left cf-icon cf-icon-left"></span>
+            Anchor Tag
+        </a>
+        <button class="btn btn__disabled">
+            <span class="btn_icon__left cf-icon cf-icon-left"></span>
+            Button Tag
+        </button>
     - name: Button icon right
       markup: |
         <a href="#" class="btn">
@@ -444,6 +518,36 @@
             <span class="btn_icon__right cf-icon cf-icon-right"></span>
         </a>
         <button class="btn">
+            Button Tag
+            <span class="btn_icon__right cf-icon cf-icon-right"></span>
+        </button>
+        <br>
+        <br>
+        <a href="#" class="btn btn__secondary">
+            Anchor Tag
+            <span class="btn_icon__right cf-icon cf-icon-right"></span>
+        </a>
+        <button class="btn btn__secondary">
+            Button Tag
+            <span class="btn_icon__right cf-icon cf-icon-right"></span>
+        </button>
+        <br>
+        <br>
+        <a href="#" class="btn btn__warning">
+            Anchor Tag
+            <span class="btn_icon__right cf-icon cf-icon-right"></span>
+        </a>
+        <button class="btn btn__warning">
+            Button Tag
+            <span class="btn_icon__right cf-icon cf-icon-right"></span>
+        </button>
+        <br>
+        <br>
+        <a href="#" class="btn btn__disabled">
+            Anchor Tag
+            <span class="btn_icon__right cf-icon cf-icon-right"></span>
+        </a>
+        <button class="btn btn__disabled">
             Button Tag
             <span class="btn_icon__right cf-icon cf-icon-right"></span>
         </button>
@@ -467,24 +571,42 @@
 
 .btn_icon__left {
     padding: 0 unit( 10.5px / @btn-font-size, em) 0 0;
-    border-right: 1px solid @white; // Fallback
-    border-right: 1px solid rgba(255, 255, 255, 0.4);
+    border-right: 1px solid @btn-text; // Fallback
+    border-right: 1px solid fade(@btn-text, 40%);
     margin: 0 unit( 7px / @btn-font-size, em) 0 0;
 
+    .btn__secondary & {
+        border-right-color: @btn__secondary-text; // Fallback
+        border-right-color: fade(@btn__secondary-text, 40%);
+    }
+    .btn__warning & {
+        border-right-color: @btn__warning-text; // Fallback
+        border-right-color: fade(@btn__warning-text, 40%);
+    }
     .btn__disabled & {
-        border-right-color: @gray-50;
+        border-right-color: @btn__disabled-text; // Fallback
+        border-right-color: fade(@btn__disabled-text, 40%);
     }
 }
 
 .btn_icon__right {
     padding: 0 0 0 unit( 10.5px / @btn-font-size, em);
     border-right: 0;
-    border-left: 1px solid @white; // Fallback
-    border-left: 1px solid rgba(255, 255, 255, 0.4);
+    border-left: 1px solid @btn-text; // Fallback
+    border-left: 1px solid fade(@btn-text, 40%);
     margin: 0 0 0 unit( 7px / @btn-font-size, em);
 
+    .btn__secondary & {
+        border-left-color: @btn__secondary-text; // Fallback
+        border-left-color: fade(@btn__secondary-text, 40%);
+    }
+    .btn__warning & {
+        border-left-color: @btn__warning-text; // Fallback
+        border-left-color: fade(@btn__warning-text, 40%);
+    }
     .btn__disabled & {
-        border-left-color: @gray-50;
+        border-left-color: @btn__disabled-text; // Fallback
+        border-left-color: fade(@btn__disabled-text, 40%);
     }
 }
 
@@ -577,7 +699,7 @@
       - "Note that the .visited, .hover, .focus, .active classes are for
          demonstration purposes only and should not be used in production."
     patterns:
-    - name: Default button style
+    - name: All button styles
       markup: |
         <a href="#" class="btn btn__grouped-first">Anchor</a>
         <a href="#" class="btn btn__grouped-last btn__compound-action">
@@ -589,8 +711,8 @@
         <button class="btn btn__grouped-last btn__compound-action">
             <span class="cf-icon cf-icon-down btn__grouped-last"></span>
         </button>
-    - name: Secondary button style
-      markup: |
+        <br>
+        <br>
         <a href="#" class="btn btn__grouped-first btn__secondary">Anchor</a>
         <a href="#" class="btn btn__grouped-last btn__secondary btn__compound-action">
             <span class="cf-icon cf-icon-down btn__grouped-last"></span>
@@ -601,8 +723,32 @@
         <button class="btn btn__grouped-last btn__secondary btn__compound-action">
             <span class="cf-icon cf-icon-down btn__grouped-last"></span>
         </button>
-    - name: Super button style
-      markup: |
+        <br>
+        <br>
+        <a href="#" class="btn btn__grouped-first btn__warning">Anchor</a>
+        <a href="#" class="btn btn__grouped-last btn__warning btn__compound-action">
+            <span class="cf-icon cf-icon-down btn__grouped-last"></span>
+        </a>
+        <br>
+        <br>
+        <button class="btn btn__grouped-first btn__warning">Button</button>
+        <button class="btn btn__grouped-last btn__warning btn__compound-action">
+            <span class="cf-icon cf-icon-down btn__grouped-last"></span>
+        </button>
+        <br>
+        <br>
+        <a href="#" class="btn btn__grouped-first btn__disabled">Anchor</a>
+        <a href="#" class="btn btn__grouped-last btn__disabled btn__compound-action">
+            <span class="cf-icon cf-icon-down btn__grouped-last"></span>
+        </a>
+        <br>
+        <br>
+        <button class="btn btn__grouped-first btn__disabled">Button</button>
+        <button class="btn btn__grouped-last btn__disabled btn__compound-action">
+            <span class="cf-icon cf-icon-down btn__grouped-last"></span>
+        </button>
+        <br>
+        <br>
         <a href="#" class="btn btn__grouped-first btn__super">Anchor</a>
         <a href="#" class="btn btn__grouped-last btn__super btn__compound-action">
             <span class="cf-icon cf-icon-down btn__grouped-last"></span>
@@ -623,23 +769,40 @@
     &,
     &:link,
     &:visited {
-        background-color: @pacific-80;
+        background-color: @btn-bg-hover;
     }
 
     &:hover,
     &:focus,
     &.hover {
-        background-color: @pacific;
+        background-color: @btn-bg;
     }
 
     &.btn__secondary {
-        background-color: @gray-80;
+        background-color: @btn__secondary-bg-hover;
     }
 
     &.btn__secondary:hover,
     &.btn__secondary:focus,
     &.btn__secondary.hover {
-        background-color: @gray;
+        background-color: @btn__secondary-bg;
+    }
+
+    &.btn__warning {
+        background-color: @btn__warning-bg-hover;
+    }
+
+    &.btn__warning:hover,
+    &.btn__warning:focus,
+    &.btn__warning.hover {
+        background-color: @btn__warning-bg;
+    }
+
+    &.btn__disabled,
+    &.btn__disabled:hover,
+    &.btn__disabled:focus,
+    &.btn__disabled.hover {
+        background-color: @btn__disabled-bg;
     }
 
     &.btn__super {
@@ -684,7 +847,7 @@
 .btn__link {
 
     padding: 0;
-    border-bottom: 1px dotted @pacific;
+    border-bottom: 1px dotted @btn-bg;
     border-radius: 0;
     // This margin is necessary to vertically align link buttons with
     // regular buttons.
@@ -693,29 +856,30 @@
     &,
     &:link,
     &:visited {
+        border-bottom-color: @btn-bg;
         background-color: transparent;
-        color: @pacific;
+        color: @btn-bg;
     }
 
     &:hover,
     &.hover {
-        border-bottom: 1px solid @pacific-50;
+        border-bottom: 1px solid @btn-bg-hover;
         background-color: transparent;
-        color: @pacific-50;
+        color: @btn-bg-hover;
     }
 
     &:focus,
     &.focus {
         border-bottom-style: solid;
         background-color: transparent;
-        outline: thin dotted @pacific;
+        outline: thin dotted @btn-bg;
     }
 
     &:active,
     &.active {
-        border-bottom: 1px solid @navy;
+        border-bottom: 1px solid @btn-bg-active;
         background-color: transparent;
-        color: @navy;
+        color: @btn-bg-active;
     }
 
 }
@@ -766,26 +930,26 @@
     &,
     &:link,
     &:visited {
-        border-bottom-color: @gray;
+        border-bottom-color: @btn__secondary-bg;
         background-color: transparent;
-        color: @gray;
+        color: @btn__secondary-bg;
     }
 
     &:hover,
     &.hover {
-        border-bottom-color: @darkgray;
-        color: @darkgray;
+        border-bottom-color: @btn__secondary-bg-hover;
+        color: @btn__secondary-bg-hover;
     }
 
     &:focus,
     &.focus {
-        outline-color: @gray;
+        outline-color: @btn__secondary-bg;
     }
 
     &:active,
     &.active {
-        border-bottom-color: @black;
-        color: @black;
+        border-bottom-color: @btn__secondary-bg-active;
+        color: @btn__secondary-bg-active;
     }
 
 }
@@ -827,677 +991,28 @@
     &,
     &:link,
     &:visited {
-        border-bottom-color: @redorange;
+        border-bottom-color: @btn__warning-bg;
         background-color: transparent;
-        color: @redorange;
+        color: @btn__warning-bg;
     }
 
     &:hover,
     &.hover {
-        border-bottom-color: @redorange-80;
-        color: @redorange-80;
+        border-bottom-color: @btn__warning-bg-hover;
+        color: @btn__warning-bg-hover;
     }
 
     &:focus,
     &.focus {
-        outline-color: @redorange;
+        outline-color: @btn__warning-bg;
     }
 
     &:active,
     &.active {
-        border-bottom-color: @dark-redorange;
-        color: @dark-redorange;
+        border-bottom-color: @btn__warning-bg-active;
+        color: @btn__warning-bg-active;
     }
 
-}
-
-
-/* topdoc
-  name: EOF
-  eof: true
-*/
-
-/* ==========================================================================
-   Capital Framework
-   Expandable Styling
-   ========================================================================== */
-
-
-/* topdoc
-    name: Recommended expandable pattern
-    family: cf-expandables
-    notes:
-      - "Expandables can be built by combining the basic barebones structure
-         described in the next section along with more specialized expandable
-         elements and modifiers described throughout."
-      - "The following combination is our recommended go-to expandable pattern."
-    patterns:
-    - name: Recommended expandable pattern
-      markup: |
-        <div class="expandable expandable__padded">
-            <button class="expandable_header expandable_target">
-                <span class="expandable_header-left expandable_label">
-                    Expandable Header
-                </span>
-                <span class="expandable_header-right expandable_link">
-                    <span class="expandable_cue-open">
-                        Show
-                        <span class="cf-icon cf-icon-plus-round"></span>
-                    </span>
-                    <span class="expandable_cue-close">
-                        Hide
-                        <span class="cf-icon cf-icon-minus-round"></span>
-                    </span>
-                </span>
-            </button>
-            <div class="expandable_content">
-                <p>
-                    Lorem ipsum dolor sit amet, consectetur adipisicing
-                    elit. Neque ipsa voluptatibus soluta nobis unde quisquam
-                    temporibus magnam debitis quidem. Ducimus ratione
-                    corporis nesciunt earum vel est quaerat blanditiis
-                    dolore ipsa?
-                </p>
-            </div>
-        </div>
-      codenotes:
-        - |
-          Pattern structure
-          -----------------
-          .expandable.expandable__padded
-            .expandable_header.expandable_target
-              .expandable_header-left.expandable_label
-              .expandable_header-right.expandable_link
-                .expandable_cue-open
-                  .cf-icon.cf-icon-plus-round
-                .expandable_cue-close
-                  .cf-icon.cf-icon-minus-round
-              .expandable_cue-open
-              .expandable_cue-close
-            .expandable_content
-    tags:
-    - cf-expandables
-*/
-
-
-/* topdoc
-    name: JS functions
-    family: cf-expandables
-    notes:
-      - "There are a number of available functions that you can call on
-         .expandable elements."
-    patterns:
-    - name: .toggle()
-      codenotes:
-        - "Toggles the expandable."
-    - name: .expand( duration )
-      codenotes:
-        - "Expands the expandable."
-        - |
-          duration
-          Type: number
-          The animation duration.
-          Not required.
-          Defaults to `$.fn.expandable.calculateExpandDuration` or
-          `$.fn.expandable.calculateCollapseDuration` if excluded.
-    - name: .collapse( duration )
-      codenotes:
-        - "Collapses the expandable."
-        - |
-          duration
-          Type: number
-          The animation duration.
-          Not required.
-          Defaults to `$.fn.expandable.calculateExpandDuration` or
-          `$.fn.expandable.calculateCollapseDuration` if excluded.
-    - name: Example usage
-      codenotes:
-        - |
-          // HTML
-          <div class="expandable" id="my-expandable">...</div>
-
-          // JS
-          // (use .get(0) to get the HTML element, that's what the functions
-          // are bound to)
-          $('#my-expandable').get(0).expand(); // Opens the expandable
-          $('#my-expandable').get(0).collapse(); // Closes the expandable
-          $('#my-expandable').get(0).toggle(); // Toggles the expandable
-    tags:
-    - cf-expandables
-*/
-
-
-/* topdoc
-    name: Barebones expandable
-    family: cf-expandables
-    notes:
-      - "This is the barebones structure for expandables that can be used (along
-         with other expanable elements and modifiers) to create custom
-         expandable patterns."
-      - "In this barebones example there are no visual styles."
-    patterns:
-    - name: Barebones expandable
-      markup: |
-        <div class="expandable">
-            <button class="expandable_target">
-                <span class="expandable_cue-open">
-                    Show
-                </span>
-                <span class="expandable_cue-close">
-                    Hide
-                </span>
-            </button>
-            <div class="expandable_content">
-                <p>
-                    Lorem ipsum dolor sit amet, consectetur adipisicing
-                    elit. Neque ipsa voluptatibus soluta nobis unde quisquam
-                    temporibus magnam debitis quidem. Ducimus ratione
-                    corporis nesciunt earum vel est quaerat blanditiis
-                    dolore ipsa?
-                </p>
-            </div>
-        </div>
-      codenotes:
-        - |
-          Pattern structure
-          -----------------
-          .expandable
-            .expandable_target
-              .expandable_cue-open
-              .expandable_cue-close
-            .expandable_content
-      notes:
-        - "Use the button tag for the .expandable_target element to allow for
-           keyboard access."
-        - "The 'Show' and 'Hide' messages can be customized directly in the HTML
-           by editing the contents of .expandable_cue-open and
-           .expandable_cue-close."
-        - "The aria-pressed attribute on .expandable_target gets automatically
-           added and updated by JavaScript."
-        - "The aria-expanded attribute on .expandable_content gets automatically
-           added and updated by JavaScript."
-    - name: .expandable__expanded (modifier)
-      codenotes:
-        - |
-          .expandable__expanded
-      notes:
-        - "Sometimes you may want the expandable to be open by default. This
-           is as easy as adding the .expandable__expanded modifier to the
-           .expandable block."
-    tags:
-    - cf-expandables
-*/
-
-.expandable {
-    margin-bottom: unit(30px / @base-font-size-px, em);
-}
-
-.expandable_target {
-    padding: 0;
-    border: 0;
-    background-color: transparent;
-    cursor: pointer;
-
-    &:focus {
-        outline: 1px dotted @black;
-        outline-offset: 1px;
-    }
-}
-
-.expandable_content {
-    // A clearfix prevents twitchy animations from occurring when margins
-    // collapse and extend past the bounds of the expandable.
-    .u-clearfix();
-}
-
-
-/* topdoc
-    name: Expandable text elements
-    family: cf-expandables
-    patterns:
-    - name: .expandable_label (element)
-      codenotes:
-        - |
-          .expandable_label
-      markup: |
-        <span class="expandable_label">
-            Lorem ipsum
-        </span>
-      notes:
-        - "Allows you to add some styled text."
-    - name: .expandable_link (element)
-      markup: |
-        <span class="expandable_link">
-            Lorem ipsum
-        </span>
-      codenotes:
-        - |
-          .expandable_link
-      notes:
-        - "Allows you to add some styled text with a link-like look."
-    tags:
-    - cf-expandables
-*/
-
-.expandable_label {
-    color: @black;
-    .webfont-medium();
-}
-
-.expandable_link {
-    color: @pacific;
-    .webfont-regular();
-    font-size: unit(@btn-font-size / @base-font-size-px, em);
-    line-height: unit(@base-line-height-px / @btn-font-size);
-}
-
-
-/* topdoc
-    name: Animated cues
-    family: cf-expandables
-    patterns:
-    - name: .expandable_cue-open/close__animated (modifier)
-      codenotes:
-        - |
-          .expandable_cue-open__animated
-          .expandable_cue-close__animated
-      markup: |
-        <div class="expandable">
-            <button class="expandable_target">
-                <span class="expandable_cue-open expandable_cue-open__animated">
-                    <span class="cf-icon cf-icon-down"></span>
-                </span>
-                <span class="expandable_cue-close expandable_cue-close__animated">
-                    <span class="cf-icon cf-icon-up"></span>
-                </span>
-            </button>
-            <div class="expandable_content">
-                <p>
-                    Lorem ipsum dolor sit amet, consectetur adipisicing
-                    elit. Neque ipsa voluptatibus soluta nobis unde quisquam
-                    temporibus magnam debitis quidem. Ducimus ratione
-                    corporis nesciunt earum vel est quaerat blanditiis
-                    dolore ipsa?
-                </p>
-            </div>
-        </div>
-        <div class="expandable expandable__expanded">
-            <button class="expandable_target">
-                <span class="expandable_cue-open expandable_cue-open__animated">
-                    <span class="cf-icon cf-icon-down"></span>
-                </span>
-                <span class="expandable_cue-close expandable_cue-close__animated">
-                    <span class="cf-icon cf-icon-up"></span>
-                </span>
-            </button>
-            <div class="expandable_content">
-                <p>
-                    Lorem ipsum dolor sit amet, consectetur adipisicing
-                    elit. Neque ipsa voluptatibus soluta nobis unde quisquam
-                    temporibus magnam debitis quidem. Ducimus ratione
-                    corporis nesciunt earum vel est quaerat blanditiis
-                    dolore ipsa?
-                </p>
-            </div>
-        </div>
-    tags:
-    - cf-expandables
-*/
-
-.expandable_cue-open__animated,
-.expandable_cue-close__animated {
-    transition: 0.25s transform;
-}
-
-.expandable_cue-close__animated {
-    transform: rotate(180deg);
-}
-
-.expandable__expanded .expandable_cue-close__animated {
-    transform: rotate(0);
-}
-
-.expandable__expanded .expandable_cue-open__animated {
-    transform: rotate(-180deg);
-}
-
-
-/* topdoc
-    name: Expandable header elements
-    family: cf-expandables
-    codenotes:
-      - |
-        Pattern structure
-        -----------------
-        .expandable_header
-          .expandable_header-left
-          .expandable_header-right
-    notes:
-      - "These additional elements are useful for more complicated expandables
-         that need to convey more information than just 'Show/Hide' before the
-         user expands it."
-    patterns:
-    - name: .expandable_header (element)
-      codenotes:
-        - |
-          .expandable_header
-      notes:
-        - "Creates a full-width container to house information that is always
-           visible."
-        - "Combine .expandable_header with .expandable_target for a full-width
-           trigger."
-    - name: .expandable_header__spaced (modifier)
-      codenotes:
-        - |
-          .expandable_header__spaced
-      notes:
-        - "Allows you to add space between .expandable_header and .expandable_content."
-        - "Inline style usage is for demoing the space between the header and
-           content and should not be used."
-    - name: .expandable_header-left, .expandable_header-right (elements)
-      codenotes:
-        - |
-          .expandable_header-left
-          .expandable_header-right
-      notes:
-        - "Allows you to float information left and right."
-    tags:
-    - cf-expandables
-*/
-
-.expandable_header {
-    display: block;
-    .u-clearfix();
-
-    // Using the button element with .expandable_header requires setting an
-    // explicit width.
-    button& {
-        width: 100%;
-        text-align: left;
-    }
-}
-
-.expandable_header__spaced {
-    padding-bottom: unit(15px / @base-font-size-px, em);
-}
-
-.expandable_header-left {
-    float: left;
-}
-
-.expandable_header-right {
-    float: right;
-}
-
-
-/* topdoc
-    name: Padded expandable modifier
-    family: cf-expandables
-    patterns:
-    - name: .expandable__padded (modifier)
-      codenotes:
-        - |
-          .expandable__padded
-      notes:
-        - "Adds padding and a background color to .expandable_header and
-           .expandable_content."
-        - "In addition to using the .expandable__padded modifier you also need
-           to make sure you are using .expandable_header."
-    tags:
-    - cf-expandables
-*/
-
-.expandable__padded {
-    margin-bottom: unit(30px / @base-font-size-px, em);
-    background: @gray-10;
-
-    &:hover,
-    &.expandable__expanded {
-        background: @gray-20;
-    }
-
-    .expandable_header {
-        padding: unit(10px / @base-font-size-px, em)
-                 unit(16px / @base-font-size-px, em);
-    }
-
-    .expandable_content {
-        // Margin collapsing trick for more consistent bottom padding.
-        margin: 0
-                unit(16px / @base-font-size-px, em)
-                unit(22px / @base-font-size-px, em);
-
-        &:before {
-            content: '';
-            display: block;
-            height: 1px;
-            margin-bottom: unit(16px / @base-font-size-px, em);
-            background: @gray-50;
-        }
-    }
-}
-
-
-/* topdoc
-    name: Expandable groups
-    family: cf-expandables
-    patterns:
-    - name: Standard expandable group
-      markup: |
-        <div class="expandable-group">
-            <div class="expandable-group_header">Expandable group header</div>
-            <div class="expandable expandable__padded">
-                <button class="expandable_header expandable_target">
-                    <span class="expandable_header-left expandable_label">
-                        Expandable Header 1
-                    </span>
-                    <span class="expandable_header-right expandable_link">
-                        <span class="expandable_cue-open">
-                            Show
-                            <span class="cf-icon cf-icon-plus-round"></span>
-                        </span>
-                        <span class="expandable_cue-close">
-                            Hide
-                            <span class="cf-icon cf-icon-minus-round"></span>
-                        </span>
-                    </span>
-                </button>
-                <div class="expandable_content">
-                    <p>
-                        Lorem ipsum dolor sit amet, consectetur adipisicing
-                        elit. Neque ipsa voluptatibus soluta nobis unde quisquam
-                        temporibus magnam debitis quidem. Ducimus ratione
-                        corporis nesciunt earum vel est quaerat blanditiis
-                        dolore ipsa?
-                    </p>
-                </div>
-            </div>
-            <div class="expandable expandable__padded">
-                <button class="expandable_header expandable_target">
-                    <span class="expandable_header-left expandable_label">
-                        Expandable Header 2
-                    </span>
-                    <span class="expandable_header-right expandable_link">
-                        <span class="expandable_cue-open">
-                            Show
-                            <span class="cf-icon cf-icon-plus-round"></span>
-                        </span>
-                        <span class="expandable_cue-close">
-                            Hide
-                            <span class="cf-icon cf-icon-minus-round"></span>
-                        </span>
-                    </span>
-                </button>
-                <div class="expandable_content">
-                    <p>
-                        Lorem ipsum dolor sit amet, consectetur adipisicing
-                        elit. Neque ipsa voluptatibus soluta nobis unde quisquam
-                        temporibus magnam debitis quidem. Ducimus ratione
-                        corporis nesciunt earum vel est quaerat blanditiis
-                        dolore ipsa?
-                    </p>
-                </div>
-            </div>
-            <div class="expandable expandable__padded">
-                <button class="expandable_header expandable_target">
-                    <span class="expandable_header-left expandable_label">
-                        Expandable Header 3
-                    </span>
-                    <span class="expandable_header-right expandable_link">
-                        <span class="expandable_cue-open">
-                            Show
-                            <span class="cf-icon cf-icon-plus-round"></span>
-                        </span>
-                        <span class="expandable_cue-close">
-                            Hide
-                            <span class="cf-icon cf-icon-minus-round"></span>
-                        </span>
-                    </span>
-                </button>
-                <div class="expandable_content">
-                    <p>
-                        Lorem ipsum dolor sit amet, consectetur adipisicing
-                        elit. Neque ipsa voluptatibus soluta nobis unde quisquam
-                        temporibus magnam debitis quidem. Ducimus ratione
-                        corporis nesciunt earum vel est quaerat blanditiis
-                        dolore ipsa?
-                    </p>
-                </div>
-            </div>
-        </div>
-      codenotes:
-        - |
-          Pattern structure
-          -----------------
-          .expandable-group
-            .expandable-group_header
-            .expandable.expandable__padded
-              [...]
-            .expandable.expandable__padded
-              [...]
-            .expandable.expandable__padded
-              [...]
-    - name: Accordion-style group
-      markup: |
-        <div class="expandable-group" data-accordion="true">
-            <div class="expandable-group_header">Expandable group header</div>
-            <div class="expandable expandable__padded">
-                <button class="expandable_header expandable_target">
-                    <span class="expandable_header-left expandable_label">
-                        Expandable Header 1
-                    </span>
-                    <span class="expandable_header-right expandable_link">
-                        <span class="expandable_cue-open">
-                            Show
-                            <span class="cf-icon cf-icon-plus-round"></span>
-                        </span>
-                        <span class="expandable_cue-close">
-                            Hide
-                            <span class="cf-icon cf-icon-minus-round"></span>
-                        </span>
-                    </span>
-                </button>
-                <div class="expandable_content">
-                    <p>
-                        Lorem ipsum dolor sit amet, consectetur adipisicing
-                        elit. Neque ipsa voluptatibus soluta nobis unde quisquam
-                        temporibus magnam debitis quidem. Ducimus ratione
-                        corporis nesciunt earum vel est quaerat blanditiis
-                        dolore ipsa?
-                    </p>
-                </div>
-            </div>
-            <div class="expandable expandable__padded">
-                <button class="expandable_header expandable_target">
-                    <span class="expandable_header-left expandable_label">
-                        Expandable Header 2
-                    </span>
-                    <span class="expandable_header-right expandable_link">
-                        <span class="expandable_cue-open">
-                            Show
-                            <span class="cf-icon cf-icon-plus-round"></span>
-                        </span>
-                        <span class="expandable_cue-close">
-                            Hide
-                            <span class="cf-icon cf-icon-minus-round"></span>
-                        </span>
-                    </span>
-                </button>
-                <div class="expandable_content">
-                    <p>
-                        Lorem ipsum dolor sit amet, consectetur adipisicing
-                        elit. Neque ipsa voluptatibus soluta nobis unde quisquam
-                        temporibus magnam debitis quidem. Ducimus ratione
-                        corporis nesciunt earum vel est quaerat blanditiis
-                        dolore ipsa?
-                    </p>
-                </div>
-            </div>
-            <div class="expandable expandable__padded">
-                <button class="expandable_header expandable_target">
-                    <span class="expandable_header-left expandable_label">
-                        Expandable Header 3
-                    </span>
-                    <span class="expandable_header-right expandable_link">
-                        <span class="expandable_cue-open">
-                            Show
-                            <span class="cf-icon cf-icon-plus-round"></span>
-                        </span>
-                        <span class="expandable_cue-close">
-                            Hide
-                            <span class="cf-icon cf-icon-minus-round"></span>
-                        </span>
-                    </span>
-                </button>
-                <div class="expandable_content">
-                    <p>
-                        Lorem ipsum dolor sit amet, consectetur adipisicing
-                        elit. Neque ipsa voluptatibus soluta nobis unde quisquam
-                        temporibus magnam debitis quidem. Ducimus ratione
-                        corporis nesciunt earum vel est quaerat blanditiis
-                        dolore ipsa?
-                    </p>
-                </div>
-            </div>
-        </div>
-      codenotes:
-        - |
-          <div class="expandable-group" data-accordion="true">
-      notes:
-        - "Accordions can only show one open expandable at a time."
-        - "Add the data-accordion=\"true\" attribute to the expandable group to
-           activate the accordion mode."
-    tags:
-    - cf-expandables
-*/
-
-.expandable-group {
-    margin-bottom: unit(30px / @base-font-size-px, em);
-}
-
-.expandable-group_header {
-    padding: unit(5px / @font-size, em)
-             unit(16px / @font-size, em);
-    border-bottom: 1px solid @gray-80;
-    background: @gray-10;
-    color: @gray;
-    .h5();
-    margin-bottom: 0;
-}
-
-.expandable-group .expandable {
-    border-bottom: 1px solid @gray-80;
-    margin-bottom: 0;
-    background: @white;
-}
-
-.expandable-group .expandable_label {
-    .h4();
-    margin-bottom: 0;
-}
-
-.expandable-group .expandable_content {
-    margin-bottom: 0;
 }
 
 
@@ -1510,6 +1025,41 @@
    Capital Framework
    Form Element Styling
    ========================================================================== */
+
+
+/* topdoc
+  name: Theme variables
+  family: cf-forms
+  notes:
+    - "The following color and sizing variables are exposed, allowing you to
+       easily override them before compiling."
+  patterns:
+  - name: Colors
+    codenotes:
+      - |
+        @input-error
+        @input-success
+  - name: Sizing
+    codenotes:
+      - |
+        @input__super-font-size
+  tags:
+  - cf-forms
+  - less
+*/
+
+// Color variables
+
+// .error
+@input-error:                   #ea130b;
+
+// .success
+@input-success:                 #009d38;
+
+// Sizing variables
+
+// .input__super
+@input__super-font-size:        18px;
 
 
 /* topdoc
@@ -1552,8 +1102,8 @@
     &[type="url"],
     &[type="tel"],
     &[type="number"] {
-        padding: unit( 10px / @super-btn-font-size, em );
-        font-size: unit( @super-btn-font-size / @base-font-size-px, em );
+        padding: unit( 10px / @input__super-font-size, em );
+        font-size: unit( @input__super-font-size / @base-font-size-px, em );
     }
 }
 
@@ -1591,12 +1141,12 @@ input[type="number"],
 select[multiple],
 textarea {
     &.error {
-        border: 1px solid @redorange;
-        outline: 1px solid @redorange;
+        border: 1px solid @input-error;
+        outline: 1px solid @input-error;
     }
     &.success {
-        border: 1px solid @green;
-        outline: 1px solid @green;
+        border: 1px solid @input-success;
+        outline: 1px solid @input-success;
     }
 }
 
@@ -1648,11 +1198,11 @@ textarea {
 }
 
 .error + .@{cf-forms_input-icon-class} {
-    color: @redorange;
+    color: @input-error;
 }
 
 .success + .@{cf-forms_input-icon-class} {
-    color: @green;
+    color: @input-success;
 }
 
 
@@ -1894,12 +1444,13 @@ textarea {
    ========================================================================== */
 
 /* topdoc
-  name: "Global Less variables"
+  name: Less variables
   notes:
-    - "The following variables are default values used in creating grids.
-      They can be overridden in your application's stylesheet.
-      Most mixins allows you to override these values by passing them arguments."
-  family: "cf-grid"
+    - "The following variables are exposed,
+       allowing you to easily override them before compiling.
+       Most mixins allows you to further override these values by passing them
+       arguments."
+  family: cf-grid
   patterns:
     - codenotes:
         - "@grid_box-sizing-polyfill-path: '/cf-grid/custom-demo/static/css';"
@@ -1923,33 +1474,33 @@ textarea {
       notes:
         - "Gives column blocks a background color if set to true."
   tags:
-    - "cf-grid"
+    - cf-grid
 */
 
 @grid_box-sizing-polyfill-path: '/cf-grid/custom-demo/static/css';
-@grid_wrapper-width: 1200px;
-@grid_gutter-width: 30px;
-@grid_total-columns: 12;
-@grid_debug: false;
+@grid_wrapper-width:            1200px;
+@grid_gutter-width:             30px;
+@grid_total-columns:            12;
+@grid_debug:                    false;
 
 
 /* topdoc
-  name: "Wrapper"
+  name: Wrapper
   notes:
     - "Wrappers are centered containers with a max-width and fixed gutters
-      that match the gutter widths of columns."
+       that match the gutter widths of columns."
     - "To support IE 6/7, ensure that the path to boxsizing.htc is set using
-      the @grid_box-sizing-polyfill-path Less variable.
-      Read more: https://github.com/Schepp/box-sizing-polyfill."
-  family: "cf-grid"
+       the @grid_box-sizing-polyfill-path Less variable.
+       Read more: https://github.com/Schepp/box-sizing-polyfill."
+  family: cf-grid
   patterns:
-    - name: "Less mixin"
+    - name: Less mixin
       codenotes:
         - ".grid_wrapper( @grid_wrapper-width: @grid_wrapper-width )"
       notes:
         - "You can create wrappers with different max-widths by passing a pixel
-          value into the mixin."
-    - name: "Usage"
+           value into the mixin."
+    - name: Usage
       codenotes:
         - |
           .main-wrapper {
@@ -1966,7 +1517,7 @@ textarea {
               This container is the same except it has a wider max-width.
           </div>
   tags:
-    - "cf-grid"
+    - cf-grid
 */
 
 .grid_wrapper( @grid_wrapper-width: @grid_wrapper-width ) {
@@ -1979,16 +1530,16 @@ textarea {
 
 
 /* topdoc
-  name: "Columns"
-  family: "cf-grid"
+  name: Columns
+  family: cf-grid
   patterns:
-    - name: "Less mixin"
+    - name: Less mixin
       codenotes:
         - ".grid_column( @columns: 1; @total: @grid_total-columns; @prefix: 0; @suffix: 0 )"
       notes:
         - "Computes column widths and prefix/suffix padding."
         - "CSS borders are used for fixed gutters."
-    - name: "Usage"
+    - name: Usage
       codenotes:
         - |
           .main-wrapper {
@@ -2002,11 +1553,11 @@ textarea {
               <div class="half">I am half of my parent.</div>
               <div class="half">I am half of my parent.</div>
           </div>
-    - name: "This is a placeholder for documenting prefix and suffix"
+    - name: This is a placeholder for documenting prefix and suffix
       codenotes:
         - "..."
   tags:
-    - "cf-grid"
+    - cf-grid
 */
 
 .grid_column( @columns: 1; @total: @grid_total-columns; @prefix: 0; @suffix: 0 ) {
@@ -2131,13 +1682,13 @@ textarea {
 
 
 /* topdoc
-  name: "Push and Pull mixins for source ordering"
-  family: "cf-grid"
+  name: Push and Pull mixins for source ordering
+  family: cf-grid
   patterns:
     - codenotes:
         - ".push( @offset: 1, @grid_total-columns: @grid_total-columns )"
         - ".pull( @offset: 1, @grid_total-columns: @grid_total-columns )"
-    - name: "Usage"
+    - name: Usage
       codenotes:
         - |
           .first {
@@ -2154,7 +1705,7 @@ textarea {
               <div class="first">I am second in the markup but appear before .second.</div>
           </div>
   tags:
-    - "cf-grid"
+    - cf-grid
 */
 
 .grid_push( @offset: 1, @grid_total-columns: @grid_total-columns ) {
@@ -2171,7 +1722,7 @@ textarea {
 
 
 /* topdoc
-  name: "Nested columns"
+  name: Nested columns
   notes:
     - "Since all cf-grid columns have left and right gutters you will notice
       undesireable offsetting when nesting columns.
@@ -2188,12 +1739,12 @@ textarea {
       To clarify, if you have a 12 column grid and place 24 columns inside
       of a wrapper cf-grid columns will automaitcally stack into 2 'rows'
       of 12."
-  family: "cf-grid"
+  family: cf-grid
   patterns:
-    - name: "Less mixin"
+    - name: Less mixin
       codenotes:
         - ".grid_nested-col-group()"
-    - name: "Usage"
+    - name: Usage
       codenotes:
         - |
           .main-wrapper {
@@ -2221,7 +1772,7 @@ textarea {
               </div>
           </div>
   tags:
-    - "cf-grid"
+    - cf-grid
 */
 
 .grid_nested-col-group() {
@@ -2264,9 +1815,9 @@ textarea {
     - cf-icons
 */
 
-@cf-icon-prefix: cf-icon;
-@cf-icon-path: '../fonts';
-@cf-icon-ie7-support: true;
+@cf-icon-prefix:                cf-icon;
+@cf-icon-path:                  '../fonts';
+@cf-icon-ie7-support:           true;
 
 
 /* topdoc
@@ -2315,6 +1866,20 @@ textarea {
   font-style: normal;
 }
 
+// The class .cf-icon is used to support adding these rules via a mixin,
+// specifically when @cf-icon-prefix is changed to something other than
+// 'cf-icon', since string interpolation is incompatible with mixin calls.
+//
+// For example you can't do this:
+// .link-with-auto-icon {
+//   .@{cf-icon-prefix}();
+// }
+// 
+// But you can do this:
+// .link-with-auto-icon {
+//   .@cf-icon();
+// }
+.cf-icon,
 .@{cf-icon-prefix} {
   font-family: 'CFPB Minicons';
   display: inline-block;
@@ -5066,60 +4631,90 @@ textarea {
    ========================================================================== */
 
 /* topdoc
-    name: Pagination
-    family: cf-pagination
-    notes:
-      - "To enable the component to jump directly to the paginated content place
-        place #pagination_content directly above your paginated content."
-    patterns:
-    - name: Default pagination
-      markup: |
-        <div id="pagination_content"></div>
-
-        <!-- Paginated content here -->
-
-        <nav class="pagination">
-            <a class="btn btn__super pagination_prev" href="#pagination_content">
-                <span class="btn_icon__left cf-icon cf-icon-left"></span>
-                Previous
-            </a>
-            <a class="btn btn__super pagination_next" href="#pagination_content">
-                Next
-                <span class="btn_icon__right cf-icon cf-icon-right"></span>
-            </a>
-            <form class="pagination_form" action="index.html#pagination_content">
-                <label class="pagination_label"
-                       for="pagination_current-page">
-                    Page
-                    <span class="u-visually-hidden">
-                        number out of 149 total pages
-                    </span>
-                </label>
-                <input
-                    class="pagination_current-page"
-                    id="pagination_current-page"
-                    name="pagination_current-page"
-                    type="number" min="1" max="149"
-                    value="149">
-                <span class="pagination_label">
-                    <span aria-hidden="true">
-                        of 149
-                    </span>
-                </span>
-                <button class="btn btn__link pagination_submit"
-                        id="pagination_submit"
-                        type="submit">
-                    Go
-                </button>
-            </form>
-        </nav>
-    tags:
-    - fj-buttons
-    - fj-forms
+  name: Theme variables
+  family: cf-pagination
+  notes:
+    - "The following color and sizing variables are exposed, allowing you to
+       easily override them before compiling."
+  patterns:
+  - name: Colors
+    codenotes:
+      - |
+        @pagination-text
+        @pagination-bg
+  - name: Sizing
+    codenotes:
+      - |
+        @pagination-font-size
+        @pagination-bp
+  tags:
+  - cf-pagination
+  - less
 */
 
-@pagination-font-size: 16px;
-@pagination-bp: 640px;
+// Color variables
+
+@pagination-text:               darken(#895983, 15%);
+@pagination-bg:                 lighten(#905c8a, 45%);
+
+// Sizing variables
+
+@pagination-font-size:          16px;
+@pagination-bp:                 640px;
+
+
+/* topdoc
+  name: Pagination
+  family: cf-pagination
+  notes:
+    - "To enable the component to jump directly to the paginated content place
+      place #pagination_content directly above your paginated content."
+  patterns:
+  - name: Default pagination
+    markup: |
+      <div id="pagination_content"></div>
+
+      <!-- Paginated content here -->
+
+      <nav class="pagination">
+          <a class="btn btn__super pagination_prev" href="#pagination_content">
+              <span class="btn_icon__left cf-icon cf-icon-left"></span>
+              Previous
+          </a>
+          <a class="btn btn__super pagination_next" href="#pagination_content">
+              Next
+              <span class="btn_icon__right cf-icon cf-icon-right"></span>
+          </a>
+          <form class="pagination_form" action="index.html#pagination_content">
+              <label class="pagination_label"
+                     for="pagination_current-page">
+                  Page
+                  <span class="u-visually-hidden">
+                      number out of 149 total pages
+                  </span>
+              </label>
+              <input
+                  class="pagination_current-page"
+                  id="pagination_current-page"
+                  name="pagination_current-page"
+                  type="number" min="1" max="149"
+                  value="149">
+              <span class="pagination_label">
+                  <span aria-hidden="true">
+                      of 149
+                  </span>
+              </span>
+              <button class="btn btn__link pagination_submit"
+                      id="pagination_submit"
+                      type="submit">
+                  Go
+              </button>
+          </form>
+      </nav>
+  tags:
+  - fj-buttons
+  - fj-forms
+*/
 
 .pagination {
     display: block;
@@ -5163,10 +4758,12 @@ textarea {
 
 .pagination_form {
     display: block;
-    padding: unit( 5px / @base-font-size-px, em );
+    padding: unit( 5px / @base-font-size-px, em )
+             unit( 5px / @base-font-size-px, em )
+             unit( 6px / @base-font-size-px, em );
     margin: unit( 16px / @base-font-size-px, em) 0 0 0;
-    background: @gray-20;
-    color: @gray;
+    background: @pagination-bg;
+    color: @pagination-text;
     text-align: center;
 }
 
@@ -5265,13 +4862,1092 @@ textarea {
 
 /* ==========================================================================
    Capital Framework
+   Advanced Typography
+   ========================================================================== */
+
+
+/* topdoc
+  name: Theme variables
+  family: cf-typography
+  notes:
+    - "The following color and sizing variables are exposed, allowing you to
+       easily override them before compiling."
+  patterns:
+  - name: Colors
+    codenotes:
+      - |
+        @pull-quote_body
+        @pull-quote_citation
+        @micro-copy-text
+        @date-text
+        @category-slug-text
+        @category-slug-hover
+        @header-slug-thin-border
+        @header-slug-thick-border
+        @padded-header-text
+        @padded-header-bg
+        @padded-header-border
+        @fancy-slug-text
+        @fancy-slug-bg
+        @fancy-slug-border
+        @meta-header-border
+        @jump-link__bg
+        @jump-link__bg-border
+        @list__branded-bullet
+  - name: Sizing
+    codenotes:
+      - |
+        @...
+  tags:
+  - cf-typography
+  - less
+*/
+
+// Color variables
+
+// .pull-quote
+@pull-quote_body:               #895983;
+@pull-quote_citation:           lighten(#895983, 15%);
+
+// .micro-copy
+@micro-copy-text:               lighten(#895983, 15%);
+
+// .date
+@date-text:                     lighten(#895983, 15%);
+
+// .category-slug
+@category-slug-text:            darken(#895983, 15%);
+@category-slug-hover:           #c7336e;
+
+// .header-slug
+@header-slug-thin-border:       #c7336e;
+@header-slug-thick-border:      #3a8899;
+
+// .padded-header
+@padded-header-text:            darken(#895983, 15%);
+@padded-header-bg:              lighten(#905c8a, 45%);
+@padded-header-border:          darken(#895983, 15%);
+
+// .fancy-slug
+@fancy-slug-text:               #905c8a;
+@fancy-slug-bg:                 lighten(#905c8a, 45%);
+@fancy-slug-border:             #905c8a;
+
+// .meta-header
+@meta-header-border:            #905c8a;
+
+// .jump-link
+@jump-link__bg:                 lighten(#905c8a, 45%);
+@jump-link__bg-border:          #905c8a;
+
+// .list__branded
+@list__branded-bullet:          #3a8899;
+
+
+/* topdoc
+ name: Pull quote
+ family: cf-typography
+ patterns:
+   - name: Default pull quote
+     markup: |
+       <aside class="pull-quote">
+           <div class="pull-quote_body">
+               Lorem ipsum dolor sit amet, consectetur adipisicing elit.
+               Cum corrupti tempora nam nihil qui mollitia consectetur
+               corporis nemo culpa dolorum!
+           </div>
+           <footer>
+               <cite class="pull-quote_citation">
+                   - Author Name
+               </cite>
+           <footer>
+       </aside>
+     notes:
+       - "Use a pull quote to highlight excerpts from the current work.
+         This is not to be confused with blockquote which quotes from an
+         external work."
+       - "Since a pull quote is an excerpt and repeats content from the
+         article it's contained within you should use the aside element."
+   - name: Large pull quote
+     markup: |
+       <aside class="pull-quote pull-quote__large">
+           <div class="pull-quote_body">
+               Lorem ipsum dolor sit amet, consectetur adipisicing elit.
+               Cum corrupti tempora nam nihil qui mollitia consectetur
+               corporis nemo culpa dolorum!
+           </div>
+           <footer>
+               <cite class="pull-quote_citation">
+                   - Author Name
+               </cite>
+           <footer>
+       </aside>
+ tags:
+   - cf-typography
+*/
+
+.pull-quote {
+
+   &_body {
+       .h3();
+       // Spacing is based off of the baseline so this margin number has been
+       // eyeballed to be ~24px.
+       margin-bottom: unit(12px / @font-size, em);
+       color: @pull-quote_body;
+   }
+
+   &_citation {
+       .h5();
+       color: @pull-quote_citation;
+   }
+}
+
+.pull-quote__large {
+
+   .pull-quote_body {
+       .h2();
+       // Spacing is based off of the baseline so this margin number has been
+       // eyeballed to be ~30px.
+       margin-bottom: unit(18px / @font-size, em);
+   }
+}
+
+
+/* topdoc
+  name: Micro copy
+  family: cf-typography
+  patterns:
+    - name: Standard micro copy
+      markup: |
+        <p class="micro-copy">
+            Lorem ipsum dolor sit amet
+        </p>
+      codenotes:
+        - .micro-copy
+    - name: Large micro copy
+      markup: |
+        <p class="micro-copy micro-copy__large">
+            Lorem ipsum dolor sit amet
+        </p>
+      codenotes:
+        - .micro-copy
+  tags:
+    - cf-typography
+*/
+
+.micro-copy {
+    color: @micro-copy-text;
+    font-size: unit(14px / @base-font-size-px, em);
+    .webfont-regular();
+
+    &__large {
+        font-size: unit(16px / @base-font-size-px, em);
+    }
+}
+
+
+/* topdoc
+  name: Short description
+  family: cf-typography
+  patterns:
+    - name: .short-desc
+      markup: |
+        <p class="short-desc">I am short description.</p>
+      codenotes:
+        - .short-desc
+    - name: .short-desc__large (modifier)
+      markup: |
+        <p class="short-desc short-desc__large">I am large short description.</p>
+      codenotes:
+        - .short-desc__large
+  tags:
+    - cf-typography
+*/
+
+.short-desc {
+    .webfont-regular();
+
+    &__large {
+        font-size: unit(18px / @base-font-size-px, em);
+    }
+}
+
+
+/* topdoc
+  name: Date
+  family: cf-typography
+  patterns:
+    - name: Default date
+      markup: |
+        <span class="date">
+            Nov 4, 2013
+        </span>
+  tags:
+    - cf-typography
+*/
+
+.date {
+    .h5();
+    color: @date-text;
+    white-space: nowrap;
+}
+
+
+/* topdoc
+  name: Category slug
+  family: cf-typography
+  patterns:
+    - name: Default category slug
+      markup: |
+        <a href="#" class="category-slug">
+            <span class="category-slug_icon cf-icon cf-icon-dialogue"></span>
+            <span class="u-visually-hidden">Category:</span>
+            Consumer finance
+        </a>
+      codenotes:
+        - |
+          Structural cheat sheet:
+          -----------------------
+          .category-slug
+            .category-slug_icon
+            .u-visually-hidden
+      notes:
+        - "We suggest using a .u-visually-hidden element to add more context for
+          screen readers."
+  tags:
+    - cf-typography
+*/
+
+.category-slug {
+    .h4();
+    display: inline-block;
+    // Eyeballed to 20px over h2.
+    margin-bottom: unit(8px / @font-size, em);
+    color: @category-slug-text;
+
+    a& {
+        .u-link__colors(@category-slug-text, @category-slug-hover);
+    }
+
+    &_icon {
+        margin-right: unit(2px / @font-size, em);
+    }
+}
+
+
+/* topdoc
+  name: Header slug
+  family: cf-typography
+  patterns:
+    - name: Default header slug
+      markup: |
+        <h2 class="header-slug">
+            <span class="header-slug_inner">
+                Blog summary
+            </span>
+        </h2>
+      codenotes:
+        - |
+          Structural cheat sheet:
+          -----------------------
+          .header-slug
+            .header-slug_inner
+  tags:
+    - cf-typography
+*/
+
+.header-slug {
+    .h5();
+    margin-bottom: unit(17px / @font-size, em);
+    border-top: 1px solid @header-slug-thin-border;
+
+    &_inner {
+        display: inline-block;
+        padding-top: unit(4px / @font-size, em);
+        margin-top: -3px;
+        border-top: 5px solid @header-slug-thick-border;
+    }
+}
+
+
+/* topdoc
+  name: Padded header
+  family: cf-typography
+  patterns:
+    - name: Default padded header
+      markup: |
+        <h2 class="padded-header">
+            Header
+        </h2>
+      codenotes:
+        - .padded-header
+  tags:
+    - cf-typography
+*/
+
+.padded-header {
+    .h5();
+    // 8px top padding to account for line-height.
+    padding: unit(8px / @font-size, em)
+             unit(10px / @font-size, em);
+    margin-bottom: 0;
+    border-bottom: 1px solid @padded-header-border;
+    background: @padded-header-bg;
+    color: @padded-header-text;
+}
+
+/* topdoc
+  name: Fancy slug
+  family: cf-typography
+  patterns:
+    - name: Default fancy slug
+      markup: |
+        <h2 class="fancy-slug">
+            <span class="fancy-slug_text">
+                <span class="fancy-slug_ribbon-left"></span>
+                Watchroom
+                <span class="fancy-slug_ribbon-right"></span>
+            </span>
+        </h2>
+      codenotes:
+        - |
+          Structural cheat sheet:
+          -----------------------
+          .fancy-slug
+            .fancy-slug_text
+                .fancy-slug_ribbon-left
+                .fancy-slug_ribbon-right
+  tags:
+    - cf-typography
+*/
+
+.fancy-slug {
+    @v-padding: 8px;
+    @ribbon-width: 17px;
+    @ribbon-angle: 33deg;
+
+    .h5();
+    position: relative;
+    // Cut the height in half since we will be adding it back with margin.
+    height: unit(((@font-size / 2) + @v-padding + 1) / @font-size, em);
+    padding: 0 unit(@ribbon-width / @font-size, em);
+    // Add back half of the height to create a space for the text to pull
+    // itself up into.
+    margin-top: unit(((@font-size / 2) + @v-padding + 1) / @font-size, em);
+    // Bottom margin is eyeballed to 15px when considering baseline and line-height.
+    margin-bottom: unit(8px / @font-size, em);
+    border-top: 1px solid @fancy-slug-border;
+    line-height: 1;
+    text-align: center;
+
+    &_text {
+        display: inline-block;
+        position: relative;
+        // Pull the text up up by half of its height so that it is vertically
+        // centered with .fancy-slugs top border. "Height" means half the
+        // font-size plus half the total padding and half the borders.
+        top: unit(((@font-size / 2) + @v-padding + 1) * -1 / @font-size, em);
+        padding: unit(@v-padding / @font-size, em) unit(20px / @font-size, em);
+        border: 1px solid @fancy-slug-border;
+        background: @fancy-slug-bg;
+    }
+
+    // Use :before as the top corner and :after as the bottom corner.
+    &_ribbon-left,
+    &_ribbon-right {
+        display: block;
+        position: absolute;
+        top: -1px;
+        width: unit(@ribbon-width / @font-size, em);
+        height: 100%;
+        border-top: 1px solid @fancy-slug-border;
+        border-bottom: 1px solid @fancy-slug-border;
+
+        .lt-ie9 & {
+            display: none;
+        }
+
+        &:before,
+        &:after {
+                display: block;
+                content: "";
+                position: absolute;
+                z-index: 3;
+                width: unit(@ribbon-width / @font-size, em);
+                height: 50%;
+                background: @fancy-slug-bg;
+                border: 0 solid @fancy-slug-border;
+        }
+    }
+
+    &_ribbon-left {
+        left: unit(-@ribbon-width / @font-size, em);
+        &:before {
+            top: 0;
+            border-left-width: 1px;
+            transform-origin: 0 0;
+            transform: skewX(@ribbon-angle);
+        }
+        &:after {
+            bottom: 0;
+            border-left-width: 1px;
+            transform-origin: 0 100%;
+            transform: skewX(-@ribbon-angle);
+        }
+    }
+
+    &_ribbon-right {
+        right: unit(-@ribbon-width / @font-size, em);
+        &:before {
+            top: 0;
+            right: 0;
+            border-right-width: 1px;
+            transform-origin: 100% 0;
+            transform:  skewX(-@ribbon-angle);
+        }
+        &:after {
+            right: 0;
+            bottom: 0;
+            border-right-width: 1px;
+            transform-origin: 100% 100%;
+            transform:  skewX(@ribbon-angle);
+        }
+    }
+}
+
+/* topdoc
+  name: Meta header
+  family: cf-typography
+  patterns:
+    - name: Default meta header
+      markup: |
+        <div class="meta-header">
+            <span class="meta-header_right date">
+                Nov 4, 2013
+            </span>
+            <a href="#" class="meta-header_left category-slug">
+                <span class="cf-icon cf-icon-credit-card"></span>
+                Consumer finance
+            </a>
+        </div>
+      codenotes:
+        - |
+          Structural cheat sheet:
+          -----------------------
+          .meta-header
+            .meta-header_right
+            .meta-header_left
+      notes:
+        - ".meta-header_right should come first in the markup so that when it
+          floats to the right it will appear on the same line as .meta-header_left."
+        - "Note that the example shows .meta-header_left using the
+          .category-slug pattern and .meta-header_right using the .date pattern
+          but you could use other patterns in place of them. Or you can even
+          swap them so that date is attached to .meta-header_left and
+          .category-slug is attacked to .meta-header_right."
+    - name: Alternate meta header arrangements
+      markup: |
+        <div class="meta-header">
+            <a href="#" class="meta-header_right category-slug">
+                <span class="cf-icon cf-icon-credit-card"></span>
+            </a>
+            <span class="meta-header_left date">
+                Nov 4, 2013
+            </span>
+        </div>
+        <br>
+        <div class="meta-header">
+            <a href="#" class="meta-header_left category-slug">
+                <span class="cf-icon cf-icon-credit-card"></span>
+                Consumer finance
+            </a>
+        </div>
+      notes:
+        - "Just some random variations to show off what you could do."
+  tags:
+    - cf-typography
+*/
+
+.meta-header {
+    padding-bottom: unit(8px / @base-font-size-px, em);
+    margin-bottom: unit(10px / @base-font-size-px, em);
+    border-bottom: 1px solid @meta-header-border;
+}
+
+.meta-header_left {
+    margin-bottom: 0;
+}
+
+.meta-header_right {
+    display: block;
+    margin-bottom: 0;
+    .respond-to-min(600px, {
+        .u-right();
+        display: inline-block;
+    });
+}
+
+
+/* topdoc
+  name: Links with icons
+  family: cf-typography
+  notes:
+    - "Styles to enable adding an icon to a link and preventing the link's
+       underline from extending under the icon."
+    - "For the underlined icon prevention to work, you must wrap the link text
+       with a `span.icon-link_text`. There can be no whitespace between the text
+       and the opening and closing span tags."
+  patterns:
+    - name: Default link with icon
+      markup: |
+        <p>
+            For more information, email
+            <a class="icon-link icon-link__mail" href="#">
+                <span class="icon-link_text">john.smith@cfpb.gov</span>
+            </a>.
+            Alternatively, you can
+            <a class="icon-link icon-link__download" href="#">
+                <span class="icon-link_text">download the info sheet</span>
+            </a>.
+            Oh, you might also want to visit this
+            <a class="icon-link icon-link__external-link" href="#">
+                <span class="icon-link_text">other organization's website</span>
+            </a> for further details.
+        </p>
+        <a class="icon-link icon-link__right" href="#">
+            Visit another section of our site
+        </a>
+      notes:
+        - "The modifier names match the cf-icon names of commonly-used icons."
+        - "Icons appear to the right of a link, by default."
+    - name: Links with icons on the left (modifier)
+      markup: |
+        <a class="icon-link icon-link__mail icon-link__before" href="#">
+            <span class="icon-link_text">john.smith@cfpb.gov</span>
+        </a><br>
+        <a class="icon-link icon-link__phone icon-link__before" href="#">
+            (123) 456-7890
+        </a>
+      notes:
+        - "Simply add the `.icon-link__before` modifier to place the icon before
+           the link text."
+        - "You can omit the `span.icon-link_text` wrapper if you do not need
+           an underline on a particular link."
+    - name: Non-wrapping icon links
+      markup: |
+        <p>
+            For more information, email
+            <a class="icon-link icon-link__mail icon-link__no-wrap" href="#">
+                <span class="icon-link_text">john.smith@cfpb.gov</span>
+            </a>.
+        </p>
+      notes:
+        - "Warning: Icons added to inline links can sometimes break onto the
+           next line. If you want to prevent this, you can add the `__no-wrap`
+           modifier to `.icon-link`."
+  tags:
+    - cf-typography
+*/
+
+.icon-link {
+    border-bottom-width: 0;
+    position: relative;
+
+    &_text {
+        border-bottom-width: 1px;
+        border-bottom-style: inherit;
+    }
+
+    &:before,
+    &:after {
+        .cf-icon();
+        margin-right: 1px;
+        margin-left: 1px;
+    }
+
+    &__download:after,
+    &__download&__before:before {
+        // Inserts the cf-icon-download glyph.
+        content: "\e406";
+    }
+
+    &__email:after,
+    &__email&__before:before {
+        // Inserts the cf-icon-email glyph.
+        content: "\e302";
+    }
+
+    &__external-link:after,
+    &__external-link&__before:before {
+        // Inserts the cf-icon-external-link glyph.
+        content: "\e610";
+    }
+
+    &__fax:after,
+    &__fax&__before:before {
+        // Inserts the cf-icon-fax glyph.
+        content: "\e310";
+    }
+
+    &__left:after,
+    &__left&__before:before {
+          // Inserts the cf-icon-left glyph.
+          content: "\e000";
+      }
+
+    &__mail:after,
+    &__mail&__before:before {
+        // Inserts the cf-icon-mail glyph.
+        content: "\e304";
+    }
+    
+    &__pdf:after,
+    &__pdf&__before:before {
+        // Inserts the cf-icon-pdf glyph.
+        content: "\e402";
+    }
+
+    &__pdf:after,
+    &__pdf&__before:before {
+        // Inserts the cf-icon-pdf glyph.
+        content: "\e402";
+    }
+
+    &__phone:after,
+    &__phone&__before:before {
+        // Inserts the cf-icon-phone glyph.
+        content: "\e306";
+    }
+
+    &__right:after,
+    &__right&__before:before {
+        // Inserts the cf-icon-right glyph.
+        content: "\e002";
+    }
+
+    // New icon modifiers must be added ABOVE this line.
+
+    &__before {
+        &:after {
+            content: '';
+        }
+    }
+
+    &__no-wrap {
+        white-space: nowrap;
+    }
+}
+
+/* topdoc
+  name: Styled link
+  family: cf-typography
+  patterns:
+    - name: .styled-link
+      markup: |
+        <a class="styled-link" href="#">
+            Default styled link
+        </a>
+      codenotes:
+        - .styled-link
+  tags:
+    - cf-typography
+*/
+
+.styled-link {
+    @font-size: 16px;
+
+    border-bottom-width: 1px;
+    .webfont-medium();
+    font-size: unit(@font-size / @base-font-size-px, em);
+}
+
+
+/* topdoc
+  name: Jump link
+  family: cf-typography
+  patterns:
+    - name: .jump-link
+      markup: |
+        <a class="jump-link" href="#">
+            <span class="jump-link_text">Default jump link</span>
+        </a>
+      codenotes:
+        - .jump-link
+    - name: .jump-link__large (modifier)
+      markup: |
+        <a class="jump-link jump-link__large" href="#">
+            <span class="jump-link_text">Large jump link</span>
+        </a>
+      codenotes:
+        - .jump-link__large
+      notes:
+        - "18px font-size, compared to the default of 16px"
+    - name: .jump-link__<icon> (modifier)
+      markup: |
+        <a class="jump-link jump-link__right" href="#">
+            <span class="jump-link_text">Jump link using the right icon from cf-icons</span>
+        </a>
+      codenotes:
+        - .jump-link__<icon>
+      notes:
+        - ".jump-link extends .icon-link, so all that is needed to add an icon
+           to a jump link is to add a modifier with the icon's name."
+    - name: .jump-link__before (modifier)
+      markup: |
+        <a class="jump-link jump-link__left jump-link__before" href="#">
+            <span class="jump-link_text">Jump link with icon on left</span>
+        </a>
+      codenotes:
+        - .jump-link__<icon>.jump-link__before
+      notes:
+        - "Jump links can also have icons before the text, like icon links."
+    - name: .jump-link__bg (modifier)
+      markup: |
+        <a class="jump-link jump-link__bg" href="#">
+            <span class="jump-link_text">Jump link with grey background and
+                solid borders on small screens</span>
+        </a>
+      codenotes:
+        - .jump-link__bg
+  tags:
+    - cf-typography
+*/
+
+.jump-link {
+    .webfont-medium();
+    font-size: unit(16px / @base-font-size-px, em);
+
+    .icon-link();
+
+    &__large {
+        font-size: unit(18px / @base-font-size-px, em);
+    }
+
+    .respond-to-max(599px, {
+        .block-link();
+
+        &:after {
+            position: absolute;
+            margin-bottom: -0.625em;
+            right: 0;
+            bottom: 50%;
+            text-align: right;
+        }
+        
+        &__before {
+            padding-left: 1.25em;
+            
+            &:before {
+                position: absolute;
+                margin-bottom: -0.625em;
+                bottom: 50%;
+                left: 0;
+            }
+        }
+
+        &_text {
+            border-bottom-width: 0;
+        }
+
+        &__bg {
+            background: @jump-link__bg;
+            border: solid @jump-link__bg-border;
+            border-width: 1px 0;
+            padding: unit(10px / @base-font-size-px, em) 1.25em unit(10px / @base-font-size-px, em) 1em;
+            &:after {
+                right: 1em;
+            }
+            &:before {
+                left: unit(10px / @base-font-size-px, em);
+            }
+        }
+    });
+}
+
+
+/* topdoc
+  name: Block link
+  family: cf-typography
+  patterns:
+    - name: .block-link
+      markup: |
+        <a class="block-link" href="#">
+            Default block link
+        </a>
+      codenotes:
+        - .block-link
+      notes:
+        - "Convert a standard inline link to a block-level element with padding,
+           background, and borders."
+        - "Primarily used within a max-width 599px media query (see .jump-link
+           and .list__links)."
+  tags:
+    - cf-typography
+*/
+
+.block-link {
+    @link-text: #fff;
+    box-sizing: border-box;
+    display: block;
+    padding: unit(10px / @base-font-size-px, em) 1.25em unit(10px / @base-font-size-px, em) 0;
+    border: dotted @link-text;
+    border-width: 1px 0;
+    margin-right: 0;
+    // 100% width is needed when .jump-link is applied to a <button>.
+    width: 100%;
+    text-align: left;
+}
+
+
+/* topdoc
+  name: Unstyled list modifier
+  family: cf-typography
+  patterns:
+    - name: Default example
+      markup: |
+        <ul class="list list__unstyled">
+            <li class="list_item">
+                <a class="list_link">List item 1</a>
+            </li>
+            <li class="list_item">
+                <a class="list_link">List item 2</a>
+            </li>
+            <li class="list_item">
+                <a class="list_link">List item 3</a>
+            </li>
+        </ul>
+      codenotes:
+        - .list.list__unstyled
+  tags:
+    - cf-typography
+*/
+
+.list__unstyled {
+    padding-left: 0;
+    list-style-type: none;
+
+    // This is needed for dd elements.
+    .list_item {
+        margin-left: 0;
+    }
+}
+
+
+/* topdoc
+  name: Spaced list modifier
+  family: cf-typography
+  patterns:
+    - name: Default example
+      markup: |
+        <ul class="list list__spaced">
+            <li class="list_item">
+                <a class="list_link">List item 1</a>
+            </li>
+            <li class="list_item">
+                <a class="list_link">List item 2</a>
+            </li>
+            <li class="list_item">
+                <a class="list_link">List item 3</a>
+            </li>
+        </ul>
+      codenotes:
+        - .list.list__spaced
+  tags:
+    - cf-typography
+*/
+
+.list__spaced {
+    .list_item + .list_item {
+        margin-top: unit(24px / @base-font-size-px, em);
+    }
+}
+
+
+/* topdoc
+  name: Spaced list item modifier
+  family: cf-typography
+  patterns:
+    - name: Default example
+      markup: |
+        <ul class="list">
+            <li class="list_item">
+                <a class="list_link">List item 1</a>
+            </li>
+            <li class="list_item">
+                <a class="list_link">List item 2</a>
+            </li>
+            <li class="list_item list_item__spaced">
+                <a class="list_link">List item 3</a>
+            </li>
+            <li class="list_item">
+                <a class="list_link">List item 4</a>
+            </li>
+        </ul>
+  tags:
+    - cf-typography
+*/
+
+.list_item__spaced {
+    margin-top: unit(24px / @base-font-size-px, em);
+}
+
+
+/* topdoc
+  name: Horizontal list modifier
+  family: cf-typography
+  patterns:
+    - name: Default example
+      markup: |
+        <ul class="list list__horizontal">
+            <li class="list_item">
+                <a class="list_link">List item 1</a>
+            </li>
+            <li class="list_item">
+                <a class="list_link">List item 2</a>
+            </li>
+            <li class="list_item">
+                <a class="list_link">List item 3</a>
+            </li>
+        </ul>
+  tags:
+    - cf-typography
+*/
+
+.list__horizontal {
+    padding-left: 0;
+
+    .list_item {
+        .u-inline-block();
+    }
+
+    .list_item {
+        // Assuming a natural space of 4px between inline block items
+        // then the space between would be 8px (4px natural + 4px added).
+        margin-right: unit(4px / @base-font-size-px, em);
+        margin-left: 0;
+    }
+}
+
+
+/* topdoc
+  name: Icon list modifier
+  family: cf-typography
+  notes:
+    - "Set up a list with icons on the left, in place of bullets."
+    - "Will need some more work to allow lines to wrap."
+  patterns:
+    - name: Default example
+      markup: |
+        <ul class="list list__icons">
+            <li class="list_item">
+                <span class="cf-icon cf-icon-email list_icon"></span>
+                List item 1
+            </li>
+            <li class="list_item">
+                <span class="cf-icon cf-icon-phone list_icon"></span>
+                List item 1
+            </li>
+            <li class="list_item">
+                <span class="cf-icon cf-icon-fax list_icon"></span>
+                List item 1
+            </li>
+        </ul>
+  tags:
+    - cf-typography
+*/
+
+.list__icons {
+    .list__unstyled();
+
+    .list_icon {
+        width: 1.5em;
+        text-align: center;
+    }
+}
+
+
+/* topdoc
+ name: Custom bullet mixin
+ family: cf-typography
+ patterns:
+   - name: Custom bullet
+     codenotes:
+       - ".custom-bullet(@text, @color, @offset, @size, @font, @type)"
+     notes:
+       - "Displays custom bullets to the left of specified elements as :before pseudo elements."
+       - "To use, pass this mixin values for the bullet to be displayed: text, color, font size,
+          and offset (distance away from the parent element the bullet should appear). 
+          Font family parameter is optional and defaults to inherited."
+       - "Bullets are absolutely positioned outside of their parent's flow,
+          so they will not receive certain properties applied to the parent 
+          (borders, text-decoration, etc)."
+       - "By default, custom bullets hang outside of their parent's content box 
+          (in the margin or padding if there is any). If you want the bullets to align 
+          with the left boundary of the parent's content box, give the parent a 
+          left margin value equal to the offset."
+ tags:
+   - cf-typography
+*/
+
+.custom-bullet(@text, @color, @offset, @size, @font:inherit) {
+    list-style-type: none;
+    position: relative;
+
+	&:before {
+		content: @text;
+		font-family: @font;
+		font-size: @size;
+		color: @color;
+		line-height: 1;
+		position: absolute;
+ 		left: -@offset;
+	}
+}
+
+
+/* topdoc
+ name: Branded list modifier
+ family: cf-typography
+ patterns:
+   - name: Branded list
+     markup: |
+       <ul class="list__branded">
+           <li>First item</li>
+           <li>Second item</li>
+           <li>Third item</li>
+       </ul>
+     codenotes:
+       - ".list__branded"
+     notes:
+       - "Uses .custom-bullet mixin to generate custom main-brand-color square bullets."
+ tags:
+   - cf-typography
+*/
+
+.list__branded {
+    li, 
+    .list_item {
+        @font-size: 22px;
+        @offset: unit(19px / @font-size, em);
+        @size: unit(22px / @base-font-size-px, em);
+        .webfont-regular();
+        .custom-bullet(@text:"\25AA", @color: @list__branded-bullet, @offset: @offset, @size: @size);
+    }
+}
+
+
+/* topdoc
+  name: EOF
+  eof: true
+*/
+/* ==========================================================================
+   Capital Framework
    Core Less file
    ========================================================================== */
 
 
 @import (less) "normalize.css";
 @import (less) "normalize-legacy-addon.css";
-@import (less) "cf-brand-colors.less";
 @import (less) "cf-vars.less";
 @import (less) "cf-media-queries.less";
 @import (less) "cf-utilities.less";
