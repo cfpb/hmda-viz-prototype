@@ -9020,6 +9020,16 @@ tbody > tr:nth-child(2n+1) > td {
 .breadcrumb a {
   text-transform: uppercase;
 }
+.wrapper,
+.content_wrapper {
+  padding: 0;
+  max-width: 100%;
+}
+.footer {
+  background: #fff;
+  display: block;
+  padding: 0;
+}
 /* set to allow printing of the tables */
 @media print {
   .wrapper,
