@@ -330,7 +330,9 @@ class build_JSON(AD_report):
 		cursor.execute(SQL,)
 		for row in cursor.fetchall():
 			#self.msa_names[row['geoid_msa']] = str(row['name10'])[:-3].replace(" ", "-")
-			self.msa_names[row['geoid_msa']] = str(row['name10'])
+			#print row['name10']
+			cut_point =str(row['name10'])[::-1].find(' ')+1
+			self.msa_names[row['geoid_msa']] = str(row['name10'])[:-cut_point].replace(' ', '-')
 		#return msa_names
 
 	def get_state_name(self, abbrev):
