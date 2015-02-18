@@ -18,7 +18,7 @@ class report_selector(AD_report):
 		with open(infile, 'r') as csvfile:
 			msareader = csv.DictReader(csvfile, delimiter = ',', quotechar='"')
 			for row in msareader:
-				for key in row:
+				for key in row: #does this happen on every row? how to stop in the first row?
 					self.report_list[key] = []
 
 	def get_report_lists(self, infile):
