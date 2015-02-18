@@ -24,7 +24,8 @@ agg = agg() #aggregation functions for all tables
 selector = selector() #holds lists of reports to be generated for each MSA
 cur = connection.connect() #creates cursor object connected to HMDAPub2012 sql database, locally hosted postgres
 selector.get_report_lists('MSAinputs.csv') #fills the dictionary of lists of reports to be generated
-
+build31.set_msa_names(cur)
+build32.set_msa_names(cur)
 for MSA in selector.report_list['A 3-1']:
 	location = (MSA,)
 	SQL = queries.count_rows_2012() #get query text for getting count of loans for the MSA
@@ -45,9 +46,9 @@ for MSA in selector.report_list['A 3-1']:
 
 #move this section into the library
 	#aggregate/year/state name/msa name/ table number.json
-	MSA_name = 'council bluffs' #should be table31['msa']['name']
+	print build31.msa_names[MSA]
 	#need to split the paths for each report
-	path = "json"+"/"+table31['type']+"/"+table31['year']+"/"+build31.get_state_name(table31['msa']['state']).lower()+"/"+MSA_name + "/" +table31['table']#set path for writing the JSON file by geography
+	path = "json"+"/"+table31['type']+"/"+table31['year']+"/"+build31.get_state_name(table31['msa']['state']).lower()+"/"+build31.msa_names[MSA].replace(' ', '-') + "/" +table31['table']#set path for writing the JSON file by geography
 	if not os.path.exists(path): #check if path exists
 		os.makedirs(path) #if path not present, create it
 	build31.write_JSON('3_1.json', table31, path)
@@ -74,7 +75,7 @@ for MSA in selector.report_list['A 3-2']: #loop over all MSAs that had report 3-
 
 	#move this section into the library
 	MSA_name = 'council bluffs' # temp until sql table is modified: should be table31['msa']['name']
-	path = "json"+"/"+table32['type']+"/"+table32['year']+"/"+build32.get_state_name(table32['msa']['state']).lower()+"/"+MSA_name + "/" + table32['table'] #directory path to store JSON object
+	path = "json"+"/"+table32['type']+"/"+table32['year']+"/"+build32.get_state_name(table32['msa']['state']).lower()+"/"+build32.msa_names[MSA].replace(' ', '-') + "/" + table32['table'] #directory path to store JSON object
 	if not os.path.exists(path): #check if path exists
 		os.makedirs(path) #if path not present, create it
 	build32.write_JSON('3_2.json', table32, path) #write the json into the correct path

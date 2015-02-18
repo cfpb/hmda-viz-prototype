@@ -322,6 +322,17 @@ class build_JSON(AD_report):
 			'MA':'Massachusetts', 'MI':'Michigan', 'MN': 'Minnesota', 'MS': 'Mississippi', 'MO': 'Missouri', 'MT': 'Montana', 'NE':'Nebraska', 'NV':'Nevada', 'NH':'New Hampshire', 'NJ':'New Jersey', 'NM':'New Mexico',
 			'NY':'New York', 'NC':'North Carolina', 'ND':'North Dakota', 'OH': 'Ohio', 'OK': 'Oklahoma', 'OR':'Oregon','PA':'Pennsylvania', 'RI':'Rhode Island', 'SC':'South Carolina',
 			'SD':'South Dakota', 'TN':'Tensessee', 'TX':'Texas', 'UT':'Utah', 'VT':'Vermont', 'VA':'Virginia', 'WA': 'Washington', 'WV':'West Virginia', 'WI':'Wisconsin', 'WY':'Wyoming', 'PR':'Puerto Rico', 'VI':'Virgin Islands'}
+		self.msa_names = {}
+
+	def set_msa_names(self, cursor):
+		SQL = '''SELECT DISTINCT name10, geoid_msa, geoid_metdiv
+			FROM tract_to_cbsa_2012'''
+		cursor.execute(SQL,)
+		for row in cursor.fetchall():
+			#self.msa_names[row['geoid_msa']] = str(row['name10'])[:-3].replace(" ", "-")
+			self.msa_names[row['geoid_msa']] = str(row['name10'])
+		#return msa_names
+
 	def get_state_name(self, abbrev):
 		state_names = {'AL': 'Alabama', 'AK': 'Alaska', 'AZ': 'Arizona', 'AR': 'Arkansas', 'CA': 'California', 'CO': 'Colorado', 'CT': 'Connecticut', 'DE':'Delaware',
 				'FL':'Florida', 'GA':'Georgia', 'HI':'Hawaii', 'ID':'Idaho', 'IL':'Illinois', 'IN':'Indiana', 'IA':'Iowa', 'KS':'Kansas', 'KY': 'Kentucky', 'LA':'Louisiana', 'ME': 'Maine', 'MD':'Maryland',
@@ -343,7 +354,7 @@ class build_JSON(AD_report):
 		self.container['desc'] = desc
 		self.container['year'] = inputs['year']
 		self.msa['id'] = MSA
-		#self.msa['name'] = inputs['MSA name'] #need to add MSA names to a database or read-in file
+		self.msa['name'] = self.msa_names[MSA] #need to add MSA names to a database or read-in file
 		self.msa['state'] = inputs['state name']
 		self.msa['state_name'] = self.state_names[self.msa['state']]
 		self.container['msa'] = self.msa
