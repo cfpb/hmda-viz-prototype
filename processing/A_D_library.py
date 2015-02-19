@@ -519,16 +519,19 @@ class MSA_info(AD_report):
 			#determine income bracket for use as an index in the JSON object
 			if inputs['percent MSA income'] < 50:
 				return 0
-			elif inputs['percent MSA income'] <= 79:
+			elif inputs['percent MSA income'] <= 80:
 				return 1
-			elif inputs['percent MSA income'] <= 99:
+			elif inputs['percent MSA income'] <= 100:
 				return 2
-			elif inputs['percent MSA income'] <= 119:
+			elif inputs['percent MSA income'] <= 120:
 				return 3
 			elif inputs['percent MSA income'] >= 120:
 				return 4
 			else:
 				print 'error setting percent MSA income bracket for index'
+				print inputs['income']
+				print inputs['MSA median income']
+				print inputs['percent MSA income']
 
 	def minority_percent(self, inputs):
 		#set index codes for minority population percent
