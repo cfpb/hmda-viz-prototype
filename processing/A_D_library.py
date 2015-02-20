@@ -12,7 +12,6 @@ class AD_report(object):
 class report_selector(AD_report):
 	def __init__(self):
 		self.report_list = {} #fill this dictionary with the headers in the CSV as dict keys
-		#how best inialize lists to avoid errors? key errors?
 
 	def initalize_lists(self, infile):
 		with open(infile, 'r') as csvfile:
@@ -93,8 +92,8 @@ class parse_inputs(AD_report):
 		a_race = []
 		co_race = []
 		#fill race lists from the demographics class
-		a_race = demo.co_race_list(row)
-		co_race = demo.a_race_list(row)
+		a_race = demo.a_race_list(row) #put applicant race codes in a list 0-5, 0 is blank field
+		co_race = demo.co_race_list(row) #put co-applicant race codes in a list 0-5, 0 is blank field
 
 		#add data elements to dictionary
 		self.inputs['a ethn'] = row['applicantethnicity'] #ethnicity of the applicant
@@ -111,6 +110,7 @@ class parse_inputs(AD_report):
 		self.inputs['MSA median income'] = row['ffiec_median_family_income']
 		self.inputs['minority percent'] = row['minoritypopulationpct']
 		self.inputs['tract to MSA income'] = row['tract_to_msa_md_income']
+		self.inputs['sequence'] = row['sequencenumber']
 		self.inputs['tract income index'] = MSA_index.tract_to_MSA_income(self.inputs)
 		self.inputs['income bracket'] = MSA_index.app_income_to_MSA(self.inputs)
 		self.inputs['minority percent'] = MSA_index.minority_percent(self.inputs)
@@ -131,6 +131,7 @@ class parse_inputs(AD_report):
 		#add data elements to dictionary
 		self.inputs['rate spread'] = row['ratespread']
 		self.inputs['lien status'] = row['lienstatus']
+		self.inputs['loan value'] = float(row['loanamount']) #loan value rounded to the nearest thousand
 		self.inputs['hoepa flag'] = int(row['hoepastatus'])
 		self.inputs['purchaser'] = int(row['purchasertype']) -1 #adjust purchaser index down 1 to match JSON
 		self.inputs['year'] = row['asofdate']
@@ -145,17 +146,6 @@ class demographics(AD_report):
 	#holds all the functions for setting race, minority status, and ethnicity for FFIEC A&D reports
 	#this class is called when the parse_t31 function is called by the controller
 
-	#set race_code to integers for use in JSON structure lists
-	#American Indian/Alaska Native or 1 indexed at 0
-	#Asian or 2 indexed at 1
-	#Black or 3 indexed at 2
-	#Pacific Islander or 4 indexed at 3
-	#White or 5 indexed at 4
-	#Not Provided indexed at 5
-	#Not Applicable indexed at 6
-	#2 minority indexed 7
-	#joint indexed 8
-	#not reported indexed 9
 	def rate_spread_index(self, rate):
 		if rate == 'NA   ' or rate == '     ':
 			return 8
@@ -215,32 +205,37 @@ class demographics(AD_report):
 		else:
 			print 'minority status not set'
 
-	#this function outputs a number code for ethnicity: 0 - hispanic or latino, 1 - not hispanic/latino
-	#2 - joint (1 applicant hispanic/latino 1 not), 3 - ethnicity not available
 	def set_loan_ethn(self, inputs):
+		#this function outputs a number code for ethnicity: 0 - hispanic or latino, 1 - not hispanic/latino
+		#2 - joint (1 applicant hispanic/latino 1 not), 3 - ethnicity not available
 		#if both ethnicity fields are blank report not available(3)
+
+
 		if inputs['a ethn'] == ' ' and inputs['co ethn'] == ' ':
 			return  3 #set to not available
 
+		#inputs['a ethn'] = int(inputs['a ethn']) #convert to integer for logic comparisons
+		#inputs['co ethn'] = int(inputs['co ethn']) # convert to integer for logic comparisions
+
 		#determine if the loan is joint hispanic/latino and non hispanic/latino(2)
-		elif inputs['a ethn'] == '1' and inputs['co ethn'] != '1':
+		elif inputs['a ethn'] == '1' and inputs['co ethn'] == '2':
 			return  2 #set to joint
-		elif inputs['a ethn'] != '1' and inputs['co ethn'] == '1':
+		elif inputs['a ethn'] == '2' and inputs['co ethn'] == '1':
 			return  2 #set to joint
 
 		#determine if loan is of hispanic ethnicity (appplicant is hispanic/latino, no co applicant info or co applicant also hispanic/latino)
-		elif inputs['a ethn'] == '1' and inputs['co ethn'] == '1':
+		elif inputs['a ethn'] == '1' and inputs['co ethn'] == '1': #both applicants hispanic
 			return  0
-		elif inputs['a ethn'] == '1' and (inputs['co ethn'] == ' ' or inputs['co ethn'] == '3' or inputs['co ethn'] == '4' or inputs['co ethn']== '5'):
+		elif inputs['a ethn'] == '1' and (inputs['co ethn'] == ' ' or inputs['co ethn'] == '3' or inputs['co ethn'] == '4' or inputs['co ethn']== '5'): #applicant hispanic, co-applicant blank, not available or no co applicant
 			return  0
-		elif (inputs['a ethn'] == ' ' or inputs['a ethn'] == '3' or inputs['a ethn'] == '4' or inputs['a ethn'] == '5') and inputs['co ethn'] == '1':
+		elif (inputs['a ethn'] == ' ' or inputs['a ethn'] == '3' or inputs['a ethn'] == '4' or inputs['a ethn'] == '5') and inputs['co ethn'] == '1': #co applicant hispanic, applicant blank, not available
 			return  0
 		#determine if loan is not hispanic or latino
-		elif inputs['a ethn'] == '2' and inputs['co ethn'] != '1':
+		elif inputs['a ethn'] == '2' and inputs['co ethn'] != '1': #applicant not hispanic (positive entry), co applicant not hispanic (all other codes)
 			return  1
-		elif inputs['a ethn'] != '1' and inputs['co ethn'] == '2':
+		elif inputs['a ethn'] != '1' and inputs['co ethn'] == '2': #co applicant not hispanic (positive entry), applicant not hispanic (all other codes)
 			return  1
-		elif (inputs['a ethn'] == '3' or inputs['a ethn'] == '4') and (inputs['co ethn'] != '1' and inputs['co ethn'] != '2'):
+		elif (inputs['a ethn'] == '3' or inputs['a ethn'] == '4') and (inputs['co ethn'] != '1' and inputs['co ethn'] != '2'): #no applicant ethnicity information, co applicant did not mark ethnicity positively
 			return  3
 		else:
 			print "error setting ethnicity"
@@ -273,27 +268,28 @@ class demographics(AD_report):
 		#if the entry is 'joint' then the loan is aggregated as 'joint'
 		#create a single race item instead of a list to use in comparisons to build aggregates
 
+
 		if inputs['joint status'] == True:
-			return  8
+			return  6
 		#determine if the loan will be filed as 'two or more minority races'
 		#if two minority races are listed, the loan is 'two or more minority races'
 		#if any combination of two or more race fields are minority then 'two or more minority races'
 		elif self.minority_count(a_race) > 1:
-			return  7
+			return  5
 
-		#if only the first race field is used, use the first filed
+		#if only the first race field is used, use the first field unless it is blank
 		elif a_race[0] != 0 and a_race[1] == 0 and a_race[2] == 0 and a_race[3] == 0 and a_race[4] == 0:
 			return  a_race[0] #if only one race is reported, and joint status and minority status are false, set race to first race
 
 		elif a_race[0] == 0 and a_race[1] == 0 and a_race[2] == 0 and a_race[3] == 0 and a_race[4] == 0:
-			return  9 #if all race fields are blank, set race to 'not reported'
+			return  7 #if all race fields are blank, set to 7 'not available'
 
 		else:
 			#does this code work for minority co applicants with non-minority applicants?
 			for i in range(1,5):
 				if i in a_race: #check if a minority race is present in the race array
-					return  a_race[0]
-					if a_race[0] == 5:
+					return  a_race[i]
+					if a_race[0] == 5: #is this section of code necessary?
 						for code in a_race:
 							if code < 5 and code != 0: #if first race is white, but a minority race is reported, set race to the first minority reported
 								return  code
@@ -311,8 +307,8 @@ class build_JSON(AD_report):
 		self.table32_categories = ['pricinginformation', 'points', 'hoepa']
 		self.table32_rates = ['1.50 - 1.99', '2.00 - 2.49', '2.50 - 2.99', '3.00 - 3.49', '3.50 - 4.49', '4.50 - 5.49', '5.50 - 6.49', '6.5 or more', 'mean', 'median']
 		self.purchaser_names = ['Fannie Mae', 'Ginnie Mae', 'Freddie Mac', 'Farmer Mac', 'Private Securitization', 'Commercial bank, savings bank or association', 'Life insurance co., credit union, finance co.', 'Affiliate institution', 'Other']
-		self.race_names = ['American Indian/Alaska Native', 'Asian', 'Black or African American', 'Native Hawaiian or Pacific Islander', 'White', '2 or more minority races', 'Joint', 'Not Provided', 'Not Applicable', 'No co-applicant']
-		self.ethnicity_names = ['Hispanic or Latino', 'Not Hispanic or Latino', 'Not provided', 'Not applicable', 'No co-applicant']
+		self.race_names = ['American Indian/Alaska Native', 'Asian', 'Black or African American', 'Native Hawaiian or Other Pacific Islander', 'White', '2 or more minority races', 'Joint (White/Minority Race', 'Not Available']
+		self.ethnicity_names = ['Hispanic or Latino', 'Not Hispanic or Latino', 'Joint (Hispanic or Latino/Not Hispanic or Latino', 'Ethnicity Not Available']
 		self.minority_statuses = ['White Non-Hispanic', 'Others, Including Hispanic']
 		self.applicant_income_bracket = ['Less than 50% of MSA/MD median', '50-79% of MSA/MD median', '80-99% of MSA/MD median', '100-119% of MSA/MD median', '120% or more of MSA/MD median', 'income not available']
 		self.tract_pct_minority = ['Less than 10% minority', '10-19% minority', '20-49% minority', '50-79% minority', '80-100% minority']
@@ -322,7 +318,32 @@ class build_JSON(AD_report):
 			'MA':'Massachusetts', 'MI':'Michigan', 'MN': 'Minnesota', 'MS': 'Mississippi', 'MO': 'Missouri', 'MT': 'Montana', 'NE':'Nebraska', 'NV':'Nevada', 'NH':'New Hampshire', 'NJ':'New Jersey', 'NM':'New Mexico',
 			'NY':'New York', 'NC':'North Carolina', 'ND':'North Dakota', 'OH': 'Ohio', 'OK': 'Oklahoma', 'OR':'Oregon','PA':'Pennsylvania', 'RI':'Rhode Island', 'SC':'South Carolina',
 			'SD':'South Dakota', 'TN':'Tensessee', 'TX':'Texas', 'UT':'Utah', 'VT':'Vermont', 'VA':'Virginia', 'WA': 'Washington', 'WV':'West Virginia', 'WI':'Wisconsin', 'WY':'Wyoming', 'PR':'Puerto Rico', 'VI':'Virgin Islands'}
-		self.msa_names = {}
+		self.msa_names = {} #holds the msa names for use in directory paths when writing JSON objects
+		self.state_msa_list = {} #holds a dictionary of msas in state by id number and name
+
+	def msas_in_state(self, cursor):
+		SQL = '''SELECT DISTINCT name10, geoid_msa
+			FROM tract_to_cbsa_2012
+			WHERE geoid_msa != '     ' and stateabbr = %s;'''
+		state_list = ['WA', 'WI', 'WV', 'FL', 'WY', 'NH', 'NJ', 'NM', 'NC', 'ND', 'NE', 'NY', 'RI', 'NV', 'CO', 'CA', 'GA', 'CT', 'OK', 'OH', 'KS', 'SC', 'KY', 'OR', 'SD', 'DE', 'HI', 'PR', 'TX', 'LA', 'TN', 'PA', 'VA', 'VI', 'AK', 'AL', 'AR', 'VT', 'IL', 'IN', 'IA', 'AZ', 'ID', 'ME', 'MD', 'MA', 'UT', 'MO', 'MN', 'MI', 'MT', 'MS']
+		state_msas = {}
+		for state in state_list:
+			location = (state,) #convert state to tuple list for psycopg2
+			cursor.execute(SQL, location) #execute SQL statement against server
+			msas = [] #holding list for MSA id and names for entire state
+			for row in cursor.fetchall():
+				temp = {} #holding dict for single MSA id and name
+				cut_point =str(row['name10'])[::-1].find(' ')+1 #find index to remove state abbreviations
+				temp['id'] = row['geoid_msa'] #set MSA number to id in dict
+				temp['name'] = str(row['name10'])[:-cut_point].replace(' ', '-').upper()
+				msas.append(temp)
+			state_msas['msa-mds'] = msas
+			name = 'msa-mds.json'
+			path = 'json'+"/"+'aggregate'+"/"+'2012'+"/"+self.state_names[state].lower()
+			print path
+			if not os.path.exists(path): #check if path exists
+				os.makedirs(path) #if path not present, create it
+			self.write_JSON(name, state_msas, path)
 
 	def set_msa_names(self, cursor):
 		SQL = '''SELECT DISTINCT name10, geoid_msa, geoid_metdiv
@@ -345,7 +366,7 @@ class build_JSON(AD_report):
 
 	def table_headers(self, table_num): #holds table descriptions
 		if table_num == '3-1':
-			return 'Loans sold. By characteristics of borrower and census tract in which property is located and by type of purchaser (includes originations and purchased loans).'
+			return 'Loans sold, by characteristics of borrower and census tract in which property is located and by type of purchaser (includes originations and purchased loans),'
 		elif table_num =='3-2':
 			return 'Pricing Information for First and Junior Lien Loans Sold by Type of Purchaser (includes originations only).'
 
@@ -364,8 +385,8 @@ class build_JSON(AD_report):
 
 	def set_purchasers(self):
 		purchasers = []
-		purchaser_names = ['Fannie Mae', 'Ginnie Mae', 'Freddie Mac', 'Farmer Mac', 'Private Securitization', 'Commercial bank, savings bank or association', 'Life insurance co., credit union, finance co.', 'Affiliate institution', 'Other']
-		for item in purchaser_names:
+		#purchaser_names = ['Fannie Mae', 'Ginnie Mae', 'Freddie Mac', 'Farmer Mac', 'Private Securitization', 'Commercial bank, savings bank or association', 'Life insurance co., credit union, finance co.', 'Affiliate institution', 'Other']
+		for item in self.purchaser_names:
 			purchasersholding = OrderedDict({})
 			purchasersholding['name'] = "{}".format(item)
 			purchasersholding['count'] = 0
@@ -375,8 +396,8 @@ class build_JSON(AD_report):
 
 	def set_purchasers32(self):
 		purchasers = []
-		purchaser_names = ['Fannie Mae', 'Ginnie Mae', 'Freddie Mac', 'Farmer Mac', 'Private Securitization', 'Commercial bank, savings bank or association', 'Life insurance co., credit union, finance co.', 'Affiliate institution', 'Other']
-		for item in purchaser_names:
+		#purchaser_names = ['Fannie Mae', 'Ginnie Mae', 'Freddie Mac', 'Farmer Mac', 'Private Securitization', 'Commercial bank, savings bank or association', 'Life insurance co., credit union, finance co.', 'Affiliate institution', 'Other']
+		for item in self.purchaser_names:
 			purchasersholding = OrderedDict({})
 			purchasersholding['name'] = "{}".format(item)
 			purchasersholding['first lien count'] = 0
@@ -389,8 +410,8 @@ class build_JSON(AD_report):
 	def set_purchasers32v2(self): #this function is used for the 'mean' and 'median' sections as they do not have loan value sections
 		from collections import OrderedDict
 		purchasers = []
-		purchaser_names = ['Fannie Mae', 'Ginnie Mae', 'Freddie Mac', 'Farmer Mac', 'Private Securitization', 'Commercial bank, savings bank or association', 'Life insurance co., credit union, finance co.', 'Affiliate institution', 'Other']
-		for item in purchaser_names:
+		#purchaser_names = ['Fannie Mae', 'Ginnie Mae', 'Freddie Mac', 'Farmer Mac', 'Private Securitization', 'Commercial bank, savings bank or association', 'Life insurance co., credit union, finance co.', 'Affiliate institution', 'Other']
+		for item in self.purchaser_names:
 			purchasersholding = OrderedDict({})
 			purchasersholding['name'] = "{}".format(item)
 			purchasersholding['first lien'] = 0
@@ -431,8 +452,7 @@ class build_JSON(AD_report):
 		return spreads
 
 	def table_31_borrower_characteristics(self, characteristic, container_name, item_list):
-		#container_name = characteristic.lower()+'s'
-		#borrowercharacteristics = []
+		container = {'ethnicities':'ethnicity', 'minoritystatuses':'minoritystatus', 'races':'race', 'applicantincomes':'applicantincome'}
 		Header = True
 		top = OrderedDict({})
 		for item in item_list:
@@ -441,7 +461,7 @@ class build_JSON(AD_report):
 				top['characteristic'] = characteristic
 				top[container_name] = []
 			Header = False
-			holding[container_name[:-1]] = "{}".format(item)
+			holding[container[container_name]] = "{}".format(item)
 			holding['purchasers'] = self.set_purchasers()
 			top[container_name].append(holding)
 		self.borrowercharacteristics.append(top)
@@ -529,9 +549,6 @@ class MSA_info(AD_report):
 				return 4
 			else:
 				print 'error setting percent MSA income bracket for index'
-				print inputs['income']
-				print inputs['MSA median income']
-				print inputs['percent MSA income']
 
 	def minority_percent(self, inputs):
 		#set index codes for minority population percent
@@ -547,7 +564,6 @@ class MSA_info(AD_report):
 			return  3
 		else:
 			print "minority percent index not set"
-			print "value of", float(inputs['minority percent'])
 
 	def tract_to_MSA_income(self, inputs):
 		#set census MSA income level: low, moderatde, middle, upper
@@ -579,7 +595,7 @@ class queries(AD_report):
 			coapplicantrace1, coapplicantrace2, coapplicantrace3, coapplicantrace4, coapplicantrace5,
 			applicantethnicity, co_applicantethnicity, applicantincome, hoepastatus,
 			purchasertype, loanamount, asofdate, statecode, statename, countycode, countyname,
-			ffiec_median_family_income, minoritypopulationpct, tract_to_msa_md_income
+			ffiec_median_family_income, minoritypopulationpct, tract_to_msa_md_income, sequencenumber
 			FROM hmdapub2012 WHERE msaofproperty = %s;'''
 		return SQL
 
@@ -587,7 +603,7 @@ class queries(AD_report):
 		#create an index in PostGres to speed up this query
 		#set the SQL statement to select the needed fields to aggregate loans for the table_3 JSON structure
 		SQL = '''SELECT
-			censustractnumber,  ratespread, lienstatus, hoepastatus,
+			censustractnumber,  ratespread, lienstatus, loanamount, hoepastatus,
 			purchasertype, asofdate, statecode, statename, countycode, countyname
 			FROM hmdapub2012 WHERE msaofproperty = %s;'''
 		return SQL
@@ -607,7 +623,7 @@ class aggregate(AD_report):
 	#aggregates loans by race category
 		container['borrowercharacteristics'][0]['races'][inputs['race']]['purchasers'][inputs['purchaser']]['count'] += 1
 		container['borrowercharacteristics'][0]['races'][inputs['race']]['purchasers'][inputs['purchaser']]['value'] += inputs['loan value']
-			#print container['borrowercharacteristics'][0]['races'][inputs['race']]['purchasers'][inputs['purchaser']]['count'], "count after"
+
 	def by_ethnicity(self, container, inputs):
 		container['borrowercharacteristics'][1]['ethnicities'][inputs['ethnicity']]['purchasers'][inputs['purchaser']]['count'] += 1
 		container['borrowercharacteristics'][1]['ethnicities'][inputs['ethnicity']]['purchasers'][inputs['purchaser']]['value'] += int(inputs['loan value'])
@@ -673,8 +689,13 @@ class aggregate(AD_report):
 			elif inputs['lien status'] == '2':
 				container['hoepa']['purchasers'][inputs['purchaser']]['junior lien count'] +=1
 				container['hoepa']['purchasers'][inputs['purchaser']]['junior lien value'] +=int(inputs['loan value'])
+			elif inputs['lien status'] == '3':
+				pass #this space reserved for loans not secured by liens
+			elif inputs['lien status'] == '4':
+				pass #this space reserved for purchased loans 'not applicable'
 			else:
 				print "invalid hoepa flag, oops"
+
 		elif inputs['hoepa flag'] == 2:
 			pass
 		else:
@@ -719,7 +740,7 @@ class aggregate(AD_report):
 			elif inputs['purchaser'] == 7 and  inputs['lien status'] == '2':
 				inputs['Affiliate institution junior rates'] += float(inputs['rate spread'])
 			elif inputs['purchaser'] == 8 and  inputs['lien status'] == '2':
-				inputs['Other purchaser junior rates'] += float(inputs['rate spread'])
+				inputs['Other junior rates'] += float(inputs['rate spread'])
 
 		else:
 			pass

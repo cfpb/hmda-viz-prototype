@@ -18,16 +18,19 @@ from A_D_library import report_selector as selector
 parsed = parse() #for parsing inputs from rows
 connection = connect() #connects to the DB
 
-build32 = build() #table 3-2 build object
+
 queries = queries() #query text for all tables
 agg = agg() #aggregation functions for all tables
 selector = selector() #holds lists of reports to be generated for each MSA
 cur = connection.connect() #creates cursor object connected to HMDAPub2012 sql database, locally hosted postgres
 selector.get_report_lists('MSAinputs.csv') #fills the dictionary of lists of reports to be generated
 
-build32.set_msa_names(cur)
+#build_msa = build()
+#build_msa.msas_in_state(cur) #creates a list of all MSAs in each state and places the file in the state's folder
 
-for MSA in selector.report_list['A 3-1']:
+MSAS= ['36540']
+for MSA in MSAS: #selector.report_list['A 3-1']:
+
 	build31 = build() #table 3-1 build object
 	build31.set_msa_names(cur)
 	location = (MSA,)
@@ -50,14 +53,16 @@ for MSA in selector.report_list['A 3-1']:
 			agg.build_report_31(table31, parsed.inputs) #aggregate loan files into the JSON structure
 
 
-		path = "json"+"/"+table31['type']+"/"+table31['year']+"/"+build31.get_state_name(table31['msa']['state']).lower()+"/"+build31.msa_names[MSA].replace(' ', '-') + "/" +table31['table']#set path for writing the JSON file by geography
+		path = "json"+"/"+table31['type']+"/"+table31['year']+"/"+build31.get_state_name(table31['msa']['state']).lower()+"/"+build31.msa_names[MSA].replace(' ', '-').lower() + "/" +table31['table']#set path for writing the JSON file by geography
 		if not os.path.exists(path): #check if path exists
 			os.makedirs(path) #if path not present, create it
-		build31.write_JSON('3_1.json', table31, path)
+		build31.write_JSON('3-1.json', table31, path)
 	else:
 		pass
 '''
 for MSA in selector.report_list['A 3-2']: #loop over all MSAs that had report 3-2 flagged for creation
+	build32 = build() #table 3-2 build object
+	build32.set_msa_names(cur)
 	location = (MSA,)
 	SQL = queries.count_rows_2012()
 	cur.execute(SQL, location) #Query the database for number of rows in the LAR in the MSA
@@ -80,9 +85,10 @@ for MSA in selector.report_list['A 3-2']: #loop over all MSAs that had report 3-
 
 		#move this section into the library
 		MSA_name = 'council bluffs' # temp until sql table is modified: should be table31['msa']['name']
-		path = "json"+"/"+table32['type']+"/"+table32['year']+"/"+build32.get_state_name(table32['msa']['state']).lower()+"/"+build32.msa_names[MSA].replace(' ', '-') + "/" + table32['table'] #directory path to store JSON object
+		path = "json"+"/"+table32['type']+"/"+table32['year']+"/"+build32.get_state_name(table32['msa']['state']).lower()+"/"+build32.msa_names[MSA].replace(' ', '-').lower() + "/" + table32['table'] #directory path to store JSON object
 		if not os.path.exists(path): #check if path exists
 			os.makedirs(path) #if path not present, create it
-		build32.write_JSON('3_2.json', table32, path) #write the json into the correct path
-'''
+		build32.write_JSON('3-2.json', table32, path) #write the json into the correct path
 
+
+'''
