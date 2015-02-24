@@ -9508,6 +9508,19 @@ tbody > tr:nth-child(2n+1) > td {
   td {
     padding: .25em;
   }
+
+  table {
+    -fs-table-paginate: paginate;
+  }
+
+  thead {
+    display: table-header-group;
+    position: fixed;
+  }
+
+  tbody {
+    display: table-row-group;
+  }
 }
 
 .intro-message {

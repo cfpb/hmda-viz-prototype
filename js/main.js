@@ -10660,12 +10660,12 @@ $( document ).ready(function() {
   console.log(theCSV);
 
   $('#csv').click(function() {
-    if (navigator.msSaveBlob) { // IE 10+
+    /*if (navigator.msSaveBlob) { // IE 10+
       var blob = new Blob([theCSV],{type: 'text/csv;charset=utf-8;'});
       navigator.msSaveBlob(blob, 'download.csv');
-    } else {
+    } else {*/
       window.open('data:text/csv;charset=utf-8,' + escape(theCSV));
-    }
+   // }
   });
 });
 /* mustache */
