@@ -76,15 +76,15 @@
 					{{/purchasers}}
 				</tr>
 			{{/minoritystatuses}}
-			{{#applicantincome}}
+			{{#applicantincomes}}
 				<tr>
-					<td class="characteristic">{{applicantincomes}}</td>
+					<td class="characteristic">{{applicantincome}}</td>
 					{{#purchasers}}
 					<td>{{count}}</td>
 					<td>{{value}}</td>
 					{{/purchasers}}
 				</tr>
-			{{/applicantincome}}
+			{{/applicantincomes}}
 		{{/borrowercharacteristics}}
 
 		<tr>
@@ -94,7 +94,7 @@
 			<tr>
 				<td class="characteristic" colspan="19"><h5>{{characteristic}}</h5></td>
 			</tr>
-			{{#tractpctminority}}
+			{{#tractpctminorities}}
 				<tr>
 					<td class="characteristic">{{tractpctminority}}</td>
 					{{#purchasers}}
@@ -102,8 +102,8 @@
 					<td>{{value}}</td>
 					{{/purchasers}}
 				</tr>
-			{{/tractpctminority}}
-			{{#incomelevel}}
+			{{/tractpctminorities}}
+			{{#incomelevels}}
 				<tr>
 					<td class="characteristic">{{incomelevel}}</td>
 					{{#purchasers}}
@@ -111,7 +111,7 @@
 					<td>{{value}}</td>
 					{{/purchasers}}
 				</tr>
-			{{/incomelevel}}
+			{{/incomelevels}}
 		{{/censuscharacteristics}}
 
 		<tr>
