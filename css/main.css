@@ -8924,6 +8924,36 @@ Header
    HMDA Viz Prototype - additional style to Capital Framework
    HMDA Viz Less file
    ========================================================================== */
+.beta-header {
+  background-color: #ffecd1;
+  font-family: "AvenirNextLTW01-Regular", Arial, sans-serif;
+  font-style: normal;
+  font-weight: normal;
+  padding: 20px;
+}
+.beta-header em,
+.beta-header i {
+  font-family: "AvenirNextLTW01-Italic", Arial, sans-serif;
+  font-style: italic;
+  font-weight: normal;
+}
+.lt-ie9 .beta-header em,
+.lt-ie9 .beta-header i {
+  font-style: normal !important;
+}
+.beta-header strong,
+.beta-header b {
+  font-family: "AvenirNextLTW01-Demi", Arial, sans-serif;
+  font-style: normal;
+  font-weight: bold;
+}
+.lt-ie9 .beta-header strong,
+.lt-ie9 .beta-header b {
+  font-weight: normal !important;
+}
+.beta-header p {
+  margin: 0;
+}
 .header nav {
   display: block;
 }
@@ -9050,7 +9080,6 @@ tbody > tr:nth-child(2n+1) > td {
   }
   thead {
     display: table-header-group;
-    position: fixed;
   }
   tbody {
     display: table-row-group;
