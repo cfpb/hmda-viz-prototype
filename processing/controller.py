@@ -26,7 +26,7 @@ selector.get_report_lists('MSAinputs.csv') #fills the dictionary of lists of rep
 
 build_msa = build() #instantiate the build object
 build_msa.msas_in_state(cur) #creates a list of all MSAs in each state and places the file in the state's folder
-'''
+
 for MSA in selector.report_list['A 3-1']:
 	build31 = build() #table 3-1 build object
 	build31.set_msa_names(cur)
@@ -34,8 +34,10 @@ for MSA in selector.report_list['A 3-1']:
 	SQL = queries.count_rows_2012() #get query text for getting count of loans for the MSA
 	cur.execute(SQL, location) #ping the database for numbers!
 	count = int(cur.fetchone()[0]) #get count of rows for the MSA
+	#add md numbers to input file list of msas, check name against last 5 digits if msa name has 0 rows or errors on check
+	print count, "LAR rows in MSA %s, for report 3-1" %MSA
 	if count > 0:
-		print count, 'LAR rows in MSA %s, for report 3-1' %MSA
+		#print count, 'LAR rows in MSA %s, for report 3-1' %MSA
 		SQL = queries.table_3_1() #set query text to table 3-1
 		cur.execute(SQL, location) #execute the query in postgres
 
@@ -57,7 +59,7 @@ for MSA in selector.report_list['A 3-1']:
 		build31.jekyll_for_msa(path2) #create and write jekyll file to the msa path
 	else:
 		pass #do nothing if no LAR rows exist for the MSA
-'''
+
 for MSA in selector.report_list['A 3-2']: #loop over all MSAs that had report 3-2 flagged for creation
 	build32 = build() #table 3-2 build object
 	build32.set_msa_names(cur)
