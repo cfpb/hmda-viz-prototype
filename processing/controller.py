@@ -26,7 +26,7 @@ selector.get_report_lists('MSAinputs2013.csv') #fills the dictionary of lists of
 
 build_msa = build() #instantiate the build object
 build_msa.msas_in_state(cur, selector) #creates a list of all MSAs in each state and places the file in the state's folder
-
+print selector.report_list['year']
 for MSA in selector.report_list['A 3-1']:
 	build31 = build() #table 3-1 build object
 	build31.set_msa_names(cur)

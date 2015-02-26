@@ -115,9 +115,10 @@ class build_JSON(AD_report):
 		self.msa['state_name'] = self.state_names[self.msa['state']]
 		self.container['msa'] = self.msa
 		return self.container
-	def set_gender(self):
+	def set_gender(self, end_point):
 		genders = ['male', 'female', 'joint (male/female']
-		pass
+		for item in genders:
+			end_point[item] = 0
 
 	def set_purchasers(self, holding_list): #this function sets the purchasers section of report 3-2
 		purchasers = []
@@ -213,13 +214,11 @@ class build_JSON(AD_report):
 		with open(os.path.join(path, name), 'w') as outfile: #writes the JSON structure to a file for the path named by report's header structure
 			json.dump(data, outfile, indent=4, ensure_ascii = False)
 
-build = build_JSON()
-build1 = build_JSON()
-build.table_32_builder()
-build1.table_31_builder()
+build4 = build_JSON()
+build4.table_31_builder()
 
-build1.print_JSON()
-#build.print_JSON()
+
+build4.print_JSON()
 
 
 
