@@ -214,9 +214,9 @@ class build_JSON(AD_report):
 		with open(os.path.join(path, name), 'w') as outfile: #writes the JSON structure to a file for the path named by report's header structure
 			json.dump(data, outfile, indent=4, ensure_ascii = False)
 
-build4 = build_JSON()
+build4 = build_JSON() #container object
 build4.table_31_builder()
-
+for race in build4
 
 build4.print_JSON()
 
