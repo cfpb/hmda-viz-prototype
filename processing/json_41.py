@@ -120,6 +120,28 @@ class build_JSON(AD_report):
 		for item in genders:
 			end_point[item] = 0
 
+	def table_41_builder(self):
+		disposition_status = []
+		categories = []
+		for race in self.race_names:
+			holding = OrderedDict({})
+			holding['race']= "{}".format(race) #race is overwritten each pass of the loop (keys are unique in dictionaries)
+
+			#holding['race']
+			#holding['purchasers']  = self.set_purchasers(['first lien count', 'first lien value', 'junior lien count', 'junior lien value']) #purchasers is overwritten each pass in the holding dictionary
+			disposition_status.append(race)
+		self.container['races'] = disposition_status
+
+		top = OrderedDict({})
+		for item in self.race_names:
+			holding = OrderedDict({})
+			top['races'] = []
+			holding[container[container_name]] = "{}".format(item)
+			holding['purchasers'] = self.set_purchasers(['count', 'value'])
+			top[container_name].append(holding)
+		self.borrowercharacteristics.append(top)
+		return self.container
+
 	def set_purchasers(self, holding_list): #this function sets the purchasers section of report 3-2
 		purchasers = []
 		for item in self.purchaser_names:
@@ -177,7 +199,7 @@ class build_JSON(AD_report):
 		categories = ['No reported pricing data', 'reported pricing data']
 		for cat in categories:
 			holding = OrderedDict({})
-			holding['pricing']= "{}".format(cat) #race is overwritten each pass of the loop (keys are unique in dictionaries)
+			holding['pricing']= "{}".format(cat)
 			holding['purchasers']  = self.set_purchasers(['first lien count', 'first lien value', 'junior lien count', 'junior lien value']) #purchasers is overwritten each pass in the holding dictionary
 			pricinginformation.append(holding)
 		self.container['pricinginformation'] = pricinginformation
@@ -214,12 +236,8 @@ class build_JSON(AD_report):
 		with open(os.path.join(path, name), 'w') as outfile: #writes the JSON structure to a file for the path named by report's header structure
 			json.dump(data, outfile, indent=4, ensure_ascii = False)
 
-build4 = build_JSON()
-build4.table_31_builder()
 
+build4 =  build_JSON()
 
+table41 = build4.table_41_builder()
 build4.print_JSON()
-
-
-
-

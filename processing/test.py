@@ -1,18 +1,21 @@
-import csv
-report_list = {} #fill this dictionary with the headers in the CSV as dict keys
+import json
+from collections import OrderedDict
+race_names = ['American Indian/Alaska Native', 'Asian', 'Black or African American', 'Native Hawaiian or Other Pacific Islander', 'White', '2 or more minority races', 'Joint (White/Minority Race', 'Not Available']
+races = []
+race_list = []
+container = OrderedDict({})
+def set_gender(self, end_point):
+    genders = ['male', 'female', 'joint (male/female']
+    for item in genders:
+        end_point[item] = 0
 
-def get_report_lists():
-    #file has MSA list (entire population)
-    #flag for aggregate
-    #flag for each aggregate report (1 print, 0 don't print)
-    #list of FIs in MSA to generate reports for?
-    #open the controller file that tells which reports to generate
-    with open('MSAinputs.csv', 'r') as csvfile:
-        msareader = csv.DictReader(csvfile, delimiter = ',', quotechar='"')
-        for row in msareader:
-            for key in row:
-                report_list[key] = []
+for race in race_names:
+    holding = OrderedDict({})
+    holding['race'] = "{}".format(race)
+    races.append(holding)
 
+container['races'] = races
+for i in range(0,len(container['races'])):
+    container['races'][i]['dispositions'] = []
 
-get_report_lists()
-print report_list
+print json.dumps(container, indent=4)
