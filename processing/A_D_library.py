@@ -286,7 +286,7 @@ class build_JSON(AD_report):
 		self.race_names = ['American Indian/Alaska Native', 'Asian', 'Black or African American', 'Native Hawaiian or Other Pacific Islander', 'White', '2 or more minority races', 'Joint (White/Minority Race', 'Not Available']
 		self.ethnicity_names = ['Hispanic or Latino', 'Not Hispanic or Latino', 'Joint (Hispanic or Latino/Not Hispanic or Latino', 'Ethnicity Not Available']
 		self.minority_statuses = ['White Non-Hispanic', 'Others, Including Hispanic']
-		self.applicant_income_bracket = ['Less than 50% of MSA/MD median', '50-79% of MSA/MD median', '80-99% of MSA/MD median', '100-119% of MSA/MD median', '120% or more of MSA/MD median', 'income not available']
+		self.applicant_income_bracket = ['Less than 50% of MSA/MD median', '50-79% of MSA/MD median', '80-99% of MSA/MD median', '100-119% of MSA/MD median', '120% or more of MSA/MD median', 'Income not available']
 		self.tract_pct_minority = ['Less than 10% minority', '10-19% minority', '20-49% minority', '50-79% minority', '80-100% minority']
 		self.tract_income = ['Low income', 'Moderate income', 'Middle income', 'Upper income']
 		self.state_names = {'AL': 'Alabama', 'AK': 'Alaska', 'AZ': 'Arizona', 'AR': 'Arkansas', 'CA': 'California', 'CO': 'Colorado', 'CT': 'Connecticut', 'DE':'Delaware',
@@ -347,15 +347,26 @@ class build_JSON(AD_report):
 			f.write(file_text)
 
 	def set_msa_names(self, cursor):
-		#this function sets the MSA names for MSA numbers
+		#this function sets the MSA names for MSA numbers by creating a dictionary of msa id numbers and names
 		#MSA names are stored with state abbreviations appended at the end, these must be removed
 		#set SQL text for query
-		SQL = '''SELECT DISTINCT name, geoid_msa, geoid_metdiv
-			FROM tract_to_cbsa_2010'''
-		cursor.execute(SQL,) #execute query against server
+
+		SQL = '''SELECT DISTINCT name, geoid_msa
+			FROM tract_to_cbsa_2012'''
+		cursor.execute(SQL) #execute query against server
 		for row in cursor.fetchall():
-			cut_point =str(row['name'])[::-1].find(' ')+1 #find the point where the state abbreviations begin
-			self.msa_names[row['geoid_msa']] = str(row['name'])[:-cut_point].replace(' ', '-')
+			cut_point =str(row['name'])[::-1].find(' ')+1 #find the point where the state abbreviations begins
+			self.msa_names[row['geoid_msa']] = str(row['name'])[:-cut_point].replace(' ', '-') #set dictionary value name to an MSA name that has no spaces or state abbreviations
+
+		#select MD names from the database
+		SQL = '''SELECT DISTINCT name, geoid_metdiv
+			FROM tract_to_cbsa_2012
+			WHERE geoid_metdiv != '          ';'''
+		cursor.execute(SQL)
+		for row in cursor.fetchall(): #get all MDs from the tract to cbsa database and put them into a dictionary of MSA names
+			cut_point = str(row['name'])[::-1].find(' ')+1 #find the point where the state abbreviation begins
+			#use only last 5 digits of the geoid_metdiv number
+			self.msa_names[row['geoid_metdiv'][5:10]] = str(row['name'])[:-cut_point].replace(' ', '-') #set dictionary value name to an MD name that has no spaces or state abbreviations
 
 	def get_state_name(self, abbrev):
 		#this is a dictionary function that returns a state name when given the abbreviation
@@ -368,7 +379,7 @@ class build_JSON(AD_report):
 
 	def table_headers(self, table_num): #holds table descriptions
 		if table_num == '3-1':
-			return 'Loans sold, by characteristics of borrower and census tract in which property is located and by type of purchaser (includes originations and purchased loans),'
+			return 'Loans sold, by characteristics of borrower and of census tract in which property is located and by type of purchaser (includes originations and purchased loans)'
 		elif table_num =='3-2':
 			return 'Pricing Information for First and Junior Lien Loans Sold by Type of Purchaser (includes originations only).'
 

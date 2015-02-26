@@ -39,6 +39,8 @@ for MSA in selector.report_list['A 3-1']:
 
 	cur.execute(SQL, location) #ping the database for numbers!
 	count = int(cur.fetchone()[0]) #get count of rows for the MSA
+	#add md numbers to input file list of msas, check name against last 5 digits if msa name has 0 rows or errors on check
+	print count, "LAR rows in MSA %s, for report 3-1" %MSA
 	if count > 0:
 		print count, 'LAR rows in MSA %s, for report 3-1, in %s' %(MSA, selector.report_list['year'][1])
 		if selector.report_list['year'][1] == '2013': #use the year on the first line of the MSA inputs file to set the query
