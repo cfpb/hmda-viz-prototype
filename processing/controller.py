@@ -23,14 +23,9 @@ selector = selector() #holds lists of reports to be generated for each MSA
 
 cur = connection.connect() #creates cursor object connected to HMDAPub2012 sql database, locally hosted postgres
 selector.get_report_lists('MSAinputs2013.csv') #fills the dictionary of lists of reports to be generated
-build41 = build()
-table41 = build41.table_41_builder()
-print table41
-build41.write_JSON('41_test.json', table41, '/users/roellk/desktop/')
 
 build_msa = build() #instantiate the build object
 build_msa.msas_in_state(cur, selector) #creates a list of all MSAs in each state and places the file in the state's folder
-print selector.report_list['year']
 for MSA in selector.report_list['A 3-1']:
 	build31 = build() #table 3-1 build object
 	build31.set_msa_names(cur)
@@ -44,7 +39,7 @@ for MSA in selector.report_list['A 3-1']:
 	cur.execute(SQL, location) #ping the database for numbers!
 	count = int(cur.fetchone()[0]) #get count of rows for the MSA
 	#add md numbers to input file list of msas, check name against last 5 digits if msa name has 0 rows or errors on check
-	print count, "LAR rows in MSA %s, for report 3-1" %MSA
+	#print count, "LAR rows in MSA %s, for report 3-1" %MSA
 	if count > 0:
 		print count, 'LAR rows in MSA %s, for report 3-1, in %s' %(MSA, selector.report_list['year'][1])
 		if selector.report_list['year'][1] == '2013': #use the year on the first line of the MSA inputs file to set the query
@@ -87,7 +82,7 @@ for MSA in selector.report_list['A 3-2']: #loop over all MSAs that had report 3-
 	count = int(cur.fetchone()[0]) #get tuple of LAR rows in MSA
 	#end = int(count[0]) #convert the tuple to int for use in the control loop
 	if count > 0:
-		print count, 'LAR rows in MSA %s, for report 3-2' %(MSA, selector.report_list['year'][1])
+		print count, 'LAR rows in MSA %s, for report 3-2, in %s' %(MSA, selector.report_list['year'][1])
 		if selector.report_list['year'][1] == '2013':
 			SQL = queries.table_3_2_2013() #set query text for table 3-2
 		elif selector.report_list['year'][1] == '2012':

@@ -14,7 +14,7 @@ class report_selector(AD_report):
 		self.report_list = {} #fill this dictionary with the headers in the CSV as dict keys
 
 	def initalize_lists(self, infile):
-		with open(infile, 'r') as csvfile:
+		with open(infile, 'rU') as csvfile:
 			msareader = csv.DictReader(csvfile, delimiter = ',', quotechar='"')
 			for row in msareader:
 				for key in row:
@@ -25,7 +25,7 @@ class report_selector(AD_report):
 		#list of FIs in MSA to generate reports for?
 		#open the controller file that tells which reports to generate
 		self.initalize_lists(infile) #initialize all reports lists
-		with open(infile, 'r') as csvfile:
+		with open(infile, 'rU') as csvfile:
 			msareader = csv.DictReader(csvfile, delimiter = ',', quotechar='"')
 			for row in msareader:
 				for key in row: # scan through keys to check all report flags in a row
@@ -122,7 +122,7 @@ class parse_inputs(AD_report):
 		self.inputs['minority count'] = demo.minority_count(a_race) #determines if the number of minority races claimed by the applicant is 2 or greater
 
 	def parse_t32(self, row): #takes a row of tuples from a table 3-1 query and parses it to the inputs dictionary
-		#parsing inputs for report 3.1
+		#parsing inputs for report 3-1
 		#self.inputs will be returned to for use in the aggregation function
 
 		demo=demographics() #instantiate class to set loan variables
@@ -140,6 +140,46 @@ class parse_inputs(AD_report):
 		self.inputs['county code'] = row['countycode'] #3 digit county code
 		self.inputs['county name'] = row['countyname'] #full county name
 		self.inputs['rate spread index'] = demo.rate_spread_index(self.inputs['rate spread']) #index of the rate spread for use in the JSON structure
+
+	def parse_t41(self, row):
+		#parsing inputs for report 4-1
+
+		MSA_index = MSA_info() #contains functions for census tract characteristics
+		demo=demographics() #contains functions for borrower characteristics
+
+		a_race = [] #race lists will hold 5 integers with 0 replacing a blank entry
+		co_race = [] #race lists will hold 5 integers with 0 replacing a blank entry
+		#fill race lists from the demographics class
+		a_race = demo.a_race_list(row) #put applicant race codes in a list 0-5, 0 is blank field
+		co_race = demo.co_race_list(row) #put co-applicant race codes in a list 0-5, 0 is blank field
+		#add data elements to dictionary
+		self.inputs['a ethn'] = row['applicantethnicity'] #ethnicity of the applicant
+		self.inputs['co ethn'] = row['coapplicantethnicity'] #ethnicity of the co-applicant
+		self.inputs['income'] = row['applicantincome'] #relied upon income rounded to the nearest thousand
+
+		self.inputs['loan value'] = float(row['loanamount']) #loan value rounded to the nearest thousand
+		self.inputs['year'] = row['asofdate'] #year or application or origination
+		self.inputs['state code'] = row['statecode'] #two digit state code
+		self.inputs['state name'] = row['statename'] #two character state abbreviation
+		self.inputs['census tract'] = row['censustractnumber'] # this is currently the 7 digit tract used by the FFIEC, it includes a decimal prior to the last two digits
+		self.inputs['county code'] = row['countycode'] #3 digit county code
+		self.inputs['county name'] = row['countyname'] #full text county name
+		self.inputs['MSA median income'] = row['ffiec_median_family_income'] #median income for the tract/msa
+		self.inputs['minority percent'] = row['minoritypopulationpct'] #%of population that is minority
+		self.inputs['tract to MSA income'] = row['tract_to_msa_md_income'] #ratio of tract to msa/md income
+		self.inputs['sequence'] = row['sequencenumber'] #the sequence number of the loan, used for checking errors
+		self.inputs['tract income index'] = MSA_index.tract_to_MSA_income(self.inputs) #sets the applicant income to an index number for aggregation
+		self.inputs['income bracket'] = MSA_index.app_income_to_MSA(self.inputs) #sets the applicant income as low med upper, high compared to msa income
+		self.inputs['minority percent'] = MSA_index.minority_percent(self.inputs) #sets the minority population percent to an index for aggregation
+		self.inputs['tract income index'] = MSA_index.tract_to_MSA_income(self.inputs) #sets the tract to msa income ratio to an index for aggregation
+		self.inputs['app non white flag'] = demo.set_non_white(a_race) #flags the applicant as non-white if true, used in setting minority status and race
+		self.inputs['co non white flag'] = demo.set_non_white(co_race) #flags the co applicant as non-white if true, used in setting minority status and race
+		self.inputs['joint status'] = demo.set_joint(self.inputs) #requires non white status flags be set prior to running set_joint
+		self.inputs['minority status'] = demo.set_minority_status(self.inputs) #requires non white flags be set prior to running set_minority_status
+		self.inputs['ethnicity'] = demo.set_loan_ethn(self.inputs) #requires  ethnicity be parsed prior to running set_loan_ethn
+		self.inputs['race'] = demo.set_race(self.inputs, a_race, co_race) #requires joint status be set prior to running set_race
+		self.inputs['minority count'] = demo.minority_count(a_race) #determines if the number of minority races claimed by the applicant is 2 or greater
+
 
 class demographics(AD_report):
 	#holds all the functions for setting race, minority status, and ethnicity for FFIEC A&D reports
@@ -317,6 +357,18 @@ class build_JSON(AD_report):
 				temp['name'] = str(row['name'])[:-cut_point].replace(' ', '-').upper()
 				msas.append(temp)
 
+			SQL = '''SELECT DISTINCT name, geoid_metdiv
+				FROM tract_to_cbsa_2010
+				WHERE geoid_metdiv != '          ' and state = %s;'''
+
+			cursor.execute(SQL, location)
+			for row in cursor.fetchall():
+				temp = {}
+				cut_point = str(row['name'])[::-1].find(' ')+1 #find last space before state names
+				temp['id'] = row['geoid_metdiv'][5:] #take only last 5 digits from metdiv number
+				temp['name'] = str(row['name'])[:-cut_point].replace(' ', '-').upper() #remove state abbrevs
+				msas.append(temp) #add one metdiv name to the list of names
+
 			state_msas['msa-mds'] = msas
 			name = 'msa-mds.json'
 			#this year path uses the year from the input file
@@ -358,6 +410,8 @@ class build_JSON(AD_report):
 		for row in cursor.fetchall():
 			cut_point =str(row['name'])[::-1].find(' ')+1 #find the point where the state abbreviations begin
 			self.msa_names[row['geoid_msa']] = str(row['name'])[:-cut_point].replace(' ', '-')
+			geoid_metdiv = str(row['geoid_metdiv'])[5:]
+			self.msa_names[geoid_metdiv] = str(row['name'])[:-cut_point].replace(' ', '_')
 
 	def get_state_name(self, abbrev):
 		#this is a dictionary function that returns a state name when given the abbreviation
@@ -371,8 +425,10 @@ class build_JSON(AD_report):
 	def table_headers(self, table_num): #holds table descriptions
 		if table_num == '3-1':
 			return 'Loans sold, by characteristics of borrower and census tract in which property is located and by type of purchaser (includes originations and purchased loans),'
-		elif table_num =='3-2':
+		elif table_num == '3-2':
 			return 'Pricing Information for First and Junior Lien Loans Sold by Type of Purchaser (includes originations only).'
+		elif table_num == '4-1':
+			return 'Disposition of applications for FHA, FSA/RHS, and VA home-purchase loans, 1- tp 4-family and manufactured home dwellings, by race, ethnicity, gender and income of applicant'
 
 	def set_header(self, inputs, MSA, desc, table_type, table_num): #sets the header information of the JSON object
 		msa = OrderedDict({})
@@ -382,23 +438,22 @@ class build_JSON(AD_report):
 		self.container['year'] = inputs['year']
 		self.msa['id'] = MSA
 		self.msa['name'] = self.msa_names[MSA] #need to add MSA names to a database or read-in file
-		self.msa['state'] = inputs['state name']
+		self.msa['state'] = inputs['state name'] #this is the two digit abbreviation
 		self.msa['state_name'] = self.state_names[self.msa['state']]
 		self.container['msa'] = self.msa
 		return self.container
 
-	def set_dispositions(self, holding_list): #this function sets the purchasers section of report 3-2
+	def set_41_dispositions(self, end_points): #builds the dispositions of applications section of report 4-1 JSON
 		dispositions = []
-		for item in self.dispositions_list:
+		for item in disp_list:
 			dispositionsholding = OrderedDict({})
 			dispositionsholding['disposition'] = "{}".format(item)
-			for thing in holding_list:
-				dispositionsholding[thing] = 0
-				dispositions.append(dispositionsholding)
 			dispositions.append(dispositionsholding)
+			for point in end_points:
+				dispositionsholding[point] = 0
 		return dispositions
 
-	def set_gender(self):
+	def set_41_gender(self): #creates the gender portion of table 4-1 JSON
 		genders = []
 		gendersholding = {}
 		for gender in self.gender_list:
@@ -407,20 +462,60 @@ class build_JSON(AD_report):
 			genders.append(holding)
 		gendersholding['genders'] = genders
 		for j in range(0, len(self.gender_list)):
-			gendersholding['genders'][j]['dispositions'] = self.set_dispositions(['count', 'value'])
+			gendersholding['genders'][j]['dispositions'] = self.set_41_dispositions(['count', 'value'])
 		return gendersholding
 
-	def table_41_builder(self):
+	def set_41_races():
 		races = []
-		for race in self.race_names:
+		for race in race_names:
 			holding = OrderedDict({})
 			holding['race'] = "{}".format(race)
 			races.append(holding)
-		self.container['races'] = races
-		for i in range(0,len(self.container['races'])):
-			self.container['races'][i]['dispositions'] = self.set_dispositions(['count', 'value'])
-			self.container['races'][i]['genders'] = self.set_gender()
-		return self.container
+		container['races'] = races
+		for i in range(0,len(container['races'])):
+			container['races'][i]['dispositions'] = set_41_dispositions(holding_list)
+			container['races'][i]['genders'] = set_41_gender()
+
+	def set_41_ethnicity():
+		ethnicities = []
+		for ethnicity in ethnicity_names:
+			holding = OrderedDict({})
+			holding['ethnicity'] = "{}".format(ethnicity)
+			ethnicities.append(holding)
+		container['ethnicities'] = ethnicities
+		for i in range(0, len(container['ethnicities'])):
+			container['ethnicities'][i]['dispositions'] = set_41_dispositions(holding_list)
+			container['ethnicities'][i]['genders'] = set_41_gender()
+
+	def set_41_minority():
+		minoritystatuses = []
+		for status in minority_statuses:
+			holding = OrderedDict({})
+			holding['minoritystatus'] = "{}".format(status)
+			minoritystatuses.append(holding)
+		container['minoritystatuses'] = minoritystatuses
+		for i in range(0, len(container['minoritystatuses'])):
+			container['minoritystatuses'][i]['dispositions'] = set_41_dispositions(holding_list)
+			container['minoritystatuses'][i]['genders'] = set_41_gender()
+
+	def set_41_incomes():
+		applicantincomes = []
+		for income in applicant_income_bracket:
+			holding = OrderedDict({})
+			holding['incomes'] = "{}".format(income)
+			applicantincomes.append(holding)
+		container['incomes'] = applicantincomes
+		for i in range(0, len(container['incomes'])):
+			container['incomes'][i]['dispositions'] = set_41_dispositions(holding_list)
+			container['incomes'][i]['dispositions'] = set_41_gender()
+		container['total'] = set_dispositions(holding_list)
+
+	def table_41_builder(self): #builds the table 4-1 JSON object: disposition of application by race and gender
+		set_41_races()
+		set_41_ethnicity()
+		set_41_minority()
+		set_41_incomes()
+
 	def set_purchasers(self, holding_list): #this function sets the purchasers section of report 3-2
 		purchasers = []
 		for item in self.purchaser_names:
