@@ -279,14 +279,13 @@ class build_JSON(AD_report):
 		self.msa = OrderedDict({}) #stores header information for the MSA
 		self.borrowercharacteristics = [] #holds all the borrower lists and dicts for the borrower portion of table 3-1
 		self.censuscharacteristics = [] #censuscharacteristics holds all the lists and dicts for the census portion of the table 3-1
-		#self.table32_cats = ['No reported pricing data', 'pricing data reported', 'percentage points above average prime offer rate: only includes loans with APR above the threshold', 'mean', 'median', 'HOEPA Loans']
 		self.table32_categories = ['pricinginformation', 'points', 'hoepa']
 		self.table32_rates = ['1.50 - 1.99', '2.00 - 2.49', '2.50 - 2.99', '3.00 - 3.49', '3.50 - 4.49', '4.50 - 5.49', '5.50 - 6.49', '6.5 or more', 'mean', 'median']
 		self.purchaser_names = ['Fannie Mae', 'Ginnie Mae', 'Freddie Mac', 'Farmer Mac', 'Private Securitization', 'Commercial bank, savings bank or association', 'Life insurance co., credit union, finance co.', 'Affiliate institution', 'Other']
 		self.race_names = ['American Indian/Alaska Native', 'Asian', 'Black or African American', 'Native Hawaiian or Other Pacific Islander', 'White', '2 or more minority races', 'Joint (White/Minority Race', 'Not Available']
 		self.ethnicity_names = ['Hispanic or Latino', 'Not Hispanic or Latino', 'Joint (Hispanic or Latino/Not Hispanic or Latino', 'Ethnicity Not Available']
 		self.minority_statuses = ['White Non-Hispanic', 'Others, Including Hispanic']
-		self.applicant_income_bracket = ['Less than 50% of MSA/MD median', '50-79% of MSA/MD median', '80-99% of MSA/MD median', '100-119% of MSA/MD median', '120% or more of MSA/MD median', 'Income not available']
+		self.applicant_income_bracket = ['Less than 50% of MSA/MD median', '50-79% of MSA/MD median', '80-99% of MSA/MD median', '100-119% of MSA/MD median', '120% or more of MSA/MD median', 'income not available']
 		self.tract_pct_minority = ['Less than 10% minority', '10-19% minority', '20-49% minority', '50-79% minority', '80-100% minority']
 		self.tract_income = ['Low income', 'Moderate income', 'Middle income', 'Upper income']
 		self.state_names = {'AL': 'Alabama', 'AK': 'Alaska', 'AZ': 'Arizona', 'AR': 'Arkansas', 'CA': 'California', 'CO': 'Colorado', 'CT': 'Connecticut', 'DE':'Delaware',
@@ -296,13 +295,15 @@ class build_JSON(AD_report):
 			'SD':'South Dakota', 'TN':'Tennessee', 'TX':'Texas', 'UT':'Utah', 'VT':'Vermont', 'VA':'Virginia', 'WA': 'Washington', 'WV':'West Virginia', 'WI':'Wisconsin', 'WY':'Wyoming', 'PR':'Puerto Rico', 'VI':'Virgin Islands'}
 		self.msa_names = {} #holds the msa names for use in directory paths when writing JSON objects
 		self.state_msa_list = {} #holds a dictionary of msas in state by id number and name
-
+		self.dispositions_list = ['Applications Received', 'Loans Originated', 'Aps. Approved But Not Accepted', 'Aplications Denied', 'Applications Withdrawn', 'Files Closed For Incompleteness']
+		self.gender_list = ['Male', 'Female', 'Joint (Male/Female)']
 	def msas_in_state(self, cursor, selector):
 		#this function builds a list of MSA numbers and names in each state
 		#set sql query text to pull MSA names for each MSA number
 		SQL = '''SELECT DISTINCT name, geoid_msa
 			FROM tract_to_cbsa_2010
 			WHERE geoid_msa != '     ' and state = %s;'''
+
 		state_list = ['WA', 'WI', 'WV', 'FL', 'WY', 'NH', 'NJ', 'NM', 'NC', 'ND', 'NE', 'NY', 'RI', 'NV', 'CO', 'CA', 'GA', 'CT', 'OK', 'OH', 'KS', 'SC', 'KY', 'OR', 'SD', 'DE', 'HI', 'PR', 'TX', 'LA', 'TN', 'PA', 'VA', 'VI', 'AK', 'AL', 'AR', 'VT', 'IL', 'IN', 'IA', 'AZ', 'ID', 'ME', 'MD', 'MA', 'UT', 'MO', 'MN', 'MI', 'MT', 'MS']
 		state_msas = {}
 		for state in state_list:
@@ -315,6 +316,7 @@ class build_JSON(AD_report):
 				temp['id'] = row['geoid_msa'] #set MSA number to id in dict
 				temp['name'] = str(row['name'])[:-cut_point].replace(' ', '-').upper()
 				msas.append(temp)
+
 			state_msas['msa-mds'] = msas
 			name = 'msa-mds.json'
 			#this year path uses the year from the input file
@@ -347,26 +349,15 @@ class build_JSON(AD_report):
 			f.write(file_text)
 
 	def set_msa_names(self, cursor):
-		#this function sets the MSA names for MSA numbers by creating a dictionary of msa id numbers and names
+		#this function sets the MSA names for MSA numbers
 		#MSA names are stored with state abbreviations appended at the end, these must be removed
 		#set SQL text for query
-
-		SQL = '''SELECT DISTINCT name, geoid_msa
-			FROM tract_to_cbsa_2012'''
-		cursor.execute(SQL) #execute query against server
+		SQL = '''SELECT DISTINCT name, geoid_msa, geoid_metdiv
+			FROM tract_to_cbsa_2010'''
+		cursor.execute(SQL,) #execute query against server
 		for row in cursor.fetchall():
-			cut_point =str(row['name'])[::-1].find(' ')+1 #find the point where the state abbreviations begins
-			self.msa_names[row['geoid_msa']] = str(row['name'])[:-cut_point].replace(' ', '-') #set dictionary value name to an MSA name that has no spaces or state abbreviations
-
-		#select MD names from the database
-		SQL = '''SELECT DISTINCT name, geoid_metdiv
-			FROM tract_to_cbsa_2012
-			WHERE geoid_metdiv != '          ';'''
-		cursor.execute(SQL)
-		for row in cursor.fetchall(): #get all MDs from the tract to cbsa database and put them into a dictionary of MSA names
-			cut_point = str(row['name'])[::-1].find(' ')+1 #find the point where the state abbreviation begins
-			#use only last 5 digits of the geoid_metdiv number
-			self.msa_names[row['geoid_metdiv'][5:10]] = str(row['name'])[:-cut_point].replace(' ', '-') #set dictionary value name to an MD name that has no spaces or state abbreviations
+			cut_point =str(row['name'])[::-1].find(' ')+1 #find the point where the state abbreviations begin
+			self.msa_names[row['geoid_msa']] = str(row['name'])[:-cut_point].replace(' ', '-')
 
 	def get_state_name(self, abbrev):
 		#this is a dictionary function that returns a state name when given the abbreviation
@@ -379,7 +370,7 @@ class build_JSON(AD_report):
 
 	def table_headers(self, table_num): #holds table descriptions
 		if table_num == '3-1':
-			return 'Loans sold, by characteristics of borrower and of census tract in which property is located and by type of purchaser (includes originations and purchased loans)'
+			return 'Loans sold, by characteristics of borrower and census tract in which property is located and by type of purchaser (includes originations and purchased loans),'
 		elif table_num =='3-2':
 			return 'Pricing Information for First and Junior Lien Loans Sold by Type of Purchaser (includes originations only).'
 
@@ -396,64 +387,49 @@ class build_JSON(AD_report):
 		self.container['msa'] = self.msa
 		return self.container
 
-	def set_purchasers(self): #sets the purchasers section of the json structure for report 3-1
-		purchasers = []
-		for item in self.purchaser_names:
-			purchasersholding = OrderedDict({})
-			purchasersholding['name'] = "{}".format(item)
-			purchasersholding['count'] = 0
-			purchasersholding['value'] = 0
-			purchasers.append(purchasersholding)
-		return purchasers
+	def set_dispositions(self, holding_list): #this function sets the purchasers section of report 3-2
+		dispositions = []
+		for item in self.dispositions_list:
+			dispositionsholding = OrderedDict({})
+			dispositionsholding['disposition'] = "{}".format(item)
+			for thing in holding_list:
+				dispositionsholding[thing] = 0
+				dispositions.append(dispositionsholding)
+			dispositions.append(dispositionsholding)
+		return dispositions
 
-	def set_purchasers32(self): #this function sets the purchasers section of report 3-2
-		purchasers = []
-		for item in self.purchaser_names:
-			purchasersholding = OrderedDict({})
-			purchasersholding['name'] = "{}".format(item)
-			#pass in the appropriate holding list for each set_purchasers call
-			#holding_list = ['count', 'value']
-			#holding_list = ['first lien count', 'first lien value', 'junior lien count', 'junior lien value']
-			#holding_list = ['first lien', 'junior lien']
-			#try: for item in holding_list:
-			#	purchasersholding[item] = 0
-			purchasersholding['first lien count'] = 0
-			purchasersholding['first lien value'] = 0
-			purchasersholding['junior lien count'] = 0
-			purchasersholding['junior lien value'] = 0
-			purchasers.append(purchasersholding)
-		return purchasers
-
-	def set_purchasers32v2(self): #this function is used for the 'mean' and 'median' sections of report 3-2 as they do not have loan value sections
-		from collections import OrderedDict
-		purchasers = []
-		for item in self.purchaser_names:
-			purchasersholding = OrderedDict({})
-			purchasersholding['name'] = "{}".format(item)
-			purchasersholding['first lien'] = 0
-			purchasersholding['junior lien'] = 0
-			purchasers.append(purchasersholding)
-		return purchasers
-
-	def table_32_builder(self): #builds the JSON structure for report 3-2
-		pricinginformation = []
-		categories = ['No reported pricing data', 'reported pricing data']
-		for cat in categories:
+	def set_gender(self):
+		genders = []
+		gendersholding = {}
+		for gender in self.gender_list:
 			holding = OrderedDict({})
-			holding['pricing']= "{}".format(cat) #race is overwritten each pass of the loop (keys are unique in dictionaries)
-			holding['purchasers']  = self.set_purchasers32() #purchasers is overwritten each pass in the holding dictionary
-			pricinginformation.append(holding)
-		self.container['pricinginformation'] = pricinginformation
+			holding['gender'] = "{}".format(gender)
+			genders.append(holding)
+		gendersholding['genders'] = genders
+		for j in range(0, len(self.gender_list)):
+			gendersholding['genders'][j]['dispositions'] = self.set_dispositions(['count', 'value'])
+		return gendersholding
 
-		holding = OrderedDict({})
-		points = self.build_rate_spreads()
-		self.container['points'] = points
-
-		hoepa = OrderedDict({})
-		hoepa['pricing'] = 'hoepa loans'
-		hoepa['purchasers'] = self.set_purchasers32()
-		self.container['hoepa'] = hoepa
+	def table_41_builder(self):
+		races = []
+		for race in self.race_names:
+			holding = OrderedDict({})
+			holding['race'] = "{}".format(race)
+			races.append(holding)
+		self.container['races'] = races
+		for i in range(0,len(self.container['races'])):
+			self.container['races'][i]['dispositions'] = self.set_dispositions(['count', 'value'])
+			self.container['races'][i]['genders'] = self.set_gender()
 		return self.container
+	def set_purchasers(self, holding_list): #this function sets the purchasers section of report 3-2
+		purchasers = []
+		for item in self.purchaser_names:
+			purchasersholding = OrderedDict({})
+			purchasersholding['name'] = "{}".format(item)
+			for item in holding_list: #pass in the appropriate holding list for each set_purchasers call
+				purchasersholding[item] = 0
+			purchasers.append(purchasersholding)
+		return purchasers
 
 	def build_rate_spreads(self): #builds the rate spreads section of the report 3-2 JSON
 		spreads = []
@@ -461,9 +437,9 @@ class build_JSON(AD_report):
 			 holding = OrderedDict({})
 			 holding['point'] = "{}".format(rate)
 			 if self.table32_rates.index(rate) < 8:
-				holding['purchasers'] = self.set_purchasers32()
+				holding['purchasers'] = self.set_purchasers(['first lien count', 'first lien value', 'junior lien count', 'junior lien value'])
 			 else:
-				holding['purchasers'] = self.set_purchasers32v2()
+				holding['purchasers'] = self.set_purchasers(['first lien', 'junior lien'])
 			 spreads.append(holding)
 		return spreads
 
@@ -478,7 +454,7 @@ class build_JSON(AD_report):
 				top[container_name] = []
 			Header = False
 			holding[container[container_name]] = "{}".format(item)
-			holding['purchasers'] = self.set_purchasers()
+			holding['purchasers'] = self.set_purchasers(['count', 'value'])
 			top[container_name].append(holding)
 		self.borrowercharacteristics.append(top)
 
@@ -493,9 +469,27 @@ class build_JSON(AD_report):
 				top[container_name] = []
 			Header = False
 			holding[container[container_name]] = "{}".format(item)
-			holding['purchasers'] = self.set_purchasers()
+			holding['purchasers'] = self.set_purchasers(['count', 'value'])
 			top[container_name].append(holding)
 		self.censuscharacteristics.append(top)
+
+	def table_32_builder(self): #builds the JSON structure for report 3-2
+		pricinginformation = []
+		categories = ['No reported pricing data', 'reported pricing data']
+		for cat in categories:
+			holding = OrderedDict({})
+			holding['pricing']= "{}".format(cat)
+			holding['purchasers']  = self.set_purchasers(['first lien count', 'first lien value', 'junior lien count', 'junior lien value']) #purchasers is overwritten each pass in the holding dictionary
+			pricinginformation.append(holding)
+		self.container['pricinginformation'] = pricinginformation
+		holding = OrderedDict({})
+		points = self.build_rate_spreads()
+		self.container['points'] = points
+		hoepa = OrderedDict({})
+		hoepa['pricing'] = 'hoepa loans'
+		hoepa['purchasers'] = self.set_purchasers(['first lien count', 'first lien value', 'junior lien count', 'junior lien value'])
+		self.container['hoepa'] = hoepa
+		return self.container
 
 	def table_31_builder(self): #assembles all components of the 3-1 JSON object, appends totals section
 		self.table_31_borrower_characteristics('Race', 'races', self.race_names)
@@ -509,7 +503,7 @@ class build_JSON(AD_report):
 		totals = {} #totals sums all the loan counts and values for each purchaser
 		top = OrderedDict({})
 		holding = OrderedDict({})
-		totals['purchasers'] = self.set_purchasers()
+		totals['purchasers'] = self.set_purchasers(['count', 'value'])
 		self.container['total'] = totals
 		return self.container
 
@@ -520,6 +514,8 @@ class build_JSON(AD_report):
 	def write_JSON(self, name, data, path): #writes a json object to file
 		with open(os.path.join(path, name), 'w') as outfile: #writes the JSON structure to a file for the path named by report's header structure
 			json.dump(data, outfile, indent=4, ensure_ascii = False)
+
+
 
 class connect_DB(AD_report): #connects to the SQL database
 	#this is currently hosted locally

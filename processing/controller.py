@@ -23,6 +23,10 @@ selector = selector() #holds lists of reports to be generated for each MSA
 
 cur = connection.connect() #creates cursor object connected to HMDAPub2012 sql database, locally hosted postgres
 selector.get_report_lists('MSAinputs2013.csv') #fills the dictionary of lists of reports to be generated
+build41 = build()
+table41 = build41.table_41_builder()
+print table41
+build41.write_JSON('41_test.json', table41, '/users/roellk/desktop/')
 
 build_msa = build() #instantiate the build object
 build_msa.msas_in_state(cur, selector) #creates a list of all MSAs in each state and places the file in the state's folder
