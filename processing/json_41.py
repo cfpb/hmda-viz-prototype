@@ -25,7 +25,8 @@ class build_JSON(AD_report):
 			'SD':'South Dakota', 'TN':'Tennessee', 'TX':'Texas', 'UT':'Utah', 'VT':'Vermont', 'VA':'Virginia', 'WA': 'Washington', 'WV':'West Virginia', 'WI':'Wisconsin', 'WY':'Wyoming', 'PR':'Puerto Rico', 'VI':'Virgin Islands'}
 		self.msa_names = {} #holds the msa names for use in directory paths when writing JSON objects
 		self.state_msa_list = {} #holds a dictionary of msas in state by id number and name
-
+		self.disposition_list = ['Applications Received', 'Loans Originated', 'Aps. Approved But Not Accepted', 'Aplications Denied', 'Applications Withdrawn', 'Files Closed For Incompleteness']
+		selfgender_list = ['Male', 'Female', 'Joint (Male/Female)']
 	def msas_in_state(self, cursor, selector):
 		#this function builds a list of MSA numbers and names in each state
 		#set sql query text to pull MSA names for each MSA number
@@ -115,10 +116,40 @@ class build_JSON(AD_report):
 		self.msa['state_name'] = self.state_names[self.msa['state']]
 		self.container['msa'] = self.msa
 		return self.container
-	def set_gender(self, end_point):
-		genders = ['male', 'female', 'joint (male/female']
-		for item in genders:
-			end_point[item] = 0
+
+	def set_dispositions(self, holding_list): #this function sets the purchasers section of report 3-2
+		dispositions = []
+		for item in self.dispositions_list:
+			dispositionsholding = OrderedDict({})
+			dispositionsholding['disposition'] = "{}".format(item)
+			for thing in holding_list:
+				dispositionsholding[thing] = 0
+				dispositions.append(dispositionsholding)
+			dispositions.append(dispositionsholding)
+		return dispositions
+
+	def set_gender(self):
+		genders = []
+		gendersholding = {}
+		for gender in self.gender_list:
+			holding = OrderedDict({})
+			holding['gender'] = "{}".format(gender)
+			genders.append(holding)
+		gendersholding['genders'] = genders
+		for j in range(0, len(gender_list)):
+			gendersholding['genders'][j]['dispositions'] = set_dispositions(['count', 'value'])
+		return gendersholding
+
+	def table_41_builder(self):
+		races = []
+		for race in self.race_names:
+			holding = OrderedDict({})
+			holding['race'] = "{}".format(race)
+			races.append(holding)
+		container['races'] = races
+		for i in range(0,len(container['races'])):
+			container['races'][i]['dispositions'] = set_dispositions(['count', 'value'])
+			container['races'][i]['genders'] = set_gender()
 
 	def set_purchasers(self, holding_list): #this function sets the purchasers section of report 3-2
 		purchasers = []
@@ -177,7 +208,7 @@ class build_JSON(AD_report):
 		categories = ['No reported pricing data', 'reported pricing data']
 		for cat in categories:
 			holding = OrderedDict({})
-			holding['pricing']= "{}".format(cat) #race is overwritten each pass of the loop (keys are unique in dictionaries)
+			holding['pricing']= "{}".format(cat)
 			holding['purchasers']  = self.set_purchasers(['first lien count', 'first lien value', 'junior lien count', 'junior lien value']) #purchasers is overwritten each pass in the holding dictionary
 			pricinginformation.append(holding)
 		self.container['pricinginformation'] = pricinginformation
@@ -213,13 +244,4 @@ class build_JSON(AD_report):
 	def write_JSON(self, name, data, path): #writes a json object to file
 		with open(os.path.join(path, name), 'w') as outfile: #writes the JSON structure to a file for the path named by report's header structure
 			json.dump(data, outfile, indent=4, ensure_ascii = False)
-
-build4 = build_JSON() #container object
-build4.table_31_builder()
-for race in build4
-
-build4.print_JSON()
-
-
-
 

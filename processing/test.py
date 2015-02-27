@@ -1,18 +1,52 @@
-import csv
-report_list = {} #fill this dictionary with the headers in the CSV as dict keys
+import json
+from collections import OrderedDict
+race_names = ['American Indian/Alaska Native', 'Asian', 'Black or African American', 'Native Hawaiian or Other Pacific Islander', 'White', '2 or more minority races', 'Joint (White/Minority Race', 'Not Available']
 
-def get_report_lists():
-    #file has MSA list (entire population)
-    #flag for aggregate
-    #flag for each aggregate report (1 print, 0 don't print)
-    #list of FIs in MSA to generate reports for?
-    #open the controller file that tells which reports to generate
-    with open('MSAinputs.csv', 'r') as csvfile:
-        msareader = csv.DictReader(csvfile, delimiter = ',', quotechar='"')
-        for row in msareader:
-            for key in row:
-                report_list[key] = []
+race_list = []
+container = OrderedDict({})
+disp_list = ['Applications Received', 'Loans Originated', 'Aps. Approved But Not Accepted', 'Aplications Denied', 'Applications Withdrawn', 'Files Closed For Incompleteness']
+holding_list = ['count', 'value']
+gender_list = ['Male', 'Female', 'Joint (Male/Female)']
+
+def set_dispositions(holding_list): #this function sets the purchasers section of report 3-2
+	dispositions = []
+	for item in disp_list:
+		dispositionsholding = OrderedDict({})
+		dispositionsholding['disposition'] = "{}".format(item)
+		for thing in holding_list:
+			dispositionsholding[thing] = 0
+			dispositions.append(dispositionsholding)
+		dispositions.append(dispositionsholding)
+	return dispositions
+
+def set_gender():
+	genders = []
+	gendersholding = {}
+	for gender in gender_list:
+		holding = OrderedDict({})
+		holding['gender'] = "{}".format(gender)
+		genders.append(holding)
+	gendersholding['genders'] = genders
+	for j in range(0, len(gender_list)):
+		gendersholding['genders'][j]['dispositions'] = set_dispositions(holding_list)
+	return gendersholding
+
+def table_41_builder():
+	races = []
+	for race in race_names:
+		holding = OrderedDict({})
+		holding['race'] = "{}".format(race)
+		races.append(holding)
+	container['races'] = races
+	for i in range(0,len(container['races'])):
+		container['races'][i]['dispositions'] = set_dispositions(holding_list)
+		container['races'][i]['genders'] = set_gender()
 
 
-get_report_lists()
-print report_list
+set_races()
+
+
+print json.dumps(container, indent=4)
+
+
+
