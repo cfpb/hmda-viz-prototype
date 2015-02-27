@@ -110,9 +110,9 @@ class parse_inputs(AD_report):
 		self.inputs['tract to MSA income'] = row['tract_to_msa_md_income'] #ratio of tract to msa/md income
 		self.inputs['sequence'] = row['sequencenumber'] #the sequence number of the loan, used for checking errors
 		self.inputs['tract income index'] = MSA_index.tract_to_MSA_income(self.inputs) #sets the applicant income to an index number for aggregation
-		self.inputs['income bracket'] = MSA_index.app_income_to_MSA(self.inputs) #sets the applicant income as low med upper, high compared to msa income
+		self.inputs['income bracket'] = MSA_index.app_income_to_MSA(self.inputs) #sets the applicant income as an index by an applicant's income as a percent of MSA median
 		self.inputs['minority percent'] = MSA_index.minority_percent(self.inputs) #sets the minority population percent to an index for aggregation
-		self.inputs['tract income index'] = MSA_index.tract_to_MSA_income(self.inputs) #sets the tract to msa income ratio to an index for aggregation
+		self.inputs['tract income index'] = MSA_index.tract_to_MSA_income(self.inputs) #sets the tract to msa income ratio to an index for aggregation (low, moderate, middle, upper)
 		self.inputs['app non white flag'] = demo.set_non_white(a_race) #flags the applicant as non-white if true, used in setting minority status and race
 		self.inputs['co non white flag'] = demo.set_non_white(co_race) #flags the co applicant as non-white if true, used in setting minority status and race
 		self.inputs['joint status'] = demo.set_joint(self.inputs) #requires non white status flags be set prior to running set_joint
@@ -156,7 +156,6 @@ class parse_inputs(AD_report):
 		self.inputs['a ethn'] = row['applicantethnicity'] #ethnicity of the applicant
 		self.inputs['co ethn'] = row['coapplicantethnicity'] #ethnicity of the co-applicant
 		self.inputs['income'] = row['applicantincome'] #relied upon income rounded to the nearest thousand
-
 		self.inputs['loan value'] = float(row['loanamount']) #loan value rounded to the nearest thousand
 		self.inputs['year'] = row['asofdate'] #year or application or origination
 		self.inputs['state code'] = row['statecode'] #two digit state code
@@ -165,13 +164,8 @@ class parse_inputs(AD_report):
 		self.inputs['county code'] = row['countycode'] #3 digit county code
 		self.inputs['county name'] = row['countyname'] #full text county name
 		self.inputs['MSA median income'] = row['ffiec_median_family_income'] #median income for the tract/msa
-		self.inputs['minority percent'] = row['minoritypopulationpct'] #%of population that is minority
-		self.inputs['tract to MSA income'] = row['tract_to_msa_md_income'] #ratio of tract to msa/md income
 		self.inputs['sequence'] = row['sequencenumber'] #the sequence number of the loan, used for checking errors
-		self.inputs['tract income index'] = MSA_index.tract_to_MSA_income(self.inputs) #sets the applicant income to an index number for aggregation
-		self.inputs['income bracket'] = MSA_index.app_income_to_MSA(self.inputs) #sets the applicant income as low med upper, high compared to msa income
-		self.inputs['minority percent'] = MSA_index.minority_percent(self.inputs) #sets the minority population percent to an index for aggregation
-		self.inputs['tract income index'] = MSA_index.tract_to_MSA_income(self.inputs) #sets the tract to msa income ratio to an index for aggregation
+		self.inputs['income bracket'] = MSA_index.app_income_to_MSA(self.inputs) #sets the applicant income as an index by an applicant's income as a percent of MSA median
 		self.inputs['app non white flag'] = demo.set_non_white(a_race) #flags the applicant as non-white if true, used in setting minority status and race
 		self.inputs['co non white flag'] = demo.set_non_white(co_race) #flags the co applicant as non-white if true, used in setting minority status and race
 		self.inputs['joint status'] = demo.set_joint(self.inputs) #requires non white status flags be set prior to running set_joint
@@ -338,8 +332,9 @@ class build_JSON(AD_report):
 					'IA':'19', 'AZ':'04', 'ID':'16', 'ME':'23', 'MD':'24', 'MA':'25', 'UT':'49', 'MO':'29', 'MN':'27', 'MI':'26', 'MT':'30', 'MS':'29'}
 		self.msa_names = {} #holds the msa names for use in directory paths when writing JSON objects
 		self.state_msa_list = {} #holds a dictionary of msas in state by id number and name
-		self.dispositions_list = ['Applications Received', 'Loans Originated', 'Aps. Approved But Not Accepted', 'Aplications Denied', 'Applications Withdrawn', 'Files Closed For Incompleteness']
+		self.dispositions_list = ['Applications Received', 'Loans Originated', 'Apps. Approved But Not Accepted', 'Aplications Denied', 'Applications Withdrawn', 'Files Closed For Incompleteness']
 		self.gender_list = ['Male', 'Female', 'Joint (Male/Female)']
+
 	def msas_in_state(self, cursor, selector):
 		#this function builds a list of MSA numbers and names in each state
 		#set sql query text to pull MSA names for each MSA number
@@ -351,25 +346,20 @@ class build_JSON(AD_report):
 			FROM tract_to_cbsa_2010
 			WHERE geoid_metdiv != '          ' and state = %s;'''
 		#state_list = ['WA', 'WI', 'WV', 'FL', 'WY', 'NH', 'NJ', 'NM', 'NC', 'ND', 'NE', 'NY', 'RI', 'NV', 'CO', 'CA', 'GA', 'CT', 'OK', 'OH', 'KS', 'SC', 'KY', 'OR', 'SD', 'DE', 'HI', 'PR', 'TX', 'LA', 'TN', 'PA', 'VA', 'VI', 'AK', 'AL', 'AR', 'VT', 'IL', 'IN', 'IA', 'AZ', 'ID', 'ME', 'MD', 'MA', 'UT', 'MO', 'MN', 'MI', 'MT', 'MS']
-
-
 		for state, code in self.state_codes.iteritems():
 			state_msas = {}
 			location = (code,) #convert state to tuple for psycopg2
 			cursor.execute(SQL, location) #execute SQL statement against server
 			msas = [] #holding list for MSA id and names for entire state
-			#print len(cursor.fetchall())
-			for row in cursor.fetchall():
-				#print row
+			for row in cursor.fetchall(): #get all MSA numbers and names for the state
 				temp = {} #holding dict for single MSA id and name
 				cut_point =str(row['name'])[::-1].find(' ')+2 #find index to remove state abbreviations
 				temp['id'] = row['geoid_msa'] #set MSA number to id in dict
 				temp['name'] = str(row['name'])[:-cut_point].replace(' ', '-').upper()
 				msas.append(temp)
 
-
 			cursor.execute(SQL2, location)
-			for row2 in cursor.fetchall():
+			for row2 in cursor.fetchall(): #get all MD numbers and names for the state
 				temp = {}
 				cut_point = str(row2['name'])[::-1].find(' ')+2 #find last space before state names
 				temp['id'] = row2['geoid_metdiv'][5:] #take only last 5 digits from metdiv number
@@ -422,12 +412,7 @@ class build_JSON(AD_report):
 
 	def get_state_name(self, abbrev):
 		#this is a dictionary function that returns a state name when given the abbreviation
-		state_names = {'AL': 'Alabama', 'AK': 'Alaska', 'AZ': 'Arizona', 'AR': 'Arkansas', 'CA': 'California', 'CO': 'Colorado', 'CT': 'Connecticut', 'DE':'Delaware',
-				'FL':'Florida', 'GA':'Georgia', 'HI':'Hawaii', 'ID':'Idaho', 'IL':'Illinois', 'IN':'Indiana', 'IA':'Iowa', 'KS':'Kansas', 'KY': 'Kentucky', 'LA':'Louisiana', 'ME': 'Maine', 'MD':'Maryland',
-				'MA':'Massachusetts', 'MI':'Michigan', 'MN': 'Minnesota', 'MS': 'Mississippi', 'MO': 'Missouri', 'MT': 'Montana', 'NE':'Nebraska', 'NV':'Nevada', 'NH':'New Hampshire', 'NJ':'New Jersey', 'NM':'New Mexico',
-				'NY':'New York', 'NC':'North Carolina', 'ND':'North Dakota', 'OH': 'Ohio', 'OK': 'Oklahoma', 'OR':'Oregon','PA':'Pennsylvania', 'RI':'Rhode Island', 'SC':'South Carolina',
-				'SD':'South Dakota', 'TN':'Tensessee', 'TX':'Texas', 'UT':'Utah', 'VT':'Vermont', 'VA':'Virginia', 'WA': 'Washington', 'WV':'West Virginia', 'WI':'Wisconsin', 'WY':'Wyoming', 'PR':'Puerto Rico', 'VI':'Virgin Islands'}
-		return state_names[abbrev]
+		return self.state_names[abbrev]
 
 	def table_headers(self, table_num): #holds table descriptions
 		if table_num == '3-1':
@@ -435,7 +420,7 @@ class build_JSON(AD_report):
 		elif table_num == '3-2':
 			return 'Pricing Information for First and Junior Lien Loans Sold by Type of Purchaser (includes originations only).'
 		elif table_num == '4-1':
-			return 'Disposition of applications for FHA, FSA/RHS, and VA home-purchase loans, 1- tp 4-family and manufactured home dwellings, by race, ethnicity, gender and income of applicant'
+			return 'Disposition of applications for FHA, FSA/RHS, and VA home-purchase loans, 1- to 4-family and manufactured home dwellings, by race, ethnicity, gender and income of applicant'
 
 	def set_header(self, inputs, MSA, desc, table_type, table_num): #sets the header information of the JSON object
 		msa = OrderedDict({})
@@ -444,7 +429,7 @@ class build_JSON(AD_report):
 		self.container['desc'] = desc
 		self.container['year'] = inputs['year']
 		self.msa['id'] = MSA
-		self.msa['name'] = self.msa_names[MSA] #need to add MSA names to a database or read-in file
+		self.msa['name'] = self.msa_names[MSA]
 		self.msa['state'] = inputs['state name'] #this is the two digit abbreviation
 		self.msa['state_name'] = self.state_names[self.msa['state']]
 		self.container['msa'] = self.msa
@@ -452,7 +437,7 @@ class build_JSON(AD_report):
 
 	def set_41_dispositions(self, end_points): #builds the dispositions of applications section of report 4-1 JSON
 		dispositions = []
-		for item in disp_list:
+		for item in self.dispositions_list:
 			dispositionsholding = OrderedDict({})
 			dispositionsholding['disposition'] = "{}".format(item)
 			dispositions.append(dispositionsholding)
@@ -472,56 +457,57 @@ class build_JSON(AD_report):
 			gendersholding['genders'][j]['dispositions'] = self.set_41_dispositions(['count', 'value'])
 		return gendersholding
 
-	def set_41_races():
+	def set_41_races(self):
 		races = []
-		for race in race_names:
+		for race in self.race_names:
 			holding = OrderedDict({})
 			holding['race'] = "{}".format(race)
 			races.append(holding)
-		container['races'] = races
-		for i in range(0,len(container['races'])):
-			container['races'][i]['dispositions'] = set_41_dispositions(holding_list)
-			container['races'][i]['genders'] = set_41_gender()
+		self.container['races'] = races
+		for i in range(0,len(self.container['races'])):
+			self.container['races'][i]['dispositions'] = self.set_41_dispositions(['count', 'value'])
+			self.container['races'][i]['genders'] = self.set_41_gender()
 
-	def set_41_ethnicity():
+	def set_41_ethnicity(self):
 		ethnicities = []
-		for ethnicity in ethnicity_names:
+		for ethnicity in self.ethnicity_names:
 			holding = OrderedDict({})
 			holding['ethnicity'] = "{}".format(ethnicity)
 			ethnicities.append(holding)
-		container['ethnicities'] = ethnicities
-		for i in range(0, len(container['ethnicities'])):
-			container['ethnicities'][i]['dispositions'] = set_41_dispositions(holding_list)
-			container['ethnicities'][i]['genders'] = set_41_gender()
+		self.container['ethnicities'] = ethnicities
+		for i in range(0, len(self.container['ethnicities'])):
+			self.container['ethnicities'][i]['dispositions'] = self.set_41_dispositions(['count', 'value'])
+			self.container['ethnicities'][i]['genders'] = self.set_41_gender()
 
-	def set_41_minority():
+	def set_41_minority(self):
 		minoritystatuses = []
-		for status in minority_statuses:
+		for status in self.minority_statuses:
 			holding = OrderedDict({})
 			holding['minoritystatus'] = "{}".format(status)
 			minoritystatuses.append(holding)
-		container['minoritystatuses'] = minoritystatuses
-		for i in range(0, len(container['minoritystatuses'])):
-			container['minoritystatuses'][i]['dispositions'] = set_41_dispositions(holding_list)
-			container['minoritystatuses'][i]['genders'] = set_41_gender()
+		self.container['minoritystatuses'] = minoritystatuses
+		for i in range(0, len(self.container['minoritystatuses'])):
+			self.container['minoritystatuses'][i]['dispositions'] = self.set_41_dispositions(['count', 'value'])
+			self.container['minoritystatuses'][i]['genders'] = self.set_41_gender()
 
-	def set_41_incomes():
+	def set_41_incomes(self):
 		applicantincomes = []
-		for income in applicant_income_bracket:
+		for income in self.applicant_income_bracket:
 			holding = OrderedDict({})
 			holding['incomes'] = "{}".format(income)
 			applicantincomes.append(holding)
-		container['incomes'] = applicantincomes
-		for i in range(0, len(container['incomes'])):
-			container['incomes'][i]['dispositions'] = set_41_dispositions(holding_list)
-			container['incomes'][i]['dispositions'] = set_41_gender()
-		container['total'] = set_dispositions(holding_list)
+		self.container['incomes'] = applicantincomes
+		for i in range(0, len(self.container['incomes'])):
+			self.container['incomes'][i]['dispositions'] = self.set_41_dispositions(['count', 'value'])
+			self.container['incomes'][i]['dispositions'] = self.set_41_gender()
+		self.container['total'] = self.set_41_dispositions(['count', 'value'])
 
 	def table_41_builder(self): #builds the table 4-1 JSON object: disposition of application by race and gender
-		set_41_races()
-		set_41_ethnicity()
-		set_41_minority()
-		set_41_incomes()
+		self.set_41_races()
+		self.set_41_ethnicity()
+		self.set_41_minority()
+		self.set_41_incomes()
+		return self.container
 
 	def set_purchasers(self, holding_list): #this function sets the purchasers section of report 3-2
 		purchasers = []
@@ -736,18 +722,29 @@ class queries(AD_report):
 			FROM hmdapub2013 WHERE msaofproperty = %s;'''
 		return SQL
 
+	def table_4_1_2012(self):
+		SQL = '''SELECT
+			censustractnumber, applicantrace1, applicantrace2, applicantrace3, applicantrace4, applicantrace5,
+			coapplicantrace1, coapplicantrace2, coapplicantrace3, coapplicantrace4, coapplicantrace5,
+			applicantethnicity, coapplicantethnicity, applicantincome, loanamount, asofdate, statecode,
+			statename, countycode, countyname, ffiec_median_family_income, sequencenumber
+			FROM hmdapub2012 WHERE msaofproperty = %s;'''
+		return SQL
+
+	def table_4_1_2013(self):
+		SQL = '''SELECT
+			censustractnumber, applicantrace1, applicantrace2, applicantrace3, applicantrace4, applicantrace5,
+			coapplicantrace1, coapplicantrace2, coapplicantrace3, coapplicantrace4, coapplicantrace5,
+			applicantethnicity, coapplicantethnicity, applicantincome, loanamount, asofdate, statecode,
+			statename, countycode, countyname, ffiec_median_family_income, sequencenumber
+			FROM hmdapub2013 WHERE msaofproperty = %s;'''
+		return SQL
+
 class aggregate(AD_report): #aggregates LAR rows by appropriate characteristics to fill the JSON files
 
 	def __init__(self):
 		pass
-		'''
-	def index_list(self, item, listless):
-		#returns the index of a an item in a list
-		if item in listless:
-			return listless.index(item)
-		else:
-			print "oops, your value is not in that list"
-		'''
+
 	def by_race(self, container, inputs): #aggregates loans by race category
 		container['borrowercharacteristics'][0]['races'][inputs['race']]['purchasers'][inputs['purchaser']]['count'] += 1
 		container['borrowercharacteristics'][0]['races'][inputs['race']]['purchasers'][inputs['purchaser']]['value'] += inputs['loan value']

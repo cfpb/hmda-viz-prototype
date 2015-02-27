@@ -24,8 +24,45 @@ selector = selector() #holds lists of reports to be generated for each MSA
 cur = connection.connect() #creates cursor object connected to HMDAPub2012 sql database, locally hosted postgres
 selector.get_report_lists('MSAinputs2013.csv') #fills the dictionary of lists of reports to be generated
 
-build_msa = build() #instantiate the build object
-build_msa.msas_in_state(cur, selector) #creates a list of all MSAs in each state and places the file in the state's folder
+#build_msa = build() #instantiate the build object
+#build_msa.msas_in_state(cur, selector) #creates a list of all MSAs in each state and places the file in the state's folder
+selector.report_list['A 4-1'] = ['17900', '17820']
+for MSA in selector.report_list['A 4-1']:
+	build41 = build()
+	build41.set_msa_names(cur) #builds a list of msa names as a dictionary
+	location = (MSA,) #pass the MSA nubmers as a tuple to Psycopg2 (doesn't take singletons)
+	if selector.report_list['year'][1] == '2012':
+		SQL = queries.count_rows_2012()
+	elif selector.report_list['year'][1] == '2013':
+		SQL = queries.count_rows_2013()
+	cur.execute(SQL, location)
+	count = int(cur.fetchone()[0])
+
+	if count > 0:
+		print count, 'LAR rows in MSA %s, for report 4-1, in %s' %(MSA, selector.report_list['year'][1])
+		if selector.report_list['year'][1] == '2012':
+			SQL = queries.table_4_1_2012()
+		elif selector.report_list['year'][1] == '2013':
+			SQL = queries.table_4_1_2013()
+		else:
+			print "invalid year in input file"
+
+		cur.execute(SQL, location)
+		for num in range(0, count):
+			row = cur.fetchone()
+			parsed.parse_t41(row)
+			if num == 0:
+				build41.set_header(parsed.inputs, MSA, build41.table_headers('4-1'), 'Aggregate', '4-1')
+				table41 = build41.table_41_builder()
+			#agg.build_report41(table41, parsed.inputs)
+		path = "json" + "/" +table41['type']+"/"+table41['year']+"/"+build41.get_state_name(table41['msa']['state']).lower()+"/"+build41.msa_names[MSA].replace(' ', '-').lower()+"/"+table41['table']
+		if not os.path.exists(path): #check if path exists
+			os.makedirs(path) #if path not present, create it
+		build41.write_JSON('4-1.json', table41, path)
+		build41.jekyll_for_report(path) #create and write jekyll file to report path
+		#year in the path is determined by the asofdate in the LAR entry
+		path2 = "json"+"/"+table41['type']+"/"+table41['year']+"/"+build41.get_state_name(table41['msa']['state']).lower()+"/"+build41.msa_names[MSA].replace(' ', '-').lower() #set path for writing the jekyll file to the msa directory
+		build41.jekyll_for_msa(path2) #create and write jekyll file to the msa path
 '''
 for MSA in selector.report_list['A 3-1']:
 	build31 = build() #table 3-1 build object
@@ -40,7 +77,6 @@ for MSA in selector.report_list['A 3-1']:
 	cur.execute(SQL, location) #ping the database for numbers!
 	count = int(cur.fetchone()[0]) #get count of rows for the MSA
 	#add md numbers to input file list of msas, check name against last 5 digits if msa name has 0 rows or errors on check
-	#print count, "LAR rows in MSA %s, for report 3-1" %MSA
 	if count > 0:
 		print count, 'LAR rows in MSA %s, for report 3-1, in %s' %(MSA, selector.report_list['year'][1])
 		if selector.report_list['year'][1] == '2013': #use the year on the first line of the MSA inputs file to set the query
