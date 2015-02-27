@@ -143,7 +143,8 @@ class parse_inputs(AD_report):
 
 	def parse_t41(self, row):
 		#parsing inputs for report 4-1
-
+		#for key, value in row.iteritems():
+		#	print key, value
 		MSA_index = MSA_info() #contains functions for census tract characteristics
 		demo=demographics() #contains functions for borrower characteristics
 
@@ -155,6 +156,8 @@ class parse_inputs(AD_report):
 		#add data elements to dictionary
 		self.inputs['a ethn'] = row['applicantethnicity'] #ethnicity of the applicant
 		self.inputs['co ethn'] = row['coapplicantethnicity'] #ethnicity of the co-applicant
+		self.inputs['app sex'] = row['applicantsex']
+		self.inputs['co app sex'] = row['coapplicantsex']
 		self.inputs['income'] = row['applicantincome'] #relied upon income rounded to the nearest thousand
 		self.inputs['loan value'] = float(row['loanamount']) #loan value rounded to the nearest thousand
 		self.inputs['year'] = row['asofdate'] #year or application or origination
@@ -164,6 +167,7 @@ class parse_inputs(AD_report):
 		self.inputs['county code'] = row['countycode'] #3 digit county code
 		self.inputs['county name'] = row['countyname'] #full text county name
 		self.inputs['MSA median income'] = row['ffiec_median_family_income'] #median income for the tract/msa
+		self.inputs['action taken'] = int(row['actiontype']) #disposition of the loan application
 		self.inputs['sequence'] = row['sequencenumber'] #the sequence number of the loan, used for checking errors
 		self.inputs['income bracket'] = MSA_index.app_income_to_MSA(self.inputs) #sets the applicant income as an index by an applicant's income as a percent of MSA median
 		self.inputs['app non white flag'] = demo.set_non_white(a_race) #flags the applicant as non-white if true, used in setting minority status and race
@@ -274,6 +278,7 @@ class demographics(AD_report):
 		for i in range(0, 5): #convert ' ' entries to 0 for easier comparisons and loan aggregation
 			if a_race[i] == ' ':
 				a_race[i] = 0
+		print a_race
 		return [int(race) for race in a_race] #convert string entries to int for easier comparison and loan aggregation
 
 	def co_race_list(self, row):
@@ -499,7 +504,6 @@ class build_JSON(AD_report):
 		self.container['incomes'] = applicantincomes
 		for i in range(0, len(self.container['incomes'])):
 			self.container['incomes'][i]['dispositions'] = self.set_41_dispositions(['count', 'value'])
-
 		self.container['total'] = self.set_41_dispositions(['count', 'value'])
 
 	def table_41_builder(self): #builds the table 4-1 JSON object: disposition of application by race and gender
@@ -727,8 +731,10 @@ class queries(AD_report):
 			censustractnumber, applicantrace1, applicantrace2, applicantrace3, applicantrace4, applicantrace5,
 			coapplicantrace1, coapplicantrace2, coapplicantrace3, coapplicantrace4, coapplicantrace5,
 			applicantethnicity, coapplicantethnicity, applicantincome, loanamount, asofdate, statecode,
-			statename, countycode, countyname, ffiec_median_family_income, sequencenumber
-			FROM hmdapub2012 WHERE msaofproperty = %s;'''
+			statename, countycode, countyname, ffiec_median_family_income, sequencenumber, actiontype,
+			applicantsex, coapplicantsex
+			FROM hmdapub2012 WHERE msaofproperty = %s and (loantype = '2' or loantype = '3' or loantype = '4')
+			and propertytype !='3' and loanpurpose = '1' ;'''
 		return SQL
 
 	def table_4_1_2013(self):
@@ -736,8 +742,10 @@ class queries(AD_report):
 			censustractnumber, applicantrace1, applicantrace2, applicantrace3, applicantrace4, applicantrace5,
 			coapplicantrace1, coapplicantrace2, coapplicantrace3, coapplicantrace4, coapplicantrace5,
 			applicantethnicity, coapplicantethnicity, applicantincome, loanamount, asofdate, statecode,
-			statename, countycode, countyname, ffiec_median_family_income, sequencenumber
-			FROM hmdapub2013 WHERE msaofproperty = %s;'''
+			statename, countycode, countyname, ffiec_median_family_income, sequencenumber, actiontype,
+			applicantsex, coapplicantsex
+			FROM hmdapub2013 WHERE msaofproperty = %s and (loantype = '2' or loantype = '3' or loantype = '4')
+			and propertytype !='3' and loanpurpose = '1' ;'''
 		return SQL
 
 class aggregate(AD_report): #aggregates LAR rows by appropriate characteristics to fill the JSON files
@@ -904,14 +912,28 @@ class aggregate(AD_report): #aggregates LAR rows by appropriate characteristics 
 				container['points'][9]['purchasers'][n]['junior lien'] = round(numpy.median(numpy.array(inputs[purchaser_junior_lien_rates[n]])),2)
 
 	def by_applicant_income_41(self, container, inputs): #aggregate loans by applicant income index
-		if inputs['income bracket'] > 5: #income index outside bounds of report 3-1
+		#invert this logic
+		if inputs['income bracket'] > 5 or inputs['action taken'] == ' ' or inputs['action taken'] > 5: #filter out of bounds indexes before calling aggregations
 			pass
+
+		elif inputs['income bracket'] <6 and inputs['action taken'] < 6:
+			container['incomes'][inputs['income bracket']]['dispositions'][0]['count'] += 1 #add to 'applications received'
+			container['incomes'][inputs['income bracket']]['dispositions'][0]['value'] += int(inputs['loan value']) #add to 'applications received'
+
+			container['incomes'][inputs['income bracket']]['dispositions'][inputs['action taken']]['count'] += 1 #loans by action taken code
+			container['incomes'][inputs['income bracket']]['dispositions'][inputs['action taken']]['value'] += int(inputs['loan value'])
 		else:
-			container['incomes'][3]['applicantincomes'][inputs['income bracket']]['purchasers'][inputs['purchaser']]['count'] += 1
-			container['incomes'][3]['applicantincomes'][inputs['income bracket']]['purchasers'][inputs['purchaser']]['value'] += int(inputs['loan value'])
+			print "error aggregating income for report 4-1"
+
+	def totals_41(self, container, inputs):
+		if inputs['action taken'] < 6 and inputs['action taken'] != ' ':
+			container['total'][inputs['action taken']]['count'] +=1
+			container['total'][inputs['action taken']]['value'] += int(inputs['loan value'])
 
 	def build_report41(self, table41, inputs):
 		self.by_applicant_income_41(table41, inputs)
+		self.totals_41(table41, inputs)
+
 
 	def build_report_31(self, table31, inputs):  #calls aggregation functions to fill JSON object for table 3-1
 		self.by_race(table31, inputs) #aggregate loan by race
