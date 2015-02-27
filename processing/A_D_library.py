@@ -499,7 +499,7 @@ class build_JSON(AD_report):
 		self.container['incomes'] = applicantincomes
 		for i in range(0, len(self.container['incomes'])):
 			self.container['incomes'][i]['dispositions'] = self.set_41_dispositions(['count', 'value'])
-			self.container['incomes'][i]['dispositions'] = self.set_41_gender()
+
 		self.container['total'] = self.set_41_dispositions(['count', 'value'])
 
 	def table_41_builder(self): #builds the table 4-1 JSON object: disposition of application by race and gender
@@ -902,6 +902,16 @@ class aggregate(AD_report): #aggregates LAR rows by appropriate characteristics 
 			#junior lien median block
 			if len(inputs[purchaser_junior_lien_rates[n]]) > 0:
 				container['points'][9]['purchasers'][n]['junior lien'] = round(numpy.median(numpy.array(inputs[purchaser_junior_lien_rates[n]])),2)
+
+	def by_applicant_income_41(self, container, inputs): #aggregate loans by applicant income index
+		if inputs['income bracket'] > 5: #income index outside bounds of report 3-1
+			pass
+		else:
+			container['incomes'][3]['applicantincomes'][inputs['income bracket']]['purchasers'][inputs['purchaser']]['count'] += 1
+			container['incomes'][3]['applicantincomes'][inputs['income bracket']]['purchasers'][inputs['purchaser']]['value'] += int(inputs['loan value'])
+
+	def build_report41(self, table41, inputs):
+		self.by_applicant_income_41(table41, inputs)
 
 	def build_report_31(self, table31, inputs):  #calls aggregation functions to fill JSON object for table 3-1
 		self.by_race(table31, inputs) #aggregate loan by race
