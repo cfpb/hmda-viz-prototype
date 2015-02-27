@@ -333,6 +333,9 @@ class build_JSON(AD_report):
 			'MA':'Massachusetts', 'MI':'Michigan', 'MN': 'Minnesota', 'MS': 'Mississippi', 'MO': 'Missouri', 'MT': 'Montana', 'NE':'Nebraska', 'NV':'Nevada', 'NH':'New Hampshire', 'NJ':'New Jersey', 'NM':'New Mexico',
 			'NY':'New York', 'NC':'North Carolina', 'ND':'North Dakota', 'OH': 'Ohio', 'OK': 'Oklahoma', 'OR':'Oregon','PA':'Pennsylvania', 'RI':'Rhode Island', 'SC':'South Carolina',
 			'SD':'South Dakota', 'TN':'Tennessee', 'TX':'Texas', 'UT':'Utah', 'VT':'Vermont', 'VA':'Virginia', 'WA': 'Washington', 'WV':'West Virginia', 'WI':'Wisconsin', 'WY':'Wyoming', 'PR':'Puerto Rico', 'VI':'Virgin Islands'}
+		self.state_codes = {'WA':'53', 'WI':'55', 'WV':'54', 'FL':'12', 'WY':'56', 'NH':'33', 'NJ':'34', 'NM':'33', 'NC':'37', 'ND':'38', 'NE':'31', 'NY':'36', 'RI':'44', 'NV':'32', 'CO':'08', 'CA':'06', 'GA':'13', 'CT':'09', 'OK':'40', 'OH':'39',
+					'KS':'20', 'SC':'45', 'KY':'21', 'OR':'41', 'SD':'46', 'DE':'10', 'HI':'15', 'PR':'43', 'TX':'48', 'LA':'22', 'TN':'47', 'PA':'42', 'VA':'51', 'VI':'78', 'AK':'02', 'AL':'01', 'AR':'05', 'VT':'50', 'IL':'17', 'IN':'18',
+					'IA':'19', 'AZ':'04', 'ID':'16', 'ME':'23', 'MD':'24', 'MA':'25', 'UT':'49', 'MO':'29', 'MN':'27', 'MI':'26', 'MT':'30', 'MS':'29'}
 		self.msa_names = {} #holds the msa names for use in directory paths when writing JSON objects
 		self.state_msa_list = {} #holds a dictionary of msas in state by id number and name
 		self.dispositions_list = ['Applications Received', 'Loans Originated', 'Aps. Approved But Not Accepted', 'Aplications Denied', 'Applications Withdrawn', 'Files Closed For Incompleteness']
@@ -344,29 +347,33 @@ class build_JSON(AD_report):
 			FROM tract_to_cbsa_2010
 			WHERE geoid_msa != '     ' and state = %s;'''
 
-		state_list = ['WA', 'WI', 'WV', 'FL', 'WY', 'NH', 'NJ', 'NM', 'NC', 'ND', 'NE', 'NY', 'RI', 'NV', 'CO', 'CA', 'GA', 'CT', 'OK', 'OH', 'KS', 'SC', 'KY', 'OR', 'SD', 'DE', 'HI', 'PR', 'TX', 'LA', 'TN', 'PA', 'VA', 'VI', 'AK', 'AL', 'AR', 'VT', 'IL', 'IN', 'IA', 'AZ', 'ID', 'ME', 'MD', 'MA', 'UT', 'MO', 'MN', 'MI', 'MT', 'MS']
-		state_msas = {}
-		for state in state_list:
-			location = (state,) #convert state to tuple for psycopg2
+		SQL2 = '''SELECT DISTINCT name, geoid_metdiv
+			FROM tract_to_cbsa_2010
+			WHERE geoid_metdiv != '          ' and state = %s;'''
+		#state_list = ['WA', 'WI', 'WV', 'FL', 'WY', 'NH', 'NJ', 'NM', 'NC', 'ND', 'NE', 'NY', 'RI', 'NV', 'CO', 'CA', 'GA', 'CT', 'OK', 'OH', 'KS', 'SC', 'KY', 'OR', 'SD', 'DE', 'HI', 'PR', 'TX', 'LA', 'TN', 'PA', 'VA', 'VI', 'AK', 'AL', 'AR', 'VT', 'IL', 'IN', 'IA', 'AZ', 'ID', 'ME', 'MD', 'MA', 'UT', 'MO', 'MN', 'MI', 'MT', 'MS']
+
+
+		for state, code in self.state_codes.iteritems():
+			state_msas = {}
+			location = (code,) #convert state to tuple for psycopg2
 			cursor.execute(SQL, location) #execute SQL statement against server
 			msas = [] #holding list for MSA id and names for entire state
+			#print len(cursor.fetchall())
 			for row in cursor.fetchall():
+				#print row
 				temp = {} #holding dict for single MSA id and name
-				cut_point =str(row['name'])[::-1].find(' ')+1 #find index to remove state abbreviations
+				cut_point =str(row['name'])[::-1].find(' ')+2 #find index to remove state abbreviations
 				temp['id'] = row['geoid_msa'] #set MSA number to id in dict
 				temp['name'] = str(row['name'])[:-cut_point].replace(' ', '-').upper()
 				msas.append(temp)
 
-			SQL = '''SELECT DISTINCT name, geoid_metdiv
-				FROM tract_to_cbsa_2010
-				WHERE geoid_metdiv != '          ' and state = %s;'''
 
-			cursor.execute(SQL, location)
-			for row in cursor.fetchall():
+			cursor.execute(SQL2, location)
+			for row2 in cursor.fetchall():
 				temp = {}
-				cut_point = str(row['name'])[::-1].find(' ')+1 #find last space before state names
-				temp['id'] = row['geoid_metdiv'][5:] #take only last 5 digits from metdiv number
-				temp['name'] = str(row['name'])[:-cut_point].replace(' ', '-').upper() #remove state abbrevs
+				cut_point = str(row2['name'])[::-1].find(' ')+2 #find last space before state names
+				temp['id'] = row2['geoid_metdiv'][5:] #take only last 5 digits from metdiv number
+				temp['name'] = str(row2['name'])[:-cut_point].replace(' ', '-').upper() #remove state abbrevs
 				msas.append(temp) #add one metdiv name to the list of names
 
 			state_msas['msa-mds'] = msas
@@ -408,7 +415,7 @@ class build_JSON(AD_report):
 			FROM tract_to_cbsa_2010'''
 		cursor.execute(SQL,) #execute query against server
 		for row in cursor.fetchall():
-			cut_point =str(row['name'])[::-1].find(' ')+1 #find the point where the state abbreviations begin
+			cut_point =str(row['name'])[::-1].find(' ') +2#find the point where the state abbreviations begin
 			self.msa_names[row['geoid_msa']] = str(row['name'])[:-cut_point].replace(' ', '-')
 			geoid_metdiv = str(row['geoid_metdiv'])[5:]
 			self.msa_names[geoid_metdiv] = str(row['name'])[:-cut_point].replace(' ', '_')
