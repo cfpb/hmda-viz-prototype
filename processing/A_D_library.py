@@ -949,7 +949,6 @@ class aggregate(AD_report): #aggregates LAR rows by appropriate characteristics 
 				container['points'][9]['purchasers'][n]['junior lien'] = round(numpy.median(numpy.array(inputs[purchaser_junior_lien_rates[n]])),2)
 
 	def by_applicant_income_41(self, container, inputs): #aggregate loans by applicant income index
-		#invert this logic
 		if inputs['income bracket'] > 5 or inputs['action taken'] == ' ' or inputs['action taken'] > 5: #filter out of bounds indexes before calling aggregations
 			pass
 
@@ -963,30 +962,58 @@ class aggregate(AD_report): #aggregates LAR rows by appropriate characteristics 
 			print "error aggregating income for report 4-1"
 
 	def by_race_41(self, container, inputs):
-		pass
+		if inputs['action taken'] >5:
+			pass
+		else:
+			container['races'][inputs['race']]['dispositions'][0]['count'] += 1
+			container['races'][inputs['race']]['dispositions'][0]['value'] += int(inputs['loan value'])
+			container['races'][inputs['race']]['dispositions'][inputs['action taken']]['value'] += 1
+			container['races'][inputs['race']]['dispositions'][inputs['action taken']]['value'] += int(inputs['loan value'])
+
+			if inputs['gender'] < 3:
+				container['races'][inputs['race']]['genders'][inputs['gender']]['dispositions'][inputs['action taken']]['count'] += 1
+				container['races'][inputs['race']]['genders'][inputs['gender']]['dispositions'][inputs['action taken']]['value'] += int(inputs['loan value'])
+
 	def by_ethnicity_41(self, container, inputs):
-		pass
+		if inputs['action taken'] >5:
+			pass
+		else:
+			container['ethnicities'][inputs['ethnicity']]['dispositions'][0]['count'] += 1
+			container['ethnicities'][inputs['ethnicity']]['dispositions'][0]['value'] += int(inputs['loan value'])
+			container['ethnicities'][inputs['ethnicity']]['dispositions'][inputs['action taken']]['value'] += 1
+			container['ethnicities'][inputs['ethnicity']]['dispositions'][inputs['action taken']]['value'] += int(inputs['loan value'])
+
+			if inputs['gender'] < 3:
+				container['ethnicities'][inputs['ethnicity']]['genders'][inputs['gender']]['dispositions'][inputs['action taken']]['count'] += 1
+				container['ethnicities'][inputs['ethnicity']]['genders'][inputs['gender']]['dispositions'][inputs['action taken']]['value'] += int(inputs['loan value'])
 
 	def by_minority_status_41(self, container, inputs):
-		container['minoritystatuses'][inputs['minority status']]['dispositions'][0]['count'] +=1 #count of total applications received
-		container['minoritystatuses'][inputs['minority status']]['dispositions'][0]['value'] +=int(inputs['loan value']) #value of total applications received
 
-		container['minoritystatuses'][inputs['minority status']]['dispositions'][inputs['action taken']]['count'] +=1 #totals of each gender for each minority status
-		container['minoritystatuses'][inputs['minority status']]['dispositions'][inputs['action taken']]['value'] +=int(inputs['loan value']) #totals of each gender for each minority status
-		if inputs['gender'] < 3:
-			container['minoritystatuses'][inputs['minority status']]['genders'][inputs['gender']]['dispositions'][inputs['action taken']]['count'] +=1 #totals of each gender for each minority status
-			container['minoritystatuses'][inputs['minority status']]['genders'][inputs['gender']]['dispositions'][inputs['action taken']]['value'] +=int(inputs['loan value']) #totals of each gender for each minority status
+		if inputs['minority status'] > 2 or inputs['action taken'] > 5:
+			pass
+		else:
+			container['minoritystatuses'][inputs['minority status']]['dispositions'][0]['count'] +=1 #count of total applications received
+			container['minoritystatuses'][inputs['minority status']]['dispositions'][0]['value'] +=int(inputs['loan value']) #value of total applications received
+
+			container['minoritystatuses'][inputs['minority status']]['dispositions'][inputs['action taken']]['count'] +=1 #totals of each gender for each minority status
+			container['minoritystatuses'][inputs['minority status']]['dispositions'][inputs['action taken']]['value'] +=int(inputs['loan value']) #totals of each gender for each minority status
+
+			if inputs['gender'] < 3:
+				container['minoritystatuses'][inputs['minority status']]['genders'][inputs['gender']]['dispositions'][inputs['action taken']]['count'] +=1 #totals of each gender for each minority status
+				container['minoritystatuses'][inputs['minority status']]['genders'][inputs['gender']]['dispositions'][inputs['action taken']]['value'] +=int(inputs['loan value']) #totals of each gender for each minority status
 
 	def totals_41(self, container, inputs):
 		if inputs['action taken'] < 6 and inputs['action taken'] != ' ':
 			container['total'][inputs['action taken']]['count'] +=1
 			container['total'][inputs['action taken']]['value'] += int(inputs['loan value'])
-	'''
-	def build_report41(self, table41, inputs):
-		self.by_applicant_income_41(table41, inputs)
-		self.totals_41(table41, inputs)
-		self.by_minority_status_41(table41, inputs)
-	'''
+
+	def build_report41(self, table41, inputs): #call functions to fill JSON object for table 4-1 (FHA, FSA, RHS, and VA home purchase loans)
+		self.by_race_41(table41, inputs) #aggregate loans by race, gender, and applicaiton disposition
+		self.by_ethnicity_41(table41, inputs)#aggregate loans by ethnicity, gender, and applicaiton disposition
+		self.by_minority_status_41(table41, inputs)#aggregate loans by minority status, gender, and applicaiton disposition
+		self.by_applicant_income_41(table41, inputs) #aggregate loans by applicant income to MSA income ratio
+		self.totals_41(table41, inputs) #totals of applications by application disposition
+
 	def build_report_31(self, table31, inputs):  #calls aggregation functions to fill JSON object for table 3-1
 		self.by_race(table31, inputs) #aggregate loan by race
 		self.by_ethnicity(table31, inputs) #aggregate loan by ethnicity

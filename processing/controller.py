@@ -57,7 +57,8 @@ for MSA in selector.report_list['A 4-1']:
 			if num == 0:
 				build41.set_header(parsed.inputs, MSA, build41.table_headers('4-1'), 'Aggregate', '4-1')
 				table41 = build41.table_41_builder()
-			#agg.build_report41(table41, parsed.inputs)
+
+			agg.build_report41(table41, parsed.inputs)
 		path = "json" + "/" +table41['type']+"/"+table41['year']+"/"+build41.get_state_name(table41['msa']['state']).lower()+"/"+build41.msa_names[MSA].replace(' ', '-').lower()+"/"+table41['table']
 		if not os.path.exists(path): #check if path exists
 			os.makedirs(path) #if path not present, create it
