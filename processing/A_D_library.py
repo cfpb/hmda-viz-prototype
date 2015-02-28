@@ -729,6 +729,16 @@ class queries(AD_report):
 			and propertytype !='3' and loanpurpose = '1' ;'''
 		return SQL
 
+	def count_rows_42_2012(self):
+		SQL = '''SELECT COUNT(msaofproperty) FROM hmdapub2012 WHERE msaofproperty = %s and loantype = '1'
+			and propertytype !='3' and loanpurpose = '1' ;'''
+		return SQL
+
+	def count_rows_42_2013(self):
+		SQL = '''SELECT COUNT(msaofproperty) FROM hmdapub2013 WHERE msaofproperty = %s and loantype = '1'
+			and propertytype !='3' and loanpurpose = '1' ;'''
+		return SQL
+
 	def table_3_1_2013(self): #set the SQL statement to select the needed fields to aggregate loans for the table_3 JSON structure
 		SQL = '''SELECT
 			censustractnumber, applicantrace1, applicantrace2, applicantrace3, applicantrace4, applicantrace5,
@@ -783,6 +793,26 @@ class queries(AD_report):
 			applicantsex, coapplicantsex
 			FROM hmdapub2013 WHERE msaofproperty = %s and (loantype = '2' or loantype = '3' or loantype = '4')
 			and propertytype !='3' and loanpurpose = '1' ;'''
+		return SQL
+
+	def table_4_2_2012(self):
+		SQL = '''SELECT
+			censustractnumber, applicantrace1, applicantrace2, applicantrace3, applicantrace4, applicantrace5,
+			coapplicantrace1, coapplicantrace2, coapplicantrace3, coapplicantrace4, coapplicantrace5,
+			applicantethnicity, coapplicantethnicity, applicantincome, loanamount, asofdate, statecode,
+			statename, countycode, countyname, ffiec_median_family_income, sequencenumber, actiontype,
+			applicantsex, coapplicantsex
+			FROM hmdapub2012 WHERE msaofproperty = %s and loantype = '1' and propertytype !='3' and loanpurpose = '1' ;'''
+		return SQL
+
+	def table_4_2_2013(self):
+		SQL = '''SELECT
+			censustractnumber, applicantrace1, applicantrace2, applicantrace3, applicantrace4, applicantrace5,
+			coapplicantrace1, coapplicantrace2, coapplicantrace3, coapplicantrace4, coapplicantrace5,
+			applicantethnicity, coapplicantethnicity, applicantincome, loanamount, asofdate, statecode,
+			statename, countycode, countyname, ffiec_median_family_income, sequencenumber, actiontype,
+			applicantsex, coapplicantsex
+			FROM hmdapub2013 WHERE msaofproperty = %s and loantype = '1' and propertytype !='3' and loanpurpose = '1' ;'''
 		return SQL
 
 class aggregate(AD_report): #aggregates LAR rows by appropriate characteristics to fill the JSON files
