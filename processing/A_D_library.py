@@ -177,11 +177,33 @@ class parse_inputs(AD_report):
 		self.inputs['ethnicity'] = demo.set_loan_ethn(self.inputs) #requires  ethnicity be parsed prior to running set_loan_ethn
 		self.inputs['race'] = demo.set_race(self.inputs, a_race, co_race) #requires joint status be set prior to running set_race
 		self.inputs['minority count'] = demo.minority_count(a_race) #determines if the number of minority races claimed by the applicant is 2 or greater
-
+		self.inputs['gender'] = demo.set_gender(self.inputs)
 
 class demographics(AD_report):
 	#holds all the functions for setting race, minority status, and ethnicity for FFIEC A&D reports
 	#this class is called when the parse_txx function is called by the controller
+	def set_gender(self, inputs):
+		male_flag = False
+		female_flag = False
+
+		if int(inputs['app sex']) > 2 and int(inputs['co app sex']) > 2: #if sex of neither applicant is reported
+			return 3 #return out of bounds index
+
+		if inputs['app sex'] == '1' or inputs['co app sex'] == '1':
+			male_flag = True
+
+		if inputs['app sex'] == '2' or inputs['co app sex'] == '2':
+			female_flag = True
+
+		if male_flag == True and female_flag == True:
+			return 2 #joint male/female application/loan
+		elif male_flag == True and female_flag == False:
+			return 0 #male loan
+		elif male_flag == False and female_flag == True:
+			return 1 #female loan
+		else:
+			print "gender not set", inputs['app sex'], inputs['co app sex']
+			print male_flag, female_flag
 
 	def rate_spread_index(self, rate):
 		#sets the rate spread variable to an index number for aggregation in the JSON object
@@ -278,7 +300,6 @@ class demographics(AD_report):
 		for i in range(0, 5): #convert ' ' entries to 0 for easier comparisons and loan aggregation
 			if a_race[i] == ' ':
 				a_race[i] = 0
-		print a_race
 		return [int(race) for race in a_race] #convert string entries to int for easier comparison and loan aggregation
 
 	def co_race_list(self, row):
@@ -452,16 +473,21 @@ class build_JSON(AD_report):
 
 	def set_41_gender(self): #creates the gender portion of table 4-1 JSON
 		genders = []
-		gendersholding = {}
 		for gender in self.gender_list:
 			holding = OrderedDict({})
 			holding['gender'] = "{}".format(gender)
 			genders.append(holding)
-		gendersholding['genders'] = genders
-		for j in range(0, len(self.gender_list)):
-			gendersholding['genders'][j]['dispositions'] = self.set_41_dispositions(['count', 'value'])
-		return gendersholding
-
+		return genders
+	def set_gender_disps(self):
+		for i in range(0, len(self.race_names)):
+			for g in range(0, len(self.gender_list)):
+				self.container['races'][i]['genders'][g]['dispositions'] = self.set_41_dispositions(['count', 'value'])
+		for i in range(0, len(self.ethnicity_names)):
+			for g in range(0, len(self.gender_list)):
+				self.container['ethnicities'][i]['genders'][g]['dispositions'] = self.set_41_dispositions(['count', 'value'])
+		for i in range(0, len(self.minority_statuses)):
+			for g in range(0, len(self.gender_list)):
+				self.container['minoritystatuses'][i]['genders'][g]['dispositions'] = self.set_41_dispositions(['count', 'value'])
 	def set_41_races(self):
 		races = []
 		for race in self.race_names:
@@ -511,6 +537,7 @@ class build_JSON(AD_report):
 		self.set_41_ethnicity()
 		self.set_41_minority()
 		self.set_41_incomes()
+		self.set_gender_disps()
 		return self.container
 
 	def set_purchasers(self, holding_list): #this function sets the purchasers section of report 3-2
@@ -690,6 +717,16 @@ class queries(AD_report):
 
 	def count_rows_2013(self): #get the count of rows in the LAR for an MSA, used to run the parsing/aggregation loop
 		SQL = '''SELECT COUNT(msaofproperty) FROM hmdapub2013 WHERE msaofproperty = %s;'''
+		return SQL
+
+	def count_rows_41_2012(self):
+		SQL = '''SELECT COUNT(msaofproperty) FROM hmdapub2012 WHERE msaofproperty = %s and (loantype = '2' or loantype = '3' or loantype = '4')
+			and propertytype !='3' and loanpurpose = '1' ;'''
+		return SQL
+
+	def count_rows_41_2013(self):
+		SQL = '''SELECT COUNT(msaofproperty) FROM hmdapub2013 WHERE msaofproperty = %s and (loantype = '2' or loantype = '3' or loantype = '4')
+			and propertytype !='3' and loanpurpose = '1' ;'''
 		return SQL
 
 	def table_3_1_2013(self): #set the SQL statement to select the needed fields to aggregate loans for the table_3 JSON structure
@@ -925,16 +962,31 @@ class aggregate(AD_report): #aggregates LAR rows by appropriate characteristics 
 		else:
 			print "error aggregating income for report 4-1"
 
+	def by_race_41(self, container, inputs):
+		pass
+	def by_ethnicity_41(self, container, inputs):
+		pass
+
+	def by_minority_status_41(self, container, inputs):
+		container['minoritystatuses'][inputs['minority status']]['dispositions'][0]['count'] +=1 #count of total applications received
+		container['minoritystatuses'][inputs['minority status']]['dispositions'][0]['value'] +=int(inputs['loan value']) #value of total applications received
+
+		container['minoritystatuses'][inputs['minority status']]['dispositions'][inputs['action taken']]['count'] +=1 #totals of each gender for each minority status
+		container['minoritystatuses'][inputs['minority status']]['dispositions'][inputs['action taken']]['value'] +=int(inputs['loan value']) #totals of each gender for each minority status
+		if inputs['gender'] < 3:
+			container['minoritystatuses'][inputs['minority status']]['genders'][inputs['gender']]['dispositions'][inputs['action taken']]['count'] +=1 #totals of each gender for each minority status
+			container['minoritystatuses'][inputs['minority status']]['genders'][inputs['gender']]['dispositions'][inputs['action taken']]['value'] +=int(inputs['loan value']) #totals of each gender for each minority status
+
 	def totals_41(self, container, inputs):
 		if inputs['action taken'] < 6 and inputs['action taken'] != ' ':
 			container['total'][inputs['action taken']]['count'] +=1
 			container['total'][inputs['action taken']]['value'] += int(inputs['loan value'])
-
+	'''
 	def build_report41(self, table41, inputs):
 		self.by_applicant_income_41(table41, inputs)
 		self.totals_41(table41, inputs)
-
-
+		self.by_minority_status_41(table41, inputs)
+	'''
 	def build_report_31(self, table31, inputs):  #calls aggregation functions to fill JSON object for table 3-1
 		self.by_race(table31, inputs) #aggregate loan by race
 		self.by_ethnicity(table31, inputs) #aggregate loan by ethnicity

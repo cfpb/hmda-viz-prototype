@@ -26,15 +26,18 @@ selector.get_report_lists('MSAinputs2013.csv') #fills the dictionary of lists of
 
 #build_msa = build() #instantiate the build object
 #build_msa.msas_in_state(cur, selector) #creates a list of all MSAs in each state and places the file in the state's folder
+selector.report_list['year'][1] = '2012'
 selector.report_list['A 4-1'] = ['17900', '17820']
 for MSA in selector.report_list['A 4-1']:
 	build41 = build()
 	build41.set_msa_names(cur) #builds a list of msa names as a dictionary
 	location = (MSA,) #pass the MSA nubmers as a tuple to Psycopg2 (doesn't take singletons)
 	if selector.report_list['year'][1] == '2012':
-		SQL = queries.count_rows_2012()
+		SQL = queries.count_rows_41_2012()
 	elif selector.report_list['year'][1] == '2013':
-		SQL = queries.count_rows_2013()
+		SQL = queries.count_rows_41_2013()
+	else:
+		print "invalid year in selection"
 	cur.execute(SQL, location)
 	count = int(cur.fetchone()[0])
 
@@ -54,7 +57,7 @@ for MSA in selector.report_list['A 4-1']:
 			if num == 0:
 				build41.set_header(parsed.inputs, MSA, build41.table_headers('4-1'), 'Aggregate', '4-1')
 				table41 = build41.table_41_builder()
-			agg.build_report41(table41, parsed.inputs)
+			#agg.build_report41(table41, parsed.inputs)
 		path = "json" + "/" +table41['type']+"/"+table41['year']+"/"+build41.get_state_name(table41['msa']['state']).lower()+"/"+build41.msa_names[MSA].replace(' ', '-').lower()+"/"+table41['table']
 		if not os.path.exists(path): #check if path exists
 			os.makedirs(path) #if path not present, create it
@@ -151,3 +154,6 @@ for MSA in selector.report_list['A 3-2']: #loop over all MSAs that had report 3-
 	else:
 		pass #do nothing if no LAR rows exist for the MSA
 '''
+
+
+
