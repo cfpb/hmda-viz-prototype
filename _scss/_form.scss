@@ -1,0 +1,35 @@
+/* form */
+form {
+    margin: 0;
+}
+.input-wrapper {
+    position: relative;
+}
+input {
+    border-radius: 2px;
+    display: block;
+    float: left;
+    font-family: "AvenirNextLTW01-Medium", Helvetica, Arial;
+    font-size: 1em;
+}
+input[type="text"] {
+    border: 1px solid $gray-20;
+    border-radius: 2px;
+    padding: 3px 95px 3px 6px;
+    width: 100%;
+}
+input[type="submit"] {
+    font-size: .75em;
+    margin: 1px 0 0 1px;
+    padding: 6px;
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+label {
+    color: $gray-50;
+    font-family: "AvenirNextLTW01-Medium", Helvetica, Arial;
+    font-size: .75em;
+    display: block;
+    margin-top: 5px;
+}
