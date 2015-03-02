@@ -1,15 +1,14 @@
 {% include head.html %}
 {% include header.html %}
 
-<div class="wrap">
-	<section class="content homepage" id="content">
-		<main role="main">
-			{% if urlsize >= 5 %}			
-			    {% include breadcrumb.html %}
-			{% endif %}
-			{{ content }}
-		</main>
-	</section>
+<div class="container" id="content">
+    {% if urlsize >= 5 %}
+    <section class="row">
+        {% include breadcrumb.html %}
+    </section>
+    {% endif %}
+    
+    {{ content }}
 </div>
 
 {% include footer.html %}

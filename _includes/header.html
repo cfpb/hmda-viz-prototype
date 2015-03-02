@@ -2,18 +2,20 @@
     <p>This beta site is a work in progress.</p>
     <p>We're prototyping new ideas. Expect some errors and inaccuracies. Accurate information can be found at <a href="http://www.ffiec.gov/hmda/default.htm">FFIEC.gov</a>.
 </div>
-<div class="wrapper">
-    <header role="banner" class="header" id="header">
-        <div class="wrap">
-            <a href="#content" class="skip-link visually-hidden focusable">Skip to Main Content</a>
-            <div class="site-title">
+<header role="banner" class="header" id="header">
+    <div class="container">
+        <a href="#content" class="skip-link visually-hidden focusable">Skip to Main Content</a>
+        <div class="row">
+            <div class="col-2">
                 <h1><a href="{{ site.baseurl }}/" class="title-link"><span class="site-org">HMDA Viz </span>Prototype</a></h1>
             </div>
-            <div class="site-logo">
-                <a href="http://www.consumerfinance.gov"><img id="logo" class="logo__js" src="{{ site.baseurl }}/img/logo.png" onerror="this.src='http://www.consumerfinance.gov/wp-content/themes/cfpb_nemo/_/img/logo.png';" alt="Consumer Financial Protection Bureau" height="66" width="262"></a>
+            <div class="col-1">
+                <a href="http://www.consumerfinance.gov"><img id="logo" class="logo" src="{{ site.baseurl }}/img/logo.png" onerror="this.src='http://www.consumerfinance.gov/wp-content/themes/cfpb_nemo/_/img/logo.png';" alt="Consumer Financial Protection Bureau" height="66" width="262"></a>
             </div>
-            <nav role="navigation">
-                <ul class="main-nav">
+        </div>
+        <div class="row">
+            <nav class="col-3" role="navigation">
+                <ul class="nav-main">
                     <li class="main-nav-active"><a href="{{ site.baseurl }}/">Home</a></li>
                     <li><a href="{{ site.baseurl }}/aggregate/">Aggregate</a></li>
                     <li><a href="{{ site.baseurl }}/disclosure/">Disclosure</a></li>
@@ -21,5 +23,5 @@
                 </ul>
             </nav>
         </div>
-    </header>
-</div>
+    </div>
+</header>

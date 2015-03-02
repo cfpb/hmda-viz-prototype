@@ -14,17 +14,12 @@ input {
 }
 input[type="text"] {
     border: 1px solid $gray-20;
-    border-radius: 2px;
     padding: 3px 95px 3px 6px;
     width: 100%;
 }
 input[type="submit"] {
     font-size: .75em;
     margin: 1px 0 0 1px;
-    padding: 6px;
-    position: absolute;
-    top: 0;
-    right: 0;
 }
 label {
     color: $gray-50;
@@ -32,4 +27,17 @@ label {
     font-size: .75em;
     display: block;
     margin-top: 5px;
+}
+
+.input-group {
+    *zoom: 1;
+    margin-top: 15px;
+    &:before, &:after {
+        content: "";
+        display: table;
+        line-height: 0;
+    }
+    &:after {
+        clear: both;
+    }
 }
