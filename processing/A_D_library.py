@@ -154,6 +154,7 @@ class parse_inputs(AD_report):
 		a_race = demo.a_race_list(row) #put applicant race codes in a list 0-5, 0 is blank field
 		co_race = demo.co_race_list(row) #put co-applicant race codes in a list 0-5, 0 is blank field
 		#add data elements to dictionary
+		print row
 		self.inputs['a ethn'] = row['applicantethnicity'] #ethnicity of the applicant
 		self.inputs['co ethn'] = row['coapplicantethnicity'] #ethnicity of the co-applicant
 		self.inputs['app sex'] = row['applicantsex']
@@ -749,6 +750,16 @@ class queries(AD_report):
 			and propertytype !='3' and loanpurpose = '3' ;'''
 		return SQL
 
+	def count_rows_44_2012(self):
+		SQL = '''SELECT COUNT(msaofproperty) FROM hmdapub2012 WHERE msaofproperty = %s
+			and propertytype !='3' and loanpurpose = '2' ;'''
+		return SQL
+
+	def count_rows_44_2013(self):
+		SQL = '''SELECT COUNT(msaofproperty) FROM hmdapub2013 WHERE msaofproperty = %s
+			and propertytype !='3' and loanpurpose = '2' ;'''
+		return SQL
+
 	def table_3_1_2013(self): #set the SQL statement to select the needed fields to aggregate loans for the table_3 JSON structure
 		SQL = '''SELECT
 			censustractnumber, applicantrace1, applicantrace2, applicantrace3, applicantrace4, applicantrace5,
@@ -843,6 +854,26 @@ class queries(AD_report):
 			statename, countycode, countyname, ffiec_median_family_income, sequencenumber, actiontype,
 			applicantsex, coapplicantsex
 			FROM hmdapub2013 WHERE msaofproperty = %s and propertytype !='3' and loanpurpose = '3' ;'''
+		return SQL
+
+	def table_4_4_2012(self):
+		SQL = '''SELECT
+			censustractnumber, applicantrace1, applicantrace2, applicantrace3, applicantrace4, applicantrace5,
+			coapplicantrace1, coapplicantrace2, coapplicantrace3, coapplicantrace4, coapplicantrace5,
+			applicantethnicity, coapplicantethnicity, applicantincome, loanamount, asofdate, statecode,
+			statename, countycode, countyname, ffiec_median_family_income, sequencenumber, actiontype,
+			applicantsex, coapplicantsex
+			FROM hmdapub2012 WHERE msaofproperty = %s and propertytype !='3' and loanpurpose = '2' ;'''
+		return SQL
+
+	def table_4_4_2013(self):
+		SQL = '''SELECT
+			censustractnumber, applicantrace1, applicantrace2, applicantrace3, applicantrace4, applicantrace5,
+			coapplicantrace1, coapplicantrace2, coapplicantrace3, coapplicantrace4, coapplicantrace5,
+			applicantethnicity, coapplicantethnicity, applicantincome, loanamount, asofdate, statecode,
+			statename, countycode, countyname, ffiec_median_family_income, sequencenumber, actiontype,
+			applicantsex, coapplicantsex
+			FROM hmdapub2013 WHERE msaofproperty = %s and propertytype !='3' and loanpurpose = '2' ;'''
 		return SQL
 
 class aggregate(AD_report): #aggregates LAR rows by appropriate characteristics to fill the JSON files
@@ -1025,12 +1056,17 @@ class aggregate(AD_report): #aggregates LAR rows by appropriate characteristics 
 		if inputs['action taken'] >5:
 			pass
 		else:
-			container['races'][inputs['race']]['dispositions'][0]['count'] += 1
+
+			container['races'][inputs['race']]['dispositions'][0]['count'] += 1 #count of total applications received
 			container['races'][inputs['race']]['dispositions'][0]['value'] += int(inputs['loan value'])
-			container['races'][inputs['race']]['dispositions'][inputs['action taken']]['value'] += 1
+
+			container['races'][inputs['race']]['dispositions'][inputs['action taken']]['count'] += 1
 			container['races'][inputs['race']]['dispositions'][inputs['action taken']]['value'] += int(inputs['loan value'])
 
 			if inputs['gender'] < 3:
+				container['races'][inputs['race']]['genders'][inputs['gender']]['dispositions'][0]['count'] += 1 #count of total applications received for each gender
+				container['races'][inputs['race']]['genders'][inputs['gender']]['dispositions'][0]['value'] += int(inputs['loan value'])
+
 				container['races'][inputs['race']]['genders'][inputs['gender']]['dispositions'][inputs['action taken']]['count'] += 1
 				container['races'][inputs['race']]['genders'][inputs['gender']]['dispositions'][inputs['action taken']]['value'] += int(inputs['loan value'])
 
@@ -1038,12 +1074,15 @@ class aggregate(AD_report): #aggregates LAR rows by appropriate characteristics 
 		if inputs['action taken'] >5:
 			pass
 		else:
-			container['ethnicities'][inputs['ethnicity']]['dispositions'][0]['count'] += 1
+			container['ethnicities'][inputs['ethnicity']]['dispositions'][0]['count'] += 1 #count of total applications received
 			container['ethnicities'][inputs['ethnicity']]['dispositions'][0]['value'] += int(inputs['loan value'])
-			container['ethnicities'][inputs['ethnicity']]['dispositions'][inputs['action taken']]['value'] += 1
+
+			container['ethnicities'][inputs['ethnicity']]['dispositions'][inputs['action taken']]['count'] += 1
 			container['ethnicities'][inputs['ethnicity']]['dispositions'][inputs['action taken']]['value'] += int(inputs['loan value'])
 
 			if inputs['gender'] < 3:
+				container['ethnicities'][inputs['ethnicity']]['genders'][inputs['gender']]['dispositions'][0]['count'] +=1 #count of all applications (all dispositions)
+				container['ethnicities'][inputs['ethnicity']]['genders'][inputs['gender']]['dispositions'][0]['value'] +=1
 				container['ethnicities'][inputs['ethnicity']]['genders'][inputs['gender']]['dispositions'][inputs['action taken']]['count'] += 1
 				container['ethnicities'][inputs['ethnicity']]['genders'][inputs['gender']]['dispositions'][inputs['action taken']]['value'] += int(inputs['loan value'])
 
@@ -1052,13 +1091,15 @@ class aggregate(AD_report): #aggregates LAR rows by appropriate characteristics 
 		if inputs['minority status'] > 2 or inputs['action taken'] > 5:
 			pass
 		else:
-			container['minoritystatuses'][inputs['minority status']]['dispositions'][0]['count'] +=1 #count of total applications received
-			container['minoritystatuses'][inputs['minority status']]['dispositions'][0]['value'] +=int(inputs['loan value']) #value of total applications received
+			container['minoritystatuses'][inputs['minority status']]['dispositions'][0]['count'] +=1 #count of total applications received by minority status
+			container['minoritystatuses'][inputs['minority status']]['dispositions'][0]['value'] +=int(inputs['loan value']) #value of total applications received by minority status
 
-			container['minoritystatuses'][inputs['minority status']]['dispositions'][inputs['action taken']]['count'] +=1 #totals of each gender for each minority status
+			container['minoritystatuses'][inputs['minority status']]['dispositions'][inputs['action taken']]['count'] +=1 #totals of each minority status by disposition of application
 			container['minoritystatuses'][inputs['minority status']]['dispositions'][inputs['action taken']]['value'] +=int(inputs['loan value']) #totals of each gender for each minority status
 
 			if inputs['gender'] < 3:
+				container['minoritystatuses'][inputs['minority status']]['genders'][inputs['gender']]['dispositions'][0]['count'] +=1 #total for all application dispositions by minority status and gender
+				container['minoritystatuses'][inputs['minority status']]['genders'][inputs['gender']]['dispositions'][0]['count'] +=int(inputs['loan value'])
 				container['minoritystatuses'][inputs['minority status']]['genders'][inputs['gender']]['dispositions'][inputs['action taken']]['count'] +=1 #totals of each gender for each minority status
 				container['minoritystatuses'][inputs['minority status']]['genders'][inputs['gender']]['dispositions'][inputs['action taken']]['value'] +=int(inputs['loan value']) #totals of each gender for each minority status
 
