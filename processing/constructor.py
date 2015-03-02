@@ -23,9 +23,9 @@ class report_4x(constructor):
 		self.agg = agg() #aggregation functions for all tables
 
 
-	def report_x(self, selector, report_number):
-		count_string_2012 = 'count_rows_47_2012'
-		count_string_2013 = 'count_rows_47_2013'
+	def report_x(self, selector, report_number, query_string, count_string):
+		#count_string_2012 = 'count_rows_47_2012'
+		#count_string_2013 = 'count_rows_47_2013'
 		query_string_2012 = 'table_4_7_2012'
 		query_string_2013 = 'table_4_7_2013'
 		parse_function = 'parse_t4x'
@@ -39,33 +39,22 @@ class report_4x(constructor):
 		elif report_number[0] == 'N':
 			report_type = 'National'
 
-		function_return(self, selector.report_list['year'][1], report_number)
+		#function_return(self, selector.report_list['year'][1], report_number)
 		cur = self.connection.connect() #creates cursor object connected to HMDAPub2012 sql database, locally hosted postgres
 
 		for MSA in selector.report_list[report_number]:
 			build_X = build()
 			build_X.set_msa_names(cur) #builds a list of msa names as a dictionary
 			location = (MSA,) #pass the MSA nubmers as a tuple to Psycopg2 (doesn't take singletons)
-			if selector.report_list['year'][1] == '2012':
-				SQL = getattr(self.queries, count_string_2012)()
 
-			elif selector.report_list['year'][1] == '2013':
-				SQL = getattr(self.queries, count_string_2013)()
-			else:
-				print "invalid year in selection"
-
+			SQL = getattr(self.queries, count_string)()
 			cur.execute(SQL, location)
 			count = int(cur.fetchone()[0])
 
 			if count > 0:
 				print count, 'LAR rows in MSA %s, for report %s, in %s' %(MSA, report_number, selector.report_list['year'][1])
-				if selector.report_list['year'][1] == '2012':
-					SQL = getattr(self.queries, query_string_2012)()
-				elif selector.report_list['year'][1] == '2013':
-					SQL = getattr(self.queries, query_string_2013)()
-				else:
-					print "invalid year in input file"
 
+				SQL = getattr(self.queries, query_string)()
 				cur.execute(SQL, location)
 				for num in range(0, count):
 					row = cur.fetchone()
