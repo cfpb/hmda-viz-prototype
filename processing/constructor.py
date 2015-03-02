@@ -309,7 +309,7 @@ class report_4x(constructor):
 				path = "json" + "/" +table41['type']+"/"+table41['year']+"/"+build41.get_state_name(table41['msa']['state']).lower()+"/"+build41.msa_names[MSA].replace(' ', '-').lower()+"/"+table41['table']
 				if not os.path.exists(path): #check if path exists
 					os.makedirs(path) #if path not present, create it
-				build41.write_JSON(table['table']+'.json', table41, path)
+				build41.write_JSON(table41['table']+'.json', table41, path)
 				build41.jekyll_for_report(path) #create and write jekyll file to report path
 				#year in the path is determined by the asofdate in the LAR entry
 				path2 = "json"+"/"+table41['type']+"/"+table41['year']+"/"+build41.get_state_name(table41['msa']['state']).lower()+"/"+build41.msa_names[MSA].replace(' ', '-').lower() #set path for writing the jekyll file to the msa directory
