@@ -154,13 +154,14 @@ class parse_inputs(AD_report):
 		a_race = demo.a_race_list(row) #put applicant race codes in a list 0-5, 0 is blank field
 		co_race = demo.co_race_list(row) #put co-applicant race codes in a list 0-5, 0 is blank field
 		#add data elements to dictionary
-		print row
+
 		self.inputs['a ethn'] = row['applicantethnicity'] #ethnicity of the applicant
 		self.inputs['co ethn'] = row['coapplicantethnicity'] #ethnicity of the co-applicant
 		self.inputs['app sex'] = row['applicantsex']
 		self.inputs['co app sex'] = row['coapplicantsex']
 		self.inputs['income'] = row['applicantincome'] #relied upon income rounded to the nearest thousand
 		self.inputs['loan value'] = float(row['loanamount']) #loan value rounded to the nearest thousand
+		self.inputs['occupancy'] = row['occupancy']
 		self.inputs['year'] = row['asofdate'] #year or application or origination
 		self.inputs['state code'] = row['statecode'] #two digit state code
 		self.inputs['state name'] = row['statename'] #two character state abbreviation
@@ -443,11 +444,23 @@ class build_JSON(AD_report):
 
 	def table_headers(self, table_num): #holds table descriptions
 		if table_num == '3-1':
-			return 'Loans sold, by characteristics of borrower and census tract in which property is located and by type of purchaser (includes originations and purchased loans),'
+			return 'Loans sold, by characteristics of borrower and census tract in which property is located and by type of purchaser (includes originations and purchased loans)'
 		elif table_num == '3-2':
-			return 'Pricing Information for First and Junior Lien Loans Sold by Type of Purchaser (includes originations only).'
+			return 'Pricing Information for First and Junior Lien Loans Sold by Type of Purchaser (includes originations only)'
 		elif table_num == '4-1':
 			return 'Disposition of applications for FHA, FSA/RHS, and VA home-purchase loans, 1- to 4-family and manufactured home dwellings, by race, ethnicity, gender and income of applicant'
+		elif table_num == '4-2':
+			return 'Disposition of applications for conventional home-purchase loans 1- to 4-family and manufactured home dwellings, by race, ethnicity, gender and income of applicant'
+		elif table_num == '4-3':
+			return 'Disposition of applications to refinnace loans on 1- to 4-family and manufactured home dwellings, by race, ethnicity, gender and income of applicant'
+		elif table_num == '4-4':
+			return 'Disposition of applications for home improvement loans, 1- to 4-family and manufactured home dwellings, by race, ethnicity, gender and income of applicant'
+		elif table_num == '4-5':
+			return 'Disposition of applications for loans on dwellings for 5 or more families, by race, ethnicity, gender and income of applicant'
+		elif table_num == '4-6':
+			return 'Disposition of applications from nonoccupants for home-purchase, home improvement, or refinancing loans, 1- to 4-family and manufactured home dwellings, by race, ethnicity, gender and income of applicant'
+		elif table_num == '4-7':
+			return 'Disposition of applications for home-purchase, home improvement, or refinancing loans, manufactured home dwellings by race, ethnicity, gender and income of applicant'
 
 	def set_header(self, inputs, MSA, desc, table_type, table_num): #sets the header information of the JSON object
 		msa = OrderedDict({})
@@ -760,6 +773,36 @@ class queries(AD_report):
 			and propertytype !='3' and loanpurpose = '2' ;'''
 		return SQL
 
+	def count_rows_45_2012(self):
+		SQL = '''SELECT COUNT(msaofproperty) FROM hmdapub2012 WHERE msaofproperty = %s
+			and propertytype ='3';'''
+		return SQL
+
+	def count_rows_45_2013(self):
+		SQL = '''SELECT COUNT(msaofproperty) FROM hmdapub2013 WHERE msaofproperty = %s
+			and propertytype ='3';'''
+		return SQL
+
+	def count_rows_46_2012(self):
+		SQL = '''SELECT COUNT(msaofproperty) FROM hmdapub2012 WHERE msaofproperty = %s
+			and propertytype !='3' and occupancy = '2';'''
+		return SQL
+
+	def count_rows_46_2013(self):
+		SQL = '''SELECT COUNT(msaofproperty) FROM hmdapub2013 WHERE msaofproperty = %s
+			and propertytype !='3' and occupancy = '2';'''
+		return SQL
+
+	def count_rows_47_2012(self):
+		SQL = '''SELECT COUNT(msaofproperty) FROM hmdapub2012 WHERE msaofproperty = %s
+			and propertytype ='2';'''
+		return SQL
+
+	def count_rows_47_2013(self):
+		SQL = '''SELECT COUNT(msaofproperty) FROM hmdapub2013 WHERE msaofproperty = %s
+			and propertytype ='2' ;'''
+		return SQL
+
 	def table_3_1_2013(self): #set the SQL statement to select the needed fields to aggregate loans for the table_3 JSON structure
 		SQL = '''SELECT
 			censustractnumber, applicantrace1, applicantrace2, applicantrace3, applicantrace4, applicantrace5,
@@ -800,7 +843,7 @@ class queries(AD_report):
 			coapplicantrace1, coapplicantrace2, coapplicantrace3, coapplicantrace4, coapplicantrace5,
 			applicantethnicity, coapplicantethnicity, applicantincome, loanamount, asofdate, statecode,
 			statename, countycode, countyname, ffiec_median_family_income, sequencenumber, actiontype,
-			applicantsex, coapplicantsex
+			applicantsex, coapplicantsex, occupancy
 			FROM hmdapub2012 WHERE msaofproperty = %s and (loantype = '2' or loantype = '3' or loantype = '4')
 			and propertytype !='3' and loanpurpose = '1' ;'''
 		return SQL
@@ -811,7 +854,7 @@ class queries(AD_report):
 			coapplicantrace1, coapplicantrace2, coapplicantrace3, coapplicantrace4, coapplicantrace5,
 			applicantethnicity, coapplicantethnicity, applicantincome, loanamount, asofdate, statecode,
 			statename, countycode, countyname, ffiec_median_family_income, sequencenumber, actiontype,
-			applicantsex, coapplicantsex
+			applicantsex, coapplicantsex, occupancy
 			FROM hmdapub2013 WHERE msaofproperty = %s and (loantype = '2' or loantype = '3' or loantype = '4')
 			and propertytype !='3' and loanpurpose = '1' ;'''
 		return SQL
@@ -822,7 +865,7 @@ class queries(AD_report):
 			coapplicantrace1, coapplicantrace2, coapplicantrace3, coapplicantrace4, coapplicantrace5,
 			applicantethnicity, coapplicantethnicity, applicantincome, loanamount, asofdate, statecode,
 			statename, countycode, countyname, ffiec_median_family_income, sequencenumber, actiontype,
-			applicantsex, coapplicantsex
+			applicantsex, coapplicantsex, occupancy
 			FROM hmdapub2012 WHERE msaofproperty = %s and loantype = '1' and propertytype !='3' and loanpurpose = '1' ;'''
 		return SQL
 
@@ -832,7 +875,7 @@ class queries(AD_report):
 			coapplicantrace1, coapplicantrace2, coapplicantrace3, coapplicantrace4, coapplicantrace5,
 			applicantethnicity, coapplicantethnicity, applicantincome, loanamount, asofdate, statecode,
 			statename, countycode, countyname, ffiec_median_family_income, sequencenumber, actiontype,
-			applicantsex, coapplicantsex
+			applicantsex, coapplicantsex, occupancy
 			FROM hmdapub2013 WHERE msaofproperty = %s and loantype = '1' and propertytype !='3' and loanpurpose = '1' ;'''
 		return SQL
 
@@ -842,7 +885,7 @@ class queries(AD_report):
 			coapplicantrace1, coapplicantrace2, coapplicantrace3, coapplicantrace4, coapplicantrace5,
 			applicantethnicity, coapplicantethnicity, applicantincome, loanamount, asofdate, statecode,
 			statename, countycode, countyname, ffiec_median_family_income, sequencenumber, actiontype,
-			applicantsex, coapplicantsex
+			applicantsex, coapplicantsex, occupancy
 			FROM hmdapub2012 WHERE msaofproperty = %s and propertytype !='3' and loanpurpose = '3' ;'''
 		return SQL
 
@@ -852,7 +895,7 @@ class queries(AD_report):
 			coapplicantrace1, coapplicantrace2, coapplicantrace3, coapplicantrace4, coapplicantrace5,
 			applicantethnicity, coapplicantethnicity, applicantincome, loanamount, asofdate, statecode,
 			statename, countycode, countyname, ffiec_median_family_income, sequencenumber, actiontype,
-			applicantsex, coapplicantsex
+			applicantsex, coapplicantsex, occupancy
 			FROM hmdapub2013 WHERE msaofproperty = %s and propertytype !='3' and loanpurpose = '3' ;'''
 		return SQL
 
@@ -862,7 +905,7 @@ class queries(AD_report):
 			coapplicantrace1, coapplicantrace2, coapplicantrace3, coapplicantrace4, coapplicantrace5,
 			applicantethnicity, coapplicantethnicity, applicantincome, loanamount, asofdate, statecode,
 			statename, countycode, countyname, ffiec_median_family_income, sequencenumber, actiontype,
-			applicantsex, coapplicantsex
+			applicantsex, coapplicantsex, occupancy
 			FROM hmdapub2012 WHERE msaofproperty = %s and propertytype !='3' and loanpurpose = '2' ;'''
 		return SQL
 
@@ -872,9 +915,70 @@ class queries(AD_report):
 			coapplicantrace1, coapplicantrace2, coapplicantrace3, coapplicantrace4, coapplicantrace5,
 			applicantethnicity, coapplicantethnicity, applicantincome, loanamount, asofdate, statecode,
 			statename, countycode, countyname, ffiec_median_family_income, sequencenumber, actiontype,
-			applicantsex, coapplicantsex
+			applicantsex, coapplicantsex, occupancy
 			FROM hmdapub2013 WHERE msaofproperty = %s and propertytype !='3' and loanpurpose = '2' ;'''
 		return SQL
+
+	def table_4_5_2012(self):
+		SQL = '''SELECT
+			censustractnumber, applicantrace1, applicantrace2, applicantrace3, applicantrace4, applicantrace5,
+			coapplicantrace1, coapplicantrace2, coapplicantrace3, coapplicantrace4, coapplicantrace5,
+			applicantethnicity, coapplicantethnicity, applicantincome, loanamount, asofdate, statecode,
+			statename, countycode, countyname, ffiec_median_family_income, sequencenumber, actiontype,
+			applicantsex, coapplicantsex, occupancy
+			FROM hmdapub2012 WHERE msaofproperty = %s and propertytype ='3';'''
+		return SQL
+
+	def table_4_5_2013(self):
+		SQL = '''SELECT
+			censustractnumber, applicantrace1, applicantrace2, applicantrace3, applicantrace4, applicantrace5,
+			coapplicantrace1, coapplicantrace2, coapplicantrace3, coapplicantrace4, coapplicantrace5,
+			applicantethnicity, coapplicantethnicity, applicantincome, loanamount, asofdate, statecode,
+			statename, countycode, countyname, ffiec_median_family_income, sequencenumber, actiontype,
+			applicantsex, coapplicantsex, occupancy
+			FROM hmdapub2013 WHERE msaofproperty = %s and propertytype ='3';'''
+		return SQL
+
+	def table_4_6_2012(self):
+		SQL = '''SELECT
+			censustractnumber, applicantrace1, applicantrace2, applicantrace3, applicantrace4, applicantrace5,
+			coapplicantrace1, coapplicantrace2, coapplicantrace3, coapplicantrace4, coapplicantrace5,
+			applicantethnicity, coapplicantethnicity, applicantincome, loanamount, asofdate, statecode,
+			statename, countycode, countyname, ffiec_median_family_income, sequencenumber, actiontype,
+			applicantsex, coapplicantsex, occupancy
+			FROM hmdapub2012 WHERE msaofproperty = %s and occupancy = '2' and propertytype !='3';'''
+		return SQL
+
+	def table_4_6_2013(self):
+		SQL = '''SELECT
+			censustractnumber, applicantrace1, applicantrace2, applicantrace3, applicantrace4, applicantrace5,
+			coapplicantrace1, coapplicantrace2, coapplicantrace3, coapplicantrace4, coapplicantrace5,
+			applicantethnicity, coapplicantethnicity, applicantincome, loanamount, asofdate, statecode,
+			statename, countycode, countyname, ffiec_median_family_income, sequencenumber, actiontype,
+			applicantsex, coapplicantsex, occupancy
+			FROM hmdapub2013 WHERE msaofproperty = %s and occupancy = '2' and propertytype !='3';'''
+		return SQL
+
+	def table_4_7_2012(self):
+		SQL = '''SELECT
+			censustractnumber, applicantrace1, applicantrace2, applicantrace3, applicantrace4, applicantrace5,
+			coapplicantrace1, coapplicantrace2, coapplicantrace3, coapplicantrace4, coapplicantrace5,
+			applicantethnicity, coapplicantethnicity, applicantincome, loanamount, asofdate, statecode,
+			statename, countycode, countyname, ffiec_median_family_income, sequencenumber, actiontype,
+			applicantsex, coapplicantsex, occupancy
+			FROM hmdapub2012 WHERE msaofproperty = %s and propertytype ='2';'''
+		return SQL
+
+	def table_4_7_2013(self):
+		SQL = '''SELECT
+			censustractnumber, applicantrace1, applicantrace2, applicantrace3, applicantrace4, applicantrace5,
+			coapplicantrace1, coapplicantrace2, coapplicantrace3, coapplicantrace4, coapplicantrace5,
+			applicantethnicity, coapplicantethnicity, applicantincome, loanamount, asofdate, statecode,
+			statename, countycode, countyname, ffiec_median_family_income, sequencenumber, actiontype,
+			applicantsex, coapplicantsex, occupancy
+			FROM hmdapub2013 WHERE msaofproperty = %s and propertytype ='2';'''
+		return SQL
+
 
 class aggregate(AD_report): #aggregates LAR rows by appropriate characteristics to fill the JSON files
 

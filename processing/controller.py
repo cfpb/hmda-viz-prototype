@@ -31,13 +31,17 @@ selector.get_report_lists('MSAinputs2013.csv') #fills the dictionary of lists of
 report_4x = report_4x()
 #report_3x = report_3x()
 
-selector.report_list['A 4-4'] = ['29620']
+#selector.report_list['A 4-6'] = ['29620']
+#selector.report_list['A 4-5'] = ['29620']
+report_4x.report_47(selector)
+report_4x.report_46(selector)
+report_4x.report_45(selector)
 report_4x.report_44(selector)
-#report_4x.report_43(selector)
-#report_4x.report_42(selector)
-#report_4x.report_41(selector)
-#report_3x.report_31(selector)
-#report_3x.report_32(selector)
+report_4x.report_43(selector)
+report_4x.report_42(selector)
+report_4x.report_41(selector)
+report_3x.report_31(selector)
+report_3x.report_32(selector)
 
 
 

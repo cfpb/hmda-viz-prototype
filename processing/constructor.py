@@ -21,6 +21,130 @@ class report_4x(constructor):
 		self.connection = connect() #connects to the DB
 		self.queries = queries() #query text for all tables
 		self.agg = agg() #aggregation functions for all tables
+	def report_47(self, selector):
+		cur = self.connection.connect() #creates cursor object connected to HMDAPub2012 sql database, locally hosted postgres
+		for MSA in selector.report_list['A 4-7']:
+			build47 = build()
+			build47.set_msa_names(cur) #builds a list of msa names as a dictionary
+			location = (MSA,) #pass the MSA nubmers as a tuple to Psycopg2 (doesn't take singletons)
+			if selector.report_list['year'][1] == '2012':
+				SQL = self.queries.count_rows_47_2012()
+			elif selector.report_list['year'][1] == '2013':
+				SQL = self.queries.count_rows_47_2013()
+			else:
+				print "invalid year in selection"
+			cur.execute(SQL, location)
+			count = int(cur.fetchone()[0])
+
+			if count > 0:
+				print count, 'LAR rows in MSA %s, for report 4-7, in %s' %(MSA, selector.report_list['year'][1])
+				if selector.report_list['year'][1] == '2012':
+					SQL = self.queries.table_4_3_2012()
+				elif selector.report_list['year'][1] == '2013':
+					SQL = self.queries.table_4_3_2013()
+				else:
+					print "invalid year in input file"
+
+				cur.execute(SQL, location)
+				for num in range(0, count):
+					row = cur.fetchone()
+					self.parsed.parse_t4x(row)
+					if num == 0:
+						build47.set_header(self.parsed.inputs, MSA, build47.table_headers('4-7'), 'Aggregate', '4-7')
+						table47 = build47.table_4x_builder()
+
+					self.agg.build_report4x(table47, self.parsed.inputs)
+				path = "json" + "/" +table47['type']+"/"+table47['year']+"/"+build47.get_state_name(table47['msa']['state']).lower()+"/"+build47.msa_names[MSA].replace(' ', '-').lower()+"/"+table47['table']
+				if not os.path.exists(path): #check if path exists
+					os.makedirs(path) #if path not present, create it
+				build47.write_JSON(table47['table']+'.json', table47, path)
+				build47.jekyll_for_report(path) #create and write jekyll file to report path
+				#year in the path is determined by the asofdate in the LAR entry
+				path2 = "json"+"/"+table47['type']+"/"+table47['year']+"/"+build47.get_state_name(table47['msa']['state']).lower()+"/"+build47.msa_names[MSA].replace(' ', '-').lower() #set path for writing the jekyll file to the msa directory
+				build47.jekyll_for_msa(path2) #create and write jekyll file to the msa path
+	def report_46(self, selector):
+		cur = self.connection.connect() #creates cursor object connected to HMDAPub2012 sql database, locally hosted postgres
+		for MSA in selector.report_list['A 4-6']:
+			build46 = build()
+			build46.set_msa_names(cur) #builds a list of msa names as a dictionary
+			location = (MSA,) #pass the MSA nubmers as a tuple to Psycopg2 (doesn't take singletons)
+			if selector.report_list['year'][1] == '2012':
+				SQL = self.queries.count_rows_46_2012()
+			elif selector.report_list['year'][1] == '2013':
+				SQL = self.queries.count_rows_46_2013()
+			else:
+				print "invalid year in selection"
+			cur.execute(SQL, location)
+			count = int(cur.fetchone()[0])
+
+			if count > 0:
+				print count, 'LAR rows in MSA %s, for report 4-6, in %s' %(MSA, selector.report_list['year'][1])
+				if selector.report_list['year'][1] == '2012':
+					SQL = self.queries.table_4_3_2012()
+				elif selector.report_list['year'][1] == '2013':
+					SQL = self.queries.table_4_3_2013()
+				else:
+					print "invalid year in input file"
+
+				cur.execute(SQL, location)
+				for num in range(0, count):
+					row = cur.fetchone()
+					self.parsed.parse_t4x(row)
+					if num == 0:
+						build46.set_header(self.parsed.inputs, MSA, build46.table_headers('4-6'), 'Aggregate', '4-6')
+						table46 = build46.table_4x_builder()
+
+					self.agg.build_report4x(table46, self.parsed.inputs)
+				path = "json" + "/" +table46['type']+"/"+table46['year']+"/"+build46.get_state_name(table46['msa']['state']).lower()+"/"+build46.msa_names[MSA].replace(' ', '-').lower()+"/"+table46['table']
+				if not os.path.exists(path): #check if path exists
+					os.makedirs(path) #if path not present, create it
+				build46.write_JSON(table46['table']+'.json', table46, path)
+				build46.jekyll_for_report(path) #create and write jekyll file to report path
+				#year in the path is determined by the asofdate in the LAR entry
+				path2 = "json"+"/"+table46['type']+"/"+table46['year']+"/"+build46.get_state_name(table46['msa']['state']).lower()+"/"+build46.msa_names[MSA].replace(' ', '-').lower() #set path for writing the jekyll file to the msa directory
+				build46.jekyll_for_msa(path2) #create and write jekyll file to the msa path
+
+	def report_45(self, selector):
+		cur = self.connection.connect() #creates cursor object connected to HMDAPub2012 sql database, locally hosted postgres
+		for MSA in selector.report_list['A 4-5']:
+			build45 = build()
+			build45.set_msa_names(cur) #builds a list of msa names as a dictionary
+			location = (MSA,) #pass the MSA nubmers as a tuple to Psycopg2 (doesn't take singletons)
+			if selector.report_list['year'][1] == '2012':
+				SQL = self.queries.count_rows_45_2012()
+			elif selector.report_list['year'][1] == '2013':
+				SQL = self.queries.count_rows_45_2013()
+			else:
+				print "invalid year in selection"
+			cur.execute(SQL, location)
+			count = int(cur.fetchone()[0])
+
+			if count > 0:
+				print count, 'LAR rows in MSA %s, for report 4-5, in %s' %(MSA, selector.report_list['year'][1])
+				if selector.report_list['year'][1] == '2012':
+					SQL = self.queries.table_4_5_2012()
+				elif selector.report_list['year'][1] == '2013':
+					SQL = self.queries.table_4_5_2013()
+				else:
+					print "invalid year in input file"
+
+				cur.execute(SQL, location)
+				for num in range(0, count):
+					row = cur.fetchone()
+					self.parsed.parse_t4x(row)
+					if num == 0:
+						build45.set_header(self.parsed.inputs, MSA, build45.table_headers('4-5'), 'Aggregate', '4-5')
+						table45 = build45.table_4x_builder()
+
+					self.agg.build_report4x(table45, self.parsed.inputs)
+				path = "json" + "/" +table45['type']+"/"+table45['year']+"/"+build45.get_state_name(table45['msa']['state']).lower()+"/"+build45.msa_names[MSA].replace(' ', '-').lower()+"/"+table45['table']
+				if not os.path.exists(path): #check if path exists
+					os.makedirs(path) #if path not present, create it
+				build45.write_JSON(table45['table']+'.json', table45, path)
+				build45.jekyll_for_report(path) #create and write jekyll file to report path
+				#year in the path is determined by the asofdate in the LAR entry
+				path2 = "json"+"/"+table45['type']+"/"+table45['year']+"/"+build45.get_state_name(table45['msa']['state']).lower()+"/"+build45.msa_names[MSA].replace(' ', '-').lower() #set path for writing the jekyll file to the msa directory
+				build45.jekyll_for_msa(path2) #create and write jekyll file to the msa path
 
 	def report_44(self, selector):
 		cur = self.connection.connect() #creates cursor object connected to HMDAPub2012 sql database, locally hosted postgres
@@ -40,9 +164,9 @@ class report_4x(constructor):
 			if count > 0:
 				print count, 'LAR rows in MSA %s, for report 4-4, in %s' %(MSA, selector.report_list['year'][1])
 				if selector.report_list['year'][1] == '2012':
-					SQL = self.queries.table_4_3_2012()
+					SQL = self.queries.table_4_4_2012()
 				elif selector.report_list['year'][1] == '2013':
-					SQL = self.queries.table_4_3_2013()
+					SQL = self.queries.table_4_4_2013()
 				else:
 					print "invalid year in input file"
 
@@ -58,7 +182,7 @@ class report_4x(constructor):
 				path = "json" + "/" +table44['type']+"/"+table44['year']+"/"+build44.get_state_name(table44['msa']['state']).lower()+"/"+build44.msa_names[MSA].replace(' ', '-').lower()+"/"+table44['table']
 				if not os.path.exists(path): #check if path exists
 					os.makedirs(path) #if path not present, create it
-				build44.write_JSON('4-4.json', table44, path)
+				build44.write_JSON(table44['table']+'.json', table44, path)
 				build44.jekyll_for_report(path) #create and write jekyll file to report path
 				#year in the path is determined by the asofdate in the LAR entry
 				path2 = "json"+"/"+table44['type']+"/"+table44['year']+"/"+build44.get_state_name(table44['msa']['state']).lower()+"/"+build44.msa_names[MSA].replace(' ', '-').lower() #set path for writing the jekyll file to the msa directory
@@ -101,7 +225,7 @@ class report_4x(constructor):
 				path = "json" + "/" +table43['type']+"/"+table43['year']+"/"+build43.get_state_name(table43['msa']['state']).lower()+"/"+build43.msa_names[MSA].replace(' ', '-').lower()+"/"+table43['table']
 				if not os.path.exists(path): #check if path exists
 					os.makedirs(path) #if path not present, create it
-				build43.write_JSON('4-3.json', table43, path)
+				build43.write_JSON(table42['table']+'.json', table43, path)
 				build43.jekyll_for_report(path) #create and write jekyll file to report path
 				#year in the path is determined by the asofdate in the LAR entry
 				path2 = "json"+"/"+table43['type']+"/"+table43['year']+"/"+build43.get_state_name(table43['msa']['state']).lower()+"/"+build43.msa_names[MSA].replace(' ', '-').lower() #set path for writing the jekyll file to the msa directory
@@ -143,7 +267,7 @@ class report_4x(constructor):
 				path = "json" + "/" +table42['type']+"/"+table42['year']+"/"+build42.get_state_name(table42['msa']['state']).lower()+"/"+build42.msa_names[MSA].replace(' ', '-').lower()+"/"+table42['table']
 				if not os.path.exists(path): #check if path exists
 					os.makedirs(path) #if path not present, create it
-				build42.write_JSON('4-2.json', table42, path)
+				build42.write_JSON(table42['table']+'.json', table42, path)
 				build42.jekyll_for_report(path) #create and write jekyll file to report path
 				#year in the path is determined by the asofdate in the LAR entry
 				path2 = "json"+"/"+table42['type']+"/"+table42['year']+"/"+build42.get_state_name(table42['msa']['state']).lower()+"/"+build42.msa_names[MSA].replace(' ', '-').lower() #set path for writing the jekyll file to the msa directory
@@ -185,7 +309,7 @@ class report_4x(constructor):
 				path = "json" + "/" +table41['type']+"/"+table41['year']+"/"+build41.get_state_name(table41['msa']['state']).lower()+"/"+build41.msa_names[MSA].replace(' ', '-').lower()+"/"+table41['table']
 				if not os.path.exists(path): #check if path exists
 					os.makedirs(path) #if path not present, create it
-				build41.write_JSON('4-1.json', table41, path)
+				build41.write_JSON(table['table']+'.json', table41, path)
 				build41.jekyll_for_report(path) #create and write jekyll file to report path
 				#year in the path is determined by the asofdate in the LAR entry
 				path2 = "json"+"/"+table41['type']+"/"+table41['year']+"/"+build41.get_state_name(table41['msa']['state']).lower()+"/"+build41.msa_names[MSA].replace(' ', '-').lower() #set path for writing the jekyll file to the msa directory
@@ -235,7 +359,7 @@ class report_3x(constructor):
 				path = "json"+"/"+table31['type']+"/"+table31['year']+"/"+build31.get_state_name(table31['msa']['state']).lower()+"/"+build31.msa_names[MSA].replace(' ', '-').lower() + "/" +table31['table']#set path for writing the JSON file by geography
 				if not os.path.exists(path): #check if path exists
 					os.makedirs(path) #if path not present, create it
-				build31.write_JSON('3-1.json', table31, path)
+				build31.write_JSON(table31['table']+'.json', table31, path)
 				build31.jekyll_for_report(path) #create and write jekyll file to report path
 				#year in the path is determined by the asofdate in the LAR entry
 				path2 = "json"+"/"+table31['type']+"/"+table31['year']+"/"+build31.get_state_name(table31['msa']['state']).lower()+"/"+build31.msa_names[MSA].replace(' ', '-').lower() #set path for writing the jekyll file to the msa directory
@@ -279,7 +403,7 @@ class report_3x(constructor):
 				path = "json"+"/"+table32['type']+"/"+table32['year']+"/"+build32.get_state_name(table32['msa']['state']).lower()+"/"+build32.msa_names[MSA].replace(' ', '-').lower() + "/" + table32['table'] #directory path to store JSON object
 				if not os.path.exists(path): #check if path exists
 					os.makedirs(path) #if path not present, create it
-				build32.write_JSON('3-2.json', table32, path) #write the json into the correct path
+				build32.write_JSON(table['table']+'.json', table32, path) #write the json into the correct path
 				build32.jekyll_for_report(path)#create and write jekyll file to report path
 				#year in the path is determined by the asofdate in the LAR entry
 				path2 = "json"+"/"+table32['type']+"/"+table32['year']+"/"+build32.get_state_name(table32['msa']['state']).lower()+"/"+build32.msa_names[MSA].replace(' ', '-').lower() #set path for writing the jekyll file to the msa directory
