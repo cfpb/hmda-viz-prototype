@@ -11,19 +11,6 @@ desc: This is a listing of all U.S. States and territories for which reports are
 			<select id="years">
 				<option value="2013" selected="selected">2013</option>
 				<option value="2012">2012</option>
-				<option value="2011">2011</option>
-				<option value="2010">2010</option>
-				<option value="2009">2009</option>
-				<option value="2008">2008</option>
-				<option value="2007">2007</option>
-				<option value="2006">2006</option>
-				<option value="2005">2005</option>
-				<option value="2004">2004</option>
-				<option value="2003">2003</option>
-				<option value="2002">2002</option>
-				<option value="2001">2001</option>
-				<option value="2000">2000</option>
-				<option value="1999">1999</option>
 			</select>
 			<label class="form-label-header" for="states">State</label>
 			<select size="10" id="states">
