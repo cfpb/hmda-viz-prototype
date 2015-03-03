@@ -54,6 +54,7 @@ class report_4x(constructor):
 
 			SQL = getattr(self.queries, self.query_string)()
 			cur.execute(SQL, location)
+
 			for num in range(0, count):
 				row = cur.fetchone()
 				getattr(self.parsed, self.parse_function)(row)

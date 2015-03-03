@@ -39,6 +39,9 @@ for report in report_list: #loop over a list of report names
 
 
 
+#selector.report_list['A 4-6'] = ['29620']
+#selector.report_list['A 4-5'] = ['29620']
+
 
 
 
