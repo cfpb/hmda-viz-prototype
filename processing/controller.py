@@ -20,10 +20,10 @@ connection = connect() #connects to the DB
 selector = selector() #holds lists of reports to be generated for each MSA
 cur = connection.connect() #creates cursor object connected to HMDAPub2012 sql database, locally hosted postgres
 selector.get_report_lists('MSAinputs2013.csv') #fills the dictionary of lists of reports to be generated
-#build_msa = build() #instantiate the build object
+build_msa = build() #instantiate the build object
 #need to make a switch to build aggregate and disclosure MSA in state lists
-#build_msa.msas_in_state(cur, selector, 'aggregate') #creates a list of all MSAs in each state and places the file in the state's aggregate folder
-#build_msa.msas_in_state(cur, selector, 'disclosure')#creates a list of all MSAs in each state and places the file in the state's disclosure folder
+build_msa.msas_in_state(cur, selector, 'aggregate') #creates a list of all MSAs in each state and places the file in the state's aggregate folder
+build_msa.msas_in_state(cur, selector, 'disclosure')#creates a list of all MSAs in each state and places the file in the state's disclosure folder
 
 def aggregation_return(year, report_number):
 	if report_number == 'A 3-1':
@@ -33,14 +33,14 @@ def aggregation_return(year, report_number):
 	elif report_number[:3] == 'A 4':
 		return 'build_report4x'
 
-def JSON_constructor_return(year, report_number):
+def JSON_constructor_return(report_number):
 	if report_number == 'A 3-1':
 		return 'table_31_builder'
 	elif report_number == 'A 3-2':
 		return 'table_32_builder'
 	elif report_number[:3] == 'A 4':
 		return 'table_4x_builder'
-def parse_return(year, report_number):
+def parse_return(report_number):
 	if report_number == 'A 3-1':
 		return 'parse_t31'
 	elif report_number == 'A 3-2':
@@ -128,14 +128,15 @@ def count_return(year, report_number):
 		elif report_number == 'A 4-7':
 			return 'count_rows_47_2012'
 
+
 report_4x = report_4x()
 #report_3x = report_3x()
-selector.report_list['A 3-1'] = ['29620']
+selector.report_list['A 4-2'] = ['29620']
 selector.report_list['A 4-1'] = ['29620']
 
 report_list = ['A 4-2', 'A 4-1']
 for report in report_list:
-	report_4x.report_x(selector, report, query_return(selector.report_list['year'][1], report), count_return(selector.report_list['year'][1], report)) #variabalize funciton inputs!!!!
+	report_4x.report_x(selector, report, query_return(selector.report_list['year'][1], report), count_return(selector.report_list['year'][1], report), parse_return(report), JSON_constructor_return(report)) #variabalize funciton inputs!!!!
 
 
 #report_4x.report_47(selector)

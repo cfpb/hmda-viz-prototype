@@ -363,7 +363,7 @@ class build_JSON(AD_report):
 		self.dispositions_list = ['Applications Received', 'Loans Originated', 'Apps. Approved But Not Accepted', 'Aplications Denied', 'Applications Withdrawn', 'Files Closed For Incompleteness']
 		self.gender_list = ['Male', 'Female', 'Joint (Male/Female)']
 
-	def msas_in_state(self, cursor, selector):
+	def msas_in_state(self, cursor, selector, report_type):
 		#this function builds a list of MSA numbers and names in each state
 		#set sql query text to pull MSA names for each MSA number
 		SQL = '''SELECT DISTINCT name, geoid_msa
@@ -398,7 +398,7 @@ class build_JSON(AD_report):
 			name = 'msa-mds.json'
 			#this year path uses the year from the input file
 			#aggregate needs to be variablalized
-			path = 'json'+"/"+'aggregate'+"/"+selector.report_list['year'][1]+"/"+self.state_names[state].replace(' ', '-').lower()
+			path = 'json'+"/"+report_type+"/"+selector.report_list['year'][1]+"/"+self.state_names[state].replace(' ', '-').lower()
 			print path #change this to a log file write
 			if not os.path.exists(path): #check if path exists
 				os.makedirs(path) #if path not present, create it

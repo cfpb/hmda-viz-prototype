@@ -23,13 +23,13 @@ class report_4x(constructor):
 		self.agg = agg() #aggregation functions for all tables
 
 
-	def report_x(self, selector, report_number, query_string, count_string):
+	def report_x(self, selector, report_number, query_string, count_string, parse_function, json_builder):
 		#count_string_2012 = 'count_rows_47_2012'
 		#count_string_2013 = 'count_rows_47_2013'
-		query_string_2012 = 'table_4_7_2012'
-		query_string_2013 = 'table_4_7_2013'
-		parse_function = 'parse_t4x'
-		json_builder = 'table_4x_builder'
+		#query_string_2012 = 'table_4_7_2012'
+		#query_string_2013 = 'table_4_7_2013'
+		#parse_function = 'parse_t4x'
+		#json_builder = 'table_4x_builder'
 
 		table_number = report_number[2:]
 		if report_number[0] == 'A':
