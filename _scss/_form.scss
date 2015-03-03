@@ -1,0 +1,47 @@
+/* form */
+form {
+    margin: 0;
+}
+.input-wrapper {
+    position: relative;
+}
+input {
+    border-radius: 2px;
+    display: block;
+    float: left;
+    font-family: "AvenirNextLTW01-Medium", Helvetica, Arial;
+    font-size: 1em;
+}
+input[type="text"] {
+    border: 1px solid $gray-20;
+    padding: 3px 95px 3px 6px;
+    width: 100%;
+}
+input[type="submit"] {
+    font-size: .75em;
+    margin: 1px 0 0 1px;
+}
+label {
+    font-family: "AvenirNextLTW01-Medium", Helvetica, Arial;
+    display: block;
+    margin-top: 5px;
+}
+
+.input-group {
+    *zoom: 1;
+    margin-top: 15px;
+    &:before, &:after {
+        content: "";
+        display: table;
+        line-height: 0;
+    }
+    &:after {
+        clear: both;
+    }
+}
+
+select {
+    border: 1px solid $gray-80;
+    border-radius: 3px;
+    padding: 5px;
+}

@@ -1,0 +1,105 @@
+.panel {
+    background-color: $white;
+    box-shadow: 0 1px 1px $gray-50; 
+    border-radius: 2px;
+    padding: 20px;
+    position: absolute;
+    left: 20px;
+    top: 20px;
+    width: 400px;
+    z-index: 1000;
+}
+.show-hide-data {
+    display: none;
+    float: right;
+}
+
+.data-wrapper {
+    display: none;
+}
+
+.help {
+    margin-top: 10px;
+
+    a:link, a:visited {
+        display: inline-block;
+        font-size: .75em;
+    }
+}
+
+#downloads {
+    font-size: .75em;
+    margin: 10px 0;
+    a {
+        font-size: 1em;
+    }
+}
+
+#data {
+    max-height: 425px;
+    margin-top: 20px;
+    overflow-y: scroll;
+    max-width: 500px;
+}
+
+.result {
+    border-top: 1px solid $gray-20;
+    padding: 10px 0;
+    &:last-child {
+        border-bottom: 1px solid $gray-20;
+    }
+    p, h5 {
+        margin: 0;
+    }
+    p {
+       font-size: .75em;
+    }
+    h5 {
+        color: $green;
+        font-family: "AvenirNextLTW01-Demi", Helvetica, Arial;
+        font-size: 1em;
+        font-weight: normal;
+        margin-bottom: 0;
+    }
+    h6 {
+        color: $gray-80;
+        font-family: "AvenirNextLTW01-Regular", Helvetica, Arial;
+        font-weight: normal;
+        margin: 0;
+        text-transform: capitalize;
+        span {
+            text-transform: uppercase;
+        }
+    }
+}
+
+.placename {
+    margin-bottom: 5px;
+}
+.type, .relevance {
+    color: $gray-50;
+    float: left;
+    width: 50%;
+    a {
+        margin: 0;
+    }
+}
+.good {
+    color: $green;
+}
+.ok {
+    color: $gold;
+}
+.bad {
+    color: $redorange;
+}
+.relevance {
+    text-align: right;
+}
+
+#count {
+    font-family: "AvenirNextLTW01-Demi", Helvetica, Arial;
+    font-size: .65em;
+    margin-top: 20px;
+    text-align: right;
+}

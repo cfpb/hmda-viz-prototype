@@ -1,0 +1,161 @@
+<script id="3-2" type="text/template">
+	<section class="banner">
+	    <div class="container">
+	        <div class="row">
+	            <div class="col-2">
+	                <h2 id="report-title">{{type}} Table {{table}}: {{desc}}, {{year}}</h2>
+	                <p id="report-msa">MSA/MD: {{msa.id}} - {{msa.name}}, {{msa.state}}</p>
+	            </div>
+	        </div>
+	        <div class="row downloads">
+	        	<div class="col-3">
+	        		<a href="{{table}}.json" class="btn btn-inverse">JSON</a> <a id="csv" class="btn btn-inverse">CSV</a> <a id="print" class="btn btn-inverse">Print</a>
+	        	</div>
+	        </div>
+	    </div>
+	</section>
+
+	<table class="table report">
+		<thead>
+			<tr>
+				<th><h5>Pricing Information</h5></th>
+				<th class="purchaser" colspan="2" valign="bottom" width="10%;">Fannie Mae</th>
+				<th class="purchaser" colspan="2" valign="bottom" width="10%;">Ginnie Mae</th>
+				<th class="purchaser" colspan="2" valign="bottom" width="10%;">Freddie Mac</th>
+				<th class="purchaser" colspan="2" valign="bottom" width="10%;">Farmer Mac</th>
+				<th class="purchaser" colspan="2" valign="bottom" width="10%;">Private Securitization</th>
+				<th class="purchaser" colspan="2" valign="bottom" width="10%;">Commercial Bank, Savings Bank, or Saving Assoc</th>
+				<th class="purchaser" colspan="2" valign="bottom" width="10%;">Insurance Co, Credit Union, Mortgage BK, or Finance Co</th>
+				<th class="purchaser" colspan="2" valign="bottom" width="10%;">Affiliate Institution</th>
+				<th class="purchaser" colspan="2" valign="bottom" width="10%;">Other Purchaser</th>
+			</tr>
+			<tr class="heading">
+				<th></th>
+				<th>First Lien #</th>
+				<th>Junior Lien #</th>
+				<th>First Lien #</th>
+				<th>Junior Lien #</th>
+				<th>First Lien #</th>
+				<th>Junior Lien #</th>
+				<th>First Lien #</th>
+				<th>Junior Lien #</th>
+				<th>First Lien #</th>
+				<th>Junior Lien #</th>
+				<th>First Lien #</th>
+				<th>Junior Lien #</th>
+				<th>First Lien #</th>
+				<th>Junior Lien #</th>
+				<th>First Lien #</th>
+				<th>Junior Lien #</th>
+				<th>First Lien #</th>
+				<th>Junior Lien #</th>
+			</tr>
+
+		</thead>
+		<tbody>
+			{{#pricinginformation}}
+				<tr>
+					<td class="characteristic">{{pricing}}</td>
+					{{#purchasers}}
+					<td>{{firstliencount}}</td>
+					<td>{{juniorliencount}}</td>
+					{{/purchasers}}
+				</tr>
+			{{/pricinginformation}}
+
+			<tr>
+				<td class="characteristic" colspan="19" align="left"><h5>Precentage Points Above Average Prime Offer Rate: Only Includes Loans With APR Above The Threshold</h5></td>
+			</tr>
+			
+			{{#points}}
+				<tr>
+					<td class="characteristic">{{point}}</td>
+					{{#purchasers}}
+					<td>{{firstliencount}}</td>
+					<td>{{juniorliencount}}</td>
+					{{/purchasers}}
+				</tr>
+			{{/points}}
+
+			<tr>
+				<td class="characteristic"><h5>HOEPA Loans</h5></td>
+				{{#hoepa.purchasers}}
+					<td>{{firstliencount}}</td>
+					<td>{{juniorliencount}}</td>
+				{{/hoepa.purchasers}}
+			</tr>
+		</tbody>
+	</table>
+
+	<table class="table report">
+		<thead>
+			<tr>
+				<th><h5>Pricing Information</h5></th>
+				<th class="purchaser" colspan="2" valign="bottom" width="10%;">Fannie Mae</th>
+				<th class="purchaser" colspan="2" valign="bottom" width="10%;">Ginnie Mae</th>
+				<th class="purchaser" colspan="2" valign="bottom" width="10%;">Freddie Mac</th>
+				<th class="purchaser" colspan="2" valign="bottom" width="10%;">Farmer Mac</th>
+				<th class="purchaser" colspan="2" valign="bottom" width="10%;">Private Securitization</th>
+				<th class="purchaser" colspan="2" valign="bottom" width="10%;">Commercial Bank, Savings Bank, or Saving Assoc</th>
+				<th class="purchaser" colspan="2" valign="bottom" width="10%;">Insurance Co, Credit Union, Mortgage BK, or Finance Co</th>
+				<th class="purchaser" colspan="2" valign="bottom" width="10%;">Affiliate Institution</th>
+				<th class="purchaser" colspan="2" valign="bottom" width="10%;">Other Purchaser</th>
+			</tr>
+			<tr class="heading">
+				<th></th>
+				<th>First Lien 000s</th>
+				<th>Junior Lien 000s</th>
+				<th>First Lien 000s</th>
+				<th>Junior Lien 000s</th>
+				<th>First Lien 000s</th>
+				<th>Junior Lien 000s</th>
+				<th>First Lien 000s</th>
+				<th>Junior Lien 000s</th>
+				<th>First Lien 000s</th>
+				<th>Junior Lien 000s</th>
+				<th>First Lien 000s</th>
+				<th>Junior Lien 000s</th>
+				<th>First Lien 000s</th>
+				<th>Junior Lien 000s</th>
+				<th>First Lien 000s</th>
+				<th>Junior Lien 000s</th>
+				<th>First Lien 000s</th>
+				<th>Junior Lien 000s</th>
+			</tr>
+
+		</thead>
+		<tbody>
+			{{#pricinginformation}}
+				<tr>
+					<td class="characteristic">{{pricing}}</td>
+					{{#purchasers}}
+					<td>{{firstlienvalue}}</td>
+					<td>{{juniorliencount}}</td>
+					{{/purchasers}}
+				</tr>
+			{{/pricinginformation}}
+
+			<tr>
+				<td class="characteristic" colspan="19" align="left"><h5>Precentage Points Above Average Prime Offer Rate: Only Includes Loans With APR Above The Threshold</h5></td>
+			</tr>
+			
+			{{#points}}
+				<tr>
+					<td class="characteristic">{{point}}</td>
+					{{#purchasers}}
+					<td>{{firstlienvalue}}</td>
+					<td>{{juniorliencount}}</td>
+					{{/purchasers}}
+				</tr>
+			{{/points}}
+
+			<tr>
+				<td class="characteristic"><h5>HOEPA Loans</h5></td>
+				{{#hoepa.purchasers}}
+					<td>{{firstlienvalue}}</td>
+					<td>{{juniorliencount}}</td>
+				{{/hoepa.purchasers}}
+			</tr>
+		</tbody>
+	</table>
+</script>

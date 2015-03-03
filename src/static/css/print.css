@@ -1,9 +1,18 @@
 /* set to allow printing of the tables */
 @media print {
-	.wrapper, .footer, .downloads {
-		display: none;
-	}
-	th, td {
-		padding: .25em;
-	}
+    .wrapper, .footer, .downloads {
+        display: none;
+    }
+    th, td {
+        padding: .25em;
+    }
+    table {
+        -fs-table-paginate: paginate;
+    }
+    thead {
+        display: table-header-group;
+    }
+    tbody {
+        display: table-row-group;
+    }
 }
