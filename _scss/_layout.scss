@@ -12,19 +12,20 @@ html {
   clear: both;
 }
 
-.wrapper {
+#content {
+    margin-top: 20px;
+}
+
+.container {
+    margin: 0 auto;
     position: relative;
+    width: 100%;
+    max-width: $max-width;
     &:after {
         content: "";
         display: table;
         clear: both;
     }
-}
-
-.container {
-    margin: 0 auto;
-    width: 100%;
-    max-width: $max-width;
 }
 
 .row {

@@ -22,9 +22,7 @@ input[type="submit"] {
     margin: 1px 0 0 1px;
 }
 label {
-    color: $gray-50;
     font-family: "AvenirNextLTW01-Medium", Helvetica, Arial;
-    font-size: .75em;
     display: block;
     margin-top: 5px;
 }
@@ -40,4 +38,10 @@ label {
     &:after {
         clear: both;
     }
+}
+
+select {
+    border: 1px solid $gray-80;
+    border-radius: 3px;
+    padding: 5px;
 }
