@@ -91,8 +91,8 @@ $( document ).ready(function() {
         }
     });
 
-    theCSV = theCSV + $('#report-title').text() + '\n';
-    theCSV = theCSV + $('#report-msa').text() + '\n';
+    theCSV = theCSV + '"' + $('#report-title').text() + '"' + '\n';
+    theCSV = theCSV + '"' + $('#report-msa').text() + '"' + '\n';
 
     console.log (colCount);
 
