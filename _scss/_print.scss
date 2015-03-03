@@ -1,0 +1,21 @@
+/* set to allow printing of the tables */
+@media print {
+    .beta-header,
+    header,
+    footer, 
+    .downloads {
+        display: none;
+    }
+    th, td {
+        padding: .25em;
+    }
+    table {
+        -fs-table-paginate: paginate;
+    }
+    thead {
+        display: table-header-group;
+    }
+    tbody {
+        display: table-row-group;
+    }
+}
