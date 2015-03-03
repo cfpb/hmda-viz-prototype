@@ -29,7 +29,6 @@ html {
 
 .row {
     *zoom: 1;
-    margin-bottom: 15px;
     &:before, &:after {
         content: "";
         display: table;
@@ -42,7 +41,7 @@ html {
 
 [class*="col-"] {
     float: left;
-    margin: 0 $gutter;
+    padding: 0 $gutter;
     min-height: 1px;
     position: relative;
 }
@@ -50,6 +49,6 @@ html {
 // 12 col grid
 @for $i from 1 to $columns+1 {
     .col-#{$i} {
-        width: (($i / $columns) * 100%) - ($gutter * 2);
+        width: (($i / $columns) * 100%);
     }
 }

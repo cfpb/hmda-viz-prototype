@@ -1,5 +1,6 @@
 /* buttons */
-.btn {
+.btn,
+a.btn {
     background-color: $pacific;
     border: none;
     border-radius: 2px;
@@ -9,4 +10,8 @@
     &:hover {
         background-color: $pacific-80;
     }
+}
+a.btn {
+	padding-left: 10px;
+	padding-right: 10px;
 }

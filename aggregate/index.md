@@ -1,11 +1,11 @@
 ---
 layout: index
+
+title: Aggregate Report by State
+desc: This is a listing of all U.S. States and territories for which reports are created. Choose a State from the listing by clicking the row and pressing the "Retrieve MSA/MDs by State" button.
 ---
 <div class="row">
-    <div class="col-3">
-		<h1>Aggregate Report by State</h1>
-		<p>Note: This is a listing of all U.S. States and territories for which reports are created. Choose a State from the listing by clicking the row and pressing the "Retrieve MSA/MDs by State" button.</p>
-
+	<div class="col-1">
 		<form class="block__bg">
 			<label class="form-label-header" for="years">Year</label>
 			<select id="years">
@@ -82,7 +82,7 @@ layout: index
 				<option value="PUERTO RICO">72 - PUERTO RICO (PR)</option>
 			</select>
 			<div class="input-group">
-				<input class="btn js-btn" type="submit" href="#" value="Submit" />
+				<a class="btn js-btn" type="submit" href="/aggreate/2013">Submit</a>
 			</div>
 		</form>
 	</div>

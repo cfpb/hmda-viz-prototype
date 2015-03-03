@@ -2,24 +2,38 @@
 {% include header.html %}
 {% assign urlsplit = page.url | split:"/" %}
 {% assign urlsize = urlsplit | size %}
-<div class="wrap">
-	<section class="content homepage" id="content">
-		<main role="main">
-		    {% include breadcrumb.html %}
 
-			<h1>{{ urlsplit[3] | upcase }} ({{ urlsplit[2] }})</h1>
+<section class="banner">
+    <div class="container">
+        <div class="row">
+            <div class="col-2">
+                <h2>{{ urlsplit[3] | upcase }} ({{ urlsplit[2] }})</h2>
+                <p>Note: This is a listing of MSA/MD(s) where institutions have reports. Choose an MSA/MD by clicking a row and pressing select MSA/MD.</p>
+            </div>
+        </div>
+    </div>
+</section>
 
-			<p>Note: This is a listing of MSA/MD(s) where institutions have reports. Choose an MSA/MD by clicking a row and pressing select MSA/MD.</p>
+<div class="container">
+    <div class="row">
+        <div class="col-3">
+            {% include breadcrumb.html %}
+        </div>
+    </div>
 
-			<form class="block__bg">
-				<label class="form-label-header" for="msa-mds">MSA/MD</label>
-				<select id="msa-mds" size="10">
-				</select>
-				<br />
-				<a href="" class="btn js-btn" id="js-this-msa">Select MSA/MD</a> <a href="{{ site.baseurl }}/aggregate/state/" class="btn">Select All Tables for MSA/MD</a> <a href="{{ site.baseurl }}/aggregate/state/" class="btn">Select All Tables for MSA/MD - Text File</a>
-			</form>
-		</main>
-	</section>
+    <div class="row">
+        <div class="col-3">
+            <form class="block__bg">
+                <label class="form-label-header" for="msa-mds">MSA/MD</label>
+                <select id="msa-mds" size="10">
+                </select>
+                <br />
+                <div class="input-group">
+                    <a href="" class="btn js-btn" id="js-this-msa">Select MSA/MD</a> <a href="{{ site.baseurl }}/aggregate/state/" class="btn">Select All Tables for MSA/MD</a> <a href="{{ site.baseurl }}/aggregate/state/" class="btn">Select All Tables for MSA/MD - Text File</a>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
 
 {% include footer.html %}

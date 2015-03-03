@@ -47,7 +47,7 @@ function setLink() {
     'use strict';
     var newURL = '';  // needed on first page, year and state make the url
     $('select').each(function() {
-        newURL += $(this).val().replace(' ', '-').toLowerCase() + '/';
+        newURL += $(this).val().replace(/ /g, '-').toLowerCase() + '/';
         console.log(newURL);
     });
     $('.js-btn').attr('href', newURL);

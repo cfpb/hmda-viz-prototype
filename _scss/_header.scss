@@ -1,6 +1,5 @@
 /* header */
 header {
-    border-bottom: 3px solid $green;
     margin: 20px 0;
     h1 {
         font-family: "AvenirNextLTW01-Demi", Helvetica, Arial;
@@ -8,6 +7,10 @@ header {
     }
     .logo {
         float: right;
+    }
+    a:link,
+    a:visited {
+        color: $black;
     }
 }
 
@@ -18,6 +21,6 @@ header {
 
 	li {
 		display: inline-block;
-		margin-right: 10px;
+		margin-right: 20px;
 	}
 }
