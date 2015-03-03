@@ -9,6 +9,16 @@ function getUIData() {
         var selectID = this.id;
         // get <select> data
         $.get(selectID + '.json', function(data) {
+            // sort on the name if its the msas
+            if (selectID === 'msa-mds') {
+                console.log('sorting');
+                data['msa-mds'].sort(function(a,b) {
+                    if(a.name < b.name) return -1;
+                    if(a.name > b.name) return 1;
+                    return 0;
+                });
+            }
+            console.log(selectID);
             // get template
             $.get('/hmda-viz-prototype/templates/selects.html', function(templates) {
                 var template = $(templates).filter('#' + selectID).html();
