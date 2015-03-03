@@ -29,7 +29,7 @@ class report_4x(constructor):
 		self.count_string = self.count_return(self.year, report)
 		self.report_number = report
 
-	def report_x(self, MSA):
+	def report_x(self, MSA, cur):
 		table_number = self.report_number[2:]
 		if self.report_number[0] == 'A':
 			report_type = 'Aggregate'
@@ -38,7 +38,7 @@ class report_4x(constructor):
 		elif self.report_number[0] == 'N':
 			report_type = 'National'
 
-		cur = self.connection.connect() #creates cursor object connected to HMDAPub2012 sql database, locally hosted postgres
+		#cur = self.connection.connect() #creates cursor object connected to HMDAPub2012 sql database, locally hosted postgres
 
 		#for MSA in selector.report_list[report_number]: #take this loop out
 		build_X = build()

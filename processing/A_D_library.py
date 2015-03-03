@@ -493,6 +493,7 @@ class build_JSON(AD_report):
 			holding['gender'] = "{}".format(gender)
 			genders.append(holding)
 		return genders
+
 	def set_gender_disps(self):
 		for i in range(0, len(self.race_names)):
 			for g in range(0, len(self.gender_list)):
@@ -571,9 +572,9 @@ class build_JSON(AD_report):
 			 holding = OrderedDict({})
 			 holding['point'] = "{}".format(rate)
 			 if self.table32_rates.index(rate) < 8:
-				holding['purchasers'] = self.set_purchasers(['first lien count', 'first lien value', 'junior lien count', 'junior lien value'])
+				holding['purchasers'] = self.set_purchasers(['firstliencount', 'firstlienvalue', 'juniorliencount', 'juniorlienvalue'])
 			 else:
-				holding['purchasers'] = self.set_purchasers(['first lien', 'junior lien'])
+				holding['purchasers'] = self.set_purchasers(['firstlien', 'juniorlien'])
 			 spreads.append(holding)
 		return spreads
 
@@ -613,7 +614,7 @@ class build_JSON(AD_report):
 		for cat in categories:
 			holding = OrderedDict({})
 			holding['pricing']= "{}".format(cat)
-			holding['purchasers']  = self.set_purchasers(['first lien count', 'first lien value', 'junior lien count', 'junior lien value']) #purchasers is overwritten each pass in the holding dictionary
+			holding['purchasers']  = self.set_purchasers(['firstliencount', 'firstlienvalue', 'juniorliencount', 'juniorlienvalue']) #purchasers is overwritten each pass in the holding dictionary
 			pricinginformation.append(holding)
 		self.container['pricinginformation'] = pricinginformation
 		holding = OrderedDict({})
@@ -621,7 +622,7 @@ class build_JSON(AD_report):
 		self.container['points'] = points
 		hoepa = OrderedDict({})
 		hoepa['pricing'] = 'hoepa loans'
-		hoepa['purchasers'] = self.set_purchasers(['first lien count', 'first lien value', 'junior lien count', 'junior lien value'])
+		hoepa['purchasers'] = self.set_purchasers(['firstliencount', 'firstlienvalue', 'juniorliencount', 'juniorlienvalue'])
 		self.container['hoepa'] = hoepa
 		return self.container
 
@@ -1026,36 +1027,36 @@ class aggregate(AD_report): #aggregates LAR rows by appropriate characteristics 
 	def by_pricing_status(self, container, inputs): #aggregate loans by lien status
 		#index 8 is for loans with no reported pricing information
 		if inputs['rate spread index'] == 8 and inputs['lien status'] == '1':
-			container['pricinginformation'][0]['purchasers'][inputs['purchaser']]['first lien count'] +=1
-			container['pricinginformation'][0]['purchasers'][inputs['purchaser']]['first lien value'] += int(inputs['loan value'])
+			container['pricinginformation'][0]['purchasers'][inputs['purchaser']]['firstliencount'] +=1
+			container['pricinginformation'][0]['purchasers'][inputs['purchaser']]['firstlienvalue'] += int(inputs['loan value'])
 		elif inputs['rate spread index'] == 8 and inputs['lien status'] == '2':
-			container['pricinginformation'][0]['purchasers'][inputs['purchaser']]['junior lien count'] +=1
-			container['pricinginformation'][0]['purchasers'][inputs['purchaser']]['junior lien value'] += int(inputs['loan value'])
+			container['pricinginformation'][0]['purchasers'][inputs['purchaser']]['juniorliencount'] +=1
+			container['pricinginformation'][0]['purchasers'][inputs['purchaser']]['juniorlienvalue'] += int(inputs['loan value'])
 		else: #if loan has pricing information aggregate by index
 			if inputs['rate spread index'] < 8 and inputs['lien status'] == '1' :
-				container['pricinginformation'][1]['purchasers'][inputs['purchaser']]['first lien count'] +=1
-				container['pricinginformation'][1]['purchasers'][inputs['purchaser']]['first lien value'] += int(inputs['loan value'])
+				container['pricinginformation'][1]['purchasers'][inputs['purchaser']]['firstliencount'] +=1
+				container['pricinginformation'][1]['purchasers'][inputs['purchaser']]['firstlienvalue'] += int(inputs['loan value'])
 			elif  inputs['rate spread index'] < 8 and inputs['lien status'] == '2':
-				container['pricinginformation'][1]['purchasers'][inputs['purchaser']]['junior lien count'] += 1
-				container['pricinginformation'][1]['purchasers'][inputs['purchaser']]['junior lien value'] += int(inputs['loan value'])
+				container['pricinginformation'][1]['purchasers'][inputs['purchaser']]['juniorliencount'] += 1
+				container['pricinginformation'][1]['purchasers'][inputs['purchaser']]['juniorlienvalue'] += int(inputs['loan value'])
 
 	def by_rate_spread(self, container, inputs): #aggregate loans by rate spread index
 		if inputs['lien status'] == '1' and inputs['rate spread index'] < 8: #aggregate first lien status loans
-			container['points'][inputs['rate spread index']]['purchasers'][inputs['purchaser']]['first lien count'] +=1
-			container['points'][inputs['rate spread index']]['purchasers'][inputs['purchaser']]['first lien value'] += int(inputs['loan value'])
+			container['points'][inputs['rate spread index']]['purchasers'][inputs['purchaser']]['firstliencount'] +=1
+			container['points'][inputs['rate spread index']]['purchasers'][inputs['purchaser']]['firstlienvalue'] += int(inputs['loan value'])
 
 		elif inputs['lien status'] == '2' and inputs['rate spread index'] <8: #aggregate subordinate lien status loans
-			container['points'][inputs['rate spread index']]['purchasers'][inputs['purchaser']]['junior lien count'] +=1
-			container['points'][inputs['rate spread index']]['purchasers'][inputs['purchaser']]['junior lien value'] += int(inputs['loan value'])
+			container['points'][inputs['rate spread index']]['purchasers'][inputs['purchaser']]['juniorliencount'] +=1
+			container['points'][inputs['rate spread index']]['purchasers'][inputs['purchaser']]['juniorlienvalue'] += int(inputs['loan value'])
 
 	def by_hoepa_status(self, container, inputs): #aggregate loans subject to HOEPA
 		if inputs['hoepa flag'] == 1:
 			if inputs['lien status'] == '1': #first lien HOEPA
-				container['hoepa']['purchasers'][inputs['purchaser']]['first lien count'] +=1
-				container['hoepa']['purchasers'][inputs['purchaser']]['first lien value'] +=int(inputs['loan value'])
+				container['hoepa']['purchasers'][inputs['purchaser']]['firstliencount'] +=1
+				container['hoepa']['purchasers'][inputs['purchaser']]['firstlienvalue'] +=int(inputs['loan value'])
 			elif inputs['lien status'] == '2': #junior lien HOEPA
-				container['hoepa']['purchasers'][inputs['purchaser']]['junior lien count'] +=1
-				container['hoepa']['purchasers'][inputs['purchaser']]['junior lien value'] +=int(inputs['loan value'])
+				container['hoepa']['purchasers'][inputs['purchaser']]['juniorliencount'] +=1
+				container['hoepa']['purchasers'][inputs['purchaser']]['juniorlienvalue'] +=int(inputs['loan value'])
 			elif inputs['lien status'] == '3':
 				pass #this space reserved for loans not secured by liens
 			elif inputs['lien status'] == '4':
