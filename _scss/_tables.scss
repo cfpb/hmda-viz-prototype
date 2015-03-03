@@ -4,33 +4,43 @@
     border-collapse: collapse;
     border-spacing: 0;
     color: $black;
-    &.report {
-        font-size: .75em;
-        margin: 20px 10px;
-    }
     th, td {
         padding: 5px 7px;
     }
     th {
         font-family: "AvenirNextLTW01-Demi", Helvetica, Arial, sans-serif;
-        &.title {
-            text-align: left;
-        }
-        &.purchaser {
-            border-bottom: 1px solid $gray-50;
-        }
     }
     tbody td {
         border: 1px solid $gray-20;
     }
 }
 .report {
+    font-size: .75em;
+    margin: 20px 10px;
+    th {
+        &.title {
+            text-align: left;
+        }
+        &.purchaser {
+            border-bottom: 2px solid $gray-50;
+        }
+    }
     h4, h5 {
         margin: 0;
     }
-    h5 {
+    h5, tr.characteristic td:first-child {
         font-family: "AvenirNextLTW01-Demi", Helvetica, Arial, sans-serif;
         font-size: 1em;
+        text-align: left;
         text-transform: uppercase;
+    }
+    tr.characteristic td {
+        border-top: 2px solid $gray-50;
+    }
+    td:first-child {
+        text-align: left;
+    }
+    td {
+        text-align: right;
     }
 }

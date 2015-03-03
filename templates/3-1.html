@@ -53,16 +53,16 @@
 
 		</thead>
 		<tbody>
-			<tr>
-				<td class="characteristic" colspan="19" align="left"><h5>Borrower Characteristics</h5></td>
+			<tr class="characteristic">
+				<td colspan="19" align="left">Borrower Characteristics</td>
 			</tr>
 			{{#borrowercharacteristics}}
-				<tr>
-					<td class="characteristic" colspan="19"><h5>{{characteristic}}</h5></td>
+				<tr class="characteristic">
+					<td colspan="19">{{characteristic}}</td>
 				</tr>
 				{{#races}}
 					<tr>
-						<td class="characteristic">{{race}}</td>
+						<td>{{race}}</td>
 						{{#purchasers}}
 						<td>{{count}}</td>
 						<td>{{value}}</td>
@@ -71,7 +71,7 @@
 				{{/races}}
 				{{#ethnicities}}
 					<tr>
-						<td class="characteristic">{{ethnicity}}</td>
+						<td>{{ethnicity}}</td>
 						{{#purchasers}}
 						<td>{{count}}</td>
 						<td>{{value}}</td>
@@ -80,7 +80,7 @@
 				{{/ethnicities}}
 				{{#minoritystatuses}}
 					<tr>
-						<td class="characteristic">{{minoritystatus}}</td>
+						<td>{{minoritystatus}}</td>
 						{{#purchasers}}
 						<td>{{count}}</td>
 						<td>{{value}}</td>
@@ -89,7 +89,7 @@
 				{{/minoritystatuses}}
 				{{#applicantincomes}}
 					<tr>
-						<td class="characteristic">{{applicantincome}}</td>
+						<td>{{applicantincome}}</td>
 						{{#purchasers}}
 						<td>{{count}}</td>
 						<td>{{value}}</td>
@@ -98,16 +98,16 @@
 				{{/applicantincomes}}
 			{{/borrowercharacteristics}}
 
-			<tr>
-				<td class="characteristic" colspan="19" align="left"><h5>Census Tract Characteristics</h5></td>
+			<tr class="characteristic">
+				<td colspan="19" align="left">Census Tract Characteristics</td>
 			</tr>
 			{{#censuscharacteristics}}
-				<tr>
-					<td class="characteristic" colspan="19"><h5>{{characteristic}}</h5></td>
+				<tr class="characteristic">
+					<td colspan="19">{{characteristic}}</td>
 				</tr>
 				{{#tractpctminorities}}
 					<tr>
-						<td class="characteristic">{{tractpctminority}}</td>
+						<td>{{tractpctminority}}</td>
 						{{#purchasers}}
 						<td>{{count}}</td>
 						<td>{{value}}</td>
@@ -116,7 +116,7 @@
 				{{/tractpctminorities}}
 				{{#incomelevels}}
 					<tr>
-						<td class="characteristic">{{incomelevel}}</td>
+						<td>{{incomelevel}}</td>
 						{{#purchasers}}
 						<td>{{count}}</td>
 						<td>{{value}}</td>
@@ -125,8 +125,8 @@
 				{{/incomelevels}}
 			{{/censuscharacteristics}}
 
-			<tr>
-				<td class="characteristic"><h5>Total</h5></td>
+			<tr class="characteristic">
+				<td>Total</td>
 				{{#total.purchasers}}
 					<td>{{count}}</td>
 					<td>{{value}}</td>
