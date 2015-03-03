@@ -15,3 +15,12 @@ a.btn {
 	padding-left: 10px;
 	padding-right: 10px;
 }
+
+.btn-inverse,
+a.btn-inverse {
+    background-color: $white;
+    color: $pacific;
+    &:hover {
+        background-color: $gray-20;
+    }
+}

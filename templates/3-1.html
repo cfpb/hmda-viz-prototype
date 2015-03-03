@@ -1,127 +1,137 @@
 <script id="3-1" type="text/template">
-	<thead>
-		<tr>
-			<th colspan="19"><h4>{{type}} Table {{table}}: {{desc}}, {{year}}</h4></th>
-		</tr>
-		<tr>
-			<th class="msa" colspan="19"><h5>MSA/MD: {{msa.id}} - {{msa.name}}, {{msa.state}}</h5></th>
-		</tr>
-		<tr class="heading">
-			<th><h5>Borrower or Census Tract Characteristics</h5></th>
-			<th colspan="2" valign="bottom" width="10%;">Fannie Mae</th>
-			<th colspan="2" valign="bottom" width="10%;">Ginnie Mae</th>
-			<th colspan="2" valign="bottom" width="10%;">Freddie Mac</th>
-			<th colspan="2" valign="bottom" width="10%;">Farmer Mac</th>
-			<th colspan="2" valign="bottom" width="10%;">Private Securitization</th>
-			<th colspan="2" valign="bottom" width="10%;">Commercial Bank, Savings Bank, or Saving Assoc</th>
-			<th colspan="2" valign="bottom" width="10%;">Insurance Co, Credit Union, Mortgage BK, or Finance Co</th>
-			<th colspan="2" valign="bottom" width="10%;">Affiliate Institution</th>
-			<th colspan="2" valign="bottom" width="10%;">Other Purchaser</th>
-		</tr>
-		<tr class="heading">
-			<th></th>
-			<th>Number</th>
-			<th>$000s</th>
-			<th>Number</th>
-			<th>$000s</th>
-			<th>Number</th>
-			<th>$000s</th>
-			<th>Number</th>
-			<th>$000s</th>
-			<th>Number</th>
-			<th>$000s</th>
-			<th>Number</th>
-			<th>$000s</th>
-			<th>Number</th>
-			<th>$000s</th>
-			<th>Number</th>
-			<th>$000s</th>
-			<th>Number</th>
-			<th>$000s</th>
-		</tr>
+	<section class="banner">
+	    <div class="container">
+	        <div class="row">
+	            <div class="col-2">
+	                <h2>{{type}} Table {{table}}: {{desc}}, {{year}}</h2>
+	                <p>MSA/MD: {{msa.id}} - {{msa.name}}, {{msa.state}}</p>
+	            </div>
+	        </div>
+	        <div class="row downloads">
+	        	<div class="col-3">
+	        		<a href="{{ urlsplit[5] }}.json" class="btn btn-inverse">JSON</a> <a id="csv" class="btn btn-inverse">CSV</a> <a id="print" class="btn btn-inverse">Print</a>
+	        	</div>
+	        </div>
+	    </div>
+	</section>
 
-	</thead>
-	<tbody>
-		<tr>
-			<td class="characteristic" colspan="19" align="left"><h5>Borrower Characteristics</h5></td>
-		</tr>
-		{{#borrowercharacteristics}}
+	<table class="table report">
+		<thead>
 			<tr>
-				<td class="characteristic" colspan="19"><h5>{{characteristic}}</h5></td>
+				<th><h5>Borrower or Census Tract Characteristics</h5></th>
+				<th class="purchaser" colspan="2" valign="bottom" width="10%;">Fannie Mae</th>
+				<th class="purchaser" colspan="2" valign="bottom" width="10%;">Ginnie Mae</th>
+				<th class="purchaser" colspan="2" valign="bottom" width="10%;">Freddie Mac</th>
+				<th class="purchaser" colspan="2" valign="bottom" width="10%;">Farmer Mac</th>
+				<th class="purchaser" colspan="2" valign="bottom" width="10%;">Private Securitization</th>
+				<th class="purchaser" colspan="2" valign="bottom" width="10%;">Commercial Bank, Savings Bank, or Saving Assoc</th>
+				<th class="purchaser" colspan="2" valign="bottom" width="10%;">Insurance Co, Credit Union, Mortgage BK, or Finance Co</th>
+				<th class="purchaser" colspan="2" valign="bottom" width="10%;">Affiliate Institution</th>
+				<th class="purchaser" colspan="2" valign="bottom" width="10%;">Other Purchaser</th>
 			</tr>
-			{{#races}}
-				<tr>
-					<td class="characteristic">{{race}}</td>
-					{{#purchasers}}
-					<td>{{count}}</td>
-					<td>{{value}}</td>
-					{{/purchasers}}
-				</tr>
-			{{/races}}
-			{{#ethnicities}}
-				<tr>
-					<td class="characteristic">{{ethnicity}}</td>
-					{{#purchasers}}
-					<td>{{count}}</td>
-					<td>{{value}}</td>
-					{{/purchasers}}
-				</tr>
-			{{/ethnicities}}
-			{{#minoritystatuses}}
-				<tr>
-					<td class="characteristic">{{minoritystatus}}</td>
-					{{#purchasers}}
-					<td>{{count}}</td>
-					<td>{{value}}</td>
-					{{/purchasers}}
-				</tr>
-			{{/minoritystatuses}}
-			{{#applicantincomes}}
-				<tr>
-					<td class="characteristic">{{applicantincome}}</td>
-					{{#purchasers}}
-					<td>{{count}}</td>
-					<td>{{value}}</td>
-					{{/purchasers}}
-				</tr>
-			{{/applicantincomes}}
-		{{/borrowercharacteristics}}
+			<tr class="heading">
+				<th></th>
+				<th>Number</th>
+				<th>$000s</th>
+				<th>Number</th>
+				<th>$000s</th>
+				<th>Number</th>
+				<th>$000s</th>
+				<th>Number</th>
+				<th>$000s</th>
+				<th>Number</th>
+				<th>$000s</th>
+				<th>Number</th>
+				<th>$000s</th>
+				<th>Number</th>
+				<th>$000s</th>
+				<th>Number</th>
+				<th>$000s</th>
+				<th>Number</th>
+				<th>$000s</th>
+			</tr>
 
-		<tr>
-			<td class="characteristic" colspan="19" align="left"><h5>Census Tract Characteristics</h5></td>
-		</tr>
-		{{#censuscharacteristics}}
+		</thead>
+		<tbody>
 			<tr>
-				<td class="characteristic" colspan="19"><h5>{{characteristic}}</h5></td>
+				<td class="characteristic" colspan="19" align="left"><h5>Borrower Characteristics</h5></td>
 			</tr>
-			{{#tractpctminorities}}
+			{{#borrowercharacteristics}}
 				<tr>
-					<td class="characteristic">{{tractpctminority}}</td>
-					{{#purchasers}}
-					<td>{{count}}</td>
-					<td>{{value}}</td>
-					{{/purchasers}}
+					<td class="characteristic" colspan="19"><h5>{{characteristic}}</h5></td>
 				</tr>
-			{{/tractpctminorities}}
-			{{#incomelevels}}
-				<tr>
-					<td class="characteristic">{{incomelevel}}</td>
-					{{#purchasers}}
-					<td>{{count}}</td>
-					<td>{{value}}</td>
-					{{/purchasers}}
-				</tr>
-			{{/incomelevels}}
-		{{/censuscharacteristics}}
+				{{#races}}
+					<tr>
+						<td class="characteristic">{{race}}</td>
+						{{#purchasers}}
+						<td>{{count}}</td>
+						<td>{{value}}</td>
+						{{/purchasers}}
+					</tr>
+				{{/races}}
+				{{#ethnicities}}
+					<tr>
+						<td class="characteristic">{{ethnicity}}</td>
+						{{#purchasers}}
+						<td>{{count}}</td>
+						<td>{{value}}</td>
+						{{/purchasers}}
+					</tr>
+				{{/ethnicities}}
+				{{#minoritystatuses}}
+					<tr>
+						<td class="characteristic">{{minoritystatus}}</td>
+						{{#purchasers}}
+						<td>{{count}}</td>
+						<td>{{value}}</td>
+						{{/purchasers}}
+					</tr>
+				{{/minoritystatuses}}
+				{{#applicantincomes}}
+					<tr>
+						<td class="characteristic">{{applicantincome}}</td>
+						{{#purchasers}}
+						<td>{{count}}</td>
+						<td>{{value}}</td>
+						{{/purchasers}}
+					</tr>
+				{{/applicantincomes}}
+			{{/borrowercharacteristics}}
 
-		<tr>
-			<td class="characteristic"><h5>Total</h5></td>
-			{{#total.purchasers}}
-				<td>{{count}}</td>
-				<td>{{value}}</td>
-			{{/total.purchasers}}
-		</tr>
-	</tbody>
-	<tfoot>
-	</tfoot>
+			<tr>
+				<td class="characteristic" colspan="19" align="left"><h5>Census Tract Characteristics</h5></td>
+			</tr>
+			{{#censuscharacteristics}}
+				<tr>
+					<td class="characteristic" colspan="19"><h5>{{characteristic}}</h5></td>
+				</tr>
+				{{#tractpctminorities}}
+					<tr>
+						<td class="characteristic">{{tractpctminority}}</td>
+						{{#purchasers}}
+						<td>{{count}}</td>
+						<td>{{value}}</td>
+						{{/purchasers}}
+					</tr>
+				{{/tractpctminorities}}
+				{{#incomelevels}}
+					<tr>
+						<td class="characteristic">{{incomelevel}}</td>
+						{{#purchasers}}
+						<td>{{count}}</td>
+						<td>{{value}}</td>
+						{{/purchasers}}
+					</tr>
+				{{/incomelevels}}
+			{{/censuscharacteristics}}
+
+			<tr>
+				<td class="characteristic"><h5>Total</h5></td>
+				{{#total.purchasers}}
+					<td>{{count}}</td>
+					<td>{{value}}</td>
+				{{/total.purchasers}}
+			</tr>
+		</tbody>
+	</table>
 </script>

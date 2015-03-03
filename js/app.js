@@ -35,7 +35,7 @@ function getTableData(table) {
             //var template = $(templates).filter('#' + table + '-new').html();
             var template = $(templates).filter('#' + table).html();
             var html = Mustache.to_html(template, data);
-            $('#' + table).html(html);
+            $('#report').html(html);
         });
     });
 }
