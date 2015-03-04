@@ -383,7 +383,7 @@ class build_JSON(AD_report):
 				temp = {} #holding dict for single MSA id and name
 				cut_point =str(row['name'])[::-1].find(' ')+2 #find index to remove state abbreviations
 				temp['id'] = row['geoid_msa'] #set MSA number to id in dict
-				temp['name'] = str(row['name'])[:-cut_point].replace(' ', '-').upper()
+				temp['name'] = str(row['name'])[:-cut_point].replace(' ', '-').replace('--','-').upper()
 				msas.append(temp)
 
 			cursor.execute(SQL2, location)
@@ -398,7 +398,7 @@ class build_JSON(AD_report):
 			name = 'msa-mds.json'
 			#this year path uses the year from the input file
 			#aggregate needs to be variablalized
-			path = 'json'+"/"+report_type+"/"+selector.report_list['year'][1]+"/"+self.state_names[state].replace(' ', '-').lower()
+			path = 'json'+"/"+report_type+"/"+selector.report_list['year'][1]+"/"+self.state_names[state].replace(' ', '-').replace('--', '-').lower()
 			print path #change this to a log file write
 			if not os.path.exists(path): #check if path exists
 				os.makedirs(path) #if path not present, create it
