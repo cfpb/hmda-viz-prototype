@@ -40,6 +40,10 @@ function getTableData(table) {
     'use strict';
     // get <table> data
     $.get(table + '.json', function(data) {
+        // get the first charactire of the table #
+        if (table.charAt(0) === '4') {
+            table = '4';    // all 4's, 4-1 through 4-7, use the same table layout
+        }
         // get template
         $.get('/hmda-viz-prototype/templates/' + table + '.html', function(templates) {
             //var template = $(templates).filter('#' + table + '-new').html();
