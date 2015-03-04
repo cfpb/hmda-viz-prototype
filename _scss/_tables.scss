@@ -16,13 +16,16 @@
 }
 .report {
     font-size: .75em;
-    margin: 20px 10px;
+    margin: 40px 0;
+    width: 100%;
     th {
+        border-left: 1px solid $gray-50;
+        border-right: 1px solid $gray-50;
         &.title {
             text-align: left;
         }
         &.purchaser {
-            border-bottom: 2px solid $gray-50;
+            border-bottom: 1px solid $gray-50;
         }
     }
     h4, h5 {

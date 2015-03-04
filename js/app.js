@@ -38,17 +38,24 @@ function getUIData() {
     */
 function getTableData(table) {
     'use strict';
+    var partials = {};
     // get <table> data
     $.get(table + '.json', function(data) {
         // get the first charactire of the table #
         if (table.charAt(0) === '4') {
             table = '4';    // all 4's, 4-1 through 4-7, use the same table layout
         }
+        // get partials
+        $.get('/hmda-viz-prototype/templates/partials-tables.html', function(templates) {
+            //var template = $(templates).filter('#' + table + '-new').html();
+            partials['tablebanner'] = $(templates).filter('#tablebanner').html();
+            //var html = Mustache.to_html(template, data);
+        });
         // get template
         $.get('/hmda-viz-prototype/templates/' + table + '.html', function(templates) {
             //var template = $(templates).filter('#' + table + '-new').html();
             var template = $(templates).filter('#' + table).html();
-            var html = Mustache.to_html(template, data);
+            var html = Mustache.to_html(template, data, partials);
             $('#report').html(html);
         });
     });

@@ -1,0 +1,17 @@
+<script id="tablebanner" type="text/template">
+	<section class="banner">
+	    <div class="container">
+	        <div class="row">
+	            <div class="col-2">
+	                <h2 id="report-title">{{type}} Table {{table}}: {{desc}}, {{year}}</h2>
+	                <p id="report-msa">MSA/MD: {{msa.id}} - {{msa.name}}, {{msa.state}}</p>
+	            </div>
+	        </div>
+	        <div class="row downloads">
+	        	<div class="col-3">
+	        		<a href="{{table}}.json" class="btn btn-inverse">JSON</a> <a id="csv" class="btn btn-inverse">CSV</a> <a id="print" class="btn btn-inverse">Print</a>
+	        	</div>
+	        </div>
+	    </div>
+	</section>
+</script>
