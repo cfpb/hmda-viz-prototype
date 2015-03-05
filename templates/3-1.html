@@ -50,8 +50,8 @@
 					<tr>
 						<td>{{race}}</td>
 						{{#purchasers}}
-						<td>{{count}}</td>
-						<td>{{value}}</td>
+						<td>{{#addCommas}}{{count}}{{/addCommas}}</td>
+						<td>{{#addCommas}}{{value}}{{/addCommas}}</td>
 						{{/purchasers}}
 					</tr>
 				{{/races}}
@@ -59,8 +59,8 @@
 					<tr>
 						<td>{{ethnicity}}</td>
 						{{#purchasers}}
-						<td>{{count}}</td>
-						<td>{{value}}</td>
+						<td>{{#addCommas}}{{count}}{{/addCommas}}</td>
+						<td>{{#addCommas}}{{value}}{{/addCommas}}</td>
 						{{/purchasers}}
 					</tr>
 				{{/ethnicities}}
@@ -68,8 +68,8 @@
 					<tr>
 						<td>{{minoritystatus}}</td>
 						{{#purchasers}}
-						<td>{{count}}</td>
-						<td>{{value}}</td>
+						<td>{{#addCommas}}{{count}}{{/addCommas}}</td>
+						<td>{{#addCommas}}{{value}}{{/addCommas}}</td>
 						{{/purchasers}}
 					</tr>
 				{{/minoritystatuses}}
@@ -77,8 +77,8 @@
 					<tr>
 						<td>{{applicantincome}}</td>
 						{{#purchasers}}
-						<td>{{count}}</td>
-						<td>{{value}}</td>
+						<td>{{#addCommas}}{{count}}{{/addCommas}}</td>
+						<td>{{#addCommas}}{{value}}{{/addCommas}}</td>
 						{{/purchasers}}
 					</tr>
 				{{/applicantincomes}}
@@ -95,8 +95,8 @@
 					<tr>
 						<td>{{tractpctminority}}</td>
 						{{#purchasers}}
-						<td>{{count}}</td>
-						<td>{{value}}</td>
+						<td>{{#addCommas}}{{count}}{{/addCommas}}</td>
+						<td>{{#addCommas}}{{value}}{{/addCommas}}</td>
 						{{/purchasers}}
 					</tr>
 				{{/tractpctminorities}}
@@ -104,8 +104,8 @@
 					<tr>
 						<td>{{incomelevel}}</td>
 						{{#purchasers}}
-						<td>{{count}}</td>
-						<td>{{value}}</td>
+						<td>{{#addCommas}}{{count}}{{/addCommas}}</td>
+						<td>{{#addCommas}}{{value}}{{/addCommas}}</td>
 						{{/purchasers}}
 					</tr>
 				{{/incomelevels}}
@@ -114,8 +114,8 @@
 			<tr class="characteristic">
 				<td>Total</td>
 				{{#total.purchasers}}
-					<td>{{count}}</td>
-					<td>{{value}}</td>
+					<td>{{#addCommas}}{{count}}{{/addCommas}}</td>
+					<td>{{#addCommas}}{{value}}{{/addCommas}}</td>
 				{{/total.purchasers}}
 			</tr>
 		</tbody>

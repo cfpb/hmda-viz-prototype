@@ -43,8 +43,8 @@
 				<tr class="characteristic">
 					<td>{{pricing}}</td>
 					{{#purchasers}}
-					<td>{{firstliencount}}</td>
-					<td>{{juniorliencount}}</td>
+					<td>{{#addCommas}}{{firstliencount}}{{/addCommas}}</td>
+					<td>{{#addCommas}}{{juniorliencount}}{{/addCommas}}</td>
 					{{/purchasers}}
 				</tr>
 			{{/pricinginformation}}
@@ -57,8 +57,8 @@
 				<tr>
 					<td>{{point}}</td>
 					{{#purchasers}}
-					<td>{{firstliencount}}</td>
-					<td>{{juniorliencount}}</td>
+					<td>{{#addCommas}}{{firstliencount}}{{/addCommas}}</td>
+					<td>{{#addCommas}}{{juniorliencount}}{{/addCommas}}</td>
 					{{/purchasers}}
 				</tr>
 			{{/points}}
@@ -66,8 +66,8 @@
 			<tr class="characteristic">
 				<td><h5>HOEPA Loans</h5></td>
 				{{#hoepa.purchasers}}
-					<td>{{firstliencount}}</td>
-					<td>{{juniorliencount}}</td>
+					<td>{{#addCommas}}{{firstliencount}}{{/addCommas}}</td>
+					<td>{{#addCommas}}{{juniorliencount}}{{/addCommas}}</td>
 				{{/hoepa.purchasers}}
 			</tr>
 		</tbody>
@@ -115,8 +115,8 @@
 				<tr class="characteristic">
 					<td>{{pricing}}</td>
 					{{#purchasers}}
-					<td>{{firstlienvalue}}</td>
-					<td>{{juniorliencount}}</td>
+					<td>{{#addCommas}}{{firstlienvalue}}{{/addCommas}}</td>
+					<td>{{#addCommas}}{{juniorlienvalue}}{{/addCommas}}</td>
 					{{/purchasers}}
 				</tr>
 			{{/pricinginformation}}
@@ -129,8 +129,8 @@
 				<tr>
 					<td>{{point}}</td>
 					{{#purchasers}}
-					<td>{{firstlienvalue}}</td>
-					<td>{{juniorliencount}}</td>
+					<td>{{#addCommas}}{{firstlienvalue}}{{/addCommas}}</td>
+					<td>{{#addCommas}}{{juniorlienvalue}}{{/addCommas}}</td>
 					{{/purchasers}}
 				</tr>
 			{{/points}}
@@ -138,8 +138,8 @@
 			<tr class="characteristic">
 				<td><h5>HOEPA Loans</h5></td>
 				{{#hoepa.purchasers}}
-					<td>{{firstlienvalue}}</td>
-					<td>{{juniorliencount}}</td>
+					<td>{{#addCommas}}{{firstlienvalue}}{{/addCommas}}</td>
+					<td>{{#addCommas}}{{juniorlienvalue}}{{/addCommas}}</td>
 				{{/hoepa.purchasers}}
 			</tr>
 		</tbody>

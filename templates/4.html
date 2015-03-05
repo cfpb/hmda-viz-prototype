@@ -34,16 +34,16 @@
 				<tr class="characteristic">
 					<td><h5>{{race}} (TOTAL)</h5></td>
 					{{#dispositions}}
-					<td>{{count}}</td>
-					<td>{{value}}</td>
+					<td>{{#addCommas}}{{count}}{{/addCommas}}</td>
+					<td>{{#addCommas}}{{value}}{{/addCommas}}</td>
 					{{/dispositions}}
 				</tr>
 				{{#genders}}
 				<tr>
 					<td>{{gender}}</td>
 					{{#dispositions}}
-					<td>{{count}}</td>
-					<td>{{value}}</td>
+					<td>{{#addCommas}}{{count}}{{/addCommas}}</td>
+					<td>{{#addCommas}}{{value}}{{/addCommas}}</td>
 					{{/dispositions}}
 				{{/genders}}
 			{{/races}}
@@ -81,18 +81,18 @@
 		<tbody>
 			{{#ethnicities}}
 				<tr class="characteristic">
-					<td>{{ethnicity}}</td>
+					<td>{{ethnicity}} (TOTAL)</td>
 					{{#dispositions}}
-					<td>{{count}}</td>
-					<td>{{value}}</td>
+					<td>{{#addCommas}}{{count}}{{/addCommas}}</td>
+					<td>{{#addCommas}}{{value}}{{/addCommas}}</td>
 					{{/dispositions}}
 				</tr>
 				{{#genders}}
 				<tr>
 					<td>{{gender}}</td>
 					{{#dispositions}}
-					<td>{{count}}</td>
-					<td>{{value}}</td>
+					<td>{{#addCommas}}{{count}}{{/addCommas}}</td>
+					<td>{{#addCommas}}{{value}}{{/addCommas}}</td>
 					{{/dispositions}}
 				{{/genders}}
 			{{/ethnicities}}
@@ -101,18 +101,18 @@
 			</tr>
 			{{#minoritystatuses}}
 				<tr class="characteristic">
-					<td>{{minoritystatus}}</td>
+					<td>{{minoritystatus}} (TOTAL)</td>
 					{{#dispositions}}
-					<td>{{count}}</td>
-					<td>{{value}}</td>
+					<td>{{#addCommas}}{{count}}{{/addCommas}}</td>
+					<td>{{#addCommas}}{{value}}{{/addCommas}}</td>
 					{{/dispositions}}
 				</tr>
 				{{#genders}}
 				<tr>
 					<td>{{gender}}</td>
 					{{#dispositions}}
-					<td>{{count}}</td>
-					<td>{{value}}</td>
+					<td>{{#addCommas}}{{count}}{{/addCommas}}</td>
+					<td>{{#addCommas}}{{value}}{{/addCommas}}</td>
 					{{/dispositions}}
 				{{/genders}}
 			{{/minoritystatuses}}
@@ -123,16 +123,16 @@
 				<tr>
 					<td>{{incomes}}</td>
 					{{#dispositions}}
-					<td>{{count}}</td>
-					<td>{{value}}</td>
+					<td>{{#addCommas}}{{count}}{{/addCommas}}</td>
+					<td>{{#addCommas}}{{value}}{{/addCommas}}</td>
 					{{/dispositions}}
 				</tr>
 			{{/incomes}}
 			<tr class="characteristic">
 				<td>Total</td>
 				{{#total}}
-				<td>{{count}}</td>
-				<td>{{value}}</td>
+				<td>{{#addCommas}}{{count}}{{/addCommas}}</td>
+				<td>{{#addCommas}}{{value}}{{/addCommas}}</td>
 				{{/total}}
 			</tr>
 		</tbody>
