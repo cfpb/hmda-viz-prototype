@@ -179,3 +179,4 @@ class report_4x(constructor):
 				return 'count_rows_46_2012'
 			elif report_number == 'A 4-7':
 				return 'count_rows_47_2012'
+

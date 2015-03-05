@@ -1,4 +1,5 @@
 #this file holds the classes used to create the A&D reports using the HMDA LAR files combined with Census demographic information
+import datetime as foo
 import numpy
 import psycopg2
 import psycopg2.extras
@@ -347,7 +348,7 @@ class build_JSON(AD_report):
 		self.race_names = ['American Indian/Alaska Native', 'Asian', 'Black or African American', 'Native Hawaiian or Other Pacific Islander', 'White', '2 or more minority races', 'Joint (White/Minority Race', 'Not Available']
 		self.ethnicity_names = ['Hispanic or Latino', 'Not Hispanic or Latino', 'Joint (Hispanic or Latino/Not Hispanic or Latino', 'Ethnicity Not Available']
 		self.minority_statuses = ['White Non-Hispanic', 'Others, Including Hispanic']
-		self.applicant_income_bracket = ['Less than 50% of MSA/MD median', '50-79% of MSA/MD median', '80-99% of MSA/MD median', '100-119% of MSA/MD median', '120% or more of MSA/MD median', 'income not available']
+		self.applicant_income_bracket = ['Less than 50% of MSA/MD median', '50-79% of MSA/MD median', '80-99% of MSA/MD median', '100-119% of MSA/MD median', '120% or more of MSA/MD median', 'Income not available']
 		self.tract_pct_minority = ['Less than 10% minority', '10-19% minority', '20-49% minority', '50-79% minority', '80-100% minority']
 		self.tract_income = ['Low income', 'Moderate income', 'Middle income', 'Upper income']
 		self.state_names = {'AL': 'Alabama', 'AK': 'Alaska', 'AZ': 'Arizona', 'AR': 'Arkansas', 'CA': 'California', 'CO': 'Colorado', 'CT': 'Connecticut', 'DE':'Delaware', 'DC':'District of Columbia',
@@ -383,7 +384,7 @@ class build_JSON(AD_report):
 				temp = {} #holding dict for single MSA id and name
 				cut_point =str(row['name'])[::-1].find(' ')+2 #find index to remove state abbreviations
 				temp['id'] = row['geoid_msa'] #set MSA number to id in dict
-				temp['name'] = str(row['name'])[:-cut_point].replace(' ', '-').replace('--','-').upper()
+				temp['name'] = str(row['name'])[:-cut_point].replace('--','-').replace(' ', '-').upper()
 				msas.append(temp)
 
 			cursor.execute(SQL2, location)
@@ -391,7 +392,7 @@ class build_JSON(AD_report):
 				temp = {}
 				cut_point = str(row2['name'])[::-1].find(' ')+2 #find last space before state names
 				temp['id'] = row2['geoid_metdiv'][5:] #take only last 5 digits from metdiv number
-				temp['name'] = str(row2['name'])[:-cut_point].replace(' ', '-').upper() #remove state abbrevs
+				temp['name'] = str(row2['name'])[:-cut_point].replace('--','-').replace(' ', '-').upper() #remove state abbrevs
 				msas.append(temp) #add one metdiv name to the list of names
 
 			state_msas['msa-mds'] = msas
@@ -435,9 +436,9 @@ class build_JSON(AD_report):
 		cursor.execute(SQL,) #execute query against server
 		for row in cursor.fetchall():
 			cut_point =str(row['name'])[::-1].find(' ') +2#find the point where the state abbreviations begin
-			self.msa_names[row['geoid_msa']] = str(row['name'])[:-cut_point].replace(' ', '-')
+			self.msa_names[row['geoid_msa']] = str(row['name'])[:-cut_point].replace(' ', '-').replace('--','-')
 			geoid_metdiv = str(row['geoid_metdiv'])[5:]
-			self.msa_names[geoid_metdiv] = str(row['name'])[:-cut_point].replace(' ', '_')
+			self.msa_names[geoid_metdiv] = str(row['name'])[:-cut_point].replace(' ', '_').replace('--','-')
 
 	def get_state_name(self, abbrev):
 		#this is a dictionary function that returns a state name when given the abbreviation
@@ -449,26 +450,31 @@ class build_JSON(AD_report):
 		elif table_num == '3-2':
 			return 'Pricing Information for First and Junior Lien Loans Sold by Type of Purchaser (includes originations only)'
 		elif table_num == '4-1':
-			return 'Disposition of applications for FHA, FSA/RHS, and VA home-purchase loans, 1- to 4-family and manufactured home dwellings, by race, ethnicity, gender and income of applicant'
+			return 'Disposition of applications for FHA, FSA/RHS, and VA home-purchase loans, 1- to 4- family and manufactured home dwellings, by race, ethnicity, gender and income of applicant'
 		elif table_num == '4-2':
-			return 'Disposition of applications for conventional home-purchase loans 1- to 4-family and manufactured home dwellings, by race, ethnicity, gender and income of applicant'
+			return 'Disposition of applications for conventional home-purchase loans 1- to 4- family and manufactured home dwellings, by race, ethnicity, gender and income of applicant'
 		elif table_num == '4-3':
-			return 'Disposition of applications to refinnace loans on 1- to 4-family and manufactured home dwellings, by race, ethnicity, gender and income of applicant'
+			return 'Disposition of applications to refinnace loans on 1- to 4- family and manufactured home dwellings, by race, ethnicity, gender and income of applicant'
 		elif table_num == '4-4':
-			return 'Disposition of applications for home improvement loans, 1- to 4-family and manufactured home dwellings, by race, ethnicity, gender and income of applicant'
+			return 'Disposition of applications for home improvement loans, 1- to 4- family and manufactured home dwellings, by race, ethnicity, gender and income of applicant'
 		elif table_num == '4-5':
 			return 'Disposition of applications for loans on dwellings for 5 or more families, by race, ethnicity, gender and income of applicant'
 		elif table_num == '4-6':
-			return 'Disposition of applications from nonoccupants for home-purchase, home improvement, or refinancing loans, 1- to 4-family and manufactured home dwellings, by race, ethnicity, gender and income of applicant'
+			return 'Disposition of applications from nonoccupants for home-purchase, home improvement, or refinancing loans, 1- to 4- family and manufactured home dwellings, by race, ethnicity, gender and income of applicant'
 		elif table_num == '4-7':
 			return 'Disposition of applications for home-purchase, home improvement, or refinancing loans, manufactured home dwellings by race, ethnicity, gender and income of applicant'
 
 	def set_header(self, inputs, MSA, table_type, table_num): #sets the header information of the JSON object
+		now = foo.datetime.now()
+		d = now.day
+		m = now.month
+		y = now.year
 		msa = OrderedDict({})
 		self.container['table'] = table_num
 		self.container['type'] = table_type
 		self.container['desc'] = self.table_headers(table_num)
 		self.container['year'] = inputs['year']
+		self.container['report-date'] = "{:0>2d}".format(d)+'/'+"{:0>2d}".format(m)+'/'+"{:0>4d}".format(y)
 		self.msa['id'] = MSA
 		self.msa['name'] = self.msa_names[MSA]
 		self.msa['state'] = inputs['state name'] #this is the two digit abbreviation
@@ -541,7 +547,7 @@ class build_JSON(AD_report):
 		applicantincomes = []
 		for income in self.applicant_income_bracket:
 			holding = OrderedDict({})
-			holding['incomes'] = "{}".format(income)
+			holding['income'] = "{}".format(income)
 			applicantincomes.append(holding)
 		self.container['incomes'] = applicantincomes
 		for i in range(0, len(self.container['incomes'])):
