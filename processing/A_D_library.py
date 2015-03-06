@@ -575,13 +575,10 @@ class build_JSON(AD_report):
 	def build_rate_spreads(self): #builds the rate spreads section of the report 3-2 JSON
 		spreads = []
 		for rate in self.table32_rates:
-			 holding = OrderedDict({})
-			 holding['point'] = "{}".format(rate)
-			 if self.table32_rates.index(rate) < 8:
-				holding['purchasers'] = self.set_purchasers(['firstliencount', 'firstlienvalue', 'juniorliencount', 'juniorlienvalue'])
-			 else:
-				holding['purchasers'] = self.set_purchasers(['firstlien', 'juniorlien'])
-			 spreads.append(holding)
+			holding = OrderedDict({})
+			holding['point'] = "{}".format(rate)
+			holding['purchasers'] = self.set_purchasers(['firstliencount', 'firstlienvalue', 'juniorliencount', 'juniorlienvalue'])
+			spreads.append(holding)
 		return spreads
 
 	def table_31_borrower_characteristics(self, characteristic, container_name, item_list): #builds the borrower characteristics section of the report 3-1 JSON

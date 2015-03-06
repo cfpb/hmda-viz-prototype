@@ -19,7 +19,7 @@ from constructor import report_4x
 connection = connect() #connects to the DB
 selector = selector() #holds lists of reports to be generated for each MSA
 cur = connection.connect() #creates cursor object connected to HMDAPub2012 sql database, locally hosted postgres
-selector.get_report_lists('MSAinputs2012.csv') #fills the dictionary of lists of reports to be generated
+selector.get_report_lists('MSAinputs2013.csv') #fills the dictionary of lists of reports to be generated
 build_msa = build() #instantiate the build object
 
 
@@ -27,15 +27,15 @@ build_msa = build() #instantiate the build object
 #build_msa.msas_in_state(cur, selector, 'disclosure')#creates a list of all MSAs in each state and places the file in the state's disclosure folder
 
 #report_3x = report_3x()
-#selector.report_list['A 4-2'] = ['29620']
+selector.report_list['A 3-2'] = ['11500']
 #selector.report_list['A 4-1'] = ['29620']
 
-report_list = ['A 4-3', 'A 4-4', 'A 4-5', 'A 4-6', 'A 4-7']
+report_list = ['A 3-2']
 for report in report_list: #loop over a list of report names
 	for MSA in selector.report_list[report]: #loop through MSAs flagged for report generation
 		report_x = report_4x(report, selector) #instantiate class and set function strings
 		report_x.report_x(MSA, cur) #variabalize funciton inputs!!!!
-
+'''
 
 report_list = ['A 3-1', 'A 3-2', 'A 4-1', 'A 4-2', 'A 4-3', 'A 4-4', 'A 4-5', 'A 4-6', 'A 4-7']
 selector.get_report_list('MSAinputs2012.csv')
@@ -49,3 +49,4 @@ for report in report_list:
 
 
 
+'''
