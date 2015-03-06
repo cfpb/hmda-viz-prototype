@@ -31,9 +31,11 @@
     h4, h5 {
         margin: 0;
     }
-    h5, tr.characteristic td:first-child {
+    tr.characteristic td:first-child,
+    th:first-child {
         font-family: "AvenirNextLTW01-Demi", Helvetica, Arial, sans-serif;
         font-size: 1em;
+        font-weight: 700;
         text-align: left;
         text-transform: uppercase;
     }
