@@ -1,0 +1,140 @@
+<script id="4" type="text/template">
+	{{> tablebanner}}
+
+	<table class="table report">
+		<thead>
+			<tr>
+				<th width="20%">Race and Gender</th>
+				<th class="purchaser" colspan="2" valign="bottom" width="13.33333%">Applications Received</th>
+				<th class="purchaser" colspan="2" valign="bottom" width="13.33333%">Loans Originated</th>
+				<th class="purchaser" colspan="2" valign="bottom" width="13.33333%">Apps. Approved But Not Accepted</th>
+				<th class="purchaser" colspan="2" valign="bottom" width="13.33333%">Appliations Denied</th>
+				<th class="purchaser" colspan="2" valign="bottom" width="13.33333%">Applications Withdrawn</th>
+				<th class="purchaser" colspan="2" valign="bottom" width="13.33333%">Files Closed For Incompleteness</th>
+			</tr>
+			<tr class="heading">
+				<th></th>
+				<th>Number</th>
+				<th>$000s</th>
+				<th>Number</th>
+				<th>$000s</th>
+				<th>Number</th>
+				<th>$000s</th>
+				<th>Number</th>
+				<th>$000s</th>
+				<th>Number</th>
+				<th>$000s</th>
+				<th>Number</th>
+				<th>$000s</th>
+			</tr>
+
+		</thead>
+		<tbody>
+			{{#races}}
+				<tr class="characteristic">
+					<td>{{race}} (TOTAL)</td>
+					{{#dispositions}}
+					<td>{{#addCommas}}{{count}}{{/addCommas}}</td>
+					<td>{{#addCommas}}{{value}}{{/addCommas}}</td>
+					{{/dispositions}}
+				</tr>
+				{{#genders}}
+				<tr>
+					<td>{{gender}}</td>
+					{{#dispositions}}
+					<td>{{#addCommas}}{{count}}{{/addCommas}}</td>
+					<td>{{#addCommas}}{{value}}{{/addCommas}}</td>
+					{{/dispositions}}
+				{{/genders}}
+			{{/races}}
+		</tbody>
+	</table>
+
+	<table class="table report">
+		<thead>
+			<tr>
+				<th width="20%">Ethnicity, Gender and Income</th>
+				<th class="purchaser" colspan="2" valign="bottom" width="13.33333%">Applications Received</th>
+				<th class="purchaser" colspan="2" valign="bottom" width="13.33333%">Loans Originated</th>
+				<th class="purchaser" colspan="2" valign="bottom" width="13.33333%">Apps. Approved But Not Accepted</th>
+				<th class="purchaser" colspan="2" valign="bottom" width="13.33333%">Appliations Denied</th>
+				<th class="purchaser" colspan="2" valign="bottom" width="13.33333%">Applications Withdrawn</th>
+				<th class="purchaser" colspan="2" valign="bottom" width="13.33333%">Files Closed For Incompleteness</th>
+			</tr>
+			<tr class="heading">
+				<th></th>
+				<th>Number</th>
+				<th>$000s</th>
+				<th>Number</th>
+				<th>$000s</th>
+				<th>Number</th>
+				<th>$000s</th>
+				<th>Number</th>
+				<th>$000s</th>
+				<th>Number</th>
+				<th>$000s</th>
+				<th>Number</th>
+				<th>$000s</th>
+			</tr>
+
+		</thead>
+		<tbody>
+			{{#ethnicities}}
+				<tr class="characteristic">
+					<td>{{ethnicity}} (TOTAL)</td>
+					{{#dispositions}}
+					<td>{{#addCommas}}{{count}}{{/addCommas}}</td>
+					<td>{{#addCommas}}{{value}}{{/addCommas}}</td>
+					{{/dispositions}}
+				</tr>
+				{{#genders}}
+				<tr>
+					<td>{{gender}}</td>
+					{{#dispositions}}
+					<td>{{#addCommas}}{{count}}{{/addCommas}}</td>
+					<td>{{#addCommas}}{{value}}{{/addCommas}}</td>
+					{{/dispositions}}
+				{{/genders}}
+			{{/ethnicities}}
+			<tr class="characteristic">
+				<td colspan="13">Minority Statuses</td>
+			</tr>
+			{{#minoritystatuses}}
+				<tr class="characteristic">
+					<td>{{minoritystatus}} (TOTAL)</td>
+					{{#dispositions}}
+					<td>{{#addCommas}}{{count}}{{/addCommas}}</td>
+					<td>{{#addCommas}}{{value}}{{/addCommas}}</td>
+					{{/dispositions}}
+				</tr>
+				{{#genders}}
+				<tr>
+					<td>{{gender}}</td>
+					{{#dispositions}}
+					<td>{{#addCommas}}{{count}}{{/addCommas}}</td>
+					<td>{{#addCommas}}{{value}}{{/addCommas}}</td>
+					{{/dispositions}}
+				{{/genders}}
+			{{/minoritystatuses}}
+			<tr class="characteristic">
+				<td colspan="13">Income of Applicants</td>
+			</tr>
+			{{#incomes}}
+				<tr>
+					<td>{{incomes}}</td>
+					{{#dispositions}}
+					<td>{{#addCommas}}{{count}}{{/addCommas}}</td>
+					<td>{{#addCommas}}{{value}}{{/addCommas}}</td>
+					{{/dispositions}}
+				</tr>
+			{{/incomes}}
+			<tr class="characteristic">
+				<td>Total</td>
+				{{#total}}
+				<td>{{#addCommas}}{{count}}{{/addCommas}}</td>
+				<td>{{#addCommas}}{{value}}{{/addCommas}}</td>
+				{{/total}}
+			</tr>
+		</tbody>
+	</table>
+</script>
