@@ -375,8 +375,11 @@ class build_JSON(AD_report):
 			FROM tract_to_cbsa_2010
 			WHERE geoid_metdiv != '          ' and state = %s;'''
 		#state_list = ['WA', 'WI', 'WV', 'FL', 'WY', 'NH', 'NJ', 'NM', 'NC', 'ND', 'NE', 'NY', 'RI', 'NV', 'CO', 'CA', 'GA', 'CT', 'OK', 'OH', 'KS', 'SC', 'KY', 'OR', 'SD', 'DE', 'HI', 'PR', 'TX', 'LA', 'TN', 'PA', 'VA', 'VI', 'AK', 'AL', 'AR', 'VT', 'IL', 'IN', 'IA', 'AZ', 'ID', 'ME', 'MD', 'MA', 'UT', 'MO', 'MN', 'MI', 'MT', 'MS']
+
 		for state, code in self.state_codes.iteritems():
+
 			state_msas = {}
+			state_holding = {}
 			location = (code,) #convert state to tuple for psycopg2
 			cursor.execute(SQL, location) #execute SQL statement against server
 			msas = [] #holding list for MSA id and names for entire state
@@ -384,7 +387,9 @@ class build_JSON(AD_report):
 				temp = {} #holding dict for single MSA id and name
 				cut_point =str(row['name'])[::-1].find(' ')+2 #find index to remove state abbreviations
 				temp['id'] = row['geoid_msa'] #set MSA number to id in dict
-				temp['name'] = str(row['name'])[:-cut_point].replace('--','-').replace(' ', '-').upper()
+				temp['name'] = str(row['name'])[:-cut_point].replace(' ', '-').upper()
+				state_holding[row['geoid_msa']] = str(row['name'])[:-cut_point].replace(' ', '-').lower()
+				self.msa_names[row['geoid_msa']] = str(row['name'])[:-cut_point].replace(' ', '-').lower()
 				msas.append(temp)
 
 			cursor.execute(SQL2, location)
@@ -392,18 +397,23 @@ class build_JSON(AD_report):
 				temp = {}
 				cut_point = str(row2['name'])[::-1].find(' ')+2 #find last space before state names
 				temp['id'] = row2['geoid_metdiv'][5:] #take only last 5 digits from metdiv number
-				temp['name'] = str(row2['name'])[:-cut_point].replace('--','-').replace(' ', '-').upper() #remove state abbrevs
+				temp['name'] = str(row2['name'])[:-cut_point].replace(' ', '-').upper() #remove state abbrevs
+				state_holding[row2['geoid_metdiv'][5:]] = str(row2['name'])[:-cut_point].replace(' ', '-').lower()
+				self.msa_names[row2['geoid_metdiv'][5:]] = str(row2['name'])[:-cut_point].replace(' ', '-').lower()
 				msas.append(temp) #add one metdiv name to the list of names
 
+			self.state_msa_list[state] = state_holding
 			state_msas['msa-mds'] = msas
-			name = 'msa-mds.json'
+			name = 'msa-mds-all.json'
 			#this year path uses the year from the input file
 			#aggregate needs to be variablalized
-			path = 'json'+"/"+report_type+"/"+selector.report_list['year'][1]+"/"+self.state_names[state].replace(' ', '-').replace('--', '-').lower()
+
+
+			path = 'json'+"/"+report_type+"/"+selector.report_list['year'][1]+"/"+self.state_names[state].replace(' ', '-').lower()
 			print path #change this to a log file write
 			if not os.path.exists(path): #check if path exists
 				os.makedirs(path) #if path not present, create it
-			self.write_JSON(name, state_msas, path)
+			#self.write_JSON(name, state_msas, path)
 			self.jekyll_for_state(path) #create and write jekyll file to state path
 
 	def jekyll_for_msa(self, path):
@@ -437,7 +447,7 @@ class build_JSON(AD_report):
 		for row in cursor.fetchall():
 			cut_point =str(row['name'])[::-1].find(' ') +2#find the point where the state abbreviations begin
 			self.msa_names[row['geoid_msa']] = str(row['name'])[:-cut_point].replace(' ', '-').replace('--','-')
-			geoid_metdiv = str(row['geoid_metdiv'])[5:]
+			geoid_metdiv = str(row['geoid_metdiv'])[5:] #take the last 5 digits of the geoid number, this is what the FFIEC uses as an MSA number for MDs
 			self.msa_names[geoid_metdiv] = str(row['name'])[:-cut_point].replace(' ', '_').replace('--','-')
 
 	def get_state_name(self, abbrev):
@@ -572,12 +582,22 @@ class build_JSON(AD_report):
 			purchasers.append(purchasersholding)
 		return purchasers
 
+	def set_purchasers_NA(self, holding_list):
+		purchasers = []
+		for item in self.purchaser_names:
+			purchasersholding = OrderedDict({})
+			purchasersholding['name'] = "{}".format(item)
+			for item in holding_list: #pass in the appropriate holding list for each set_purchasers call
+				purchasersholding[item] = 'NA'
+			purchasers.append(purchasersholding)
+		return purchasers
+
 	def build_rate_spreads(self): #builds the rate spreads section of the report 3-2 JSON
 		spreads = []
 		for rate in self.table32_rates:
 			holding = OrderedDict({})
 			holding['point'] = "{}".format(rate)
-			holding['purchasers'] = self.set_purchasers(['firstliencount', 'firstlienvalue', 'juniorliencount', 'juniorlienvalue'])
+			holding['purchasers'] = self.set_purchasers_NA(['firstliencount', 'firstlienvalue', 'juniorliencount', 'juniorlienvalue'])
 			spreads.append(holding)
 		return spreads
 
@@ -991,6 +1011,10 @@ class aggregate(AD_report): #aggregates LAR rows by appropriate characteristics 
 		pass
 
 	def by_race(self, container, inputs): #aggregates loans by race category
+		if inputs['race'] == 5 and inputs['purchaser'] == 0:
+			print inputs['sequence'], inputs['loan value'], "fannie mae 2 minority"
+		#if inputs['race'] == 6 and inputs['purchaser'] == 0:
+		#	print inputs['sequence'], inputs['loan value'], "fannie mae joint"
 		container['borrowercharacteristics'][0]['races'][inputs['race']]['purchasers'][inputs['purchaser']]['count'] += 1
 		container['borrowercharacteristics'][0]['races'][inputs['race']]['purchasers'][inputs['purchaser']]['value'] += inputs['loan value']
 
@@ -1045,10 +1069,16 @@ class aggregate(AD_report): #aggregates LAR rows by appropriate characteristics 
 
 	def by_rate_spread(self, container, inputs): #aggregate loans by rate spread index
 		if inputs['lien status'] == '1' and inputs['rate spread index'] < 8: #aggregate first lien status loans
+			if container['points'][inputs['rate spread index']]['purchasers'][inputs['purchaser']]['firstliencount'] == 'NA':
+				container['points'][inputs['rate spread index']]['purchasers'][inputs['purchaser']]['firstliencount'] =0
+				container['points'][inputs['rate spread index']]['purchasers'][inputs['purchaser']]['firstlienvalue'] =0
 			container['points'][inputs['rate spread index']]['purchasers'][inputs['purchaser']]['firstliencount'] +=1
 			container['points'][inputs['rate spread index']]['purchasers'][inputs['purchaser']]['firstlienvalue'] += int(inputs['loan value'])
 
 		elif inputs['lien status'] == '2' and inputs['rate spread index'] <8: #aggregate subordinate lien status loans
+			if container['points'][inputs['rate spread index']]['purchasers'][inputs['purchaser']]['juniorliencount'] == 'NA':
+				container['points'][inputs['rate spread index']]['purchasers'][inputs['purchaser']]['juniorliencount'] =0
+				container['points'][inputs['rate spread index']]['purchasers'][inputs['purchaser']]['juniorlienvalue'] =0
 			container['points'][inputs['rate spread index']]['purchasers'][inputs['purchaser']]['juniorliencount'] +=1
 			container['points'][inputs['rate spread index']]['purchasers'][inputs['purchaser']]['juniorlienvalue'] += int(inputs['loan value'])
 
@@ -1120,11 +1150,13 @@ class aggregate(AD_report): #aggregates LAR rows by appropriate characteristics 
 		first_lien_purchasers = ['Fannie Mae first rates', 'Ginnie Mae first rates', 'Freddie Mac first rates', 'Farmer Mac first rates', 'Private Securitization first rates', 'Commercial bank, savings bank or association first rates', 'Life insurance co., credit union, finance co. first rates', 'Affiliate institution first rates', 'Other first rates']
 		junior_lien_purchasers = ['Fannie Mae junior rates', 'Ginnie Mae junior rates', 'Freddie Mac junior rates', 'Farmer Mac junior rates', 'Private Securitization junior rates', 'Commercial bank, savings bank or association junior rates', 'Life insurance co., credit union, finance co. junior rates', 'Affiliate institution junior rates', 'Other junior rates']
 		for n in range(0,9):
-			if float(container['pricinginformation'][1]['purchasers'][n]['first lien count']) > 0 and inputs[first_lien_purchasers[n]] > 0: #bug fix for divide by 0 errors
-				container['points'][8]['purchasers'][n]['first lien'] = round(inputs[first_lien_purchasers[n]]/float(container['pricinginformation'][1]['purchasers'][n]['first lien count']),2)
+			if float(container['pricinginformation'][1]['purchasers'][n]['firstliencount']) > 0 and inputs[first_lien_purchasers[n]] > 0: #bug fix for divide by 0 errors
+				#container['points'][8]['purchasers'][n]['first lien'] = 0
+				container['points'][8]['purchasers'][n]['firstlienvalue'] = round(inputs[first_lien_purchasers[n]]/float(container['pricinginformation'][1]['purchasers'][n]['firstliencount']),2)
 
-			if float(container['pricinginformation'][1]['purchasers'][n]['junior lien count']) > 0 and inputs[junior_lien_purchasers[n]] > 0: #bug fix for divide by 0 errors
-				container['points'][8]['purchasers'][n]['junior lien'] = round(inputs[junior_lien_purchasers[n]]/float(container['pricinginformation'][1]['purchasers'][n]['junior lien count']),2)
+			if float(container['pricinginformation'][1]['purchasers'][n]['juniorliencount']) > 0 and inputs[junior_lien_purchasers[n]] > 0: #bug fix for divide by 0 errors
+				#container['points'][8]['purchasers'][n]['junior lien'] = 0
+				container['points'][8]['purchasers'][n]['juniorlienvalue'] = round(inputs[junior_lien_purchasers[n]]/float(container['pricinginformation'][1]['purchasers'][n]['juniorliencount']),2)
 
 	def fill_median_lists(self, inputs): #add all rate spreads to a list to find the median rate spread
 		purchaser_first_lien_rates = ['Fannie Mae first lien list', 'Ginnie Mae first lien list', 'Freddie Mac first lien list', 'Farmer Mac first lien list', 'Private Securitization first lien list', 'Commercial bank, savings bank or association first lien list', 'Life insurance co., credit union, finance co. first lien list', 'Affiliate institution first lien list', 'Other first lien list']
@@ -1142,11 +1174,12 @@ class aggregate(AD_report): #aggregates LAR rows by appropriate characteristics 
 		for n in range(0,9):
 			#first lien median block
 			if len(inputs[purchaser_first_lien_rates[n]]) > 0:
-				container['points'][9]['purchasers'][n]['first lien'] = round(numpy.median(numpy.array(inputs[purchaser_first_lien_rates[n]])),2)
-
+				container['points'][9]['purchasers'][n]['firstliencount'] = round(numpy.median(numpy.array(inputs[purchaser_first_lien_rates[n]])),2) #for normal median
+				container['points'][9]['purchasers'][n]['firstlienvalue'] = round(numpy.median(numpy.array(inputs[purchaser_first_lien_rates[n]])),2) #for weighted median
 			#junior lien median block
 			if len(inputs[purchaser_junior_lien_rates[n]]) > 0:
-				container['points'][9]['purchasers'][n]['junior lien'] = round(numpy.median(numpy.array(inputs[purchaser_junior_lien_rates[n]])),2)
+				container['points'][9]['purchasers'][n]['juniorliencount'] = round(numpy.median(numpy.array(inputs[purchaser_junior_lien_rates[n]])),2) #for normal median
+				container['points'][9]['purchasers'][n]['juniorlienvalue'] = round(numpy.median(numpy.array(inputs[purchaser_junior_lien_rates[n]])),2) #for weighted median
 
 	def by_applicant_income_4x(self, container, inputs): #aggregate loans by applicant income index
 		if inputs['income bracket'] > 5 or inputs['action taken'] == ' ' or inputs['action taken'] > 5: #filter out of bounds indexes before calling aggregations
@@ -1214,6 +1247,8 @@ class aggregate(AD_report): #aggregates LAR rows by appropriate characteristics 
 
 	def totals_4x(self, container, inputs):
 		if inputs['action taken'] < 6 and inputs['action taken'] != ' ':
+			container['total'][0]['count'] += 1
+			container['total'][0]['value'] += int(inputs['loan value'])
 			container['total'][inputs['action taken']]['count'] +=1
 			container['total'][inputs['action taken']]['value'] += int(inputs['loan value'])
 
