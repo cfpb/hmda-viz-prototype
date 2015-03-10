@@ -1,0 +1,23 @@
+/* banner */
+.banner {
+	background-color: $gold-80;
+	background-image:
+	    linear-gradient(
+	      135deg, 
+	      $pacific, $pacific-80
+	    );
+	color: $white;
+	padding: 20px 0;
+
+	h2 {
+		margin-top: 0;
+	}
+}
+
+.downloads {
+	margin-top: 20px;
+
+	.btn {
+		font-size: .75em;
+	}
+}

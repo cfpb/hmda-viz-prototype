@@ -1,16 +1,10 @@
 {% include head.html %}
 {% include header.html %}
-{% assign urlsplit = page.url | split:"/" %}
-{% assign urlsize = urlsplit | size %}
-<div class="wrap">
-	<section class="content homepage" id="content">
-		<main role="main">
-			{% if urlsize >= 5 %}			
-			    {% include breadcrumb.html %}
-			{% endif %}
-			{{ content }}
-		</main>
-	</section>
+
+{% include banner.html %}
+
+<div class="container" id="content">
+    {{ content }}
 </div>
 
 {% include footer.html %}

@@ -1,0 +1,51 @@
+/* tables */
+.table {
+    background: none;
+    border-collapse: collapse;
+    border-spacing: 0;
+    color: $black;
+    th, td {
+        padding: 5px 7px;
+    }
+    th {
+        font-family: "AvenirNextLTW01-Demi", Helvetica, Arial, sans-serif;
+    }
+    tbody td {
+        border: 1px solid $gray-20;
+    }
+}
+.report {
+    font-size: .75em;
+    margin: 40px 0;
+    width: 100%;
+    th {
+        border-left: 1px solid $gray-50;
+        border-right: 1px solid $gray-50;
+        &.title {
+            text-align: left;
+        }
+        &.purchaser {
+            border-bottom: 1px solid $gray-50;
+        }
+    }
+    h4, h5 {
+        margin: 0;
+    }
+    tr.characteristic td:first-child,
+    th:first-child {
+        font-family: "AvenirNextLTW01-Demi", Helvetica, Arial, sans-serif;
+        font-size: 1em;
+        font-weight: 700;
+        text-align: left;
+        text-transform: uppercase;
+    }
+    tr.characteristic td {
+        border-top: 2px solid $gray-50;
+    }
+    td:first-child {
+        text-align: left;
+    }
+    td {
+        text-align: right;
+    }
+}

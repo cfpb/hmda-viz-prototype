@@ -1,0 +1,28 @@
+/* buttons */
+.btn,
+a.btn {
+    background-color: $pacific;
+    border: none;
+    border-radius: 2px;
+    color: $white;
+    cursor: pointer;
+    min-width: 75px;
+    padding: 5px;
+    &:hover {
+        background-color: $pacific-80;
+    }
+}
+a.btn {
+	padding-left: 10px;
+	padding-right: 10px;
+}
+
+.btn-inverse,
+a.btn-inverse {
+    background-color: $white;
+    color: $pacific;
+    &:hover {
+        background-color: $pacific-80;
+        color: $white;
+    }
+}

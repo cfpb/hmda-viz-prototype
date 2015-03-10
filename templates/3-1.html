@@ -1,33 +1,123 @@
 <script id="3-1" type="text/template">
-	{{#borrowercharacteristics}}
-		<tr>
-			<th colspan="19"><h3>{{name}}</h3></th>
-		</tr>
-		{{#types}}
-			<tr>
-				<th class="characteristic">{{name}}</th>
-				{{#purchasers}}
-				<td>{{count}}</td>
-				<td>{{value}}</td>
-				{{/purchasers}}
-			</tr>
-		{{/types}}
-	{{/borrowercharacteristics}}
-</script>
+	{{> tablebanner}}
 
-<script id="3-1-new" type="text/template">
-	{{#borrower-characteristics}}
-		<tr>
-			<th colspan="19"><h3>Race - {{ key }}</h3></th>
-		</tr>
-		{{#Race}}
+	<table class="table report">
+		<thead>
 			<tr>
-				<th class="characteristic">American Indian/Alaska Native</th>
-				{{#American Indian/Alaska Native.purchasers}}
-				<td>{{count}}</td>
-				<td>{{value}}</td>
-				{{/American Indian/Alaska Native.purchasers}}
+				<th>Borrower or Census Tract Characteristics</th>
+				<th class="purchaser" colspan="2" valign="bottom" width="10%;">Fannie Mae</th>
+				<th class="purchaser" colspan="2" valign="bottom" width="10%;">Ginnie Mae</th>
+				<th class="purchaser" colspan="2" valign="bottom" width="10%;">Freddie Mac</th>
+				<th class="purchaser" colspan="2" valign="bottom" width="10%;">Farmer Mac</th>
+				<th class="purchaser" colspan="2" valign="bottom" width="10%;">Private Securitization</th>
+				<th class="purchaser" colspan="2" valign="bottom" width="10%;">Commercial Bank, Savings Bank, or Saving Assoc</th>
+				<th class="purchaser" colspan="2" valign="bottom" width="10%;">Insurance Co, Credit Union, Mortgage BK, or Finance Co</th>
+				<th class="purchaser" colspan="2" valign="bottom" width="10%;">Affiliate Institution</th>
+				<th class="purchaser" colspan="2" valign="bottom" width="10%;">Other Purchaser</th>
 			</tr>
-		{{/Race}}
-	{{/borrower-characteristics}}
+			<tr class="heading">
+				<th></th>
+				<th>Number</th>
+				<th>$000s</th>
+				<th>Number</th>
+				<th>$000s</th>
+				<th>Number</th>
+				<th>$000s</th>
+				<th>Number</th>
+				<th>$000s</th>
+				<th>Number</th>
+				<th>$000s</th>
+				<th>Number</th>
+				<th>$000s</th>
+				<th>Number</th>
+				<th>$000s</th>
+				<th>Number</th>
+				<th>$000s</th>
+				<th>Number</th>
+				<th>$000s</th>
+			</tr>
+
+		</thead>
+		<tbody>
+			<tr class="characteristic">
+				<td colspan="19" align="left">Borrower Characteristics</td>
+			</tr>
+			{{#borrowercharacteristics}}
+				<tr class="characteristic">
+					<td colspan="19">{{characteristic}}</td>
+				</tr>
+				{{#races}}
+					<tr>
+						<td>{{race}}</td>
+						{{#purchasers}}
+						<td>{{#addCommas}}{{count}}{{/addCommas}}</td>
+						<td>{{#addCommas}}{{value}}{{/addCommas}}</td>
+						{{/purchasers}}
+					</tr>
+				{{/races}}
+				{{#ethnicities}}
+					<tr>
+						<td>{{ethnicity}}</td>
+						{{#purchasers}}
+						<td>{{#addCommas}}{{count}}{{/addCommas}}</td>
+						<td>{{#addCommas}}{{value}}{{/addCommas}}</td>
+						{{/purchasers}}
+					</tr>
+				{{/ethnicities}}
+				{{#minoritystatuses}}
+					<tr>
+						<td>{{minoritystatus}}</td>
+						{{#purchasers}}
+						<td>{{#addCommas}}{{count}}{{/addCommas}}</td>
+						<td>{{#addCommas}}{{value}}{{/addCommas}}</td>
+						{{/purchasers}}
+					</tr>
+				{{/minoritystatuses}}
+				{{#applicantincomes}}
+					<tr>
+						<td>{{applicantincome}}</td>
+						{{#purchasers}}
+						<td>{{#addCommas}}{{count}}{{/addCommas}}</td>
+						<td>{{#addCommas}}{{value}}{{/addCommas}}</td>
+						{{/purchasers}}
+					</tr>
+				{{/applicantincomes}}
+			{{/borrowercharacteristics}}
+
+			<tr class="characteristic">
+				<td colspan="19" align="left">Census Tract Characteristics</td>
+			</tr>
+			{{#censuscharacteristics}}
+				<tr class="characteristic">
+					<td colspan="19">{{characteristic}}</td>
+				</tr>
+				{{#tractpctminorities}}
+					<tr>
+						<td>{{tractpctminority}}</td>
+						{{#purchasers}}
+						<td>{{#addCommas}}{{count}}{{/addCommas}}</td>
+						<td>{{#addCommas}}{{value}}{{/addCommas}}</td>
+						{{/purchasers}}
+					</tr>
+				{{/tractpctminorities}}
+				{{#incomelevels}}
+					<tr>
+						<td>{{incomelevel}}</td>
+						{{#purchasers}}
+						<td>{{#addCommas}}{{count}}{{/addCommas}}</td>
+						<td>{{#addCommas}}{{value}}{{/addCommas}}</td>
+						{{/purchasers}}
+					</tr>
+				{{/incomelevels}}
+			{{/censuscharacteristics}}
+
+			<tr class="characteristic">
+				<td>Total</td>
+				{{#total.purchasers}}
+					<td>{{#addCommas}}{{count}}{{/addCommas}}</td>
+					<td>{{#addCommas}}{{value}}{{/addCommas}}</td>
+				{{/total.purchasers}}
+			</tr>
+		</tbody>
+	</table>
 </script>

@@ -1,0 +1,55 @@
+/* layout */
+html {
+  box-sizing: border-box;
+}
+*, *:before, *:after {
+  box-sizing: inherit;
+}
+
+.group:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+#content {
+    margin-top: 20px;
+}
+
+.container {
+    margin: 0 auto;
+    position: relative;
+    width: 100%;
+    max-width: $max-width;
+    &:after {
+        content: "";
+        display: table;
+        clear: both;
+    }
+}
+
+.row {
+    *zoom: 1;
+    &:before, &:after {
+        content: "";
+        display: table;
+        line-height: 0;
+    }
+    &:after {
+        clear: both;
+    }
+}
+
+[class*="col-"] {
+    float: left;
+    padding: 0 $gutter;
+    min-height: 1px;
+    position: relative;
+}
+
+// 12 col grid
+@for $i from 1 to $columns+1 {
+    .col-#{$i} {
+        width: (($i / $columns) * 100%);
+    }
+}
