@@ -53,6 +53,7 @@ function getTableData(table) {
             return function(string, render) {
                 var footnote = 0;
                 var footnote2 = 0;
+                var footnote3 = 0;
                 var footnoteurl = '/hmda-viz-prototype/footnotes/' + data.year + '/#';
                 var url = '';
                 console.log(render(string).toLowerCase());
@@ -62,12 +63,9 @@ function getTableData(table) {
                         footnote = 5;
                         break;
                     case 'not available':
-                        footnote = 6;
-                        break;
                     case 'ethnicity not available':
-                        footnote = 6;
-                        break;
                     case 'income not available':
+                    case 'race not available':
                         footnote = 6;
                         break;
                     case 'ethnicity':
@@ -77,6 +75,7 @@ function getTableData(table) {
                         footnote = 8;
                         break;
                     case 'applicant income':
+                    case 'income of applicants':
                         footnote = 9;
                         break;
                     case 'racial&#x2f;ethnic composition':
@@ -101,6 +100,7 @@ function getTableData(table) {
                     default:
                         footnote = 0;
                         footnote2 = 0;
+                        footnote3 = 0;
                 }
 
                 // return

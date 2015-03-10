@@ -4,7 +4,7 @@
 	<table class="table report">
 		<thead>
 			<tr>
-				<th width="20%">Race and Gender</th>
+				<th width="20%">Race and Gender <a href="/hmda-viz-prototype/footnotes/{{year}}/#5"><sup>5</sup></a> <a href="/hmda-viz-prototype/footnotes/{{year}}/#18"><sup>18</sup></a> <a href="/hmda-viz-prototype/footnotes/{{year}}/#19"><sup>19</sup></a></th>
 				<th class="purchaser" colspan="2" valign="bottom" width="13.33333%">Applications Received</th>
 				<th class="purchaser" colspan="2" valign="bottom" width="13.33333%">Loans Originated</th>
 				<th class="purchaser" colspan="2" valign="bottom" width="13.33333%">Apps. Approved But Not Accepted</th>
@@ -32,7 +32,7 @@
 		<tbody>
 			{{#races}}
 				<tr class="characteristic">
-					<td>{{race}} (TOTAL)</td>
+					<td>{{#footnote}}{{race}}{{/footnote}} (TOTAL)</td>
 					{{#dispositions}}
 					<td>{{#addCommas}}{{count}}{{/addCommas}}</td>
 					<td>{{#addCommas}}{{value}}{{/addCommas}}</td>
@@ -53,7 +53,7 @@
 	<table class="table report">
 		<thead>
 			<tr>
-				<th width="20%">Ethnicity, Gender and Income</th>
+				<th width="20%">Ethnicity, Gender and Income <a href="/hmda-viz-prototype/footnotes/{{year}}/#7"><sup>7</sup></a> <a href="/hmda-viz-prototype/footnotes/{{year}}/#18"><sup>18</sup></a> <a href="/hmda-viz-prototype/footnotes/{{year}}/#19"><sup>19</sup></a></th>
 				<th class="purchaser" colspan="2" valign="bottom" width="13.33333%">Applications Received</th>
 				<th class="purchaser" colspan="2" valign="bottom" width="13.33333%">Loans Originated</th>
 				<th class="purchaser" colspan="2" valign="bottom" width="13.33333%">Apps. Approved But Not Accepted</th>
@@ -81,7 +81,7 @@
 		<tbody>
 			{{#ethnicities}}
 				<tr class="characteristic">
-					<td>{{ethnicity}} (TOTAL)</td>
+					<td>{{#footnote}}{{ethnicity}}{{/footnote}} (TOTAL)</td>
 					{{#dispositions}}
 					<td>{{#addCommas}}{{count}}{{/addCommas}}</td>
 					<td>{{#addCommas}}{{value}}{{/addCommas}}</td>
@@ -97,7 +97,7 @@
 				{{/genders}}
 			{{/ethnicities}}
 			<tr class="characteristic">
-				<td colspan="13">Minority Statuses</td>
+				<td colspan="13">Minority Status <a href="/hmda-viz-prototype/footnotes/{{year}}/#8"><sup>8</sup></a> <a href="/hmda-viz-prototype/footnotes/{{year}}/#18"><sup>18</sup></a> <a href="/hmda-viz-prototype/footnotes/{{year}}/#19"><sup>19</sup></a></td>
 			</tr>
 			{{#minoritystatuses}}
 				<tr class="characteristic">
@@ -117,11 +117,11 @@
 				{{/genders}}
 			{{/minoritystatuses}}
 			<tr class="characteristic">
-				<td colspan="13">Income of Applicants</td>
+				<td colspan="13">Income of Applicants <a href="/hmda-viz-prototype/footnotes/{{year}}/#9"><sup>9</sup></a></td>
 			</tr>
 			{{#incomes}}
 				<tr>
-					<td>{{income}}</td>
+					<td>{{#footnote}}{{income}}{{/footnote}}</td>
 					{{#dispositions}}
 					<td>{{#addCommas}}{{count}}{{/addCommas}}</td>
 					<td>{{#addCommas}}{{value}}{{/addCommas}}</td>
@@ -129,7 +129,7 @@
 				</tr>
 			{{/incomes}}
 			<tr class="characteristic">
-				<td>Total</td>
+				<td>Total <a href="/hmda-viz-prototype/footnotes/{{year}}/#14"><sup>14</sup></a></td>
 				{{#total}}
 				<td>{{#addCommas}}{{count}}{{/addCommas}}</td>
 				<td>{{#addCommas}}{{value}}{{/addCommas}}</td>
