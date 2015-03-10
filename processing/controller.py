@@ -24,7 +24,7 @@ build_msa.msas_in_state(cur, selector, 'disclosure')#creates a list of all MSAs 
 
 
 #testing code
-selector.report_list['A 3-1'] = ['11500']
+#selector.report_list['A 3-1'] = ['11500']
 #selector.report_list['A 3-2'] = ['11500']
 #selector.report_list['A 4-1'] = ['11500']
 #selector.report_list['A 4-2'] = ['11500']
@@ -34,8 +34,8 @@ selector.report_list['A 3-1'] = ['11500']
 #selector.report_list['A 4-6'] = ['11500']
 #selector.report_list['A 4-7'] = ['11500']
 #selector.report_list['A 4-1'] = ['29620']
-report_list = ['A 3-1']
-#report_list = ['A 3-1', 'A 3-2', 'A 4-1', 'A 4-2', 'A 4-3', 'A 4-4', 'A 4-5', 'A 4-6', 'A 4-7']
+#report_list = ['A 3-1']
+report_list = ['A 3-1', 'A 3-2', 'A 4-1', 'A 4-2', 'A 4-3', 'A 4-4', 'A 4-5', 'A 4-6', 'A 4-7'] #this needs to be changed to read from the input file
 check_file = check_file(build_msa) #needs a report list, state list, and msa list
 check_file.is_file('aggregate', '2013', report_list)
 
@@ -43,10 +43,6 @@ for report in report_list: #loop over a list of report names
 	for MSA in selector.report_list[report]: #loop through MSAs flagged for report generation
 		report_x = report_4x(report, selector) #instantiate class and set function strings
 		report_x.report_x(MSA, cur) #variabalize funciton inputs!!!!
-
-#print build_msa.msa_names
-#print build_msa.state_msa_list['DE']
-
 
 #code to run a second set of reports with a different input file
 "state_list[state] = {'state': {'id':'name', 'id':'name'}}"
