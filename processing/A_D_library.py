@@ -1011,8 +1011,8 @@ class aggregate(AD_report): #aggregates LAR rows by appropriate characteristics 
 		pass
 
 	def by_race(self, container, inputs): #aggregates loans by race category
-		if inputs['race'] == 5 and inputs['purchaser'] == 0:
-			print inputs['sequence'], inputs['loan value'], "fannie mae 2 minority"
+		#if inputs['race'] == 5 and inputs['purchaser'] == 0:
+		#	print inputs['sequence'], inputs['loan value'], "fannie mae 2 minority"
 		#if inputs['race'] == 6 and inputs['purchaser'] == 0:
 		#	print inputs['sequence'], inputs['loan value'], "fannie mae joint"
 		container['borrowercharacteristics'][0]['races'][inputs['race']]['purchasers'][inputs['purchaser']]['count'] += 1

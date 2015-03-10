@@ -13,10 +13,6 @@ class check_file(file_checker):
 	def is_file(self, report_type, report_year, report_list):
 		#report_type is aggregate or disclosure
 		path_intro = '/Users/roellk/Desktop/HMDA/hmda-viz-prototype/processing/json/'
-		#path =path_intro + report_type + report_year + state + report_number + report_name # 'aggregate/2012/michigan/lansing-east-lansing/4-1/4-1.json'
-		#print os.path.isfile() #returns a boolean, True of file exists
-		#print self.msa_names['DE']
-		#self.state_names = {'DE':'Delaware'}
 		for state, state_name in self.state_names.iteritems(): #loop states -- files live here
 			state_path = path_intro + report_type + '/' + report_year + '/' + self.state_names[state].lower()
 			print state
@@ -35,8 +31,4 @@ class check_file(file_checker):
 					else:
 						#print "booooooo, it's not here"
 						pass
-		#for key, value in self.msa_names.iteritems():
-		#	print key, value, "\n"
-		#need check path and write paths
-		#if not os.path.exists(path): #check if path exists
-		#	os.makedirs(path) #if path not present, create it
+
