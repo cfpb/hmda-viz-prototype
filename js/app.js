@@ -114,9 +114,16 @@ function getTableData(table) {
             table = '4';    // all 4's, 4-1 through 4-7, use the same table layout
         }
         // get partials
+        // table banner
         $.get('/hmda-viz-prototype/templates/partials-tables.html', function(templates) {
             //var template = $(templates).filter('#' + table + '-new').html();
             partials['tablebanner'] = $(templates).filter('#tablebanner').html();
+            //var html = Mustache.to_html(template, data);
+        });
+        // table date
+        $.get('/hmda-viz-prototype/templates/partials-tables.html', function(templates) {
+            //var template = $(templates).filter('#' + table + '-new').html();
+            partials['tabledate'] = $(templates).filter('#tabledate').html();
             //var html = Mustache.to_html(template, data);
         });
         // get template
