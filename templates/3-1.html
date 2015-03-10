@@ -44,11 +44,11 @@
 			</tr>
 			{{#borrowercharacteristics}}
 				<tr class="characteristic">
-					<td colspan="19">{{characteristic}}</td>
+					<td colspan="19">{{#footnote}}{{characteristic}}{{/footnote}}</td>
 				</tr>
 				{{#races}}
 					<tr>
-						<td>{{race}}</td>
+						<td>{{#footnote}}{{race}}{{/footnote}}</td>
 						{{#purchasers}}
 						<td>{{#addCommas}}{{count}}{{/addCommas}}</td>
 						<td>{{#addCommas}}{{value}}{{/addCommas}}</td>
@@ -57,7 +57,7 @@
 				{{/races}}
 				{{#ethnicities}}
 					<tr>
-						<td>{{ethnicity}}</td>
+						<td>{{#footnote}}{{ethnicity}}{{/footnote}}</td>
 						{{#purchasers}}
 						<td>{{#addCommas}}{{count}}{{/addCommas}}</td>
 						<td>{{#addCommas}}{{value}}{{/addCommas}}</td>
@@ -66,7 +66,7 @@
 				{{/ethnicities}}
 				{{#minoritystatuses}}
 					<tr>
-						<td>{{minoritystatus}}</td>
+						<td>{{#footnote}}{{minoritystatus}}{{/footnote}}</td>
 						{{#purchasers}}
 						<td>{{#addCommas}}{{count}}{{/addCommas}}</td>
 						<td>{{#addCommas}}{{value}}{{/addCommas}}</td>
@@ -75,7 +75,7 @@
 				{{/minoritystatuses}}
 				{{#applicantincomes}}
 					<tr>
-						<td>{{applicantincome}}</td>
+						<td>{{#footnote}}{{applicantincome}}{{/footnote}}</td>
 						{{#purchasers}}
 						<td>{{#addCommas}}{{count}}{{/addCommas}}</td>
 						<td>{{#addCommas}}{{value}}{{/addCommas}}</td>
@@ -85,15 +85,15 @@
 			{{/borrowercharacteristics}}
 
 			<tr class="characteristic">
-				<td colspan="19" align="left">Census Tract Characteristics</td>
+				<td colspan="19" align="left">Census Tract Characteristics <a href="/hmda-viz-prototype/footnotes/{{year}}/#10"><sup>10</sup></a></td>
 			</tr>
 			{{#censuscharacteristics}}
 				<tr class="characteristic">
-					<td colspan="19">{{characteristic}}</td>
+					<td colspan="19">{{#footnote}}{{characteristic}}{{/footnote}}</td>
 				</tr>
 				{{#tractpctminorities}}
 					<tr>
-						<td>{{tractpctminority}}</td>
+						<td>{{#footnote}}{{tractpctminority}}{{/footnote}}</td>
 						{{#purchasers}}
 						<td>{{#addCommas}}{{count}}{{/addCommas}}</td>
 						<td>{{#addCommas}}{{value}}{{/addCommas}}</td>
@@ -102,7 +102,7 @@
 				{{/tractpctminorities}}
 				{{#incomelevels}}
 					<tr>
-						<td>{{incomelevel}}</td>
+						<td>{{#footnote}}{{incomelevel}}{{/footnote}}</td>
 						{{#purchasers}}
 						<td>{{#addCommas}}{{count}}{{/addCommas}}</td>
 						<td>{{#addCommas}}{{value}}{{/addCommas}}</td>
@@ -112,7 +112,7 @@
 			{{/censuscharacteristics}}
 
 			<tr class="characteristic">
-				<td>Total</td>
+				<td>Total <a href="/hmda-viz-prototype/footnotes/{{year}}/#14"><sup>14</sup></a></td>
 				{{#total.purchasers}}
 					<td>{{#addCommas}}{{count}}{{/addCommas}}</td>
 					<td>{{#addCommas}}{{value}}{{/addCommas}}</td>
