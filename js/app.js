@@ -89,6 +89,15 @@ function getTableData(table) {
                     case 'total':
                         footnote = 14;
                         break;
+                    case 'no reported pricing data':
+                        footnote = 15;
+                        break;
+                    case 'mean':
+                        footnote = 30;
+                        break;
+                    case 'median':
+                        footnote = 31;
+                        break;
                     default:
                         footnote = 0;
                         footnote2 = 0;

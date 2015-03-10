@@ -41,7 +41,7 @@
 		<tbody>
 			{{#pricinginformation}}
 				<tr class="characteristic">
-					<td>{{pricing}}</td>
+					<td>{{#footnote}}{{pricing}}{{/footnote}}</td>
 					{{#purchasers}}
 					<td>{{#addCommas}}{{firstliencount}}{{/addCommas}}</td>
 					<td>{{#addCommas}}{{juniorliencount}}{{/addCommas}}</td>
@@ -50,12 +50,12 @@
 			{{/pricinginformation}}
 
 			<tr class="characteristic">
-				<td colspan="19" align="left">Precentage Points Above Average Prime Offer Rate: Only Includes Loans With APR Above The Threshold</td>
+				<td colspan="19" align="left">Precentage Points Above Average Prime Offer Rate: Only Includes Loans With APR Above The Threshold <a href="/hmda-viz-prototype/footnotes/{{year}}/#16"><sup>16</sup></a></td>
 			</tr>
 			
 			{{#points}}
 				<tr>
-					<td>{{point}}</td>
+					<td>{{#footnote}}{{point}}{{/footnote}}</td>
 					{{#purchasers}}
 					<td>{{#addCommas}}{{firstliencount}}{{/addCommas}}</td>
 					<td>{{#addCommas}}{{juniorliencount}}{{/addCommas}}</td>
@@ -64,7 +64,7 @@
 			{{/points}}
 
 			<tr class="characteristic">
-				<td>HOEPA Loans</td>
+				<td>HOEPA Loans <a href="/hmda-viz-prototype/footnotes/{{year}}/#17"><sup>17</sup></a></td>
 				{{#hoepa.purchasers}}
 					<td>{{#addCommas}}{{firstliencount}}{{/addCommas}}</td>
 					<td>{{#addCommas}}{{juniorliencount}}{{/addCommas}}</td>
@@ -113,7 +113,7 @@
 		<tbody>
 			{{#pricinginformation}}
 				<tr class="characteristic">
-					<td>{{pricing}}</td>
+					<td>{{#footnote}}{{pricing}}{{/footnote}}</td>
 					{{#purchasers}}
 					<td>{{#addCommas}}{{firstlienvalue}}{{/addCommas}}</td>
 					<td>{{#addCommas}}{{juniorlienvalue}}{{/addCommas}}</td>
@@ -122,12 +122,12 @@
 			{{/pricinginformation}}
 
 			<tr class="characteristic">
-				<td colspan="19" align="left">Precentage Points Above Average Prime Offer Rate: Only Includes Loans With APR Above The Threshold</td>
+				<td colspan="19" align="left">Precentage Points Above Average Prime Offer Rate: Only Includes Loans With APR Above The Threshold <a href="/hmda-viz-prototype/footnotes/{{year}}/#16"><sup>16</sup></a></td>
 			</tr>
 			
 			{{#points}}
 				<tr>
-					<td>{{point}}</td>
+					<td>{{#footnote}}{{point}}{{/footnote}}</td>
 					{{#purchasers}}
 					<td>{{#addCommas}}{{firstlienvalue}}{{/addCommas}}</td>
 					<td>{{#addCommas}}{{juniorlienvalue}}{{/addCommas}}</td>
@@ -136,7 +136,7 @@
 			{{/points}}
 
 			<tr class="characteristic">
-				<td>HOEPA Loans</td>
+				<td>HOEPA Loans <a href="/hmda-viz-prototype/footnotes/{{year}}/#17"><sup>17</sup></a></td>
 				{{#hoepa.purchasers}}
 					<td>{{#addCommas}}{{firstlienvalue}}{{/addCommas}}</td>
 					<td>{{#addCommas}}{{juniorlienvalue}}{{/addCommas}}</td>
