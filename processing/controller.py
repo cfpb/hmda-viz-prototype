@@ -1,7 +1,6 @@
 import json
-import psycopg2
-import psycopg2.extras
-from collections import OrderedDict
+import os
+import csv
 import psycopg2
 import psycopg2.extras
 from collections import OrderedDict
@@ -11,94 +10,54 @@ from A_D_library import connect_DB as connect
 from A_D_library import build_JSON as build
 from A_D_library import aggregate as agg
 from A_D_library import queries
+from A_D_library import report_selector as selector
+from constructor import report_4x
+from file_check import check_file
 
-#instantiate library functions
-parsed = parse()
-connection = connect()
-build31 = build()
-build32 = build()
-queries = queries()
-agg = agg()
+connection = connect() #connects to the DB
+selector = selector() #holds lists of reports to be generated for each MSA
+cur = connection.connect() #creates cursor object connected to HMDAPub2012 sql database, locally hosted postgres
+selector.get_report_lists('MSAinputs2013.csv') #fills the dictionary of lists of reports to be generated
+build_msa = build() #instantiate the build object for file path, jekyll files
+build_msa.msas_in_state(cur, selector, 'aggregate') #creates a list of all MSAs in each state and places the file in the state's aggregate folder
+build_msa.msas_in_state(cur, selector, 'disclosure')#creates a list of all MSAs in each state and places the file in the state's disclosure folder
 
-#set cursor object
-cur = connection.connect()
 
-#set MSA list
-MSA = '36540' #this will be a list that comes from the input file
-table_31 = '3-1'
-table_32 = '3-2'
-report_desc32 = build32.table_headers(table_31) #this will come from the input file
-report_desc31 = build31.table_headers(table_32)
-location = (MSA,)
+#testing code
+#selector.report_list['A 3-1'] = ['11500']
+#selector.report_list['A 3-2'] = ['11500']
+#selector.report_list['A 4-1'] = ['11500']
+#selector.report_list['A 4-2'] = ['11500']
+#selector.report_list['A 4-3'] = ['11500']
+#selector.report_list['A 4-4'] = ['11500']
+#selector.report_list['A 4-5'] = ['11500']
+#selector.report_list['A 4-6'] = ['11500']
+#selector.report_list['A 4-7'] = ['11500']
+#selector.report_list['A 4-1'] = ['29620']
+#report_list = ['A 3-1']
+report_list = ['A 3-1', 'A 3-2', 'A 4-1', 'A 4-2', 'A 4-3', 'A 4-4', 'A 4-5', 'A 4-6', 'A 4-7'] #this needs to be changed to read from the input file
+check_file = check_file(build_msa) #needs a report list, state list, and msa list
+check_file.is_file('aggregate', '2013', report_list)
 
-table_type = 'aggregate' #this will be in the input file
-#get count for looping over rows in the MSA
+for report in report_list: #loop over a list of report names
+	for MSA in selector.report_list[report]: #loop through MSAs flagged for report generation
+		report_x = report_4x(report, selector) #instantiate class and set function strings
+		report_x.report_x(MSA, cur) #variabalize funciton inputs!!!!
 
-SQL = queries.count_rows_2012() #get query text for getting count of loans for the MSA
-cur.execute(SQL, location) #ping the database for numbers!
-count = cur.fetchone() #get cont of rows for the MSA
-end = int(count[0]) #set count to an integer from a list of long type
-#end = 5
-print end
+#code to run a second set of reports with a different input file
+"state_list[state] = {'state': {'id':'name', 'id':'name'}}"
+'''
 
-#if report 3-1 is selected: need a function to read in report generation parameters
-SQL = queries.table_3_1()
-cur.execute(SQL, location)
+report_list = ['A 3-1', 'A 3-2', 'A 4-1', 'A 4-2', 'A 4-3', 'A 4-4', 'A 4-5', 'A 4-6', 'A 4-7']
+selector.get_report_list('MSAinputs2012.csv')
+for report in report_list:
+	for MSA in selector.report_list[report]:
+		report_x = report_4x(report, selector)
+		report_x.report_x(MSA, cur)
+#selector.report_list['A 4-6'] = ['29620']
+#selector.report_list['A 4-5'] = ['29620']
 
-#json_data = open('JSON_out.json')
-#cont = OrderedDict(json.load(json_data))
-table31 = build31.build_JSON()
-table32 = build32.build_JSON32()
-#print cont
-#print json.dumps(cont, indent=4)
-for num in range(0, end):
-    #print "in loop"
-    #fetch one row from the LAR
-    row = cur.fetchone()
-    parsed.parse_t31(row) #parse the row and store in the inputs dictionary - parse_inputs.inputs
-    if num == 0:
-        build31.set_header32(parsed.inputs, MSA, report_desc31, table_type, table_31)
-        build32.set_header32(parsed.inputs, MSA, report_desc32, table_type, table_32)
-        #aggregate the first loan into appropriate rows for the table
-        if parsed.inputs['purchaser'] >=0:
-            agg.by_race(table31, parsed.inputs) #aggregate loan by race
-            agg.by_ethnicity(table31, parsed.inputs) #aggregate loan by ethnicity
-            agg.by_minority_status(table31, parsed.inputs) #aggregate loan by minority status
-            agg.by_applicant_income(table31, parsed.inputs)
-            agg.by_minority_composition(table31, parsed.inputs)
-            agg.by_tract_income(table31, parsed.inputs)
-            agg.totals(table31, parsed.inputs) #aggregate totals for each purchaser
-            agg.by_pricing_status(table32, parsed.inputs) #aggregate count by lien status
-            agg.by_rate_spread(table32, parsed.inputs)
-            agg.by_hoepa_status(table32, parsed.inputs)
-            agg.rate_sum(table32, parsed.inputs)
-            agg.fill_median_lists(parsed.inputs)
-    else:
-        #aggregate the subsequent loan into appropriate rows for the table
-        #table 3-1
 
-        if parsed.inputs['purchaser'] >= 0:
-            agg.by_race(table31, parsed.inputs) #aggregate loan by race
-            agg.by_ethnicity(table31, parsed.inputs) #aggregate loan by ethnicity
-            agg.by_minority_status(table31, parsed.inputs) #aggregate loan by minority status
-            agg.by_applicant_income(table31, parsed.inputs)
-            agg.by_minority_composition(table31, parsed.inputs)
-            agg.by_tract_income(table31, parsed.inputs)
-            agg.totals(table31, parsed.inputs) #aggregate totals for each purchaser
-            #table 3-2
-            agg.by_pricing_status(table32, parsed.inputs) #aggregate count by lien status
-            agg.by_rate_spread(table32, parsed.inputs)
-            agg.by_hoepa_status(table32, parsed.inputs)
-            agg.rate_sum(table32, parsed.inputs)
-            agg.fill_median_lists(parsed.inputs)
 
-agg.by_median(table32, parsed.inputs) #this stays outside the loop
-agg.by_mean(table32, parsed.inputs) #this stays outside the loop
 
-#write reports in json format
-name = 'report31_' + MSA + '.json'
-build31.write_JSON(name, table31)
-name2 = 'report32_' + MSA + '.json'
-build32.write_JSON(name2, table32)
-
-#build.set_header32(self, inputs, MSA, desc, table_type, table_num)
+'''
