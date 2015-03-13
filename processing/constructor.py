@@ -65,9 +65,11 @@ class report_4x(constructor):
 				#this line needs generalization
 				getattr(self.agg, self.aggregation)(table_X, self.parsed.inputs)
 
-				if self.report_number[2:] == '3-2': #report 3-2 requires out of loop aggregation functions
-					self.agg.by_median(table_X, self.parsed.inputs)
-					self.agg.by_mean(table_X, self.parsed.inputs)
+		if self.report_number[2:] == '3-2': #report 3-2 requires out of loop aggregation functions
+			self.agg.by_median(table_X, self.parsed.inputs)
+			self.agg.by_weighted_mean(table_X, self.parsed.inputs)
+			self.agg.by_weighted_median(table_X, self.parsed.inputs)
+			self.agg.by_mean(table_X, self.parsed.inputs)
 			path = "json" + "/" +table_X['type']+"/"+table_X['year']+"/"+build_X.get_state_name(table_X['msa']['state']).replace(' ', '-').lower()+"/"+build_X.msa_names[MSA].replace(' ', '-').lower()+"/"+table_X['table']
 			if not os.path.exists(path): #check if path exists
 				os.makedirs(path) #if path not present, create it

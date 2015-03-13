@@ -1,6 +1,7 @@
 #this file holds the classes used to create the A&D reports using the HMDA LAR files combined with Census demographic information
 import datetime as foo
 import numpy
+import weighted
 import psycopg2
 import psycopg2.extras
 from collections import OrderedDict
@@ -40,46 +41,48 @@ class report_selector(AD_report):
 class parse_inputs(AD_report):
 	inputs = {}
 	def __init__(self):
-		#initialize rate spread sum variables for first liens
-		self.inputs['Fannie Mae first rates'] =0
-		self.inputs['Ginnie Mae first rates'] =0
-		self.inputs['Freddie Mac first rates'] =0
-		self.inputs['Farmer Mac first rates'] =0
-		self.inputs['Private Securitization first rates'] =0
-		self.inputs['Commercial bank, savings bank or association first rates'] =0
-		self.inputs['Life insurance co., credit union, finance co. first rates'] =0
-		self.inputs['Affiliate institution first rates'] = 0
-		self.inputs['Other first rates'] =0
-		#initialize rate spread sum variables for junior liens
-		self.inputs['Fannie Mae junior rates'] =0
-		self.inputs['Ginnie Mae junior rates'] =0
-		self.inputs['Freddie Mac junior rates'] =0
-		self.inputs['Farmer Mac junior rates'] =0
-		self.inputs['Private Securitization junior rates'] =0
-		self.inputs['Commercial bank, savings bank or association junior rates'] =0
-		self.inputs['Life insurance co., credit union, finance co. junior rates'] =0
-		self.inputs['Affiliate institution junior rates'] = 0
-		self.inputs['Other junior rates'] =0
-		#initialize lists to hold rates for determining the median first lien rate
-		self.inputs['Fannie Mae first lien list'] = []
-		self.inputs['Ginnie Mae first lien list'] = []
-		self.inputs['Freddie Mac first lien list'] = []
-		self.inputs['Farmer Mac first lien list'] = []
-		self.inputs['Private Securitization first lien list'] = []
-		self.inputs['Commercial bank, savings bank or association first lien list'] = []
-		self.inputs['Life insurance co., credit union, finance co. first lien list'] = []
-		self.inputs['Affiliate institution first lien list'] = []
-		self.inputs['Other first lien list'] = []
-		#initialize lists to hold rates for determining the median junior lien rate
-		self.inputs['Fannie Mae junior lien list'] = []
-		self.inputs['Ginnie Mae junior lien list'] = []
-		self.inputs['Freddie Mac junior lien list'] = []
-		self.inputs['Farmer Mac junior lien list'] = []
-		self.inputs['Private Securitization junior lien list'] = []
-		self.inputs['Commercial bank, savings bank or association junior lien list'] = []
-		self.inputs['Life insurance co., credit union, finance co. junior lien list'] = []
-		self.inputs['Affiliate institution junior lien list'] = []
-		self.inputs['Other junior lien list'] = []
+		#initialize rate spread sum variables for first lien means
+		self.inputs['Fannie Mae first rates'] =[]
+		self.inputs['Ginnie Mae first rates'] =[]
+		self.inputs['Freddie Mac first rates'] =[]
+		self.inputs['Farmer Mac first rates'] =[]
+		self.inputs['Private Securitization first rates'] =[]
+		self.inputs['Commercial bank, savings bank or association first rates'] =[]
+		self.inputs['Life insurance co., credit union, finance co. first rates'] =[]
+		self.inputs['Affiliate institution first rates'] = []
+		self.inputs['Other first rates'] =[]
+		#initialize rate spread sum variables for junior lien means
+		self.inputs['Fannie Mae junior rates'] =[]
+		self.inputs['Ginnie Mae junior rates'] =[]
+		self.inputs['Freddie Mac junior rates'] =[]
+		self.inputs['Farmer Mac junior rates'] =[]
+		self.inputs['Private Securitization junior rates'] =[]
+		self.inputs['Commercial bank, savings bank or association junior rates'] =[]
+		self.inputs['Life insurance co., credit union, finance co. junior rates'] =[]
+		self.inputs['Affiliate institution junior rates'] = []
+		self.inputs['Other junior rates'] =[]
+
+		#initialize rate spread sum variables for first lien weighted means
+		self.inputs['Fannie Mae first weight'] =[]
+		self.inputs['Ginnie Mae first weight'] =[]
+		self.inputs['Freddie Mac first weight'] =[]
+		self.inputs['Farmer Mac first weight'] =[]
+		self.inputs['Private Securitization first weight'] =[]
+		self.inputs['Commercial bank, savings bank or association first weight'] =[]
+		self.inputs['Life insurance co., credit union, finance co. first weight'] =[]
+		self.inputs['Affiliate institution first weight'] = []
+		self.inputs['Other first weight'] =[]
+
+		#initialize rate spread sum variables for junior lien weighted means
+		self.inputs['Fannie Mae junior weight'] =[]
+		self.inputs['Ginnie Mae junior weight'] =[]
+		self.inputs['Freddie Mac junior weight'] =[]
+		self.inputs['Farmer Mac junior weight'] =[]
+		self.inputs['Private Securitization junior weight'] =[]
+		self.inputs['Commercial bank, savings bank or association junior weight'] =[]
+		self.inputs['Life insurance co., credit union, finance co. junior weight'] =[]
+		self.inputs['Affiliate institution junior weight'] = []
+		self.inputs['Other junior weight'] =[]
 
 	def parse_t31(self, row): #takes a row of tuples from a table 3-1 query and parses it to the inputs dictionary
 		#parsing inputs for report 3.1
@@ -345,10 +348,10 @@ class build_JSON(AD_report):
 		self.table32_categories = ['pricinginformation', 'points', 'hoepa']
 		self.table32_rates = ['1.50 - 1.99', '2.00 - 2.49', '2.50 - 2.99', '3.00 - 3.49', '3.50 - 4.49', '4.50 - 5.49', '5.50 - 6.49', '6.5 or more', 'Mean', 'Median']
 		self.purchaser_names = ['Fannie Mae', 'Ginnie Mae', 'Freddie Mac', 'Farmer Mac', 'Private Securitization', 'Commercial bank, savings bank or association', 'Life insurance co., credit union, finance co.', 'Affiliate institution', 'Other']
-		self.race_names = ['American Indian/Alaska Native', 'Asian', 'Black or African American', 'Native Hawaiian or Other Pacific Islander', 'White', '2 or more minority races', 'Joint (White/Minority Race', 'Not Available']
-		self.ethnicity_names = ['Hispanic or Latino', 'Not Hispanic or Latino', 'Joint (Hispanic or Latino/Not Hispanic or Latino', 'Ethnicity Not Available']
+		self.race_names = ['American Indian/Alaska Native', 'Asian', 'Black or African American', 'Native Hawaiian or Other Pacific Islander', 'White', '2 or more minority races', 'Joint (White/Minority Race)', 'Race Not Available']
+		self.ethnicity_names = ['Hispanic or Latino', 'Not Hispanic or Latino', 'Joint (Hispanic or Latino/Not Hispanic or Latino)', 'Ethnicity Not Available']
 		self.minority_statuses = ['White Non-Hispanic', 'Others, Including Hispanic']
-		self.applicant_income_bracket = ['Less than 50% of MSA/MD median', '50-79% of MSA/MD median', '80-99% of MSA/MD median', '100-119% of MSA/MD median', '120% or more of MSA/MD median', 'Income not available']
+		self.applicant_income_bracket = ['Less than 50% of MSA/MD median', '50-79% of MSA/MD median', '80-99% of MSA/MD median', '100-119% of MSA/MD median', '120% or more of MSA/MD median', 'Income Not Available']
 		self.tract_pct_minority = ['Less than 10% minority', '10-19% minority', '20-49% minority', '50-79% minority', '80-100% minority']
 		self.tract_income = ['Low income', 'Moderate income', 'Middle income', 'Upper income']
 		self.state_names = {'AL': 'Alabama', 'AK': 'Alaska', 'AZ': 'Arizona', 'AR': 'Arkansas', 'CA': 'California', 'CO': 'Colorado', 'CT': 'Connecticut', 'DE':'Delaware', 'DC':'District of Columbia',
@@ -588,7 +591,10 @@ class build_JSON(AD_report):
 			purchasersholding = OrderedDict({})
 			purchasersholding['name'] = "{}".format(item)
 			for item in holding_list: #pass in the appropriate holding list for each set_purchasers call
-				purchasersholding[item] = 'NA'
+				if item == 'juniorliencount' or item == 'juniorlienvalue':
+					purchasersholding[item] = 'NA'
+				else:
+					purchasersholding[item] = 0
 			purchasers.append(purchasersholding)
 		return purchasers
 
@@ -597,7 +603,10 @@ class build_JSON(AD_report):
 		for rate in self.table32_rates:
 			holding = OrderedDict({})
 			holding['point'] = "{}".format(rate)
-			holding['purchasers'] = self.set_purchasers_NA(['firstliencount', 'firstlienvalue', 'juniorliencount', 'juniorlienvalue'])
+			if self.table32_rates.index(rate) < 4:
+				holding['purchasers'] = self.set_purchasers_NA(['firstliencount', 'firstlienvalue', 'juniorliencount', 'juniorlienvalue'])
+			else:
+				holding['purchasers'] = self.set_purchasers(['firstliencount', 'firstlienvalue', 'juniorliencount', 'juniorlienvalue'])
 			spreads.append(holding)
 		return spreads
 
@@ -1008,7 +1017,10 @@ class queries(AD_report):
 class aggregate(AD_report): #aggregates LAR rows by appropriate characteristics to fill the JSON files
 
 	def __init__(self):
-		pass
+		self.purchaser_first_lien_rates = ['Fannie Mae first rates', 'Ginnie Mae first rates', 'Freddie Mac first rates', 'Farmer Mac first rates', 'Private Securitization first rates', 'Commercial bank, savings bank or association first rates', 'Life insurance co., credit union, finance co. first rates', 'Affiliate institution first rates', 'Other first rates']
+		self.purchaser_junior_lien_rates = ['Fannie Mae junior rates', 'Ginnie Mae junior rates', 'Freddie Mac junior rates', 'Farmer Mac junior rates', 'Private Securitization junior rates', 'Commercial bank, savings bank or association junior rates', 'Life insurance co., credit union, finance co. junior rates', 'Affiliate institution junior rates', 'Other junior rates']
+		self.purchaser_first_lien_weight = ['Fannie Mae first weight', 'Ginnie Mae first weight', 'Freddie Mac first weight', 'Farmer Mac first weight', 'Private Securitization first weight', 'Commercial bank, savings bank or association first weight', 'Life insurance co., credit union, finance co. first weight', 'Affiliate institution first weight', 'Other first weight']
+		self.purchaser_junior_lien_weight = ['Fannie Mae junior weight', 'Ginnie Mae junior weight', 'Freddie Mac junior weight', 'Farmer Mac junior weight', 'Private Securitization junior weight', 'Commercial bank, savings bank or association junior weight', 'Life insurance co., credit union, finance co. junior weight', 'Affiliate institution junior weight', 'Other junior weight']
 
 	def by_race(self, container, inputs): #aggregates loans by race category
 		#if inputs['race'] == 5 and inputs['purchaser'] == 0:
@@ -1102,85 +1114,80 @@ class aggregate(AD_report): #aggregates LAR rows by appropriate characteristics 
 		else:
 			print "HOEPA flag not present or outside parameters" #error message to be displayed if a loan falls outside logic parameters
 
-	def rate_sum(self, container, inputs): #sums rates on loans to find the mean of rate spreads
-		if inputs['rate spread'] != 'NA   ' and inputs['rate spread'] != '     ': #filter out non-numeric or non listed rates
-			#lien status 1 - first liens sum of rate spreads by purchaser
-			if inputs['purchaser'] == 0 and inputs['lien status'] == '1':
-				inputs['Fannie Mae first rates'] += float(inputs['rate spread'])
-			elif inputs['purchaser'] == 1 and  inputs['lien status'] == '1':
-				inputs['Ginnie Mae first rates'] +=float(inputs['rate spread'])
-			elif inputs['purchaser'] == 2 and  inputs['lien status'] == '1':
-				inputs['Freddie Mac first rates'] += float(inputs['rate spread'])
-			elif inputs['purchaser'] == 3 and  inputs['lien status'] == '1':
-				inputs['Farmer Mac first rates'] += float(inputs['rate spread'])
-			elif inputs['purchaser'] == 4 and  inputs['lien status'] == '1':
-				inputs['Private Securitization first rates'] += float(inputs['rate spread'])
-			elif inputs['purchaser'] == 5 and  inputs['lien status'] == '1':
-				inputs['Commercial bank, savings bank or association first rates'] += float(inputs['rate spread'])
-			elif inputs['purchaser'] == 6 and  inputs['lien status'] == '1':
-				inputs['Life insurance co., credit union, finance co. first rates'] += float(inputs['rate spread'])
-			elif inputs['purchaser'] == 7 and  inputs['lien status'] == '1':
-				inputs['Affiliate institution first rates'] += float(inputs['rate spread'])
-			elif inputs['purchaser'] == 8 and  inputs['lien status'] == '1':
-				inputs['Other first rates'] += float(inputs['rate spread'])
-			#lien status 2 - junior liens sum of rate spreads by purchaser
-			elif inputs['purchaser'] == 0 and inputs['lien status'] == '2':
-				inputs['Fannie Mae junior rates'] += float(inputs['rate spread'])
-			elif inputs['purchaser'] == 1 and  inputs['lien status'] == '2':
-				inputs['Ginnie Mae junior rates'] +=float(inputs['rate spread'])
-			elif inputs['purchaser'] == 2 and  inputs['lien status'] == '2':
-				inputs['Freddie Mac junior rates'] += float(inputs['rate spread'])
-			elif inputs['purchaser'] == 3 and  inputs['lien status'] == '2':
-				inputs['Farmer Mac junior rates'] += float(inputs['rate spread'])
-			elif inputs['purchaser'] == 4 and  inputs['lien status'] == '2':
-				inputs['Private Securitization junior rates'] += float(inputs['rate spread'])
-			elif inputs['purchaser'] == 5 and  inputs['lien status'] == '2':
-				inputs['Commercial bank, savings bank or association junior rates'] += float(inputs['rate spread'])
-			elif inputs['purchaser'] == 6 and  inputs['lien status'] == '2':
-				inputs['Life insurance co., credit union, finance co. junior rates'] += float(inputs['rate spread'])
-			elif inputs['purchaser'] == 7 and  inputs['lien status'] == '2':
-				inputs['Affiliate institution junior rates'] += float(inputs['rate spread'])
-			elif inputs['purchaser'] == 8 and  inputs['lien status'] == '2':
-				inputs['Other junior rates'] += float(inputs['rate spread'])
-
-		else:
-			pass #this space reserved for an error message
-
 	def by_mean(self, container, inputs): #aggregate loans by mean of rate spread
-		first_lien_purchasers = ['Fannie Mae first rates', 'Ginnie Mae first rates', 'Freddie Mac first rates', 'Farmer Mac first rates', 'Private Securitization first rates', 'Commercial bank, savings bank or association first rates', 'Life insurance co., credit union, finance co. first rates', 'Affiliate institution first rates', 'Other first rates']
-		junior_lien_purchasers = ['Fannie Mae junior rates', 'Ginnie Mae junior rates', 'Freddie Mac junior rates', 'Farmer Mac junior rates', 'Private Securitization junior rates', 'Commercial bank, savings bank or association junior rates', 'Life insurance co., credit union, finance co. junior rates', 'Affiliate institution junior rates', 'Other junior rates']
+		#first_lien_purchasers = ['Fannie Mae first rates', 'Ginnie Mae first rates', 'Freddie Mac first rates', 'Farmer Mac first rates', 'Private Securitization first rates', 'Commercial bank, savings bank or association first rates', 'Life insurance co., credit union, finance co. first rates', 'Affiliate institution first rates', 'Other first rates']
+		#junior_lien_purchasers = ['Fannie Mae junior rates', 'Ginnie Mae junior rates', 'Freddie Mac junior rates', 'Farmer Mac junior rates', 'Private Securitization junior rates', 'Commercial bank, savings bank or association junior rates', 'Life insurance co., credit union, finance co. junior rates', 'Affiliate institution junior rates', 'Other junior rates']
 		for n in range(0,9):
-			if float(container['pricinginformation'][1]['purchasers'][n]['firstliencount']) > 0 and inputs[first_lien_purchasers[n]] > 0: #bug fix for divide by 0 errors
+			if float(container['pricinginformation'][1]['purchasers'][n]['firstliencount']) > 0 and inputs[self.purchaser_first_lien_rates[n]] > 0: #bug fix for divide by 0 errors
 				#container['points'][8]['purchasers'][n]['first lien'] = 0
-				container['points'][8]['purchasers'][n]['firstlienvalue'] = round(inputs[first_lien_purchasers[n]]/float(container['pricinginformation'][1]['purchasers'][n]['firstliencount']),2)
+				container['points'][8]['purchasers'][n]['firstliencount'] = round(numpy.mean(numpy.array(inputs[self.purchaser_first_lien_rates[n]])),2)#round(self.inputs[first_lien_rates[n]]/float(container['pricinginformation'][1]['purchasers'][n]['firstliencount']),2)
 
-			if float(container['pricinginformation'][1]['purchasers'][n]['juniorliencount']) > 0 and inputs[junior_lien_purchasers[n]] > 0: #bug fix for divide by 0 errors
+			if float(container['pricinginformation'][1]['purchasers'][n]['juniorliencount']) > 0 and inputs[self.purchaser_junior_lien_rates[n]] > 0: #bug fix for divide by 0 errors
 				#container['points'][8]['purchasers'][n]['junior lien'] = 0
-				container['points'][8]['purchasers'][n]['juniorlienvalue'] = round(inputs[junior_lien_purchasers[n]]/float(container['pricinginformation'][1]['purchasers'][n]['juniorliencount']),2)
+				#print inputs[self.purchaser_junior_lien_rates[n]], "junior lien rates"
+				container['points'][8]['purchasers'][n]['juniorliencount'] = round(numpy.mean(numpy.array(inputs[self.purchaser_junior_lien_rates[n]])),2)#round(inputs[self.junior_lien_rates[n]]/float(container['pricinginformation'][1]['purchasers'][n]['juniorliencount']),2)
 
-	def fill_median_lists(self, inputs): #add all rate spreads to a list to find the median rate spread
-		purchaser_first_lien_rates = ['Fannie Mae first lien list', 'Ginnie Mae first lien list', 'Freddie Mac first lien list', 'Farmer Mac first lien list', 'Private Securitization first lien list', 'Commercial bank, savings bank or association first lien list', 'Life insurance co., credit union, finance co. first lien list', 'Affiliate institution first lien list', 'Other first lien list']
-		purchaser_junior_lien_rates = ['Fannie Mae junior lien list', 'Ginnie Mae junior lien list', 'Freddie Mac junior lien list', 'Farmer Mac junior lien list', 'Private Securitization junior lien list', 'Commercial bank, savings bank or association junior lien list', 'Life insurance co., credit union, finance co. junior lien list', 'Affiliate institution junior lien list', 'Other junior lien list']
+	def by_weighted_mean(self, container, inputs): #aggregate loans by weighted mean of rate spread
+		#first_lien_purchasers = ['Fannie Mae first weight', 'Ginnie Mae first weight', 'Freddie Mac first weight', 'Farmer Mac first weight', 'Private Securitization first weight', 'Commercial bank, savings bank or association first weight', 'Life insurance co., credit union, finance co. first weight', 'Affiliate institution first weight', 'Other first weight']
+		#junior_lien_purchasers = ['Fannie Mae junior weight', 'Ginnie Mae junior weight', 'Freddie Mac junior weight', 'Farmer Mac junior weight', 'Private Securitization junior weight', 'Commercial bank, savings bank or association junior weight', 'Life insurance co., credit union, finance co. junior weight', 'Affiliate institution junior weight', 'Other junior weight']
+		for n in range(0,9):
+			if float(container['pricinginformation'][1]['purchasers'][n]['firstliencount']) > 0 and inputs[self.purchaser_first_lien_weight[n]] > 0: #bug fix for divide by 0 errors
+				nd_first_rates = numpy.array(inputs[self.purchaser_first_lien_rates[n]])
+				nd_first_weights = numpy.array(inputs[self.purchaser_first_lien_weight[n]])
+				#print nd_first_rates
+				#print nd_first_weights
+				container['points'][8]['purchasers'][n]['firstlienvalue'] = round(numpy.average(nd_first_rates, weights=nd_first_weights),2)#round(inputs[self.purchaser_first_lien_weight[n]]/float(container['pricinginformation'][1]['purchasers'][n]['firstlienvalue']),2)
+
+			if float(container['pricinginformation'][1]['purchasers'][n]['juniorliencount']) > 0 and inputs[self.purchaser_junior_lien_weight[n]] > 0: #bug fix for divide by 0 errors
+				nd_junior_rates = numpy.array(inputs[self.purchaser_junior_lien_rates[n]])
+				nd_junior_weights = numpy.array(inputs[self.purchaser_junior_lien_rates[n]])
+				container['points'][8]['purchasers'][n]['juniorlienvalue'] = round(numpy.average(nd_junior_rates, weights=nd_junior_weights),2)#round(inputs[self.purchaser_junior_lien_weight[n]]/float(container['pricinginformation'][1]['purchasers'][n]['juniorlienvalue']),2)
+
+	def fill_weight_lists(self, inputs): #add all loan values to a list to find means and medians
+		if inputs['rate spread'] != 'NA   ' and inputs['rate spread'] != '     ':
+
+			if inputs['lien status'] =='1':
+				inputs[self.purchaser_first_lien_weight[inputs['purchaser']]].append(int(inputs['loan value']))
+			elif inputs['lien status'] == '2':
+				inputs[self.purchaser_junior_lien_weight[inputs['purchaser']]].append(int(inputs['loan value']))
+
+	def fill_rate_lists(self, inputs): #add all rate spreads to a list to find the mean and median rate spreads
+		#purchaser_first_lien_rates = ['Fannie Mae first lien list', 'Ginnie Mae first lien list', 'Freddie Mac first lien list', 'Farmer Mac first lien list', 'Private Securitization first lien list', 'Commercial bank, savings bank or association first lien list', 'Life insurance co., credit union, finance co. first lien list', 'Affiliate institution first lien list', 'Other first lien list']
+		#purchaser_junior_lien_rates = ['Fannie Mae junior lien list', 'Ginnie Mae junior lien list', 'Freddie Mac junior lien list', 'Farmer Mac junior lien list', 'Private Securitization junior lien list', 'Commercial bank, savings bank or association junior lien list', 'Life insurance co., credit union, finance co. junior lien list', 'Affiliate institution junior lien list', 'Other junior lien list']
 		if inputs['rate spread'] == 'NA   ' or inputs['rate spread'] == '     ':
 			pass
 		elif inputs['lien status'] == '1': #add to first lien rate spread list
-			inputs[purchaser_first_lien_rates[inputs['purchaser']]].append(float(inputs['rate spread']))
+			inputs[self.purchaser_first_lien_rates[inputs['purchaser']]].append(float(inputs['rate spread']))
 		elif inputs['lien status'] == '2': #add to junior lien rate spread list
-			inputs[purchaser_junior_lien_rates[inputs['purchaser']]].append(float(inputs['rate spread']))
+			inputs[self.purchaser_junior_lien_rates[inputs['purchaser']]].append(float(inputs['rate spread']))
 
 	def by_median(self, container, inputs): #puts the median rate spread in the JSON object
-		purchaser_first_lien_rates = ['Fannie Mae first lien list', 'Ginnie Mae first lien list', 'Freddie Mac first lien list', 'Farmer Mac first lien list', 'Private Securitization first lien list', 'Commercial bank, savings bank or association first lien list', 'Life insurance co., credit union, finance co. first lien list', 'Affiliate institution first lien list', 'Other first lien list']
-		purchaser_junior_lien_rates = ['Fannie Mae junior lien list', 'Ginnie Mae junior lien list', 'Freddie Mac junior lien list', 'Farmer Mac junior lien list', 'Private Securitization junior lien list', 'Commercial bank, savings bank or association junior lien list', 'Life insurance co., credit union, finance co. junior lien list', 'Affiliate institution junior lien list', 'Other junior lien list']
+		#purchaser_first_lien_rates = ['Fannie Mae first lien list', 'Ginnie Mae first lien list', 'Freddie Mac first lien list', 'Farmer Mac first lien list', 'Private Securitization first lien list', 'Commercial bank, savings bank or association first lien list', 'Life insurance co., credit union, finance co. first lien list', 'Affiliate institution first lien list', 'Other first lien list']
+		#purchaser_junior_lien_rates = ['Fannie Mae junior lien list', 'Ginnie Mae junior lien list', 'Freddie Mac junior lien list', 'Farmer Mac junior lien list', 'Private Securitization junior lien list', 'Commercial bank, savings bank or association junior lien list', 'Life insurance co., credit union, finance co. junior lien list', 'Affiliate institution junior lien list', 'Other junior lien list']
 		for n in range(0,9):
 			#first lien median block
-			if len(inputs[purchaser_first_lien_rates[n]]) > 0:
-				container['points'][9]['purchasers'][n]['firstliencount'] = round(numpy.median(numpy.array(inputs[purchaser_first_lien_rates[n]])),2) #for normal median
-				container['points'][9]['purchasers'][n]['firstlienvalue'] = round(numpy.median(numpy.array(inputs[purchaser_first_lien_rates[n]])),2) #for weighted median
+			if len(inputs[self.purchaser_first_lien_rates[n]]) > 0: #check to see if the array is populated
+				container['points'][9]['purchasers'][n]['firstliencount'] = round(numpy.median(numpy.array(inputs[self.purchaser_first_lien_rates[n]])),2) #for normal median
+				#container['points'][9]['purchasers'][n]['firstlienvalue'] = round(numpy.median(numpy.array(inputs[purchaser_first_lien_rates[n]])),2) #for weighted median
 			#junior lien median block
-			if len(inputs[purchaser_junior_lien_rates[n]]) > 0:
-				container['points'][9]['purchasers'][n]['juniorliencount'] = round(numpy.median(numpy.array(inputs[purchaser_junior_lien_rates[n]])),2) #for normal median
-				container['points'][9]['purchasers'][n]['juniorlienvalue'] = round(numpy.median(numpy.array(inputs[purchaser_junior_lien_rates[n]])),2) #for weighted median
-
+			if len(inputs[self.purchaser_junior_lien_rates[n]]) > 0: #check to see if the array is populated
+				container['points'][9]['purchasers'][n]['juniorliencount'] = round(numpy.median(numpy.array(inputs[self.purchaser_junior_lien_rates[n]])),2) #for normal median
+				#container['points'][9]['purchasers'][n]['juniorlienvalue'] = round(numpy.median(numpy.array(inputs[purchaser_junior_lien_rates[n]])),2) #for weighted median
+	def by_weighted_median(self, container, inputs):
+		for n in range(0,9):
+			#first lien weighted median block
+			#print inputs[self.purchaser_first_lien_rates[n]], inputs[self.purchaser_first_lien_weight[n]]
+			if len(inputs[self.purchaser_first_lien_rates[n]]) >0 and len(inputs[self.purchaser_first_lien_weight[n]]) >0: #check to see if the array is populated
+				nd_first_rates = numpy.array(inputs[self.purchaser_first_lien_rates[n]]) #set arrays to nparrays
+				nd_first_values = numpy.array(inputs[self.purchaser_first_lien_weight[n]])
+				container['points'][9]['purchasers'][n]['firstlienvalue'] = round(weighted.median(nd_first_rates, nd_first_values),2) #for weighted median
+			#junior lien weighted median block
+			#print self.purchaser_junior_lien_rates[n], inputs[self.purchaser_junior_lien_rates[n]]
+			#print self.purchaser_junior_lien_weight[n], inputs[self.purchaser_junior_lien_weight[n]]
+			if len(inputs[self.purchaser_junior_lien_rates[n]]) > 0 and len(inputs[self.purchaser_junior_lien_weight[n]]) >0: #check to see if the array is populated
+				nd_junior_rates = numpy.array(inputs[self.purchaser_junior_lien_rates[n]]) #set array to numpy array
+				nd_junior_values = numpy.array(inputs[self.purchaser_junior_lien_weight[n]]) #set arry to numpy array
+				container['points'][9]['purchasers'][n]['juniorlienvalue'] = round(weighted.median(nd_junior_rates, nd_junior_values),2)
 	def by_applicant_income_4x(self, container, inputs): #aggregate loans by applicant income index
 		if inputs['income bracket'] > 5 or inputs['action taken'] == ' ' or inputs['action taken'] > 5: #filter out of bounds indexes before calling aggregations
 			pass
@@ -1273,8 +1280,8 @@ class aggregate(AD_report): #aggregates LAR rows by appropriate characteristics 
 		self.by_pricing_status(table32, inputs) #aggregate count by lien status
 		self.by_rate_spread(table32, inputs) #aggregate loans by percentage points above APOR as ##.##%
 		self.by_hoepa_status(table32, inputs) #aggregates loans by presence of HOEPA flag
-		self.rate_sum(table32, inputs) #sums spreads above APOR for each loan purchaser, used to determine medians
-		self.fill_median_lists(inputs) #fills the median rate spread for each purchaser
+		self.fill_rate_lists(inputs)
+		self.fill_weight_lists(inputs) #fills the median rate spread for each purchaser
 		#mean and median functions are not called here
 		#mean and median function must be called outside the control loop
 		return table32
