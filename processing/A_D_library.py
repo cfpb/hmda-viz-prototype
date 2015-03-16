@@ -98,6 +98,8 @@ class parse_inputs(AD_report):
 		a_race = demo.a_race_list(row) #put applicant race codes in a list 0-5, 0 is blank field
 		co_race = demo.co_race_list(row) #put co-applicant race codes in a list 0-5, 0 is blank field
 		#add data elements to dictionary
+		self.inputs['a_race'] = a_race
+		self.inputs['co_race'] = co_race
 		self.inputs['a ethn'] = row['applicantethnicity'] #ethnicity of the applicant
 		self.inputs['co ethn'] = row['coapplicantethnicity'] #ethnicity of the co-applicant
 		self.inputs['income'] = row['applicantincome'] #relied upon income rounded to the nearest thousand
@@ -120,9 +122,9 @@ class parse_inputs(AD_report):
 		self.inputs['app non white flag'] = demo.set_non_white(a_race) #flags the applicant as non-white if true, used in setting minority status and race
 		self.inputs['co non white flag'] = demo.set_non_white(co_race) #flags the co applicant as non-white if true, used in setting minority status and race
 		self.inputs['joint status'] = demo.set_joint(self.inputs) #requires non white status flags be set prior to running set_joint
-		self.inputs['minority status'] = demo.set_minority_status(self.inputs) #requires non white flags be set prior to running set_minority_status
-		self.inputs['ethnicity'] = demo.set_loan_ethn(self.inputs) #requires  ethnicity be parsed prior to running set_loan_ethn
 		self.inputs['race'] = demo.set_race(self.inputs, a_race, co_race) #requires joint status be set prior to running set_race
+		self.inputs['ethnicity'] = demo.set_loan_ethn(self.inputs) #requires  ethnicity be parsed prior to running set_loan_ethn
+		self.inputs['minority status'] = demo.set_minority_status(self.inputs) #requires non white flags be set prior to running set_minority_status
 		self.inputs['minority count'] = demo.minority_count(a_race) #determines if the number of minority races claimed by the applicant is 2 or greater
 
 	def parse_t32(self, row): #takes a row of tuples from a table 3-1 query and parses it to the inputs dictionary
@@ -264,12 +266,12 @@ class demographics(AD_report):
 
 	def set_minority_status(self, inputs):
 		#determine minority status, this is a binary category
-		#if either applicant reported a non-white race or an ethinicity of hispanic or latino then minority status is true
-		if inputs['app non white flag'] == True or inputs['co non white flag'] == True or inputs['a ethn'] == '1' or inputs['co ethn'] == '1':
-			return  1
-		#if both applicants reported white race and non-hispanic/latino ethnicity then minority status is false
+		if inputs['app non white flag'] is None and inputs['co non white flag'] is None and int(inputs['a ethn']) > 2 and int(inputs['co ethn']) > 2:
+			return 2 #filter out non-natural person loans
+		elif inputs['app non white flag'] == True or inputs['co non white flag'] == True or inputs['a ethn'] == '1' or inputs['co ethn'] == '1':
+			return  1 #if either applicant reported a non-white race or an ethinicity of hispanic or latino then minority status is true
 		elif inputs['app non white flag'] != True and inputs['co non white flag'] != True and inputs['a ethn']  != '1' and inputs['co ethn'] != '1':
-			return 0
+			return 0 #if both applicants reported white race and non-hispanic/latino ethnicity then minority status is false
 		else:
 			print 'minority status not set'
 
@@ -1023,8 +1025,9 @@ class aggregate(AD_report): #aggregates LAR rows by appropriate characteristics 
 		self.purchaser_junior_lien_weight = ['Fannie Mae junior weight', 'Ginnie Mae junior weight', 'Freddie Mac junior weight', 'Farmer Mac junior weight', 'Private Securitization junior weight', 'Commercial bank, savings bank or association junior weight', 'Life insurance co., credit union, finance co. junior weight', 'Affiliate institution junior weight', 'Other junior weight']
 
 	def by_race(self, container, inputs): #aggregates loans by race category
-		#if inputs['race'] == 5 and inputs['purchaser'] == 0:
-		#	print inputs['sequence'], inputs['loan value'], "fannie mae 2 minority"
+		if inputs['minority status'] == 2:
+			print inputs['sequence'], inputs['loan value'],
+			print inputs['a_race'], inputs['co_race'], inputs['app non white flag'], inputs['co non white flag'], inputs['race'], inputs['ethnicity'], inputs['minority status']
 		#if inputs['race'] == 6 and inputs['purchaser'] == 0:
 		#	print inputs['sequence'], inputs['loan value'], "fannie mae joint"
 		container['borrowercharacteristics'][0]['races'][inputs['race']]['purchasers'][inputs['purchaser']]['count'] += 1
@@ -1035,9 +1038,11 @@ class aggregate(AD_report): #aggregates LAR rows by appropriate characteristics 
 		container['borrowercharacteristics'][1]['ethnicities'][inputs['ethnicity']]['purchasers'][inputs['purchaser']]['value'] += int(inputs['loan value'])
 
 	def by_minority_status(self, container, inputs): #aggregate loans by minority status
-		container['borrowercharacteristics'][2]['minoritystatuses'][inputs['minority status']]['purchasers'][inputs['purchaser']]['count'] += 1
-		container['borrowercharacteristics'][2]['minoritystatuses'][inputs['minority status']]['purchasers'][inputs['purchaser']]['value']+= int(inputs['loan value'])
-
+		if inputs['minority status'] < 2:
+			container['borrowercharacteristics'][2]['minoritystatuses'][inputs['minority status']]['purchasers'][inputs['purchaser']]['count'] += 1
+			container['borrowercharacteristics'][2]['minoritystatuses'][inputs['minority status']]['purchasers'][inputs['purchaser']]['value']+= int(inputs['loan value'])
+		else:
+			pass
 	def by_applicant_income(self, container, inputs): #aggregate loans by applicant income index
 		if inputs['income bracket'] > 5: #income index outside bounds of report 3-1
 			pass
