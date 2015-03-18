@@ -1,511 +1,670 @@
 {
-	 "metadata": {
-		  "src": "http://www.ffiec.gov/hmda/pdf/spec2014.pdf",
-		  "year": "2014"
-	 },
-	 "transmittalSheet": {
-		  "recordID": {
-			   "label": "Record Identifier",
-			   "start": "1",
-			   "end": "1",
-			   "length": "1",
-			   "dataType": "N",
-			   "description": "Value is 1"
-		  },
-		  "respondentID": {
-			   "label": "Respondent-ID",
-			   "start": "2",
-			   "end": "11",
-			   "length": "10",
-			   "dataType": "AN",
-			   "description": "Assigned by your federal regulatory agency. Format is right-justified and zero filled."
-		  },
-		  "agencyCode": {
-			   "label": "Agency Code",
-			   "start": "12",
-			   "end": "12",
-			   "length": "1",
-			   "dataType": "N",
-			   "description": "Values are 1=OCC, 2=FRS, 3=FDIC, 5=NCUA, 7=HUD, or 9=CFPB"
-		  },
-		  "timestamp": {
-			   "label": "Timestamp",
-			   "start": "13",
-			   "end": "24",
-			   "length": "12",
-			   "dataType": "N",
-			   "description": "Format is century, year, month, day, hour, minute (e.g., Jan. 17, 2013, at 1:30 pm would be 201301171330)"
-		  },
-		  "filler": {
-			   "label": "Filler",
-			   "start": "25",
-			   "end": "25",
-			   "length": "1",
-			   "dataType": "AN",
-			   "description": "Blank"
-		  },
-		  "activityYear": {
-			   "label": "Activity Year",
-			   "start": "26",
-			   "end": "29",
-			   "length": "4",
-			   "dataType": "N",
-			   "description": "Four digit year (e.g., 2013)"
-		  },
-		  "taxID": {
-			   "label": "Tax ID",
-			   "start": "30",
-			   "end": "39",
-			   "length": "10",
-			   "dataType": "AN",
-			   "description": "Format is 99-9999999"
-		  },
-		  "totalLineEntries": {
-			   "label": "Total Line Entries",
-			   "start": "40",
-			   "end": "46",
-			   "length": "7",
-			   "dataType": "N",
-			   "description": "The N of line entries contained in the accompanying Loan/Application Register"
-		  },
-		  "institutionName": {
-			   "label": "Respondent Name",
-			   "start": "47",
-			   "end": "76",
-			   "length": "30",
-			   "dataType": "AN",
-			   "description": "Left-justified and upper case"
-		  },
-		  "respondentAddress": {
-			   "label": "Respondent Address",
-			   "start": "77",
-			   "end": "116",
-			   "length": "40",
-			   "dataType": "AN",
-			   "description": "Left-justified"
-		  },
-		  "respondentCity": {
-			   "label": "Respondent City",
-			   "start": "117",
-			   "end": "141",
-			   "length": "25",
-			   "dataType": "AN",
-			   "description": "Left-justified"
-		  },
-		  "respondentState": {
-			   "label": "Respondent State",
-			   "start": "142",
-			   "end": "143",
-			   "length": "2",
-			   "dataType": "AN",
-			   "description": "Postal Code abbreviation"
-		  },
-		  "respondentZip": {
-			   "label": "Respondent Zip",
-			   "start": "144",
-			   "end": "153",
-			   "length": "10",
-			   "dataType": "AN",
-			   "description": "Format is 99999 left-justified or Code 99999-9999"
-		  },
-		  "parentName": {
-			   "label": "Parent Name",
-			   "start": "154",
-			   "end": "183",
-			   "length": "30",
-			   "dataType": "AN",
-			   "description": "If applicable"
-		  },
-		  "parentAddress": {
-			   "label": "Parent Address",
-			   "start": "184",
-			   "end": "223",
-			   "length": "40",
-			   "dataType": "AN",
-			   "description": "If applicable"
-		  },
-		  "parentCity": {
-			   "label": "Parent City",
-			   "start": "224",
-			   "end": "248",
-			   "length": "25",
-			   "dataType": "AN",
-			   "description": "If applicable"
-		  },
-		  "parentState": {
-			   "label": "Parent State",
-			   "start": "249",
-			   "end": "250",
-			   "length": "2",
-			   "dataType": "AN",
-			   "description": "If applicable"
-		  },
-		  "parentZip": {
-			   "label": "Parent Zip Code",
-			   "start": "251",
-			   "end": "260",
-			   "length": "10",
-			   "dataType": "AN",
-			   "description": "If applicable; format is 99999 left-justified or 99999-9999"
-		  },
-		  "contactName": {
-			   "label": "Contact Person's Name",
-			   "start": "261",
-			   "end": "290",
-			   "length": "30",
-			   "dataType": "AN",
-			   "description": "For questionable data, reports, or other issues that may arise during an annual processing cycle."
-		  },
-		  "contactPhone": {
-			   "label": "Contact Person's Phone Number",
-			   "start": "291",
-			   "end": "302",
-			   "length": "12",
-			   "dataType": "AN",
-			   "description": "Format is 999-999-9999"
-		  },
-		  "contactFax": {
-			   "label": "Contact Person's Facsimile Number",
-			   "start": "303",
-			   "end": "314",
-			   "length": "12",
-			   "dataType": "AN",
-			   "description": "Format is 999-999-9999"
-		  },
-		  "respondentEmail": {
-			   "label": "Contact Person's E-mail Address",
-			   "start": "315",
-			   "end": "380",
-			   "length": "66",
-			   "dataType": "AN",
-			   "description": "Enter only one e-mail address. E-mail address must contain only one @ symbol. Format is left-justified."
-		  }
-	 },
-	 "loanApplicationRegister": {
-		  "Application of Loan Number": {
-			   "label": "Record Identifier",
-			   "dataType": "N",
-			   "description": "Enter an identifying loan number that can be used later to retrieve the loan or application file. It can be any number of your institution's choosing (not exceeding 25 characters). You may use letters, numerals, or a combination of both."
-		  },
-		    "dateApplicationReceived": {
-		  	   "label": "Date Application Received",
-		  	   "dataType": "AN",
-		  	   "description": "Enter the date the loan application was received by your institution by month, day, and year. If your institution normally records the date shown on the application form you may use that date instead. Enter “NA” for loans purchased by your institution. For paper submissions only, use numerals in the form MM/DD/YYYY (for example, 01/15/2003). For submissions in electronic form, the proper format is YYYYMMDD."
-		    },
-		      "loanType": {
-		    	   "label": "Loan Type",
-		    	   "dataType": "N",
-		    	   "Codes": [
-		    	   		{"1" : "Conventional"},
-		    	   		{"2" : ""},
-		    	   		{"3" : ""},
-		    	   		{"4" : ""}
-		    	   		]
-		      },
+    "metadata": {
+        "src": "http://www.ffiec.gov/hmda/pdf/spec2014.pdf",
+        "year": "2014"
+    },
+    "transmittalSheet": {
+        "recordID": {
+            "label": "Record Identifier",
+            "start": "1",
+            "end": "1",
+            "length": "1",
+            "dataType": "N",
+            "description": "Value is 1"
+        },
+        "respondentID": {
+            "label": "Respondent-ID",
+            "start": "2",
+            "end": "11",
+            "length": "10",
+            "dataType": "AN",
+            "description": "Assigned by your federal regulatory agency. Format is right-justified and zero filled."
+        },
+        "agencyCode": {
+            "label": "Agency Code",
+            "start": "12",
+            "end": "12",
+            "length": "1",
+            "dataType": "N",
+            "description": "Values are 1=OCC, 2=FRS, 3=FDIC, 5=NCUA, 7=HUD, or 9=CFPB"
+        },
+        "timestamp": {
+            "label": "Timestamp",
+            "start": "13",
+            "end": "24",
+            "length": "12",
+            "dataType": "N",
+            "description": "Format is century, year, month, day, hour, minute (e.g., Jan. 17, 2013, at 1:30 pm would be 201301171330)"
+        },
+        "filler": {
+            "label": "Filler",
+            "start": "25",
+            "end": "25",
+            "length": "1",
+            "dataType": "AN",
+            "description": "Blank"
+        },
+        "activityYear": {
+            "label": "Activity Year",
+            "start": "26",
+            "end": "29",
+            "length": "4",
+            "dataType": "N",
+            "description": "Four digit year (e.g., 2013)"
+        },
+        "taxID": {
+            "label": "Tax ID",
+            "start": "30",
+            "end": "39",
+            "length": "10",
+            "dataType": "AN",
+            "description": "Format is 99-9999999"
+        },
+        "totalLineEntries": {
+            "label": "Total Line Entries",
+            "start": "40",
+            "end": "46",
+            "length": "7",
+            "dataType": "N",
+            "description": "The N of line entries contained in the accompanying Loan/Application Register"
+        },
+        "institutionName": {
+            "label": "Respondent Name",
+            "start": "47",
+            "end": "76",
+            "length": "30",
+            "dataType": "AN",
+            "description": "Left-justified and upper case"
+        },
+        "respondentAddress": {
+            "label": "Respondent Address",
+            "start": "77",
+            "end": "116",
+            "length": "40",
+            "dataType": "AN",
+            "description": "Left-justified"
+        },
+        "respondentCity": {
+            "label": "Respondent City",
+            "start": "117",
+            "end": "141",
+            "length": "25",
+            "dataType": "AN",
+            "description": "Left-justified"
+        },
+        "respondentState": {
+            "label": "Respondent State",
+            "start": "142",
+            "end": "143",
+            "length": "2",
+            "dataType": "AN",
+            "description": "Postal Code abbreviation"
+        },
+        "respondentZip": {
+            "label": "Respondent Zip",
+            "start": "144",
+            "end": "153",
+            "length": "10",
+            "dataType": "AN",
+            "description": "Format is 99999 left-justified or Code 99999-9999"
+        },
+        "parentName": {
+            "label": "Parent Name",
+            "start": "154",
+            "end": "183",
+            "length": "30",
+            "dataType": "AN",
+            "description": "If applicable"
+        },
+        "parentAddress": {
+            "label": "Parent Address",
+            "start": "184",
+            "end": "223",
+            "length": "40",
+            "dataType": "AN",
+            "description": "If applicable"
+        },
+        "parentCity": {
+            "label": "Parent City",
+            "start": "224",
+            "end": "248",
+            "length": "25",
+            "dataType": "AN",
+            "description": "If applicable"
+        },
+        "parentState": {
+            "label": "Parent State",
+            "start": "249",
+            "end": "250",
+            "length": "2",
+            "dataType": "AN",
+            "description": "If applicable"
+        },
+        "parentZip": {
+            "label": "Parent Zip Code",
+            "start": "251",
+            "end": "260",
+            "length": "10",
+            "dataType": "AN",
+            "description": "If applicable; format is 99999 left-justified or 99999-9999"
+        },
+        "contactName": {
+            "label": "Contact Person's Name",
+            "start": "261",
+            "end": "290",
+            "length": "30",
+            "dataType": "AN",
+            "description": "For questionable data, reports, or other issues that may arise during an annual processing cycle."
+        },
+        "contactPhone": {
+            "label": "Contact Person's Phone Number",
+            "start": "291",
+            "end": "302",
+            "length": "12",
+            "dataType": "AN",
+            "description": "Format is 999-999-9999"
+        },
+        "contactFax": {
+            "label": "Contact Person's Facsimile Number",
+            "start": "303",
+            "end": "314",
+            "length": "12",
+            "dataType": "AN",
+            "description": "Format is 999-999-9999"
+        },
+        "respondentEmail": {
+            "label": "Contact Person's E-mail Address",
+            "start": "315",
+            "end": "380",
+            "length": "66",
+            "dataType": "AN",
+            "description": "Enter only one e-mail address. E-mail address must contain only one @ symbol. Format is left-justified."
+        }
+    },
+    "loanApplicationRegister": {
+        "Application or Loan Number": {
+            "label": "Application Number",
+            "dataType": "N",
+            "description": "Enter an identifying loan number that can be used later to retrieve the loan or application file. It can be any number of your institution's choosing (not exceeding 25 characters). You may use letters, numerals, or a combination of both."
+        },
+        "dateApplicationReceived": {
+            "label": "Date Application Received",
+            "dataType": "AN",
+            "description": "Enter the date the loan application was received by your institution by month, day, and year. If your institution normally records the date shown on the application form you may use that date instead. Enter “NA” for loans purchased by your institution. For paper submissions only, use numerals in the form MM/DD/YYYY (for example, 01/15/2003). For submissions in electronic form, the proper format is YYYYMMDD."
+        },
+        "loanType": {
+            "label": "Type of Loan or Application",
+            "dataType": "N",
+            "description": "Indicate the type of loan or application by entering the applicable Code from the following:",
+            "codes": [
+                {
+                    "1": "Conventional (any loan other than FHA, VA, FSA, or RHS loans)"
+                },
+                {
+                    "2": "FHA-insured (Federal Housing Administration)"
+                },
+                {
+                    "3": "VA-Guaranteed (Veterans Administration)"
+                },
+                {
+                    "4": "FSA/RHS-guaranteed (Farm Service Agency or Rural Housing Service)"
+                }
+            ]
+        },
+        "propertyType": {
+            "label": "Property Type",
+            "dataType": "N",
+            "description": "Indicate the property type by entering the applicable Code from the following:",
+            "codes": [
+                {
+                    "1": "One-to four-family dwelling (other htan manufactured housing)"
+                },
+                {
+                    "2": "Manufactured housing"
+                },
+                {
+                    "3": "Multifamily dwelling"
+                }
+            ],
+            "notes": [
+                {
+                    "a": "Use Code 1, not Code 3, for loans on individual condominium or cooperative units."
+                },
+                {
+                    "b": "If you cannot determine (despite reasonable efforts to find out) whether the loan or application relates to a manufactured home, use Code 1."
+                }
+            ]
+        },
+        "loanPurpose": {
+            "label": "Purpose of Loan or Application",
+            "dataType": "N",
+            "description": "Indicate the purpose of the loan or application by entering the applicable Code from the following:",
+            "codes": [
+                {
+                    "1": "Home purchase"
+                },
+                {
+                    "2": "Home improvement"
+                },
+                {
+                    "3": "Refinancing"
+                }
+            ],
+            "notes": [
+                {
+                    "a": "Do not report a refinancing if, under the loan agreement, you were unconditionally obligated to refinance the obligation, or you were obligated to refinance the obligation subject to conditions within the borrower's control."
+                }
+            ]
+        },
+        "ownerOccupancy": {
+            "label": "Owner Occupancy",
+            "dataType": "N",
+            "description": "Indicate whether the property to which the loan or loan application relates is to be owner-occupied as a principal residence by entering the applicable Code from the following:",
+            "Codes": [
+                {
+                    "1": "Owner-occupied as a principal dwelling"
+                },
+                {
+                    "2": "Not owner-occupied as a principal dwelling"
+                },
+                {
+                    "3": "Not applicable"
+                }
+            ],
+            "notes": [
+                {
+                    "a": "For purchased loans, use Code 1 unless the loan documents or application indicate that the property will not be owner-occupied as a principal residence."
+                },
+                {
+                    "b": "Use Code 2 for second homes or vacation homes, as well as for rental properties."
+                },
+                {
+                    "c": "Use Code 3 if the property to which the loan relates is a multifamily dwelling; is not located in an MSA; or is located in an MSA or an MD in which your institution has neither a home nor a branch office. Alternatively, at your institution's option, you may report the actual occupancy status, using Code 1 or 2 as applicable."
+                }
+            ]
+        },
+        "loanAmount": {
+            "label": "Loan Amount",
+            "dataType": "N",
+            "description": "Enter the amount of the loan or application. Do not report loans below $500. Show the amount in thousands, rounding to the nearest thousand (round $500 up to the next $1,000). For example, a loan for $167,300 should be entered as 167 and one for $15,500 as 16.",
+            "notes": [
+                {
+                    "a": "For a home purchase loan that you originated, enter the principal amount of the loan."
+                },
+                {
+                    "b": "For a home purchase loan that you purchased, enter the unpaid principal balance of the loan at the time of purchase."
+                },
+                {
+                    "c": "For a home improvement loan, enter the entire amount of the loan—including unpaid finance charges if that is how such loans are recorded on your books—even if only a part of the proceeds is intended for home improvement."
+                },
+                {
+                    "d": "If you opt to report home-equity lines of credit, report only the portion of the line intended for home improvement or home purchase."
+                },
+                {
+                    "e": "For a refinancing, indicate the total amount of the refinancing, including both the amount outstanding on the original loan and any amount of “new money."
+                },
+                {
+                    "f": "For a loan application that was denied or withdrawn, enter the amount for which the applicant applied."
+                }
+            ]
+        },
+        "preapprovals": {
+            "label": "Request for Preapproval of a Home Purchase Loan",
+            "dataType": "N",
+            "description": "Request for Preapproval of a Home Purchase Loan. Indicate whether the application or loan involved a request for preapproval of a home purchase loan by entering the applicable Code from the following:",
+            "Codes": [
+                {
+                    "1": "Preapproval requested"
+                },
+                {
+                    "2": "Preapproval not requested"
+                },
+                {
+                    "3": "Not applicable"
+                }
+            ],
+            "notes": [
+                {
+                    "a": "Enter Code 2 if your institution has a covered preapproval program but the applicant does not request a preapproval."
+                },
+                {
+                    "b": "Enter Code 3 if your institution does not have a preapproval program as defined in §1003.2."
+                },
+                {
+                    "c": "Enter Code 3 for applications or loans for home improvement or refinancing, and for purchased loans."
+                }
+            ]
+        },
+        "actionTaken": {
+            "label": "Type of Action Taken",
+            "description": "Indicate the type of action taken on the application or loan by using one of the following Codes.",
+            "dataType": "N",
+            "Codes": [
+                {
+                    "1": "Loan originated"
+                },
+                {
+                    "2": "Application approved but noat accepted"
+                },
+                {
+                    "3": "Application denied"
+                },
+                {
+                    "4": "Application withdrawn"
+                },
+                {
+                    "5": "File closed for incompleteness"
+                },
+                {
+                    "6": "Loan purchased by your institution"
+                },
+                {
+                    "7": "Preapproval request denied"
+                },
+                {
+                    "8": "Preapproval request approved but not accepted (optional reporting)"
+                }
+            ],
+            "notes": [
+                {
+                    "a": "Use Code 1 for a loan that is originated, including one resulting from a request for preapproval."
+                },
+                {
+                    "b": "For a counteroffer (your offer to the applicant to make the loan on different terms or in a different amount from the terms or amount applied for), use Code 1 if the applicant accepts. Use Code 3 if the applicant turns down the counteroffer or does not respond."
+                },
+                {
+                    "c": "Use Code 2 when the application is approved but the applicant (or the loan broker or correspondent) fails to respond to your notification of approval or your commitment letter within the specified time. Do not use this Code for a preapproval request."
+                },
+                {
+                    "d": "Use Code 4 only when the application is expressly withdrawn by the applicant before a credit decision is made. Do not use Code 4 if a request for preapproval is withdrawn; preapproval requests that are withdrawn are not reported under HMDA."
+                },
+                {
+                    "e": "Use Code 5 if you sent a written notice of incompleteness under §1002.9(c)(2) of Regulation B (Equal Credit Opportunity) and the applicant did not respond to your request for additional information within the period of time specified in your notice. Do not use this Code for requests for preapproval that are incomplete; these preapproval requests are not reported under HMDA."
+                }
+            ]
+        },
+        "actionDate": {
+            "label": "Date of Action",
+            "dataType": "N",
+            "description": "For paper submissions only, enter the date by month, day, and year, using numerals in the form MM/DD/YYYY (for example, 02/22/2003). For submissions in electronic form, the proper format is YYYYMMDD.",
+            "notes": [
+                {
+                    "a": "For loans originated, enter the settlement or closing date."
+                },
+                {
+                    "b": "For loans purchased, enter the date of purchase by your institution."
+                },
+                {
+                    "c": "For applications and preapprovals denied, applications and preapprovals approved but not accepted by the applicant, and files closed for incompleteness, enter the date that the action was taken by your institution or the date the notice was sent to the applicant."
+                },
+                {
+                    "d": "For applications withdrawn, enter the date you received the applicant's express withdrawal, or enter the date shown on the notification from the applicant, in the case of a written withdrawal."
+                },
+                {
+                    "e": "For preapprovals that lead to a loan origination, enter the date of the origination."
+                }
+            ]
+        },
 
-		  "respondentID": {
-			   "label": "Respondent-ID",
-			   "dataType": "AN",
-			   "description": "Assigned by your federal regulatory agency. Format is right-justified and zero-filled."
-		  },
-		  "agencyCode": {
-			   "label": "Agency Code",
-			   "dataType": "N",
-			   "Codes": [
-				   	{"1" : "OCC"},
-				   	{"2" : "FRS"},
-				   	{"3" : "FDIC"},
-				   	{"5" : "NCUA"},
-				   	{"7" : "HUD"},
-			   		{"9" : "CFPB"}
-			   	]
-		  },
-		  "loanNumber": {
-			   "label": "Loan/Application Number",
-			   "dataType": "AN",
-			   "description": "Unique identifier across the home office and branch sites"
-		  },
 
 
-		  "propertyType": {
-			   "label": "Property Type",
-			   "dataType": "N",
-			   "Codes": [
-			   {"Code 1" : ""},
-			   {"Code 2" : ""},
-			   {"Code 3" : ""}
-		  ]},
-		  "loanPurpose": {
-			   "label": "Loan Purpose",
-			   "dataType": "N",
-			   "Codes": [
-			   		{"1" : " "},
-			   		{"2" : " "},
-			   		{"3" : " "}
-			  		]
-		  },
-		  "ownerOccupancy": {
-			   "label": "Owner Occupancy",
-			   "dataType": "N",
-			   "Codes":[
-			   		{"1" : ""},
-			   		{"2" : ""},
-			   		{"3" : ""}
-			   		]
-		  },
-		  "loanAmount": {
-			   "label": "Loan Amount",
-			   "dataType": "N",
-			   "description": "Report in thousands, round to the nearest thousand with leading zeros and without commas"
-		  },
-		  "preapprovals": {
-			   "label": "Preapprovals",
-			   "dataType": "N",
-			   "Codes": [
-			   		{"1" : ""},
-			   		{"2" : ""},
-			   		{"3" : ""}
-			   		]
-		  },
-		  "actionTaken": {
-			   "label": "Type of Action Taken",
-			   "dataType": "N",
-			   "Codes": [
-			   		{"1" : ""},
-			   		{"2" : ""},
-			   		{"3" : ""},
-			   		{"4" : ""},
-			   		{"5" : ""},
-			   		{"6" : ""},
-			   		{"7" : ""},
-			   		{"8" : ""}
 
 
-			   ]
-		  },
-		  "actionDate": {
-			   "label": "Date of Action",
-			   "start": "57",
-			   "end": "64",
-			   "length": "8",
-			   "dataType": "N",
-			   "description": "Format is ccyymmdd"
-		  },
-		  "metroArea": {
-			   "label": "Metropolitan Statistical Area/Metropolitan Division",
-			   "start": "65",
-			   "end": "69",
-			   "length": "5",
-			   "dataType": "AN",
-			   "description": "Metropolitan Statistical Area or Metropolitan Division (if appropriate) code or NA left-justified"
-		  },
-		  "fipsState": {
-			   "label": "State Code",
-			   "start": "70",
-			   "end": "71",
-			   "length": "2",
-			   "dataType": "AN",
-			   "description": "FIPS code with leading zerosor NA left-justified"
-		  },
-		  "fipsCounty": {
-			   "label": "County Code",
-			   "start": "72",
-			   "end": "74",
-			   "length": "3",
-			   "dataType": "AN",
-			   "description": "FIPS code with leading zeros or NA left-justified"
-		  },
-		  "censusTract": {
-			   "label": "Census Tract",
-			   "start": "75",
-			   "end": "81",
-			   "length": "7",
-			   "dataType": "AN",
-			   "description": "Include decimal point and any leading or trailing zeros or NA left-justified"
-		  },
-		  "applicantEthnicity": {
-			   "label": "Applicant Ethnicity",
-			   "start": "82",
-			   "end": "82",
-			   "length": "1",
-			   "dataType": "N",
-			   "description": "Values are 1, 2, 3, or 4"
-		  },
-		  "coapplicantEthnicity": {
-			   "label": "Co-applicant Ethnicity",
-			   "start": "83",
-			   "end": "83",
-			   "length": "1",
-			   "dataType": "N",
-			   "description": "Values are 1, 2, 3, 4, or 5"
-		  },
-		  "applicantRace1": {
-			   "label": "Applicant Race: 1",
-			   "start": "84",
-			   "end": "84",
-			   "length": "1",
-			   "dataType": "N",
-			   "description": "Values are 1, 2, 3, 4, 5, 6, or 7"
-		  },
-		  "applicantRace2": {
-			   "label": "Applicant Race: 2",
-			   "start": "85",
-			   "end": "85",
-			   "length": "1",
-			   "dataType": "AN",
-			   "description": "Values are 1, 2, 3, 4, 5, or blank"
-		  },
-		  "applicantRace3": {
-			   "label": "Applicant Race: 3",
-			   "start": "86",
-			   "end": "86",
-			   "length": "1",
-			   "dataType": "AN",
-			   "description": "Values are 1, 2, 3, 4, 5, or blank"
-		  },
-		  "applicantRace4": {
-			   "label": "Applicant Race: 4",
-			   "start": "87",
-			   "end": "87",
-			   "length": "1",
-			   "dataType": "AN",
-			   "description": "Values are 1, 2, 3, 4, 5, or blank"
-		  },
-		  "applicantRace5": {
-			   "label": "Applicant Race: 5",
-			   "start": "88",
-			   "end": "88",
-			   "length": "1",
-			   "dataType": "AN",
-			   "description": "Values are 1, 2, 3, 4, 5, or blank"
-		  },
-		  "coapplicantRace1": {
-			   "label": "Co-applicant Race: 1",
-			   "start": "89",
-			   "end": "89",
-			   "length": "1",
-			   "dataType": "N",
-			   "description": "Values are 1, 2, 3, 4, 5, 6, 7, or 8"
-		  },
-		  "coapplicantRace2": {
-			   "label": "Co-applicant Race: 2",
-			   "start": "90",
-			   "end": "90",
-			   "length": "1",
-			   "dataType": "AN",
-			   "description": "Values are 1, 2, 3, 4, 5, or blank"
-		  },
-		  "coapplicantRace3": {
-			   "label": "Co-applicant Race: 3",
-			   "start": "91",
-			   "end": "91",
-			   "length": "1",
-			   "dataType": "AN",
-			   "description": "Values are 1, 2, 3, 4, 5, or blank"
-		  },
-		  "coapplicantRace4": {
-			   "label": "Co-applicant Race: 4",
-			   "start": "92",
-			   "end": "92",
-			   "length": "1",
-			   "dataType": "AN",
-			   "description": "Values are 1, 2, 3, 4, 5, or blank"
-		  },
-		  "coapplicantRace5": {
-			   "label": "Co-applicant Race: 5",
-			   "start": "93",
-			   "end": "93",
-			   "length": "1",
-			   "dataType": "AN",
-			   "description": "Values are 1, 2, 3, 4, 5, or blank"
-		  },
-		  "applicantSex": {
-			   "label": "Applicant Sex",
-			   "start": "94",
-			   "end": "94",
-			   "length": "1",
-			   "dataType": "N",
-			   "description": "Values are 1, 2, 3, or 4"
-		  },
-		  "coapplicantSex": {
-			   "label": "Co-applicant Sex",
-			   "start": "95",
-			   "end": "95",
-			   "length": "1",
-			   "dataType": "N",
-			   "description": "Values are 1, 2, 3, 4, or 5"
-		  },
-		  "applicantIncome": {
-			   "label": "Applicant Income",
-			   "start": "96",
-			   "end": "99",
-			   "length": "4",
-			   "dataType": "AN",
-			   "description": "Report in thousands, round to the nearest thousand with leading zeros and without commas or NA left-justified"
-		  },
-		  "purchaserType": {
-			   "label": "Type of Purchaser",
-			   "start": "100",
-			   "end": "100",
-			   "length": "1",
-			   "dataType": "N",
-			   "description": "Values are 0, 1, 2, 3, 4, 5, 6, 7, 8, or 9"
-		  },
-		  "denialReason1": {
-			   "label": "Denial Reason: 1",
-			   "start": "101",
-			   "end": "101",
-			   "length": "1",
-			   "dataType": "AN",
-			   "description": "Values are 1, 2, 3, 4, 5, 6, 7, 8, 9, or blank"
-		  },
-		  "denialReason2": {
-			   "label": "Denial Reason: 2",
-			   "start": "102",
-			   "end": "102",
-			   "length": "1",
-			   "dataType": "AN",
-			   "description": "Values are 1, 2, 3, 4, 5, 6, 7, 8, 9, or blank"
-		  },
-		  "denialReason3": {
-			   "label": "Denial Reason: 3",
-			   "start": "103",
-			   "end": "103",
-			   "length": "1",
-			   "dataType": "AN",
-			   "description": "Values are 1, 2, 3, 4, 5, 6, 7, 8, 9, or blank"
-		  },
-		  "rateSpread": {
-			   "label": "Rate Spread",
-			   "start": "104",
-			   "end": "108",
-			   "length": "5",
-			   "dataType": "AN",
-			   "description": "Enter the rate spread to two decimal places. Include the decimal point and any leading or trailing zeros or NA left-justified"
-		  },
-		  "hoepaStatus": {
-			   "label": "HOEPA Status",
-			   "start": "109",
-			   "end": "109",
-			   "length": "1",
-			   "dataType": "N",
-			   "description": "Values are 1 or 2"
-		  },
-		  "lienStatus": {
-			   "label": "Lien Status",
-			   "start": "110",
-			   "end": "110",
-			   "length": "1",
-			   "dataType": "N",
-			   "description": "Values are 1, 2, 3, or 4"
-		  },
-		  "filler": {
-			   "label": "Filler",
-			   "start": "111",
-			   "end": "380",
-			   "length": "270",
-			   "dataType": "AN",
-			   "description": "Blank"
-		  }
-	 }
+
+
+
+
+
+
+        "respondentID": {
+            "label": "Respondent-ID",
+            "dataType": "AN",
+            "description": "Assigned by your federal regulatory agency. Format is right-justified and zero-filled."
+        },
+        "agencyCode": {
+            "label": "Agency Code",
+            "dataType": "N",
+            "codes": [
+                {
+                    "1": "OCC"
+                },
+                {
+                    "2": "FRS"
+                },
+                {
+                    "3": "FDIC"
+                },
+                {
+                    "5": "NCUA"
+                },
+                {
+                    "7": "HUD"
+                },
+                {
+                    "9": "CFPB"
+                }
+            ]
+        },
+        "loanNumber": {
+            "label": "Loan/Application Number",
+            "dataType": "AN",
+            "description": "Unique identifier across the home office and branch sites"
+        },
+        "metroArea": {
+            "label": "Metropolitan Statistical Area/Metropolitan Division",
+            "start": "65",
+            "end": "69",
+            "length": "5",
+            "dataType": "AN",
+            "description": "Metropolitan Statistical Area or Metropolitan Division (if appropriate) code or NA left-justified"
+        },
+        "fipsState": {
+            "label": "State Code",
+            "start": "70",
+            "end": "71",
+            "length": "2",
+            "dataType": "AN",
+            "description": "FIPS code with leading zerosor NA left-justified"
+        },
+        "fipsCounty": {
+            "label": "County Code",
+            "start": "72",
+            "end": "74",
+            "length": "3",
+            "dataType": "AN",
+            "description": "FIPS code with leading zeros or NA left-justified"
+        },
+        "censusTract": {
+            "label": "Census Tract",
+            "start": "75",
+            "end": "81",
+            "length": "7",
+            "dataType": "AN",
+            "description": "Include decimal point and any leading or trailing zeros or NA left-justified"
+        },
+        "applicantEthnicity": {
+            "label": "Applicant Ethnicity",
+            "start": "82",
+            "end": "82",
+            "length": "1",
+            "dataType": "N",
+            "description": "Values are 1, 2, 3, or 4"
+        },
+        "coapplicantEthnicity": {
+            "label": "Co-applicant Ethnicity",
+            "start": "83",
+            "end": "83",
+            "length": "1",
+            "dataType": "N",
+            "description": "Values are 1, 2, 3, 4, or 5"
+        },
+        "applicantRace1": {
+            "label": "Applicant Race: 1",
+            "start": "84",
+            "end": "84",
+            "length": "1",
+            "dataType": "N",
+            "description": "Values are 1, 2, 3, 4, 5, 6, or 7"
+        },
+        "applicantRace2": {
+            "label": "Applicant Race: 2",
+            "start": "85",
+            "end": "85",
+            "length": "1",
+            "dataType": "AN",
+            "description": "Values are 1, 2, 3, 4, 5, or blank"
+        },
+        "applicantRace3": {
+            "label": "Applicant Race: 3",
+            "start": "86",
+            "end": "86",
+            "length": "1",
+            "dataType": "AN",
+            "description": "Values are 1, 2, 3, 4, 5, or blank"
+        },
+        "applicantRace4": {
+            "label": "Applicant Race: 4",
+            "start": "87",
+            "end": "87",
+            "length": "1",
+            "dataType": "AN",
+            "description": "Values are 1, 2, 3, 4, 5, or blank"
+        },
+        "applicantRace5": {
+            "label": "Applicant Race: 5",
+            "start": "88",
+            "end": "88",
+            "length": "1",
+            "dataType": "AN",
+            "description": "Values are 1, 2, 3, 4, 5, or blank"
+        },
+        "coapplicantRace1": {
+            "label": "Co-applicant Race: 1",
+            "start": "89",
+            "end": "89",
+            "length": "1",
+            "dataType": "N",
+            "description": "Values are 1, 2, 3, 4, 5, 6, 7, or 8"
+        },
+        "coapplicantRace2": {
+            "label": "Co-applicant Race: 2",
+            "start": "90",
+            "end": "90",
+            "length": "1",
+            "dataType": "AN",
+            "description": "Values are 1, 2, 3, 4, 5, or blank"
+        },
+        "coapplicantRace3": {
+            "label": "Co-applicant Race: 3",
+            "start": "91",
+            "end": "91",
+            "length": "1",
+            "dataType": "AN",
+            "description": "Values are 1, 2, 3, 4, 5, or blank"
+        },
+        "coapplicantRace4": {
+            "label": "Co-applicant Race: 4",
+            "start": "92",
+            "end": "92",
+            "length": "1",
+            "dataType": "AN",
+            "description": "Values are 1, 2, 3, 4, 5, or blank"
+        },
+        "coapplicantRace5": {
+            "label": "Co-applicant Race: 5",
+            "start": "93",
+            "end": "93",
+            "length": "1",
+            "dataType": "AN",
+            "description": "Values are 1, 2, 3, 4, 5, or blank"
+        },
+        "applicantSex": {
+            "label": "Applicant Sex",
+            "start": "94",
+            "end": "94",
+            "length": "1",
+            "dataType": "N",
+            "description": "Values are 1, 2, 3, or 4"
+        },
+        "coapplicantSex": {
+            "label": "Co-applicant Sex",
+            "start": "95",
+            "end": "95",
+            "length": "1",
+            "dataType": "N",
+            "description": "Values are 1, 2, 3, 4, or 5"
+        },
+        "applicantIncome": {
+            "label": "Applicant Income",
+            "start": "96",
+            "end": "99",
+            "length": "4",
+            "dataType": "AN",
+            "description": "Report in thousands, round to the nearest thousand with leading zeros and without commas or NA left-justified"
+        },
+        "purchaserType": {
+            "label": "Type of Purchaser",
+            "start": "100",
+            "end": "100",
+            "length": "1",
+            "dataType": "N",
+            "description": "Values are 0, 1, 2, 3, 4, 5, 6, 7, 8, or 9"
+        },
+        "denialReason1": {
+            "label": "Denial Reason: 1",
+            "start": "101",
+            "end": "101",
+            "length": "1",
+            "dataType": "AN",
+            "description": "Values are 1, 2, 3, 4, 5, 6, 7, 8, 9, or blank"
+        },
+        "denialReason2": {
+            "label": "Denial Reason: 2",
+            "start": "102",
+            "end": "102",
+            "length": "1",
+            "dataType": "AN",
+            "description": "Values are 1, 2, 3, 4, 5, 6, 7, 8, 9, or blank"
+        },
+        "denialReason3": {
+            "label": "Denial Reason: 3",
+            "start": "103",
+            "end": "103",
+            "length": "1",
+            "dataType": "AN",
+            "description": "Values are 1, 2, 3, 4, 5, 6, 7, 8, 9, or blank"
+        },
+        "rateSpread": {
+            "label": "Rate Spread",
+            "start": "104",
+            "end": "108",
+            "length": "5",
+            "dataType": "AN",
+            "description": "Enter the rate spread to two decimal places. Include the decimal point and any leading or trailing zeros or NA left-justified"
+        },
+        "hoepaStatus": {
+            "label": "HOEPA Status",
+            "start": "109",
+            "end": "109",
+            "length": "1",
+            "dataType": "N",
+            "description": "Values are 1 or 2"
+        },
+        "lienStatus": {
+            "label": "Lien Status",
+            "start": "110",
+            "end": "110",
+            "length": "1",
+            "dataType": "N",
+            "description": "Values are 1, 2, 3, or 4"
+        },
+        "filler": {
+            "label": "Filler",
+            "start": "111",
+            "end": "380",
+            "length": "270",
+            "dataType": "AN",
+            "description": "Blank"
+        }
+    }
 }

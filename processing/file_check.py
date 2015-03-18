@@ -17,7 +17,7 @@ class check_file(file_checker):
 
 	def is_file(self, report_type, report_year, report_list):
 		#report_type is aggregate or disclosure
-		path_intro = '/Users/roellk/Desktop/HMDA/hmda-viz-prototype/processing/json/'
+		path_intro = '/Users/roellk/Desktop/HMDA/hmda-viz-prototype/'
 		for state, state_name in self.state_names.iteritems(): #loop states -- files live here
 			state_msas = {}
 			state_holding = []
@@ -45,7 +45,7 @@ class check_file(file_checker):
 						#print "booooooo, it's not here"
 						pass
 
-			state_msas['msa=mds'] = state_holding
+			state_msas['msa-mds'] = state_holding
 			#write msa-mds.json file
 			if not os.path.exists(state_path): #check if path exists
 				os.makedirs(state_path) #if path not present, create it

@@ -414,7 +414,7 @@ class build_JSON(AD_report):
 			#aggregate needs to be variablalized
 
 
-			path = 'json'+"/"+report_type+"/"+selector.report_list['year'][1]+"/"+self.state_names[state].replace(' ', '-').lower()
+			path = '../'+report_type+"/"+selector.report_list['year'][1]+"/"+self.state_names[state].replace(' ', '-').lower()
 			print path #change this to a log file write
 			if not os.path.exists(path): #check if path exists
 				os.makedirs(path) #if path not present, create it
