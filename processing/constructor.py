@@ -68,14 +68,14 @@ class report_4x(constructor):
 				self.agg.by_weighted_mean(table_X, self.parsed.inputs)
 				self.agg.by_weighted_median(table_X, self.parsed.inputs)
 				self.agg.by_mean(table_X, self.parsed.inputs)
-			path = "json" + "/" +table_X['type']+"/"+table_X['year']+"/"+build_X.get_state_name(table_X['msa']['state']).replace(' ', '-').lower()+"/"+build_X.msa_names[MSA].replace(' ', '-').lower()+"/"+table_X['table']
+			path = "../" +table_X['type']+"/"+table_X['year']+"/"+build_X.get_state_name(table_X['msa']['state']).replace(' ', '-').lower()+"/"+build_X.msa_names[MSA].replace(' ', '-').lower()+"/"+table_X['table']
 			if not os.path.exists(path): #check if path exists
 				os.makedirs(path) #if path not present, create it
 			build_X.write_JSON(table_X['table']+'.json', table_X, path)
 			#use an if exists check for jekyll files
 			build_X.jekyll_for_report(path) #create and write jekyll file to report path
 			#year in the path is determined by the asofdate in the LAR entry
-			path2 = "json"+"/"+table_X['type']+"/"+table_X['year']+"/"+build_X.get_state_name(table_X['msa']['state']).replace(' ', '-').lower()+"/"+build_X.msa_names[MSA].replace(' ', '-').lower() #set path for writing the jekyll file to the msa directory
+			path2 = "../"+table_X['type']+"/"+table_X['year']+"/"+build_X.get_state_name(table_X['msa']['state']).replace(' ', '-').lower()+"/"+build_X.msa_names[MSA].replace(' ', '-').lower() #set path for writing the jekyll file to the msa directory
 			build_X.jekyll_for_msa(path2) #create and write jekyll file to the msa path
 
 
