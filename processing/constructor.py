@@ -48,7 +48,7 @@ class report_4x(constructor):
 		SQL = getattr(self.queries, self.count_string)()
 		cur.execute(SQL, location)
 		count = int(cur.fetchone()[0])
-
+		#table_X =
 		if count > 0:
 			print count, 'LAR rows in MSA %s, for report %s, in %s' %(MSA, self.report_number, self.year)
 
@@ -61,13 +61,13 @@ class report_4x(constructor):
 				if num == 0:
 					build_X.set_header(self.parsed.inputs, MSA, report_type, table_number)
 					table_X = getattr(build_X, self.json_builder)()
-
-				#this line needs generalization
 				getattr(self.agg, self.aggregation)(table_X, self.parsed.inputs)
 
-				if self.report_number[2:] == '3-2': #report 3-2 requires out of loop aggregation functions
-					self.agg.by_median(table_X, self.parsed.inputs)
-					self.agg.by_mean(table_X, self.parsed.inputs)
+			if self.report_number[2:] == '3-2': #report 3-2 requires out of loop aggregation functions
+				self.agg.by_median(table_X, self.parsed.inputs)
+				self.agg.by_weighted_mean(table_X, self.parsed.inputs)
+				self.agg.by_weighted_median(table_X, self.parsed.inputs)
+				self.agg.by_mean(table_X, self.parsed.inputs)
 			path = "json" + "/" +table_X['type']+"/"+table_X['year']+"/"+build_X.get_state_name(table_X['msa']['state']).replace(' ', '-').lower()+"/"+build_X.msa_names[MSA].replace(' ', '-').lower()+"/"+table_X['table']
 			if not os.path.exists(path): #check if path exists
 				os.makedirs(path) #if path not present, create it

@@ -22,22 +22,22 @@ build_msa = build() #instantiate the build object for file path, jekyll files
 build_msa.msas_in_state(cur, selector, 'aggregate') #creates a list of all MSAs in each state and places the file in the state's aggregate folder
 build_msa.msas_in_state(cur, selector, 'disclosure')#creates a list of all MSAs in each state and places the file in the state's disclosure folder
 
-
+AL_MSAs = ['45180', '45980', '11500', '10760', '42460', '13820', '19460', '23460', '46740', '17980', '12220', '20020', '18980', '33860', '46260', '33660', '19300', '22840',
+'21460','10700','21640','42820','26620','22520','46220']
 #testing code
-#selector.report_list['A 3-1'] = ['11500']
-#selector.report_list['A 3-2'] = ['11500']
-#selector.report_list['A 4-1'] = ['11500']
-#selector.report_list['A 4-2'] = ['11500']
-#selector.report_list['A 4-3'] = ['11500']
-#selector.report_list['A 4-4'] = ['11500']
-#selector.report_list['A 4-5'] = ['11500']
-#selector.report_list['A 4-6'] = ['11500']
-#selector.report_list['A 4-7'] = ['11500']
-#selector.report_list['A 4-1'] = ['29620']
+selector.report_list['A 3-1'] = AL_MSAs
+selector.report_list['A 3-2'] = AL_MSAs
+selector.report_list['A 4-1'] = AL_MSAs
+selector.report_list['A 4-2'] = AL_MSAs
+selector.report_list['A 4-3'] = AL_MSAs
+selector.report_list['A 4-4'] = AL_MSAs
+selector.report_list['A 4-5'] = AL_MSAs
+selector.report_list['A 4-6'] = AL_MSAs
+selector.report_list['A 4-7'] = AL_MSAs
+selector.report_list['A 4-1'] = AL_MSAs
 #report_list = ['A 3-1']
-report_list = ['A 3-1', 'A 3-2', 'A 4-1', 'A 4-2', 'A 4-3', 'A 4-4', 'A 4-5', 'A 4-6', 'A 4-7'] #this needs to be changed to read from the input file
-check_file = check_file(build_msa) #needs a report list, state list, and msa list
-check_file.is_file('aggregate', '2013', report_list)
+report_list = ['A 3-2', 'A 4-1', 'A 4-2', 'A 4-3', 'A 4-4', 'A 4-5', 'A 4-6', 'A 4-7'] #this needs to be changed to read from the input file
+
 
 for report in report_list: #loop over a list of report names
 	for MSA in selector.report_list[report]: #loop through MSAs flagged for report generation
@@ -61,3 +61,9 @@ for report in report_list:
 
 
 '''
+#check_file must be run after reports are generated
+report_list = ['A 3-2', 'A 4-1', 'A 4-2', 'A 4-3', 'A 4-4', 'A 4-5', 'A 4-6', 'A 4-7'] #this needs to be changed to read from the input file
+check_file = check_file(build_msa) #needs a report list, state list, and msa list
+check_file.is_file('aggregate', selector.report_list['year'][0], report_list)
+
+
