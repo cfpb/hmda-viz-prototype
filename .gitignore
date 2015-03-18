@@ -44,5 +44,8 @@ _site
 
 .sass-cache/
 
-# for now remove aggregate/2012 #
-aggregate/2012/
+# for now remove aggregate/2012 and /2013, except 2013/alabama #
+aggregate/*
+!aggregate/2013
+aggregate/2013/*
+!aggregate/2013/alabama
