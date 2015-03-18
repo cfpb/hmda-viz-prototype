@@ -23,7 +23,7 @@ build_msa.msas_in_state(cur, selector, 'aggregate') #creates a list of all MSAs 
 build_msa.msas_in_state(cur, selector, 'disclosure')#creates a list of all MSAs in each state and places the file in the state's disclosure folder
 
 AL_MSAs = ['45180', '45980', '11500', '10760', '42460', '13820', '19460', '23460', '46740', '17980', '12220', '20020', '18980', '33860', '46260', '33660', '19300', '22840',
-'21460','10700','21640','42820','26620','22520','46220']
+'21460','10700','21640','42820','26620','22520','46220', '36540']
 #testing code
 selector.report_list['A 3-1'] = AL_MSAs
 selector.report_list['A 3-2'] = AL_MSAs
