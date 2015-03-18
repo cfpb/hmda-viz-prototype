@@ -45,7 +45,7 @@ class check_file(file_checker):
 						#print "booooooo, it's not here"
 						pass
 
-			state_msas['msa=mds'] = state_holding
+			state_msas['msa-mds'] = state_holding
 			#write msa-mds.json file
 			if not os.path.exists(state_path): #check if path exists
 				os.makedirs(state_path) #if path not present, create it
