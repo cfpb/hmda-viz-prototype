@@ -1025,9 +1025,9 @@ class aggregate(AD_report): #aggregates LAR rows by appropriate characteristics 
 		self.purchaser_junior_lien_weight = ['Fannie Mae junior weight', 'Ginnie Mae junior weight', 'Freddie Mac junior weight', 'Farmer Mac junior weight', 'Private Securitization junior weight', 'Commercial bank, savings bank or association junior weight', 'Life insurance co., credit union, finance co. junior weight', 'Affiliate institution junior weight', 'Other junior weight']
 
 	def by_race(self, container, inputs): #aggregates loans by race category
-		if inputs['minority status'] == 2:
-			print inputs['sequence'], inputs['loan value'],
-			print inputs['a_race'], inputs['co_race'], inputs['app non white flag'], inputs['co non white flag'], inputs['race'], inputs['ethnicity'], inputs['minority status']
+		#if inputs['minority status'] == 2:
+		#	print inputs['sequence'], inputs['loan value'],
+		#	print inputs['a_race'], inputs['co_race'], inputs['app non white flag'], inputs['co non white flag'], inputs['race'], inputs['ethnicity'], inputs['minority status']
 		#if inputs['race'] == 6 and inputs['purchaser'] == 0:
 		#	print inputs['sequence'], inputs['loan value'], "fannie mae joint"
 		container['borrowercharacteristics'][0]['races'][inputs['race']]['purchasers'][inputs['purchaser']]['count'] += 1
@@ -1242,7 +1242,7 @@ class aggregate(AD_report): #aggregates LAR rows by appropriate characteristics 
 
 	def by_minority_status_4x(self, container, inputs):
 
-		if inputs['minority status'] > 2 or inputs['action taken'] > 5:
+		if inputs['minority status'] > 1 or inputs['action taken'] > 5:
 			pass
 		else:
 			container['minoritystatuses'][inputs['minority status']]['dispositions'][0]['count'] +=1 #count of total applications received by minority status

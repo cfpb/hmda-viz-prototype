@@ -20,7 +20,7 @@ class check_file(file_checker):
 		path_intro = '/Users/roellk/Desktop/HMDA/hmda-viz-prototype/processing/json/'
 		for state, state_name in self.state_names.iteritems(): #loop states -- files live here
 			state_msas = {}
-			state_holding = {}
+			state_holding = []
 			state_path = path_intro + report_type + '/' + report_year + '/' + self.state_names[state].replace(' ',  '-').lower()
 			print state
 			for msa_code, msa_name in self.msa_names[state].iteritems(): #loop MSAs
@@ -33,9 +33,11 @@ class check_file(file_checker):
 					if os.path.isfile(file_path) == True: #a report exists for the MSA, add the MSA name and id to the msa-mds.json file
 						print file_path, "*"*10, "huzzah it's here!\n"
 						print msa_code, msa_name, "*"*50
-						state_msas['id'] = msa_code
-						state_msas['name'] = msa_name
-						print state_msas
+						msa = {}
+						msa['id'] = msa_code
+						msa['name'] = msa_name
+						state_holding.append(msa)
+						print msa
 						break
 
 						#add id and name to msa-mds.json
@@ -43,6 +45,7 @@ class check_file(file_checker):
 						#print "booooooo, it's not here"
 						pass
 
+			state_msas['msa=mds'] = state_holding
 			#write msa-mds.json file
 			if not os.path.exists(state_path): #check if path exists
 				os.makedirs(state_path) #if path not present, create it
