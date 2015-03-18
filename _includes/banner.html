@@ -3,7 +3,9 @@
         <div class="row">
             <div class="col-2">
                 <h2>{{ page.title }}</h2>
+                {% if page.desc %}
                 <p>{{ page.desc }}</p>
+                {% endif %}
             </div>
         </div>
     </div>

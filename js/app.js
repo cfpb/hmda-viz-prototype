@@ -11,14 +11,14 @@ function getUIData() {
         $.get(selectID + '.json', function(data) {
             // sort on the name if its the msas
             if (selectID === 'msa-mds') {
-                console.log('sorting');
+                //console.log('sorting');
                 data['msa-mds'].sort(function(a,b) {
                     if(a.name < b.name) return -1;
                     if(a.name > b.name) return 1;
                     return 0;
                 });
             }
-            console.log(selectID);
+            //console.log(selectID);
             // get template
             $.get('/hmda-viz-prototype/templates/selects.html', function(templates) {
                 var template = $(templates).filter('#' + selectID).html();
@@ -44,20 +44,95 @@ function getTableData(table) {
     $.get(table + '.json', function(data) {
         // add function to data to add commas to numbers
         // used in mustache templates as {#addCommas}}{{count}}{{/addCommas}}
-        data["addCommas"] = function() {
+        data['addCommas'] = function() {
             return function(number, render) {
                 return render(number).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
             }
         };
-        console.log(data);
+        data['footnote'] = function() {
+            return function(string, render) {
+                var footnote = 0;
+                var footnote2 = 0;
+                var footnote3 = 0;
+                var footnoteurl = '/hmda-viz-prototype/footnotes/' + data.year + '/#';
+                var url = '';
+                console.log(render(string).toLowerCase());
+
+                switch (render(string).toLowerCase()) {
+                    case 'race':
+                        footnote = 5;
+                        break;
+                    case 'not available':
+                    case 'ethnicity not available':
+                    case 'income not available':
+                    case 'race not available':
+                        footnote = 6;
+                        break;
+                    case 'ethnicity':
+                        footnote = 7;
+                        break;
+                    case 'minority status':
+                        footnote = 8;
+                        break;
+                    case 'applicant income':
+                    case 'income of applicants':
+                        footnote = 9;
+                        break;
+                    case 'racial&#x2f;ethnic composition':
+                        footnote = 11;
+                        break;
+                    case 'income':
+                        footnote = 12;
+                        footnote2 = 13;
+                        break;
+                    case 'total':
+                        footnote = 14;
+                        break;
+                    case 'no reported pricing data':
+                        footnote = 15;
+                        break;
+                    case 'mean':
+                        footnote = 30;
+                        break;
+                    case 'median':
+                        footnote = 31;
+                        break;
+                    default:
+                        footnote = 0;
+                        footnote2 = 0;
+                        footnote3 = 0;
+                }
+
+                // return
+                if (footnote != 0) {
+                    url = render(string) + ' <a href="' + footnoteurl + footnote + '"><sup>' + footnote + '</sup></a>';
+                    if (footnote2 != 0) {
+                        url = url + ' <a href="' + footnoteurl + footnote2 + '"><sup>' + footnote2 + '</sup></a>';
+                    }
+                    console.log (url);
+                    return url;
+                }
+                else {
+                    return render(string);
+                }
+            }
+        }
+        //console.log(data);
         // get the first charactire of the table #
         if (table.charAt(0) === '4') {
             table = '4';    // all 4's, 4-1 through 4-7, use the same table layout
         }
         // get partials
+        // table banner
         $.get('/hmda-viz-prototype/templates/partials-tables.html', function(templates) {
             //var template = $(templates).filter('#' + table + '-new').html();
             partials['tablebanner'] = $(templates).filter('#tablebanner').html();
+            //var html = Mustache.to_html(template, data);
+        });
+        // table date
+        $.get('/hmda-viz-prototype/templates/partials-tables.html', function(templates) {
+            //var template = $(templates).filter('#' + table + '-new').html();
+            partials['tabledate'] = $(templates).filter('#tabledate').html();
             //var html = Mustache.to_html(template, data);
         });
         // get template
@@ -78,7 +153,7 @@ function setLink() {
     var newURL = '';  // needed on first page, year and state make the url
     $('select').each(function() {
         newURL += $(this).val().replace(/ /g, '-').toLowerCase() + '/';
-        console.log(newURL);
+        //console.log(newURL);
     });
     $('.js-btn').attr('href', newURL);
 }
@@ -89,7 +164,7 @@ $( document ).ready(function() {
 
     var urlPath = window.location.pathname.split('/');
     var path = urlPath[urlPath.length-2];
-    console.log('length = ' + urlPath.length);
+    //console.log('length = ' + urlPath.length);
     if (urlPath.length === 8) {
         getTableData(path);
     } else if (urlPath.length === 6) {
@@ -113,7 +188,7 @@ $( document ).ready(function() {
     var colCount = 0;
     var theCSV = '';
     $('.report thead tr:first-child th').each(function () { // shouldn't rely on thead being there
-        console.log ('im in');
+        //console.log ('im in');
         if ($(this).attr('colspan')) {
             colCount += +$(this).attr('colspan');
         } else {
@@ -124,7 +199,7 @@ $( document ).ready(function() {
     theCSV = theCSV + '"' + $('#report-title').text() + '"' + '\n';
     theCSV = theCSV + '"' + $('#report-msa').text() + '"' + '\n';
 
-    console.log (colCount);
+    //console.log (colCount);
 
     // loop through each row
     $('.report thead tr th, .report thead tr td, .report tbody tr td').each(function () {

@@ -43,3 +43,9 @@ src/index.html
 _site
 
 .sass-cache/
+
+# for now remove aggregate/2012 and /2013, except 2013/alabama #
+aggregate/*
+!aggregate/2013
+aggregate/2013/*
+!aggregate/2013/alabama
