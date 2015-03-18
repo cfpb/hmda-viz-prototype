@@ -36,7 +36,7 @@ selector.report_list['A 4-6'] = AL_MSAs
 selector.report_list['A 4-7'] = AL_MSAs
 selector.report_list['A 4-1'] = AL_MSAs
 #report_list = ['A 3-1']
-report_list = ['A 3-2', 'A 4-1', 'A 4-2', 'A 4-3', 'A 4-4', 'A 4-5', 'A 4-6', 'A 4-7'] #this needs to be changed to read from the input file
+report_list = ['A 3-1', 'A 3-2', 'A 4-1', 'A 4-2', 'A 4-3', 'A 4-4', 'A 4-5', 'A 4-6', 'A 4-7'] #this needs to be changed to read from the input file
 
 
 for report in report_list: #loop over a list of report names
