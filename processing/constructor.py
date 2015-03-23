@@ -61,7 +61,7 @@ class report_4x(constructor):
 				if num == 0:
 					build_X.set_header(self.parsed.inputs, MSA, report_type, table_number)
 					table_X = getattr(build_X, self.json_builder)()
-					print table_X
+
 				getattr(self.agg, self.aggregation)(table_X, self.parsed.inputs)
 
 			if self.report_number[2:] == '3-2': #report 3-2 requires out of loop aggregation functions
@@ -69,7 +69,7 @@ class report_4x(constructor):
 				self.agg.by_weighted_mean(table_X, self.parsed.inputs)
 				self.agg.by_weighted_median(table_X, self.parsed.inputs)
 				self.agg.by_mean(table_X, self.parsed.inputs)
-			print table_X['type']
+
 			path = "../" +table_X['type']+"/"+table_X['year']+"/"+build_X.get_state_name(table_X['msa']['state']).replace(' ', '-').lower()+"/"+build_X.msa_names[MSA].replace(' ', '-').lower()+"/"+table_X['table']
 			if not os.path.exists(path): #check if path exists
 				os.makedirs(path) #if path not present, create it
