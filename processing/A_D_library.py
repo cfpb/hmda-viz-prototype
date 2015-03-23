@@ -187,6 +187,44 @@ class parse_inputs(AD_report):
 		self.inputs['minority count'] = demo.minority_count(a_race) #determines if the number of minority races claimed by the applicant is 2 or greater
 		self.inputs['gender'] = demo.set_gender(self.inputs)
 
+	def parse_t5x(self, row):
+		'''applicantrace1, applicantrace2, applicantrace3, applicantrace4, applicantrace5,
+		coapplicantrace1, coapplicantrace2, coapplicantrace3, coapplicantrace4, coapplicantrace5,
+		applicantethnicity, coapplicantethnicity, applicantincome, loanamount, asofdate,
+		actiontype, ffiec_median_family_income, sequencenumber'''
+
+		#self.inputs will be used in the aggregation functions
+		#note: sequence number did not exist prior to 2012 and HUD median income became FFIEC median income in 2012
+		#instantiate classes to set loan variables
+		MSA_index = MSA_info() #contains functions for census tract characteristics
+		demo=demographics() #contains functions for borrower characteristics
+
+		a_race = [] #race lists will hold 5 integers with 0 replacing a blank entry
+		co_race = [] #race lists will hold 5 integers with 0 replacing a blank entry
+		#fill race lists from the demographics class
+		a_race = demo.a_race_list(row) #put applicant race codes in a list 0-5, 0 is blank field
+		co_race = demo.co_race_list(row) #put co-applicant race codes in a list 0-5, 0 is blank field
+		#add data elements to dictionary
+		self.inputs['a_race'] = a_race
+		self.inputs['co_race'] = co_race
+		self.inputs['a ethn'] = row['applicantethnicity'] #ethnicity of the applicant
+		self.inputs['co ethn'] = row['coapplicantethnicity'] #ethnicity of the co-applicant
+		self.inputs['income'] = row['applicantincome'] #relied upon income rounded to the nearest thousand
+		self.inputs['loan value'] = float(row['loanamount']) #loan value rounded to the nearest thousand
+		self.inputs['year'] = row['asofdate'] #year or application or origination
+		self.inputs['state code'] = row['statecode'] #two digit state code
+		self.inputs['state name'] = row['statename'] #two character state abbreviation
+		self.inputs['MSA median income'] = row['ffiec_median_family_income'] #median income for the tract/msa
+		self.inputs['sequence'] = row['sequencenumber'] #the sequence number of the loan, used for checking errors
+		self.inputs['income bracket'] = MSA_index.app_income_to_MSA(self.inputs) #sets the applicant income as an index by an applicant's income as a percent of MSA median
+		self.inputs['app non white flag'] = demo.set_non_white(a_race) #flags the applicant as non-white if true, used in setting minority status and race
+		self.inputs['co non white flag'] = demo.set_non_white(co_race) #flags the co applicant as non-white if true, used in setting minority status and race
+		self.inputs['joint status'] = demo.set_joint(self.inputs) #requires non white status flags be set prior to running set_joint
+		self.inputs['race'] = demo.set_race(self.inputs, a_race, co_race) #requires joint status be set prior to running set_race
+		self.inputs['ethnicity'] = demo.set_loan_ethn(self.inputs) #requires  ethnicity be parsed prior to running set_loan_ethn
+		self.inputs['minority status'] = demo.set_minority_status(self.inputs) #requires non white flags be set prior to running set_minority_status
+		self.inputs['minority count'] = demo.minority_count(a_race) #determines if the number of minority races claimed by the applicant is 2 or greater
+
 class demographics(AD_report):
 	#holds all the functions for setting race, minority status, and ethnicity for FFIEC A&D reports
 	#this class is called when the parse_txx function is called by the controller
@@ -252,6 +290,7 @@ class demographics(AD_report):
 			elif race_list[i] == 5:
 				return False #flag false if the only race listed was white (5)
 
+			#set default return to true or false and then only run 1 check
 	def set_joint(self, inputs): #takes a dictionary 'inputs' which is held in the controller(?) object and used to process each loan row
 		#joint status exists if one borrower is white and one is non-white
 		#check to see if joint status exists
@@ -368,7 +407,7 @@ class build_JSON(AD_report):
 		self.state_msa_list = {} #holds a dictionary of msas in state by id number and name
 		self.dispositions_list = ['Applications Received', 'Loans Originated', 'Apps. Approved But Not Accepted', 'Aplications Denied', 'Applications Withdrawn', 'Files Closed For Incompleteness']
 		self.gender_list = ['Male', 'Female', 'Joint (Male/Female)']
-
+		self.end_points = ['count', 'value']
 	def msas_in_state(self, cursor, selector, report_type):
 		#this function builds a list of MSA numbers and names in each state
 		#set sql query text to pull MSA names for each MSA number
@@ -478,7 +517,8 @@ class build_JSON(AD_report):
 			return 'Disposition of applications from nonoccupants for home-purchase, home improvement, or refinancing loans, 1- to 4- family and manufactured home dwellings, by race, ethnicity, gender and income of applicant'
 		elif table_num == '4-7':
 			return 'Disposition of applications for home-purchase, home improvement, or refinancing loans, manufactured home dwellings by race, ethnicity, gender and income of applicant'
-
+		elif table_num == '5-1':
+			return 'Disposition of applications for FHA, FSA/RHS, and VA home-purchase loans, 1- to 4-family and manufactured home dwellings, by income, race and ethnicity of applicant'
 	def set_header(self, inputs, MSA, table_type, table_num): #sets the header information of the JSON object
 		now = foo.datetime.now()
 		d = now.day
@@ -489,7 +529,7 @@ class build_JSON(AD_report):
 		self.container['type'] = table_type
 		self.container['desc'] = self.table_headers(table_num)
 		self.container['year'] = inputs['year']
-		self.container['report-date'] = "{:0>2d}".format(d)+'/'+"{:0>2d}".format(m)+'/'+"{:0>4d}".format(y)
+		self.container['report-date'] = "{:0>2d}".format(m)+'/'+"{:0>2d}".format(d)+'/'+"{:0>4d}".format(y)
 		self.msa['id'] = MSA
 		self.msa['name'] = self.msa_names[MSA]
 		self.msa['state'] = inputs['state name'] #this is the two digit abbreviation
@@ -497,6 +537,32 @@ class build_JSON(AD_report):
 		self.container['msa'] = self.msa
 		return self.container
 
+	def set_stuff(self, end_points, thing_list, thing_singular):
+		listyness = []
+		for thing in thing_list:
+			things_holding = OrderedDict({})
+			things_holding[thing_singular] = "{}".format(thing)
+			listyness.append(things_holding)
+			for point in end_points:
+				things_holding[point] = 0
+		return listyness
+
+	def set_income_brackets(self):
+		income_brackets = []
+		for bracket in self.applicant_income_bracket[:-1]:
+			income_holding = OrderedDict({})
+			income_holding['incomebracket'] = "{}".format(bracket)
+			income_brackets.append(income_holding)
+		return income_brackets
+
+	def table_5x_builder(self):
+		income_brackets= []
+		self.container['incomebrackets'] = self.set_income_brackets()
+		for i in range(0,len(self.container['incomebrackets'])):
+			self.container['incomebrackets'][i]['races'] = self.set_stuff(self.end_points, self.race_names, 'race')
+			self.container['incomebrackets'][i]['ethnicities'] = self.set_stuff(self.end_points, self.ethnicity_names, 'ethnicity')
+			self.container['incomebrackets'][i]['minoritystatuses'] = self.set_stuff(self.end_points, self.minority_statuses, 'minoritystatus')
+		return self.container
 	def set_4x_dispositions(self, end_points): #builds the dispositions of applications section of report 4-1 JSON
 		dispositions = []
 		for item in self.dispositions_list:
@@ -839,6 +905,16 @@ class queries(AD_report):
 			and propertytype ='2' ;'''
 		return SQL
 
+
+	def count_rows_51_2012(self):
+		SQL = '''SELECT COUNT(msaofproperty) FROM hmdapub2012 WHERE msaofproperty = %s
+			and propertytype !='3' and loantype !='1' and loanpurpose = '1';'''
+
+	def count_rows_51_2013(self):
+		SQL = '''SELECT COUNT(msaofproperty) FROM hmdapub2013 WHERE msaofproperty = %s
+			and propertytype !='3' and loantype !='1' and loanpurpose = '1';'''
+		return SQL
+
 	def table_3_1_2013(self): #set the SQL statement to select the needed fields to aggregate loans for the table_3 JSON structure
 		SQL = '''SELECT
 			censustractnumber, applicantrace1, applicantrace2, applicantrace3, applicantrace4, applicantrace5,
@@ -1015,6 +1091,23 @@ class queries(AD_report):
 			FROM hmdapub2013 WHERE msaofproperty = %s and propertytype ='2';'''
 		return SQL
 
+	def table_5_1_2012(self):
+		SQL = '''SELECT
+			applicantrace1, applicantrace2, applicantrace3, applicantrace4, applicantrace5,
+			coapplicantrace1, coapplicantrace2, coapplicantrace3, coapplicantrace4, coapplicantrace5,
+			applicantethnicity, coapplicantethnicity, applicantincome, loanamount, asofdate,
+			actiontype, ffiec_median_family_income, statecode, statename, sequencenumber
+			FROM hmdapub2012 WHERE msaofproperty = %s and propertytype !='3' and loantype !='1' and loanpurpose = '1';'''
+		return SQL
+
+	def table_5_1_2013(self):
+		SQL = '''SELECT
+			applicantrace1, applicantrace2, applicantrace3, applicantrace4, applicantrace5,
+			coapplicantrace1, coapplicantrace2, coapplicantrace3, coapplicantrace4, coapplicantrace5,
+			applicantethnicity, coapplicantethnicity, applicantincome, loanamount, asofdate,
+			actiontype, ffiec_median_family_income, statecode, statename, sequencenumber
+			FROM hmdapub2013 WHERE msaofproperty = %s and propertytype !='3' and loantype !='1' and loanpurpose = '1';'''
+		return SQL
 
 class aggregate(AD_report): #aggregates LAR rows by appropriate characteristics to fill the JSON files
 
@@ -1264,6 +1357,8 @@ class aggregate(AD_report): #aggregates LAR rows by appropriate characteristics 
 			container['total'][inputs['action taken']]['count'] +=1
 			container['total'][inputs['action taken']]['value'] += int(inputs['loan value'])
 
+	def build_report5x(self, table5x, inputs):
+		pass
 	def build_report4x(self, table4x, inputs): #call functions to fill JSON object for table 4-1 (FHA, FSA, RHS, and VA home purchase loans)
 		self.by_race_4x(table4x, inputs) #aggregate loans by race, gender, and applicaiton disposition
 		self.by_ethnicity_4x(table4x, inputs)#aggregate loans by ethnicity, gender, and applicaiton disposition
