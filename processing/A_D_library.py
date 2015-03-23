@@ -188,10 +188,6 @@ class parse_inputs(AD_report):
 		self.inputs['gender'] = demo.set_gender(self.inputs)
 
 	def parse_t5x(self, row):
-		'''applicantrace1, applicantrace2, applicantrace3, applicantrace4, applicantrace5,
-		coapplicantrace1, coapplicantrace2, coapplicantrace3, coapplicantrace4, coapplicantrace5,
-		applicantethnicity, coapplicantethnicity, applicantincome, loanamount, asofdate,
-		actiontype, ffiec_median_family_income, sequencenumber'''
 
 		#self.inputs will be used in the aggregation functions
 		#note: sequence number did not exist prior to 2012 and HUD median income became FFIEC median income in 2012
@@ -214,6 +210,7 @@ class parse_inputs(AD_report):
 		self.inputs['year'] = row['asofdate'] #year or application or origination
 		self.inputs['state code'] = row['statecode'] #two digit state code
 		self.inputs['state name'] = row['statename'] #two character state abbreviation
+		self.inputs['action taken'] = int(row['actiontype']) #disposition of the loan application
 		self.inputs['MSA median income'] = row['ffiec_median_family_income'] #median income for the tract/msa
 		self.inputs['sequence'] = row['sequencenumber'] #the sequence number of the loan, used for checking errors
 		self.inputs['income bracket'] = MSA_index.app_income_to_MSA(self.inputs) #sets the applicant income as an index by an applicant's income as a percent of MSA median
@@ -1366,8 +1363,37 @@ class aggregate(AD_report): #aggregates LAR rows by appropriate characteristics 
 			container['total'][inputs['action taken']]['count'] +=1
 			container['total'][inputs['action taken']]['value'] += int(inputs['loan value'])
 
+	def by_5x_race(self, container, inputs):
+
+		if inputs['income bracket'] > 4 or inputs['action taken'] > 5:
+			pass
+		else:
+			container['incomebrackets'][inputs['income bracket']]['races'][inputs['race']]['dispositions'][0]['count'] +=1 #increment count of applications received
+			container['incomebrackets'][inputs['income bracket']]['races'][inputs['race']]['dispositions'][0]['value'] += int(inputs['loan value']) #increment value of applications received
+			container['incomebrackets'][inputs['income bracket']]['races'][inputs['race']]['dispositions'][inputs['action taken']]['count'] +=1 #increment count of action taken by race category
+			container['incomebrackets'][inputs['income bracket']]['races'][inputs['race']]['dispositions'][inputs['action taken']]['value'] += int(inputs['loan value']) #increment value of action taken by race category
+	def by_5x_ethnicity(self, container, inputs):
+		if inputs['income bracket'] > 4 or inputs['action taken'] > 5:
+			pass
+		else:
+			container['incomebrackets'][inputs['income bracket']]['ethnicities'][inputs['ethnicity']]['dispositions'][0]['count'] +=1 #increment count of applications received by ethnicity
+			container['incomebrackets'][inputs['income bracket']]['ethnicities'][inputs['ethnicity']]['dispositions'][0]['value'] +=int(inputs['loan value']) #increment value of applications received by ethnicity
+			container['incomebrackets'][inputs['income bracket']]['ethnicities'][inputs['ethnicity']]['dispositions'][inputs['action taken']]['count'] +=1 #increment count of action taken by ethnicity
+			container['incomebrackets'][inputs['income bracket']]['ethnicities'][inputs['ethnicity']]['dispositions'][inputs['action taken']]['value'] +=int(inputs['loan value']) #increment value of action taken by ethnicity
+	def by_5x_minoritystatus(self, container, inputs):
+		if inputs['income bracket'] > 4 or inputs['action taken'] > 5:
+			pass
+		else:
+			container['incomebrackets'][inputs['income bracket']]['minoritystatuses'][inputs['minority status']]['dispositions'][0]['count'] += 1 #increment count of applications received by minority status
+			container['incomebrackets'][inputs['income bracket']]['minoritystatuses'][inputs['minority status']]['dispositions'][0]['value'] += int(inputs['loan value']) #increment value of applications received by minority status
+			container['incomebrackets'][inputs['income bracket']]['minoritystatuses'][inputs['minority status']]['dispositions'][inputs['action taken']]['count'] += 1 #increment count by action taken and minority status
+			container['incomebrackets'][inputs['income bracket']]['minoritystatuses'][inputs['minority status']]['dispositions'][inputs['action taken']]['value'] += int(inputs['loan value']) #incrment value by action taken and minority status
+
 	def build_report5x(self, table5x, inputs):
-		pass
+		self.by_5x_race(table5x, inputs)
+		self.by_5x_ethnicity(table5x, inputs)
+		self.by_5x_minoritystatus(table5x, inputs)
+
 	def build_report4x(self, table4x, inputs): #call functions to fill JSON object for table 4-1 (FHA, FSA, RHS, and VA home purchase loans)
 		self.by_race_4x(table4x, inputs) #aggregate loans by race, gender, and applicaiton disposition
 		self.by_ethnicity_4x(table4x, inputs)#aggregate loans by ethnicity, gender, and applicaiton disposition
