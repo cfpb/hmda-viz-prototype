@@ -11,6 +11,15 @@ def print_JSON(container): #prints a json object to the terminal
 	print json.dumps(container, indent=4)
 
 
+def set_4x_dispositions(end_points): #builds the dispositions of applications section of report 4-1 JSON
+	dispositions = []
+	for item in dispositions_list:
+		dispositionsholding = OrderedDict({})
+		dispositionsholding['disposition'] = "{}".format(item)
+		dispositions.append(dispositionsholding)
+		for point in end_points:
+			dispositionsholding[point] = 0
+	return dispositions
 
 def set_stuff(end_points, thing_list, thing_singular):
 	listyness = []
@@ -18,8 +27,7 @@ def set_stuff(end_points, thing_list, thing_singular):
 		things_holding = OrderedDict({})
 		things_holding[thing_singular] = "{}".format(thing)
 		listyness.append(things_holding)
-		for point in end_points:
-			things_holding[point] = 0
+
 	return listyness
 
 def set_income_brackets():
@@ -34,9 +42,17 @@ def build_5x():
 	container['incomebrackets'] = set_income_brackets()
 	for i in range(0,len(container['incomebrackets'])):
 		container['incomebrackets'][i]['races'] = set_stuff(end_points, race_names, 'race')
+		for j in range(0, len(container['incomebrackets'][i]['races'])):
+			container['incomebrackets'][i]['races'][j]['dispositions'] = set_4x_dispositions(end_points)
+
 		container['incomebrackets'][i]['ethnicities'] = set_stuff(end_points, ethnicity_names, 'ethnicity')
+		for j in range(0, len(container['incomebrackets'][i]['ethnicities'])):
+			container['incomebrackets'][i]['ethnicities'][j]['dispositions'] = set_4x_dispositions(end_points)
+
 		container['incomebrackets'][i]['minoritystatuses'] = set_stuff(end_points, minority_statuses, 'minoritystatus')
-	#container['races'] = set_5x_races(end_points)
+		for j in range(0, len(container['incomebrackets'][i]['minoritystatuses'])):
+			container['incomebrackets'][i]['minoritystatuses'][j]['dispositions'] = set_4x_dispositions(end_points)
+	container['total'] = set_4x_dispositions(end_points)
 
 build_5x()
 print_JSON(container)

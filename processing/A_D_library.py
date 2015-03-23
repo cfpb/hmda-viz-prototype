@@ -543,8 +543,6 @@ class build_JSON(AD_report):
 			things_holding = OrderedDict({})
 			things_holding[thing_singular] = "{}".format(thing)
 			listyness.append(things_holding)
-			for point in end_points:
-				things_holding[point] = 0
 		return listyness
 
 	def set_income_brackets(self):
@@ -558,12 +556,23 @@ class build_JSON(AD_report):
 	def table_5x_builder(self):
 		income_brackets= []
 		self.container['incomebrackets'] = self.set_income_brackets()
+		income_brackets= []
+		self.container['incomebrackets'] = self.set_income_brackets()
 		for i in range(0,len(self.container['incomebrackets'])):
 			self.container['incomebrackets'][i]['races'] = self.set_stuff(self.end_points, self.race_names, 'race')
+			for j in range(0, len(self.container['incomebrackets'][i]['races'])):
+				self.container['incomebrackets'][i]['races'][j]['dispositions'] = self.set_dispositions(self.end_points)
+
 			self.container['incomebrackets'][i]['ethnicities'] = self.set_stuff(self.end_points, self.ethnicity_names, 'ethnicity')
+			for j in range(0, len(self.container['incomebrackets'][i]['ethnicities'])):
+				self.container['incomebrackets'][i]['ethnicities'][j]['dispositions'] = self.set_dispositions(self.end_points)
+
 			self.container['incomebrackets'][i]['minoritystatuses'] = self.set_stuff(self.end_points, self.minority_statuses, 'minoritystatus')
+			for j in range(0, len(self.container['incomebrackets'][i]['minoritystatuses'])):
+				self.container['incomebrackets'][i]['minoritystatuses'][j]['dispositions'] = self.set_dispositions(self.end_points)
+		self.container['total'] = self.set_dispositions(self.end_points)
 		return self.container
-	def set_4x_dispositions(self, end_points): #builds the dispositions of applications section of report 4-1 JSON
+	def set_dispositions(self, end_points): #builds the dispositions of applications section of report 4-1 JSON
 		dispositions = []
 		for item in self.dispositions_list:
 			dispositionsholding = OrderedDict({})
@@ -584,13 +593,13 @@ class build_JSON(AD_report):
 	def set_gender_disps(self):
 		for i in range(0, len(self.race_names)):
 			for g in range(0, len(self.gender_list)):
-				self.container['races'][i]['genders'][g]['dispositions'] = self.set_4x_dispositions(['count', 'value'])
+				self.container['races'][i]['genders'][g]['dispositions'] = self.set_dispositions(['count', 'value'])
 		for i in range(0, len(self.ethnicity_names)):
 			for g in range(0, len(self.gender_list)):
-				self.container['ethnicities'][i]['genders'][g]['dispositions'] = self.set_4x_dispositions(['count', 'value'])
+				self.container['ethnicities'][i]['genders'][g]['dispositions'] = self.set_dispositions(['count', 'value'])
 		for i in range(0, len(self.minority_statuses)):
 			for g in range(0, len(self.gender_list)):
-				self.container['minoritystatuses'][i]['genders'][g]['dispositions'] = self.set_4x_dispositions(['count', 'value'])
+				self.container['minoritystatuses'][i]['genders'][g]['dispositions'] = self.set_dispositions(['count', 'value'])
 	def set_4x_races(self):
 		races = []
 		for race in self.race_names:
@@ -599,7 +608,7 @@ class build_JSON(AD_report):
 			races.append(holding)
 		self.container['races'] = races
 		for i in range(0,len(self.container['races'])):
-			self.container['races'][i]['dispositions'] = self.set_4x_dispositions(['count', 'value'])
+			self.container['races'][i]['dispositions'] = self.set_dispositions(['count', 'value'])
 			self.container['races'][i]['genders'] = self.set_4x_gender()
 
 	def set_4x_ethnicity(self):
@@ -610,7 +619,7 @@ class build_JSON(AD_report):
 			ethnicities.append(holding)
 		self.container['ethnicities'] = ethnicities
 		for i in range(0, len(self.container['ethnicities'])):
-			self.container['ethnicities'][i]['dispositions'] = self.set_4x_dispositions(['count', 'value'])
+			self.container['ethnicities'][i]['dispositions'] = self.set_dispositions(['count', 'value'])
 			self.container['ethnicities'][i]['genders'] = self.set_4x_gender()
 
 	def set_4x_minority(self):
@@ -621,7 +630,7 @@ class build_JSON(AD_report):
 			minoritystatuses.append(holding)
 		self.container['minoritystatuses'] = minoritystatuses
 		for i in range(0, len(self.container['minoritystatuses'])):
-			self.container['minoritystatuses'][i]['dispositions'] = self.set_4x_dispositions(['count', 'value'])
+			self.container['minoritystatuses'][i]['dispositions'] = self.set_dispositions(['count', 'value'])
 			self.container['minoritystatuses'][i]['genders'] = self.set_4x_gender()
 
 	def set_4x_incomes(self):
@@ -632,7 +641,7 @@ class build_JSON(AD_report):
 			applicantincomes.append(holding)
 		self.container['incomes'] = applicantincomes
 		for i in range(0, len(self.container['incomes'])):
-			self.container['incomes'][i]['dispositions'] = self.set_4x_dispositions(['count', 'value'])
+			self.container['incomes'][i]['dispositions'] = self.set_dispositions(['count', 'value'])
 		self.container['total'] = self.set_4x_dispositions(['count', 'value'])
 
 	def table_4x_builder(self): #builds the table 4-1 JSON object: disposition of application by race and gender

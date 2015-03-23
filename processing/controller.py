@@ -20,7 +20,7 @@ cur = connection.connect() #creates cursor object connected to HMDAPub2012 sql d
 selector.get_report_lists('MSAinputs2013.csv') #fills the dictionary of lists of reports to be generated
 build_msa = build() #instantiate the build object for file path, jekyll files
 build_msa.msas_in_state(cur, selector, 'aggregate') #creates a list of all MSAs in each state and places the file in the state's aggregate folder
-build_msa.msas_in_state(cur, selector, 'disclosure')#creates a list of all MSAs in each state and places the file in the state's disclosure folder
+#build_msa.msas_in_state(cur, selector, 'disclosure')#creates a list of all MSAs in each state and places the file in the state's disclosure folder
 
 AL_MSAs = ['45180', '45980', '11500', '10760', '42460', '13820', '19460', '23460', '46740', '17980', '12220', '20020', '18980', '33860', '46260', '33660', '19300', '22840',
 '21460','10700','21640','42820','26620','22520','46220']
