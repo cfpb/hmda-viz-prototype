@@ -46,6 +46,8 @@ Currently only the 2013/alabama path works in the UI. You can then select any MS
 
 You should now see an HTML table with options to download the json, csv and print.
 
+![Screenshot](report.png)
+
 ## Known issues
 
 We are still in the prototyping phase so there is a lot of work happening on both the front-end and processing sides. One obvious issue is that only certain paths currently work for the forms.
