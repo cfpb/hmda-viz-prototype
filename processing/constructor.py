@@ -53,6 +53,8 @@ class report_4x(constructor):
 			print count, 'LAR rows in MSA %s, for report %s, in %s' %(MSA, self.report_number, self.year)
 
 			SQL = getattr(self.queries, self.query_string)()
+
+
 			cur.execute(SQL, location)
 
 			for num in range(0, count):

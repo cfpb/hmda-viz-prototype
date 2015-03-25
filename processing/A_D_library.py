@@ -366,14 +366,14 @@ class demographics(AD_report):
 			return  5
 
 		elif a_race[0] != 0 and a_race[1] == 0 and a_race[2] == 0 and a_race[3] == 0 and a_race[4] == 0: #if only the first race field is used, use the first field unless it is blank
-			return  a_race[0] #if only one race is reported, and joint status and minority status are false, set race to first race
+			return  a_race[0]-1 #if only one race is reported, and joint status and minority status are false, set race to first race
 		elif a_race[0] == 0 and a_race[1] == 0 and a_race[2] == 0 and a_race[3] == 0 and a_race[4] == 0:
 			return  7 #if all race fields are blank, set to 7 'not available'
 		else:
-			for i in range(0,5):
+			for i in range(1,5):
 				for r in range(0,5):
 					if a_race[r] == i:
-						return a_race[r] #return first instance of minority race
+						return a_race[r] -1 #return first instance of minority race
 						break
 
 class build_JSON(AD_report):
@@ -833,6 +833,8 @@ class queries(AD_report):
 	#need to standardize field names in order to use the same query across eyars
 		#ffiec_median_family_income vs HUD_median_family_income
 		#no sequencenumber prior to 2012
+
+
 	def count_rows_2012(self): #get the count of rows in the LAR for an MSA, used to run the parsing/aggregation loop
 		SQL = '''SELECT COUNT(msaofproperty) FROM hmdapub2012 WHERE msaofproperty = %s;'''
 		return SQL
