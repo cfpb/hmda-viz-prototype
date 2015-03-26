@@ -28,7 +28,7 @@ class report_4x(constructor):
 		self.aggregation = self.aggregation_return(self.year, report)
 		self.count_string = self.count_return(self.year, report)
 		self.report_number = report
-
+		print self.year, report
 	def report_x(self, MSA, cur):
 		table_number = self.report_number[2:]
 		if self.report_number[0] == 'A':
@@ -48,19 +48,21 @@ class report_4x(constructor):
 		SQL = getattr(self.queries, self.count_string)()
 		cur.execute(SQL, location)
 		count = int(cur.fetchone()[0])
-		#table_X =
+
 		if count > 0:
 			print count, 'LAR rows in MSA %s, for report %s, in %s' %(MSA, self.report_number, self.year)
-
 			SQL = getattr(self.queries, self.query_string)()
 			cur.execute(SQL, location)
-
+			testcount= count
 			for num in range(0, count):
+				testcount -=1
+				#print cur.fetchall()
 				row = cur.fetchone()
 				getattr(self.parsed, self.parse_function)(row)
 				if num == 0:
 					build_X.set_header(self.parsed.inputs, MSA, report_type, table_number)
 					table_X = getattr(build_X, self.json_builder)()
+
 				getattr(self.agg, self.aggregation)(table_X, self.parsed.inputs)
 
 			if self.report_number[2:] == '3-2': #report 3-2 requires out of loop aggregation functions
@@ -68,6 +70,7 @@ class report_4x(constructor):
 				self.agg.by_weighted_mean(table_X, self.parsed.inputs)
 				self.agg.by_weighted_median(table_X, self.parsed.inputs)
 				self.agg.by_mean(table_X, self.parsed.inputs)
+
 			path = "../" +table_X['type']+"/"+table_X['year']+"/"+build_X.get_state_name(table_X['msa']['state']).replace(' ', '-').lower()+"/"+build_X.msa_names[MSA].replace(' ', '-').lower()+"/"+table_X['table']
 			if not os.path.exists(path): #check if path exists
 				os.makedirs(path) #if path not present, create it
@@ -86,6 +89,8 @@ class report_4x(constructor):
 			return 'build_report_32'
 		elif report_number[:3] == 'A 4':
 			return 'build_report4x'
+		elif report_number[:3] == 'A 5':
+			return 'build_report5x'
 
 	def JSON_constructor_return(self, report_number):
 		if report_number == 'A 3-1':
@@ -94,6 +99,8 @@ class report_4x(constructor):
 			return 'table_32_builder'
 		elif report_number[:3] == 'A 4':
 			return 'table_4x_builder'
+		elif report_number[:3] == 'A 5':
+			return 'table_5x_builder'
 
 	def parse_return(self, report_number):
 		if report_number == 'A 3-1':
@@ -102,6 +109,8 @@ class report_4x(constructor):
 			return 'parse_t32'
 		elif report_number[:3] == 'A 4':
 			return 'parse_t4x'
+		elif report_number[:3] == 'A 5':
+			return 'parse_t5x'
 
 	def query_return(self, year, report_number):
 		if year == '2013':
@@ -123,6 +132,8 @@ class report_4x(constructor):
 				return 'table_4_6_2013'
 			elif report_number == 'A 4-7':
 				return 'table_4_7_2013'
+			elif report_number == 'A 5-1':
+				return 'table_5_1_2013'
 		elif year == '2012':
 			if report_number == 'A 3-1':
 				return 'table_3_1_2012'
@@ -143,7 +154,7 @@ class report_4x(constructor):
 			elif report_number == 'A 4-7':
 				return 'table_4_7_2012'
 
-	def count_return(self, year, report_number):
+	def count_return(self, year, report_number): #generalize with string manipulation
 		if year == '2013':
 			if report_number == 'A 3-1':
 				return 'count_rows_2013'
@@ -163,6 +174,8 @@ class report_4x(constructor):
 				return 'count_rows_46_2013'
 			elif report_number == 'A 4-7':
 				return 'count_rows_47_2013'
+			elif report_number == 'A 5-1':
+				return 'count_rows_51_2013'
 		elif year == '2012':
 			if report_number == 'A 3-1':
 				return 'count_rows_2012'
