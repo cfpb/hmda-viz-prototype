@@ -28,7 +28,7 @@ class report_4x(constructor):
 		self.aggregation = self.aggregation_return(self.year, report)
 		self.count_string = self.count_return(self.year, report)
 		self.report_number = report
-
+		print self.year, report
 	def report_x(self, MSA, cur):
 		table_number = self.report_number[2:]
 		if self.report_number[0] == 'A':
@@ -48,16 +48,15 @@ class report_4x(constructor):
 		SQL = getattr(self.queries, self.count_string)()
 		cur.execute(SQL, location)
 		count = int(cur.fetchone()[0])
-		#table_X =
+
 		if count > 0:
 			print count, 'LAR rows in MSA %s, for report %s, in %s' %(MSA, self.report_number, self.year)
-
 			SQL = getattr(self.queries, self.query_string)()
-
-
 			cur.execute(SQL, location)
-
+			testcount= count
 			for num in range(0, count):
+				testcount -=1
+				#print cur.fetchall()
 				row = cur.fetchone()
 				getattr(self.parsed, self.parse_function)(row)
 				if num == 0:
