@@ -880,6 +880,24 @@ class queries(AD_report):
 	def table_A_5_1_conditions(self):
 		return '''and propertytype !='3' and loantype !='1' and loanpurpose = '1';'''
 
+	def table_A_5_2_conditions(self):
+		return '''and propertytype !='3' and loantype ='1' and loanpurpose = '1';'''
+
+	def table_A_5_3_conditions(self):
+		return '''and propertytype !='3' and loanpurpose = '3';'''
+
+	def table_A_5_4_conditions(self):
+		return '''and propertytype !='3' and loanpurpose = '2';'''
+
+	def table_A_5_5_conditions(self):
+		return '''and propertytype ='3';'''
+
+	def table_A_5_6_conditions(self):
+		return '''and occupancy ='1' and propertytype !='3' ;'''
+
+	def table_A_5_7_conditions(self):
+		return '''and propertytype ='2' ;'''
+
 	def table_3_1_columns(self):
 		return '''censustractnumber, applicantrace1, applicantrace2, applicantrace3, applicantrace4, applicantrace5,
 			coapplicantrace1, coapplicantrace2, coapplicantrace3, coapplicantrace4, coapplicantrace5,
