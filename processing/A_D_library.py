@@ -118,7 +118,7 @@ class parse_inputs(AD_report):
 		self.inputs['tract income index'] = MSA_index.tract_to_MSA_income(self.inputs) #sets the applicant income to an index number for aggregation
 		self.inputs['income bracket'] = MSA_index.app_income_to_MSA(self.inputs) #sets the applicant income as an index by an applicant's income as a percent of MSA median
 		self.inputs['minority percent'] = MSA_index.minority_percent(self.inputs) #sets the minority population percent to an index for aggregation
-		self.inputs['tract income index'] = MSA_index.tract_to_MSA_income(self.inputs) #sets the tract to msa income ratio to an index for aggregation (low, moderate, middle, upper)
+
 		self.inputs['app non white flag'] = demo.set_non_white(a_race) #flags the applicant as non-white if true, used in setting minority status and race
 		self.inputs['co non white flag'] = demo.set_non_white(co_race) #flags the co applicant as non-white if true, used in setting minority status and race
 		self.inputs['minority count'] = demo.minority_count(a_race) #determines if the number of minority races claimed by the applicant is 2 or greater
@@ -229,6 +229,21 @@ class parse_inputs(AD_report):
 			#print self.inputs['race']
 		self.inputs['ethnicity'] = demo.set_loan_ethn(self.inputs) #requires  ethnicity be parsed prior to running set_loan_ethn
 		self.inputs['minority status'] = demo.set_minority_status(self.inputs) #requires non white flags be set prior to running set_minority_status
+
+	def parse_t7x(self, row):
+		MSA_index = MSA_info() #contains functions for census tract characteristics
+
+		self.inputs['year'] = row['asofdate'] #year or application or origination
+		self.inputs['state code'] = row['statecode'] #two digit state code
+		self.inputs['MSA median income'] = row['ffiec_median_family_income'] #median income for the tract/msa
+		self.inputs['state code'] = row['statecode'] #two digit state code
+		self.inputs['state name'] = row['statename'] #two character state abbreviation
+		self.inputs['loan value'] = float(row['loanamount']) #loan value rounded to the nearest thousand
+		self.inputs['action taken'] = int(row['actiontype']) #disposition of the loan application
+		self.inputs['minority percent'] = row['minoritypopulationpct'] #%of population that is minority
+
+		self.inputs['tract to MSA income'] = row['tract_to_msa_md_income'] #ratio of tract to msa/md income
+		self.inputs['tract income index'] = MSA_index.tract_to_MSA_income(self.inputs) #sets the tract to msa income ratio to an index for aggregation (low,
 
 
 class demographics(AD_report):
@@ -561,6 +576,9 @@ class build_JSON(AD_report):
 			income_holding['incomebracket'] = "{}".format(bracket)
 			income_brackets.append(income_holding)
 		return income_brackets
+
+	def table_7x_builder(self):
+		pass
 
 	def table_5x_builder(self):
 		income_brackets= []
@@ -898,6 +916,28 @@ class queries(AD_report):
 	def table_A_5_7_conditions(self):
 		return '''and propertytype ='2' ;'''
 
+	def table_A_7_1_conditions(self):
+		return '''and loantype != '1' and propertytype !='3' and loanpurpose = '1';'''
+
+
+	def table_A_7_2_conditions(self):
+		return '''and loantype = '1' and propertytype !='3' and loanpurpose = '1';'''
+
+	def table_A_7_3_conditions(self):
+		return '''and propertytype !='3' and loanpurpose = '3';'''
+
+	def table_A_7_4_conditions(self):
+		return '''and propertytype !='3' and loanpurpose = '2';'''
+
+	def table_A_7_5_conditions(self):
+		return '''and propertytype ='3';'''
+
+	def table_A_7_6_conditions(self):
+		return '''and propertytype !='3' and occupancy = '2';'''
+
+	def table_A_7_7_conditions(self):
+		return '''and propertytype ='3';'''
+
 	def table_3_1_columns(self):
 		return '''censustractnumber, applicantrace1, applicantrace2, applicantrace3, applicantrace4, applicantrace5,
 			coapplicantrace1, coapplicantrace2, coapplicantrace3, coapplicantrace4, coapplicantrace5,
@@ -921,7 +961,8 @@ class queries(AD_report):
 			applicantethnicity, coapplicantethnicity, applicantincome, loanamount, asofdate,
 			actiontype, ffiec_median_family_income, statecode, statename, sequencenumber'''
 
-
+	def table_7_x_columns(self):
+		return '''minoritypopulationpct, actiontype, loanamount, ffiec_median_family_income, tract_to_msa_md_income, asofdate, statecode, statename '''
 class aggregate(AD_report): #aggregates LAR rows by appropriate characteristics to fill the JSON files
 
 	def __init__(self):
@@ -1196,6 +1237,9 @@ class aggregate(AD_report): #aggregates LAR rows by appropriate characteristics 
 			container['incomebrackets'][inputs['income bracket']]['minoritystatuses'][inputs['minority status']]['dispositions'][0]['value'] += int(inputs['loan value']) #increment value of applications received by minority status
 			container['incomebrackets'][inputs['income bracket']]['minoritystatuses'][inputs['minority status']]['dispositions'][inputs['action taken']]['count'] += 1 #increment count by action taken and minority status
 			container['incomebrackets'][inputs['income bracket']]['minoritystatuses'][inputs['minority status']]['dispositions'][inputs['action taken']]['value'] += int(inputs['loan value']) #incrment value by action taken and minority status
+
+	def build_report7x(self, table7x, inputs):
+		pass
 
 	def build_report5x(self, table5x, inputs):
 		self.by_5x_race(table5x, inputs)

@@ -49,7 +49,7 @@ class report_4x(constructor):
 
 		if count > 0:
 			print count, 'LAR rows in MSA %s, for report %s, in %s' %(MSA, self.report_number, self.year)
-			if self.report_number[2] == '4' or self.report_number[2] == '5':
+			if self.report_number[2] == '4' or self.report_number[2] == '5' or self.report_number[2] == '7':
 				self.report_number = self.report_number[:4] + 'x' #'A 4-1'
 			columns = getattr(self.queries, ('table_' + self.report_number[2:].replace(' ','_').replace('-','_')+'_columns'))()
 
@@ -91,6 +91,8 @@ class report_4x(constructor):
 			return 'build_report4x'
 		elif report_number[:3] == 'A 5':
 			return 'build_report5x'
+		elif report_number[:3] == 'A 7':
+			return 'build_report7x'
 
 	def JSON_constructor_return(self, report_number):
 		if report_number == 'A 3-1':
@@ -101,6 +103,8 @@ class report_4x(constructor):
 			return 'table_4x_builder'
 		elif report_number[:3] == 'A 5':
 			return 'table_5x_builder'
+		elif report_number[:3] == 'A 7':
+			return 'table_7x_builder'
 
 	def parse_return(self, report_number):
 		if report_number == 'A 3-1':
@@ -111,5 +115,6 @@ class report_4x(constructor):
 			return 'parse_t4x'
 		elif report_number[:3] == 'A 5':
 			return 'parse_t5x'
-
+		elif report_number[:3] == 'A 7':
+			return 'parse_t7x'
 
