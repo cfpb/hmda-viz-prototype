@@ -41,7 +41,9 @@ class report_4x(constructor):
 		#for MSA in selector.report_list[report_number]: #take this loop out
 		build_X = build()
 		build_X.set_msa_names(cur) #builds a list of msa names as a dictionary
+
 		location = (MSA,) #pass the MSA nubmers as a tuple to Psycopg2 (doesn't take singletons)
+		self.parsed.inputs['small county flag'] = self.agg.get_small_county_flag(cur, location)
 		conditions = getattr(self.queries, ('table_' + self.report_number.replace(' ','_').replace('-','_') +'_conditions'))()
 		SQL = (self.queries.SQL_Count + conditions).format(year=self.year, MSA=MSA)
 		cur.execute(SQL, location)
@@ -58,9 +60,9 @@ class report_4x(constructor):
 			cur.execute(SQL, location)
 			for num in range(0, count):
 				row = cur.fetchone()
-				#print row
+
 				getattr(self.parsed, self.parse_function)(row)
-				#print self.parsed.inputs['tract income index']
+
 				if num == 0:
 					build_X.set_header(self.parsed.inputs, MSA, report_type, table_number)
 

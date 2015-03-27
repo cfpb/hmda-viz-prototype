@@ -117,7 +117,7 @@ class parse_inputs(AD_report):
 		self.inputs['sequence'] = row['sequencenumber'] #the sequence number of the loan, used for checking errors
 		self.inputs['tract income index'] = MSA_index.tract_to_MSA_income(self.inputs) #sets the applicant income to an index number for aggregation
 		self.inputs['income bracket'] = MSA_index.app_income_to_MSA(self.inputs) #sets the applicant income as an index by an applicant's income as a percent of MSA median
-		self.inputs['minority percent'] = MSA_index.minority_percent(self.inputs) #sets the minority population percent to an index for aggregation
+		self.inputs['minority percent index'] = MSA_index.minority_percent(self.inputs) #sets the minority population percent to an index for aggregation
 
 		self.inputs['app non white flag'] = demo.set_non_white(a_race) #flags the applicant as non-white if true, used in setting minority status and race
 		self.inputs['co non white flag'] = demo.set_non_white(co_race) #flags the co applicant as non-white if true, used in setting minority status and race
@@ -241,9 +241,9 @@ class parse_inputs(AD_report):
 		self.inputs['loan value'] = float(row['loanamount']) #loan value rounded to the nearest thousand
 		self.inputs['action taken'] = int(row['actiontype']) #disposition of the loan application
 		self.inputs['minority percent'] = row['minoritypopulationpct'] #%of population that is minority
+		self.inputs['minority percent index'] = MSA_index.minority_percent(self.inputs) #sets the minority population percent to an index for aggregation
 		self.inputs['tract to MSA income'] = row['tract_to_msa_md_income'] #ratio of tract to msa/md income
 		self.inputs['tract income index'] = MSA_index.tract_to_MSA_income(self.inputs) #sets the tract to msa income ratio to an index for aggregation (low,
-
 
 class demographics(AD_report):
 	#holds all the functions for setting race, minority status, and ethnicity for FFIEC A&D reports
@@ -542,6 +542,32 @@ class build_JSON(AD_report):
 			return 'Disposition of applications for home-purchase, home improvement, or refinancing loans, manufactured home dwellings by race, ethnicity, gender and income of applicant'
 		elif table_num == '5-1':
 			return 'Disposition of applications for FHA, FSA/RHS, and VA home-purchase loans, 1- to 4-family and manufactured home dwellings, by income, race and ethnicity of applicant'
+		elif table_num == '5-2':
+			return
+		elif table_num == '5-3':
+			return
+		elif table_num == '5-4':
+			return
+		elif table_num == '5-5':
+			return
+		elif table_num == '5-6':
+			return
+		elif table_num == '5-7':
+			return
+		elif table_num =='7-1':
+			return 'Disposition of applications for FHA, FSA/RHS, and VA home-purchase loans, 1- to 4-family and manufactured home dwellings, by characteristics of census tract in which property is located'
+		elif table_num =='7-2':
+			return 'Disposition of applications for conventional home-purchase loans, 1- to 4-family and manufactured home dwellings, by characteristics of census tract in which property is located'
+		elif table_num =='7-3':
+			return
+		elif table_num =='7-4':
+			return
+		elif table_num =='7-5':
+			return
+		elif table_num =='7-6':
+			return
+		elif table_num =='7-7':
+			return
 	def set_header(self, inputs, MSA, table_type, table_num): #sets the header information of the JSON object
 		now = foo.datetime.now()
 		d = now.day
@@ -577,21 +603,48 @@ class build_JSON(AD_report):
 		return brackets
 
 	def table_7x_builder(self):
-		self.container['racial_ethnic_composition'] = self.set_brackets('race', self.tract_pct_minority)
-		for i in range(0,len(self.container['racial_ethnic_composition'])):
-			self.container['racial_ethnic_composition'][i]['dispositions'] = self.set_dispositions(self.end_points)
-		self.container['incomecharacteristics'] = self.set_brackets('income', self.tract_income)
-		for i in range(0,len(self.container['incomecharacteristics'])):
-			self.container['incomecharacteristics'][i]['dispositions'] = self.set_dispositions(self.end_points)
-		self.container['income&racial/ethnic_composition'] = self.set_brackets('income', self.tract_income)
-		for i in range(0, len(self.container['income&racial/ethnic_composition'])):
-			self.container['income&racial/ethnic_composition'][i]['racial_ethnic_composition'] = self.set_brackets('race', self.tract_pct_minority)
-			for j in range(0, len(self.container['income&racial/ethnic_composition'][i]['racial_ethnic_composition'])):
-				self.container['income&racial/ethnic_composition'][i]['racial_ethnic_composition'][j]['disposition'] = self.set_dispositions(self.end_points)
+		self.container['censuscharacteristics'] = []
+		holding = OrderedDict({})
+		holding['characteristic'] = 'Race/Ethnic Composition'
+		holding['compositions'] = self.set_brackets('composition', self.tract_pct_minority)
+		for i in range(0, len(holding['compositions'])):
+			holding['compositions'][i]['dispositions'] = self.set_dispositions(self.end_points)
+		self.container['censuscharacteristics'].append(holding)
+
+		holding = OrderedDict({})
+		holding['characteristic'] = 'Income Characteristics'
+		holding['incomes'] = self.set_brackets('income', self.tract_income)
+		for i in range(0, len(holding['incomes'])):
+			holding['incomes'][i]['dispositions'] = self.set_dispositions(self.end_points)
+		self.container['censuscharacteristics'].append(holding)
+
+		holding = OrderedDict({})
+		holding['characteristic'] = 'Income & Racial/Ethnic Composition'
+		holding['incomes'] = self.set_brackets('income', self.tract_income)
+		for i in range(0, len(holding['incomes'])):
+			holding['incomes'][i]['compositions'] = self.set_brackets('composition', self.tract_pct_minority)
+			for j in range(0, len(holding['incomes'][i]['compositions'])):
+				holding['incomes'][i]['compositions'][j]['dispositions'] = self.set_dispositions(self.end_points)
+		self.container['censuscharacteristics'].append(holding)
+
+		holding = OrderedDict({})
+		holding['type'] = 'Small County'
+		holding['dispositions'] = self.set_dispositions(self.end_points)
+		self.container['types'] = []
+		self.container['types'].append(holding)
+
+		holding = OrderedDict({})
+		holding['type'] = 'All Other Tracts'
+		holding['dispositions'] = self.set_dispositions(self.end_points)
+		self.container['types'].append(holding)
+		self.container['total'] = self.set_dispositions(self.end_points)
+
+
 		return self.container
+
 	def table_5x_builder(self):
 
-		self.container['applicantincomes'] = self.set_brackets('income', self.applicant_income_bracket[:-1])
+		self.container['applicantincomes'] = self.set_brackets('applicantincome', self.applicant_income_bracket[:-1])
 		race_holding = OrderedDict({})
 		race_holding['characteristic'] = 'Race'
 		race_holding['races'] = self.set_stuff(self.race_names, 'race')
@@ -1018,11 +1071,11 @@ class aggregate(AD_report): #aggregates LAR rows by appropriate characteristics 
 			container['borrowercharacteristics'][3]['applicantincomes'][inputs['income bracket']]['purchasers'][inputs['purchaser']]['value'] += int(inputs['loan value'])
 
 	def by_minority_composition(self, container, inputs): #aggregate loans by MSA minority population percent
-		if inputs['minority percent'] == 4: #minority percent not available
+		if inputs['minority percent index'] == 4: #minority percent not available
 			pass
 		else:
-			container['censuscharacteristics'][0]['tractpctminorities'][inputs['minority percent']]['purchasers'][inputs['purchaser']]['count'] += 1
-			container['censuscharacteristics'][0]['tractpctminorities'][inputs['minority percent']]['purchasers'][inputs['purchaser']]['value'] += int(inputs['loan value'])
+			container['censuscharacteristics'][0]['tractpctminorities'][inputs['minority percent index']]['purchasers'][inputs['purchaser']]['count'] += 1
+			container['censuscharacteristics'][0]['tractpctminorities'][inputs['minority percent index']]['purchasers'][inputs['purchaser']]['value'] += int(inputs['loan value'])
 
 	def by_tract_income(self, container, inputs): #aggregate loans by tract to MSA income ratio
 		if inputs['tract income index'] > 3: #income ratio not available or outside report 3-1 bounds
@@ -1258,8 +1311,76 @@ class aggregate(AD_report): #aggregates LAR rows by appropriate characteristics 
 			container['applicantincomes'][inputs['income bracket']]['borrowercharacteristics'][2]['minoritystatus'][inputs['minority status']]['dispositions'][inputs['action taken']]['count'] += 1 #increment count by action taken and minority status
 			container['applicantincomes'][inputs['income bracket']]['borrowercharacteristics'][2]['minoritystatus'][inputs['minority status']]['dispositions'][inputs['action taken']]['value'] += int(inputs['loan value']) #incrment value by action taken and minority status
 
+	def by_minority_concentration(self, container, inputs):
+		if inputs['minority percent index'] > 3 or inputs['action taken'] > 5:
+			pass
+		else:
+			container['censuscharacteristics'][0]['compositions'][inputs['minority percent index']]['dispositions'][0]['count'] +=1
+			container['censuscharacteristics'][0]['compositions'][inputs['minority percent index']]['dispositions'][0]['value'] += int(inputs['loan value'])
+
+			container['censuscharacteristics'][0]['compositions'][inputs['minority percent index']]['dispositions'][inputs['action taken']]['count'] +=1
+			container['censuscharacteristics'][0]['compositions'][inputs['minority percent index']]['dispositions'][inputs['action taken']]['value'] += int(inputs['loan value'])
+
+	def by_tract_to_msa_income(self, container, inputs):
+		if inputs['action taken']>5 or inputs['tract income index'] > 3:
+			pass
+		else:
+			container['censuscharacteristics'][1]['incomes'][inputs['tract income index']]['dispositions'][0]['count'] +=1
+			container['censuscharacteristics'][1]['incomes'][inputs['tract income index']]['dispositions'][0]['value'] += int(inputs['loan value'])
+
+			container['censuscharacteristics'][1]['incomes'][inputs['tract income index']]['dispositions'][inputs['action taken']]['count'] +=1
+			container['censuscharacteristics'][1]['incomes'][inputs['tract income index']]['dispositions'][inputs['action taken']]['value'] += int(inputs['loan value'])
+	def by_income_ethnic_combo(self, container, inputs):
+		if inputs['action taken'] > 5 or inputs['tract income index'] > 3:
+			pass
+		else:
+			container['censuscharacteristics'][2]['incomes'][inputs['tract income index']]['compositions'][inputs['minority percent index']]['dispositions'][0]['count'] +=1
+			container['censuscharacteristics'][2]['incomes'][inputs['tract income index']]['compositions'][inputs['minority percent index']]['dispositions'][0]['value'] += int(inputs['loan value'])
+			container['censuscharacteristics'][2]['incomes'][inputs['tract income index']]['compositions'][inputs['minority percent index']]['dispositions'][inputs['action taken']]['count'] +=1
+			container['censuscharacteristics'][2]['incomes'][inputs['tract income index']]['compositions'][inputs['minority percent index']]['dispositions'][inputs['action taken']]['value'] += int(inputs['loan value'])
+
+	def get_small_county_flag(self, cur, MSA):
+		#msa can be either an MSA or the last 5 of a geoid?
+		SQL = '''SELECT small_county FROM tract_to_cbsa_2010 WHERE geoid_msa = %s;'''
+
+		cur.execute(SQL, MSA)
+		small_county_flag = cur.fetchall()[0]
+		#print small_county_flag
+
+	def by_small_county(self, container, inputs):
+		if inputs['small county flag'] == '1':
+			container['types'][0]['dispositions'][0]['count'] +=1
+			container['types'][0]['dispositions'][0]['value'] +=int(inputs['loan value'])
+			container['types'][0]['dispositions'][inputs['action taken']]['count'] +=1
+			container['types'][0]['dispositions'][inputs['action taken']]['value'] +=int(inputs['loan value'])
+		#this needs to reference tract_to_cbsa_2010
+
+	def by_other_tracts(self, container, inputs):
+		#refers to tracts for which Census income data is unavailable
+		if inputs['tract to MSA income'] == 4 and inputs['action taken'] < 6:
+			container['types'][1]['dispositions'][0]['count'] +=1
+			container['types'][1]['dispositions'][0]['value'] +=int(inputs['loan value'])
+			container['types'][1]['dispositions'][inputs['action taken']]['count'] +=1
+			container['types'][1]['dispositions'][inputs['action taken']]['value'] +=int(inputs['loan value'])
+
+	def totals_7x(self, container, inputs):
+
+		if inputs['action taken'] > 5:
+			pass
+		else:
+
+			container['total'][0]['count'] += 1
+			container['total'][0]['value'] += int(inputs['loan value'])
+			container['total'][inputs['action taken']]['count'] += 1
+			container['total'][inputs['action taken']]['value'] += int(inputs['loan value'])
+
 	def build_report7x(self, table7x, inputs):
-		pass
+		self.by_minority_concentration(table7x, inputs)
+		self.by_tract_to_msa_income(table7x, inputs)
+		self.by_income_ethnic_combo(table7x, inputs)
+		self.by_small_county(table7x, inputs)
+		self.by_other_tracts(table7x, inputs)
+		self.totals_7x(table7x, inputs)
 
 	def build_report5x(self, table5x, inputs):
 		self.by_5x_race(table5x, inputs)
