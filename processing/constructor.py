@@ -24,9 +24,9 @@ class report_4x(constructor):
 		self.agg = agg() #aggregation functions for all tables
 		self.json_builder = self.JSON_constructor_return(report)
 		self.parse_function = self.parse_return(report)
-		self.query_string = self.query_return(self.year, report)
+		#self.query_string = self.query_return(self.year, report)
 		self.aggregation = self.aggregation_return(self.year, report)
-		self.count_string = self.count_return(self.year, report)
+		#self.count_string = self.count_return(self.year, report)
 		self.report_number = report
 
 	def report_x(self, MSA, cur):
@@ -38,29 +38,31 @@ class report_4x(constructor):
 		elif self.report_number[0] == 'N':
 			report_type = 'National'
 
-		#cur = self.connection.connect() #creates cursor object connected to HMDAPub2012 sql database, locally hosted postgres
-
 		#for MSA in selector.report_list[report_number]: #take this loop out
 		build_X = build()
 		build_X.set_msa_names(cur) #builds a list of msa names as a dictionary
 		location = (MSA,) #pass the MSA nubmers as a tuple to Psycopg2 (doesn't take singletons)
-
-		SQL = getattr(self.queries, self.count_string)()
+		conditions = getattr(self.queries, ('table_' + self.report_number.replace(' ','_').replace('-','_') +'_conditions'))()
+		SQL = (self.queries.SQL_Count + conditions).format(year=self.year, MSA=MSA)
 		cur.execute(SQL, location)
 		count = int(cur.fetchone()[0])
-		#table_X =
+
 		if count > 0:
 			print count, 'LAR rows in MSA %s, for report %s, in %s' %(MSA, self.report_number, self.year)
+			if self.report_number[2] == '4' or self.report_number[2] == '5':
+				self.report_number = self.report_number[:4] + 'x' #'A 4-1'
+			columns = getattr(self.queries, ('table_' + self.report_number[2:].replace(' ','_').replace('-','_')+'_columns'))()
 
-			SQL = getattr(self.queries, self.query_string)()
+			SQL = (self.queries.SQL_Query + conditions).format(columns=columns, year=self.year, MSA=MSA)
+
 			cur.execute(SQL, location)
-
 			for num in range(0, count):
 				row = cur.fetchone()
 				getattr(self.parsed, self.parse_function)(row)
 				if num == 0:
 					build_X.set_header(self.parsed.inputs, MSA, report_type, table_number)
 					table_X = getattr(build_X, self.json_builder)()
+
 				getattr(self.agg, self.aggregation)(table_X, self.parsed.inputs)
 
 			if self.report_number[2:] == '3-2': #report 3-2 requires out of loop aggregation functions
@@ -68,6 +70,7 @@ class report_4x(constructor):
 				self.agg.by_weighted_mean(table_X, self.parsed.inputs)
 				self.agg.by_weighted_median(table_X, self.parsed.inputs)
 				self.agg.by_mean(table_X, self.parsed.inputs)
+
 			path = "../" +table_X['type']+"/"+table_X['year']+"/"+build_X.get_state_name(table_X['msa']['state']).replace(' ', '-').lower()+"/"+build_X.msa_names[MSA].replace(' ', '-').lower()+"/"+table_X['table']
 			if not os.path.exists(path): #check if path exists
 				os.makedirs(path) #if path not present, create it
@@ -86,6 +89,8 @@ class report_4x(constructor):
 			return 'build_report_32'
 		elif report_number[:3] == 'A 4':
 			return 'build_report4x'
+		elif report_number[:3] == 'A 5':
+			return 'build_report5x'
 
 	def JSON_constructor_return(self, report_number):
 		if report_number == 'A 3-1':
@@ -94,6 +99,8 @@ class report_4x(constructor):
 			return 'table_32_builder'
 		elif report_number[:3] == 'A 4':
 			return 'table_4x_builder'
+		elif report_number[:3] == 'A 5':
+			return 'table_5x_builder'
 
 	def parse_return(self, report_number):
 		if report_number == 'A 3-1':
@@ -102,84 +109,7 @@ class report_4x(constructor):
 			return 'parse_t32'
 		elif report_number[:3] == 'A 4':
 			return 'parse_t4x'
+		elif report_number[:3] == 'A 5':
+			return 'parse_t5x'
 
-	def query_return(self, year, report_number):
-		if year == '2013':
-			if report_number == 'A 3-1':
-				return 'table_3_1_2013'
-			elif report_number == 'A 3-2':
-				return 'table_3_2_2013'
-			elif report_number == 'A 4-1':
-				return 'table_4_1_2013'
-			elif report_number == 'A 4-2':
-				return 'table_4_2_2013'
-			elif report_number == 'A 4-3':
-				return 'table_4_3_2013'
-			elif report_number == 'A 4-4':
-				return 'table_4_4_2013'
-			elif report_number == 'A 4-5':
-				return 'table_4_5_2013'
-			elif report_number == 'A 4-6':
-				return 'table_4_6_2013'
-			elif report_number == 'A 4-7':
-				return 'table_4_7_2013'
-		elif year == '2012':
-			if report_number == 'A 3-1':
-				return 'table_3_1_2012'
-			elif report_number == 'A 3-2':
-				return 'table_3_2_2012'
-			elif report_number == 'A 4-1':
-				return 'table_4_1_2012'
-			elif report_number == 'A 4-2':
-				return 'table_4_2_2012'
-			elif report_number == 'A 4-3':
-				return 'table_4_3_2012'
-			elif report_number == 'A 4-4':
-				return 'table_4_4_2012'
-			elif report_number == 'A 4-5':
-				return 'table_4_5_2012'
-			elif report_number == 'A 4-6':
-				return 'table_4_6_2012'
-			elif report_number == 'A 4-7':
-				return 'table_4_7_2012'
-
-	def count_return(self, year, report_number):
-		if year == '2013':
-			if report_number == 'A 3-1':
-				return 'count_rows_2013'
-			elif report_number == 'A 3-2':
-				return 'count_rows_2013'
-			elif report_number == 'A 4-1':
-				return 'count_rows_41_2013'
-			elif report_number == 'A 4-2':
-				return 'count_rows_42_2013'
-			elif report_number == 'A 4-3':
-				return 'count_rows_43_2013'
-			elif report_number == 'A 4-4':
-				return 'count_rows_44_2013'
-			elif report_number == 'A 4-5':
-				return 'count_rows_45_2013'
-			elif report_number == 'A 4-6':
-				return 'count_rows_46_2013'
-			elif report_number == 'A 4-7':
-				return 'count_rows_47_2013'
-		elif year == '2012':
-			if report_number == 'A 3-1':
-				return 'count_rows_2012'
-			elif report_number == 'A 3-2':
-				return 'count_rows_2012'
-			elif report_number == 'A 4-1':
-				return 'count_rows_41_2012'
-			elif report_number == 'A 4-2':
-				return 'count_rows_42_2012'
-			elif report_number == 'A 4-3':
-				return 'count_rows_43_2012'
-			elif report_number == 'A 4-4':
-				return 'count_rows_44_2012'
-			elif report_number == 'A 4-5':
-				return 'count_rows_45_2012'
-			elif report_number == 'A 4-6':
-				return 'count_rows_46_2012'
-			elif report_number == 'A 4-7':
-				return 'count_rows_47_2012'
 
