@@ -10,7 +10,7 @@ gender_list = ['Male', 'Female', 'Joint (Male/Female)']
 ethnicity_names = ['Hispanic or Latino', 'Not Hispanic or Latino', 'Joint (Hispanic or Latino/Not Hispanic or Latino', 'Ethnicity Not Available']
 minority_statuses = ['White Non-Hispanic', 'Others, Including Hispanic']
 applicant_income_bracket = ['Less than 50% of MSA/MD median', '50-79% of MSA/MD median', '80-99% of MSA/MD median', '100-119% of MSA/MD median', '120% or more of MSA/MD median', 'income not available']
-
+tract_pct_minority = ['Less than 10% minority', '10-19% minority', '20-49% minority', '50-79% minority', '80-100% minority']
 def set_41_dispositions(holding_list): #this function sets the purchasers section of report 3-2
 	dispositions = []
 	for item in disp_list:
@@ -41,14 +41,14 @@ def table_41_builder():
 
 def set_41_races():
 	races = []
-	for race in race_names:
+	for race in tract_pct_minority:
 		holding = OrderedDict({})
 		holding['race'] = "{}".format(race)
 		races.append(holding)
 	container['races'] = races
 	for i in range(0,len(container['races'])):
 		container['races'][i]['dispositions'] = set_41_dispositions(holding_list)
-		container['races'][i]['genders'] = set_41_gender()
+		#container['races'][i]['genders'] = set_41_gender()
 
 def set_41_ethnicity():
 	ethnicities = []
@@ -59,7 +59,7 @@ def set_41_ethnicity():
 	container['ethnicities'] = ethnicities
 	for i in range(0, len(container['ethnicities'])):
 		container['ethnicities'][i]['dispositions'] = set_41_dispositions(holding_list)
-		container['ethnicities'][i]['genders'] = set_41_gender()
+		#container['ethnicities'][i]['genders'] = set_41_gender()
 
 def set_41_minority():
 	minoritystatuses = []
@@ -70,7 +70,7 @@ def set_41_minority():
 	container['minoritystatuses'] = minoritystatuses
 	for i in range(0, len(container['minoritystatuses'])):
 		container['minoritystatuses'][i]['dispositions'] = set_41_dispositions(holding_list)
-		container['minoritystatuses'][i]['genders'] = set_41_gender()
+		#container['minoritystatuses'][i]['genders'] = set_41_gender()
 
 def set_41_incomes():
 	applicantincomes = []
@@ -81,8 +81,8 @@ def set_41_incomes():
 	container['incomes'] = applicantincomes
 	for i in range(0, len(container['incomes'])):
 		container['incomes'][i]['dispositions'] = set_41_dispositions(holding_list)
-		container['incomes'][i]['dispositions'] = set_41_gender()
-	container['total'] = set_dispositions(holding_list)
+		#container['incomes'][i]['dispositions'] = set_41_gender()
+	container['total'] = set_41_dispositions(holding_list)
 
 table_41_builder()
 print json.dumps(container, indent=4)

@@ -429,7 +429,7 @@ class build_JSON(AD_report):
 					'IA':'19', 'AZ':'04', 'ID':'16', 'ME':'23', 'MD':'24', 'MA':'25', 'UT':'49', 'MO':'29', 'MN':'27', 'MI':'26', 'MT':'30', 'MS':'29', 'DC':'11'}
 		self.msa_names = {} #holds the msa names for use in directory paths when writing JSON objects
 		self.state_msa_list = {} #holds a dictionary of msas in state by id number and name
-		self.dispositions_list = ['Applications Received', 'Loans Originated', 'Apps. Approved But Not Accepted', 'Aplications Denied', 'Applications Withdrawn', 'Files Closed For Incompleteness']
+		self.dispositions_list = ['Applications Received', 'Loans Originated', 'Apps. Approved But Not Accepted', 'Applications Denied', 'Applications Withdrawn', 'Files Closed For Incompleteness']
 		self.gender_list = ['Male', 'Female', 'Joint (Male/Female)']
 		self.end_points = ['count', 'value']
 	def msas_in_state(self, cursor, selector, report_type):
@@ -561,7 +561,7 @@ class build_JSON(AD_report):
 		self.container['msa'] = self.msa
 		return self.container
 
-	def set_stuff(self, end_points, thing_list, thing_singular):
+	def set_stuff(self, thing_list, thing_singular):
 		listyness = []
 		for thing in thing_list:
 			things_holding = OrderedDict({})
@@ -573,7 +573,7 @@ class build_JSON(AD_report):
 		income_brackets = []
 		for bracket in self.applicant_income_bracket[:-1]:
 			income_holding = OrderedDict({})
-			income_holding['incomebracket'] = "{}".format(bracket)
+			income_holding['applicantincome'] = "{}".format(bracket)
 			income_brackets.append(income_holding)
 		return income_brackets
 
@@ -581,23 +581,56 @@ class build_JSON(AD_report):
 		pass
 
 	def table_5x_builder(self):
+		borrower_characteristics = ['Race', 'Ethnicity', 'Minority Status']
+		borrower_characteristics_plural = ['races', 'ethnicities', 'minoritystatuses']
 		income_brackets= []
-		self.container['incomebrackets'] = self.set_income_brackets()
-		income_brackets= []
-		self.container['incomebrackets'] = self.set_income_brackets()
-		for i in range(0,len(self.container['incomebrackets'])):
-			self.container['incomebrackets'][i]['races'] = self.set_stuff(self.end_points, self.race_names, 'race')
-			for j in range(0, len(self.container['incomebrackets'][i]['races'])):
-				self.container['incomebrackets'][i]['races'][j]['dispositions'] = self.set_dispositions(self.end_points)
+		self.container['applicantincomes'] = self.set_income_brackets()
+		race_holding = OrderedDict({})
+		race_holding['characteristic'] = 'Race'
+		race_holding['races'] = self.set_stuff(self.race_names, 'race')
+		for i in range(0,len(race_holding['races'])):
+			race_holding['races'][i]['dispositions'] = self.set_dispositions(self.end_points)
 
-			self.container['incomebrackets'][i]['ethnicities'] = self.set_stuff(self.end_points, self.ethnicity_names, 'ethnicity')
-			for j in range(0, len(self.container['incomebrackets'][i]['ethnicities'])):
-				self.container['incomebrackets'][i]['ethnicities'][j]['dispositions'] = self.set_dispositions(self.end_points)
+		ethnicity_holding = OrderedDict({})
+		ethnicity_holding['characteristic'] = 'Ethnicity'
+		ethnicity_holding['ethnicities'] = self.set_stuff(self.ethnicity_names, 'ethnicity')
+		for i in range(0,len(ethnicity_holding['ethnicities'])):
+			ethnicity_holding['ethnicities'][i]['dispositions'] = self.set_dispositions(self.end_points)
 
-			self.container['incomebrackets'][i]['minoritystatuses'] = self.set_stuff(self.end_points, self.minority_statuses, 'minoritystatus')
-			for j in range(0, len(self.container['incomebrackets'][i]['minoritystatuses'])):
-				self.container['incomebrackets'][i]['minoritystatuses'][j]['dispositions'] = self.set_dispositions(self.end_points)
+		minoritystatus_holding = OrderedDict({})
+		minoritystatus_holding['characteristic'] = 'Minority Status'
+		minoritystatus_holding['minoritystatus'] = self.set_stuff(self.minority_statuses, 'minoritystatus')
+		for i in range(0,len(minoritystatus_holding['minoritystatus'])):
+			minoritystatus_holding['minoritystatus'][i]['dispositions'] = self.set_dispositions(self.end_points)
+		#make lists of borrower characterisitics
+		for i in range(0,len(self.container['applicantincomes'])):
+			self.container['applicantincomes'][i]['borrowercharacteristics'] = []
+			self.container['applicantincomes'][i]['borrowercharacteristics'].append(race_holding)
+			self.container['applicantincomes'][i]['borrowercharacteristics'].append(ethnicity_holding)
+			self.container['applicantincomes'][i]['borrowercharacteristics'].append(minoritystatus_holding)
+		#for i in range(0,len(self.container['applicantincomes'])):
+		#	for characteristic in borrower_characteristics_plural:
+		#		if characteristic == 'races':
+		#			self.container['applicantincomes'][0]['borrowercharacteristics'][0][characteristic] = self.set_stuff(self.end_points, self.race_names, 'race')
+				#elif characteristic == 'ethnicities':
+				#	self.container['applicantincomes'][i]['borrowercharacteristics'][characteristic] = self.set_stuff(self.end_points, self.ethnicity_names, 'ethnicity')
+				#elif characteristic == 'minoritystatuses':
+				#	self.container['applicantincomes'][i]['borrowercharacteristics'][characteristic] = self.set_stuff(self.end_points, self.minority_statuses, 'minoritystatus')
+		'''
+		self.container['applicantincomes'][i]['races'] = self.set_stuff(self.end_points, self.race_names, 'race')
+		for j in range(0, len(self.container['applicantincomes'][i]['races'])):
+			self.container['applicantincomes'][i]['races'][j]['dispositions'] = self.set_dispositions(self.end_points)
+
+		self.container['applicantincomes'][i]['ethnicities'] = self.set_stuff(self.end_points, self.ethnicity_names, 'ethnicity')
+		for j in range(0, len(self.container['applicantincomes'][i]['ethnicities'])):
+			self.container['applicantincomes'][i]['ethnicities'][j]['dispositions'] = self.set_dispositions(self.end_points)
+
+		self.container['applicantincomes'][i]['minoritystatuses'] = self.set_stuff(self.end_points, self.minority_statuses, 'minoritystatus')
+		for j in range(0, len(self.container['applicantincomes'][i]['minoritystatuses'])):
+			self.container['applicantincomes'][i]['minoritystatuses'][j]['dispositions'] = self.set_dispositions(self.end_points)
+		'''
 		self.container['total'] = self.set_dispositions(self.end_points)
+		#self.print_JSON()
 		return self.container
 	def set_dispositions(self, end_points): #builds the dispositions of applications section of report 4-1 JSON
 		dispositions = []
@@ -1217,26 +1250,26 @@ class aggregate(AD_report): #aggregates LAR rows by appropriate characteristics 
 			pass
 		else:
 
-			container['incomebrackets'][inputs['income bracket']]['races'][inputs['race']]['dispositions'][0]['count'] +=1 #increment count of applications received
-			container['incomebrackets'][inputs['income bracket']]['races'][inputs['race']]['dispositions'][0]['value'] += int(inputs['loan value']) #increment value of applications received
-			container['incomebrackets'][inputs['income bracket']]['races'][inputs['race']]['dispositions'][inputs['action taken']]['count'] +=1 #increment count of action taken by race category
-			container['incomebrackets'][inputs['income bracket']]['races'][inputs['race']]['dispositions'][inputs['action taken']]['value'] += int(inputs['loan value']) #increment value of action taken by race category
+			container['applicantincomes'][inputs['income bracket']]['borrowercharacteristics'][0]['races'][inputs['race']]['dispositions'][0]['count'] +=1 #increment count of applications received
+			container['applicantincomes'][inputs['income bracket']]['borrowercharacteristics'][0]['races'][inputs['race']]['dispositions'][0]['value'] += int(inputs['loan value']) #increment value of applications received
+			container['applicantincomes'][inputs['income bracket']]['borrowercharacteristics'][0]['races'][inputs['race']]['dispositions'][inputs['action taken']]['count'] +=1 #increment count of action taken by race category
+			container['applicantincomes'][inputs['income bracket']]['borrowercharacteristics'][0]['races'][inputs['race']]['dispositions'][inputs['action taken']]['value'] += int(inputs['loan value']) #increment value of action taken by race category
 	def by_5x_ethnicity(self, container, inputs):
 		if inputs['income bracket'] > 4 or inputs['action taken'] > 5:
 			pass
 		else:
-			container['incomebrackets'][inputs['income bracket']]['ethnicities'][inputs['ethnicity']]['dispositions'][0]['count'] +=1 #increment count of applications received by ethnicity
-			container['incomebrackets'][inputs['income bracket']]['ethnicities'][inputs['ethnicity']]['dispositions'][0]['value'] +=int(inputs['loan value']) #increment value of applications received by ethnicity
-			container['incomebrackets'][inputs['income bracket']]['ethnicities'][inputs['ethnicity']]['dispositions'][inputs['action taken']]['count'] +=1 #increment count of action taken by ethnicity
-			container['incomebrackets'][inputs['income bracket']]['ethnicities'][inputs['ethnicity']]['dispositions'][inputs['action taken']]['value'] +=int(inputs['loan value']) #increment value of action taken by ethnicity
+			container['applicantincomes'][inputs['income bracket']]['borrowercharacteristics'][1]['ethnicities'][inputs['ethnicity']]['dispositions'][0]['count'] +=1 #increment count of applications received by ethnicity
+			container['applicantincomes'][inputs['income bracket']]['borrowercharacteristics'][1]['ethnicities'][inputs['ethnicity']]['dispositions'][0]['value'] +=int(inputs['loan value']) #increment value of applications received by ethnicity
+			container['applicantincomes'][inputs['income bracket']]['borrowercharacteristics'][1]['ethnicities'][inputs['ethnicity']]['dispositions'][inputs['action taken']]['count'] +=1 #increment count of action taken by ethnicity
+			container['applicantincomes'][inputs['income bracket']]['borrowercharacteristics'][1]['ethnicities'][inputs['ethnicity']]['dispositions'][inputs['action taken']]['value'] +=int(inputs['loan value']) #increment value of action taken by ethnicity
 	def by_5x_minoritystatus(self, container, inputs):
 		if inputs['income bracket'] > 4 or inputs['action taken'] > 5 or inputs['minority status'] > 1:
 			pass
 		else:
-			container['incomebrackets'][inputs['income bracket']]['minoritystatuses'][inputs['minority status']]['dispositions'][0]['count'] += 1 #increment count of applications received by minority status
-			container['incomebrackets'][inputs['income bracket']]['minoritystatuses'][inputs['minority status']]['dispositions'][0]['value'] += int(inputs['loan value']) #increment value of applications received by minority status
-			container['incomebrackets'][inputs['income bracket']]['minoritystatuses'][inputs['minority status']]['dispositions'][inputs['action taken']]['count'] += 1 #increment count by action taken and minority status
-			container['incomebrackets'][inputs['income bracket']]['minoritystatuses'][inputs['minority status']]['dispositions'][inputs['action taken']]['value'] += int(inputs['loan value']) #incrment value by action taken and minority status
+			container['applicantincomes'][inputs['income bracket']]['borrowercharacteristics'][2]['minoritystatus'][inputs['minority status']]['dispositions'][0]['count'] += 1 #increment count of applications received by minority status
+			container['applicantincomes'][inputs['income bracket']]['borrowercharacteristics'][2]['minoritystatus'][inputs['minority status']]['dispositions'][0]['value'] += int(inputs['loan value']) #increment value of applications received by minority status
+			container['applicantincomes'][inputs['income bracket']]['borrowercharacteristics'][2]['minoritystatus'][inputs['minority status']]['dispositions'][inputs['action taken']]['count'] += 1 #increment count by action taken and minority status
+			container['applicantincomes'][inputs['income bracket']]['borrowercharacteristics'][2]['minoritystatus'][inputs['minority status']]['dispositions'][inputs['action taken']]['value'] += int(inputs['loan value']) #incrment value by action taken and minority status
 
 	def build_report7x(self, table7x, inputs):
 		pass
