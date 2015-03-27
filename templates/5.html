@@ -1,0 +1,141 @@
+<script id="5" type="text/template">
+	{{> tablebanner}}
+
+	<table class="table report">
+		<thead>
+			<tr>
+				<th width="20%">Income, Race and Ethnicity</th>
+				<th class="purchaser" colspan="2" valign="bottom" width="13.33333%">Applications Received<a href="/hmda-viz-prototype/footnotes/{{year}}/#20"><sup>20</sup></a></th>
+				<th class="purchaser" colspan="2" valign="bottom" width="13.33333%">Loans Originated</th>
+				<th class="purchaser" colspan="2" valign="bottom" width="13.33333%">Apps. Approved But Not Accepted</th>
+				<th class="purchaser" colspan="2" valign="bottom" width="13.33333%">Appliations Denied</th>
+				<th class="purchaser" colspan="2" valign="bottom" width="13.33333%">Applications Withdrawn</th>
+				<th class="purchaser" colspan="2" valign="bottom" width="13.33333%">Files Closed For Incompleteness</th>
+			</tr>
+			<tr class="heading">
+				<th></th>
+				<th>Number</th>
+				<th>$000s</th>
+				<th>Number</th>
+				<th>$000s</th>
+				<th>Number</th>
+				<th>$000s</th>
+				<th>Number</th>
+				<th>$000s</th>
+				<th>Number</th>
+				<th>$000s</th>
+				<th>Number</th>
+				<th>$000s</th>
+			</tr>
+
+		</thead>
+		<tbody>
+			{{#incomebrackets}}
+				<tr class="characteristic">
+					<td colspan="13">{{incomebracket}}</td>
+				</tr>
+				{{#races}}
+				<tr class="characteristic">
+					<td colspan="13">{{race}}</td>
+				</tr>
+				{{#dispositions}}
+				<tr>
+					<td>
+					<td>{{#addCommas}}{{count}}{{/addCommas}}</td>
+					<td>{{#addCommas}}{{value}}{{/addCommas}}</td>
+				</tr>
+				{{/dispositions}}
+			{{/incomebrackets}}
+		</tbody>
+	</table>
+
+	<table class="table report">
+		<thead>
+			<tr>
+				<th width="20%">Ethnicity, Gender and Income <a href="/hmda-viz-prototype/footnotes/{{year}}/#7"><sup>7</sup></a> <a href="/hmda-viz-prototype/footnotes/{{year}}/#18"><sup>18</sup></a> <a href="/hmda-viz-prototype/footnotes/{{year}}/#19"><sup>19</sup></a></th>
+				<th class="purchaser" colspan="2" valign="bottom" width="13.33333%">Applications Received</th>
+				<th class="purchaser" colspan="2" valign="bottom" width="13.33333%">Loans Originated</th>
+				<th class="purchaser" colspan="2" valign="bottom" width="13.33333%">Apps. Approved But Not Accepted</th>
+				<th class="purchaser" colspan="2" valign="bottom" width="13.33333%">Appliations Denied</th>
+				<th class="purchaser" colspan="2" valign="bottom" width="13.33333%">Applications Withdrawn</th>
+				<th class="purchaser" colspan="2" valign="bottom" width="13.33333%">Files Closed For Incompleteness</th>
+			</tr>
+			<tr class="heading">
+				<th></th>
+				<th>Number</th>
+				<th>$000s</th>
+				<th>Number</th>
+				<th>$000s</th>
+				<th>Number</th>
+				<th>$000s</th>
+				<th>Number</th>
+				<th>$000s</th>
+				<th>Number</th>
+				<th>$000s</th>
+				<th>Number</th>
+				<th>$000s</th>
+			</tr>
+
+		</thead>
+		<tbody>
+			{{#ethnicities}}
+				<tr class="characteristic">
+					<td>{{#footnote}}{{ethnicity}}{{/footnote}} (TOTAL)</td>
+					{{#dispositions}}
+					<td>{{#addCommas}}{{count}}{{/addCommas}}</td>
+					<td>{{#addCommas}}{{value}}{{/addCommas}}</td>
+					{{/dispositions}}
+				</tr>
+				{{#genders}}
+				<tr>
+					<td>{{gender}}</td>
+					{{#dispositions}}
+					<td>{{#addCommas}}{{count}}{{/addCommas}}</td>
+					<td>{{#addCommas}}{{value}}{{/addCommas}}</td>
+					{{/dispositions}}
+				{{/genders}}
+			{{/ethnicities}}
+			<tr class="characteristic">
+				<td colspan="13">Minority Status <a href="/hmda-viz-prototype/footnotes/{{year}}/#8"><sup>8</sup></a> <a href="/hmda-viz-prototype/footnotes/{{year}}/#18"><sup>18</sup></a> <a href="/hmda-viz-prototype/footnotes/{{year}}/#19"><sup>19</sup></a></td>
+			</tr>
+			{{#minoritystatuses}}
+				<tr class="characteristic">
+					<td>{{minoritystatus}} (TOTAL)</td>
+					{{#dispositions}}
+					<td>{{#addCommas}}{{count}}{{/addCommas}}</td>
+					<td>{{#addCommas}}{{value}}{{/addCommas}}</td>
+					{{/dispositions}}
+				</tr>
+				{{#genders}}
+				<tr>
+					<td>{{gender}}</td>
+					{{#dispositions}}
+					<td>{{#addCommas}}{{count}}{{/addCommas}}</td>
+					<td>{{#addCommas}}{{value}}{{/addCommas}}</td>
+					{{/dispositions}}
+				{{/genders}}
+			{{/minoritystatuses}}
+			<tr class="characteristic">
+				<td colspan="13">Income of Applicants <a href="/hmda-viz-prototype/footnotes/{{year}}/#9"><sup>9</sup></a></td>
+			</tr>
+			{{#incomes}}
+				<tr>
+					<td>{{#footnote}}{{income}}{{/footnote}}</td>
+					{{#dispositions}}
+					<td>{{#addCommas}}{{count}}{{/addCommas}}</td>
+					<td>{{#addCommas}}{{value}}{{/addCommas}}</td>
+					{{/dispositions}}
+				</tr>
+			{{/incomes}}
+			<tr class="characteristic">
+				<td>Total <a href="/hmda-viz-prototype/footnotes/{{year}}/#14"><sup>14</sup></a></td>
+				{{#total}}
+				<td>{{#addCommas}}{{count}}{{/addCommas}}</td>
+				<td>{{#addCommas}}{{value}}{{/addCommas}}</td>
+				{{/total}}
+			</tr>
+		</tbody>
+	</table>
+
+	{{> tabledate}}
+</script>
