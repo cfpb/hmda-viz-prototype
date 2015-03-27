@@ -608,29 +608,8 @@ class build_JSON(AD_report):
 			self.container['applicantincomes'][i]['borrowercharacteristics'].append(race_holding)
 			self.container['applicantincomes'][i]['borrowercharacteristics'].append(ethnicity_holding)
 			self.container['applicantincomes'][i]['borrowercharacteristics'].append(minoritystatus_holding)
-		#for i in range(0,len(self.container['applicantincomes'])):
-		#	for characteristic in borrower_characteristics_plural:
-		#		if characteristic == 'races':
-		#			self.container['applicantincomes'][0]['borrowercharacteristics'][0][characteristic] = self.set_stuff(self.end_points, self.race_names, 'race')
-				#elif characteristic == 'ethnicities':
-				#	self.container['applicantincomes'][i]['borrowercharacteristics'][characteristic] = self.set_stuff(self.end_points, self.ethnicity_names, 'ethnicity')
-				#elif characteristic == 'minoritystatuses':
-				#	self.container['applicantincomes'][i]['borrowercharacteristics'][characteristic] = self.set_stuff(self.end_points, self.minority_statuses, 'minoritystatus')
-		'''
-		self.container['applicantincomes'][i]['races'] = self.set_stuff(self.end_points, self.race_names, 'race')
-		for j in range(0, len(self.container['applicantincomes'][i]['races'])):
-			self.container['applicantincomes'][i]['races'][j]['dispositions'] = self.set_dispositions(self.end_points)
 
-		self.container['applicantincomes'][i]['ethnicities'] = self.set_stuff(self.end_points, self.ethnicity_names, 'ethnicity')
-		for j in range(0, len(self.container['applicantincomes'][i]['ethnicities'])):
-			self.container['applicantincomes'][i]['ethnicities'][j]['dispositions'] = self.set_dispositions(self.end_points)
-
-		self.container['applicantincomes'][i]['minoritystatuses'] = self.set_stuff(self.end_points, self.minority_statuses, 'minoritystatus')
-		for j in range(0, len(self.container['applicantincomes'][i]['minoritystatuses'])):
-			self.container['applicantincomes'][i]['minoritystatuses'][j]['dispositions'] = self.set_dispositions(self.end_points)
-		'''
 		self.container['total'] = self.set_dispositions(self.end_points)
-		#self.print_JSON()
 		return self.container
 	def set_dispositions(self, end_points): #builds the dispositions of applications section of report 4-1 JSON
 		dispositions = []
