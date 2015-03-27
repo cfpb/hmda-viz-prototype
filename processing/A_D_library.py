@@ -241,7 +241,6 @@ class parse_inputs(AD_report):
 		self.inputs['loan value'] = float(row['loanamount']) #loan value rounded to the nearest thousand
 		self.inputs['action taken'] = int(row['actiontype']) #disposition of the loan application
 		self.inputs['minority percent'] = row['minoritypopulationpct'] #%of population that is minority
-
 		self.inputs['tract to MSA income'] = row['tract_to_msa_md_income'] #ratio of tract to msa/md income
 		self.inputs['tract income index'] = MSA_index.tract_to_MSA_income(self.inputs) #sets the tract to msa income ratio to an index for aggregation (low,
 
@@ -569,22 +568,30 @@ class build_JSON(AD_report):
 			listyness.append(things_holding)
 		return listyness
 
-	def set_income_brackets(self):
-		income_brackets = []
-		for bracket in self.applicant_income_bracket[:-1]:
-			income_holding = OrderedDict({})
-			income_holding['applicantincome'] = "{}".format(bracket)
-			income_brackets.append(income_holding)
-		return income_brackets
+	def set_brackets(self, bracket_singular, bracket_list):
+		brackets = []
+		for bracket in bracket_list:
+			holding = OrderedDict({})
+			holding[bracket_singular] = "{}".format(bracket)
+			brackets.append(holding)
+		return brackets
 
 	def table_7x_builder(self):
-		pass
-
+		self.container['racial_ethnic_composition'] = self.set_brackets('race', self.tract_pct_minority)
+		for i in range(0,len(self.container['racial_ethnic_composition'])):
+			self.container['racial_ethnic_composition'][i]['dispositions'] = self.set_dispositions(self.end_points)
+		self.container['incomecharacteristics'] = self.set_brackets('income', self.tract_income)
+		for i in range(0,len(self.container['incomecharacteristics'])):
+			self.container['incomecharacteristics'][i]['dispositions'] = self.set_dispositions(self.end_points)
+		self.container['income&racial/ethnic_composition'] = self.set_brackets('income', self.tract_income)
+		for i in range(0, len(self.container['income&racial/ethnic_composition'])):
+			self.container['income&racial/ethnic_composition'][i]['racial_ethnic_composition'] = self.set_brackets('race', self.tract_pct_minority)
+			for j in range(0, len(self.container['income&racial/ethnic_composition'][i]['racial_ethnic_composition'])):
+				self.container['income&racial/ethnic_composition'][i]['racial_ethnic_composition'][j]['disposition'] = self.set_dispositions(self.end_points)
+		return self.container
 	def table_5x_builder(self):
-		borrower_characteristics = ['Race', 'Ethnicity', 'Minority Status']
-		borrower_characteristics_plural = ['races', 'ethnicities', 'minoritystatuses']
-		income_brackets= []
-		self.container['applicantincomes'] = self.set_income_brackets()
+
+		self.container['applicantincomes'] = self.set_brackets('income', self.applicant_income_bracket[:-1])
 		race_holding = OrderedDict({})
 		race_holding['characteristic'] = 'Race'
 		race_holding['races'] = self.set_stuff(self.race_names, 'race')
@@ -611,6 +618,7 @@ class build_JSON(AD_report):
 
 		self.container['total'] = self.set_dispositions(self.end_points)
 		return self.container
+
 	def set_dispositions(self, end_points): #builds the dispositions of applications section of report 4-1 JSON
 		dispositions = []
 		for item in self.dispositions_list:

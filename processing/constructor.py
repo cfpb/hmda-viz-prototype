@@ -58,9 +58,12 @@ class report_4x(constructor):
 			cur.execute(SQL, location)
 			for num in range(0, count):
 				row = cur.fetchone()
+				#print row
 				getattr(self.parsed, self.parse_function)(row)
+				#print self.parsed.inputs['tract income index']
 				if num == 0:
 					build_X.set_header(self.parsed.inputs, MSA, report_type, table_number)
+
 					table_X = getattr(build_X, self.json_builder)()
 
 				getattr(self.agg, self.aggregation)(table_X, self.parsed.inputs)

@@ -14,15 +14,6 @@ def write_JSON(name, data): #writes a json object to file
 	with open(name, 'w') as outfile: #writes the JSON structure to a file for the path named by report's header structure
 		json.dump(data, outfile, indent=4, ensure_ascii = False)
 
-def table_7x_builder():
-	container['racial_ethnic_composition'] = set_brackets('race', tract_pct_minority)
-	for i in range(0,len(container['racial/ethnic composition'])):
-		container['racial/ethnic composition'][i]['dispositions'] = set_stuff(end_points, dispositions_list, 'disposition')
-		#container['racial/ethnic composition'][i]['race'] = set_stuff(end_points, tract_income, 'income')
-		#for j in range(0, len(container['racial/ethnic composition'][i]['dispositions'])):
-		#	container['racial/ethnic composition'][i]['dispositions'][j] = set_stuff(end_points, dispositions_list, 'disposition')
-	container['incomecharacteristics'] = set_brackets('income', tract_income)
-
 def set_brackets(bracket_singular, bracket_list):
 	brackets = []
 	for bracket in bracket_list:
@@ -31,13 +22,27 @@ def set_brackets(bracket_singular, bracket_list):
 		brackets.append(holding)
 	return brackets
 
-def set_stuff(end_points, thing_list, thing_singular):
-	listyness = []
-	for thing in thing_list:
-		things_holding = OrderedDict({})
-		things_holding[thing_singular] = "{}".format(thing)
-		listyness.append(things_holding)
-	return listyness
+def set_dispositions(end_points): #builds the dispositions of applications section of report 4-1 JSON
+	dispositions = []
+	for item in dispositions_list:
+		dispositionsholding = OrderedDict({})
+		dispositionsholding['disposition'] = "{}".format(item)
+		dispositions.append(dispositionsholding)
+		for point in end_points:
+			dispositionsholding[point] = 0
+	return dispositions
+def table_7x_builder():
+	container['racial_ethnic_composition'] = set_brackets('race', tract_pct_minority)
+	for i in range(0,len(container['racial_ethnic_composition'])):
+		container['racial_ethnic_composition'][i]['dispositions'] = set_dispositions(end_points)
+	container['incomecharacteristics'] = set_brackets('income', tract_income)
+	for i in range(0,len(container['incomecharacteristics'])):
+		container['incomecharacteristics'][i]['dispositions'] = set_dispositions(end_points)
+	container['income&racial/ethnic_composition'] = set_brackets('income', tract_income)
+	for i in range(0, len(container['income&racial/ethnic_composition'])):
+		container['income&racial/ethnic_composition'][i]['racial_ethnic_composition'] = set_brackets('race', tract_pct_minority)
+		for j in range(0, len(container['income&racial/ethnic_composition'][i]['racial_ethnic_composition'])):
+			container['income&racial/ethnic_composition'][i]['racial_ethnic_composition'][j]['disposition'] = set_dispositions(end_points)
 
 table_7x_builder()
 
