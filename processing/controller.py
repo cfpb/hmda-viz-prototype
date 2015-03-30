@@ -43,10 +43,17 @@ selector.report_list['A 5-5'] = AL_MSAs
 selector.report_list['A 5-6'] = AL_MSAs
 selector.report_list['A 5-7'] = AL_MSAs
 selector.report_list['A 7-1'] = AL_MSAs
+selector.report_list['A 7-2'] = AL_MSAs
+selector.report_list['A 7-3'] = AL_MSAs
+selector.report_list['A 7-4'] = AL_MSAs
+selector.report_list['A 7-5'] = AL_MSAs
+selector.report_list['A 7-6'] = AL_MSAs
+selector.report_list['A 7-7'] = AL_MSAs
 #selector.report_list['A 7-1'] = ['11500']
-report_list = ['A 7-1']
-#report_list = ['A 5-1', 'A 5-2', 'A 5-3', 'A 5-4', 'A 5-5', 'A 5-6', 'A 5-7']
-#report_list = ['A 3-1', 'A 3-2', 'A 4-1', 'A 4-2', 'A 4-3', 'A 4-4', 'A 4-5', 'A 4-6', 'A 4-7', 'A 5-1'] #this needs to be changed to read from the input file
+#report_list = ['A 7-1']
+#report_list = ['A 5-1', 'A 5-2', 'A 5-3', 'A 5-4', 'A 5-5', 'A 5-7']
+report_list = ['A 7-1', 'A 7-2', 'A 7-3', 'A 7-4', 'A 7-5', 'A 7-6', 'A 7-7']
+#report_list = ['A 3-1', 'A 3-2', 'A 4-1', 'A 4-2', 'A 4-3', 'A 4-4', 'A 4-5', 'A 4-6', 'A 4-7', 'A 5-1', 'A 5-2', 'A 5-3', 'A 5-4', 'A 5-5', 'A 5-7'] #this needs to be changed to read from the input file
 
 
 for report in report_list: #loop over a list of report names
@@ -73,7 +80,7 @@ for report in report_list:
 '''
 #check_file must be run after reports are generated
 report_list = ['A 3-1', 'A 3-2', 'A 4-1', 'A 4-2', 'A 4-3', 'A 4-4', 'A 4-5', 'A 4-6', 'A 4-7'] #this needs to be changed to read from the input file
-#check_file = check_file(build_msa) #needs a report list, state list, and msa list
-#check_file.is_file('aggregate', selector.report_list['year'][0], report_list)
+check_file = check_file(build_msa) #needs a report list, state list, and msa list
+check_file.is_file('aggregate', selector.report_list['year'][0], report_list)
 
 

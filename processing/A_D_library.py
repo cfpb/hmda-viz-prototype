@@ -543,31 +543,30 @@ class build_JSON(AD_report):
 		elif table_num == '5-1':
 			return 'Disposition of applications for FHA, FSA/RHS, and VA home-purchase loans, 1- to 4-family and manufactured home dwellings, by income, race and ethnicity of applicant'
 		elif table_num == '5-2':
-			return
+			return 'Disposition of applications for conventional home-purchase loans, 1- to 4-family and manufactured home dwellings, by income race, and ethnicity of applicant'
 		elif table_num == '5-3':
-			return
+			return 'Disposition of applications to refinance loans on 1- to 4-family and manufactured home dwellings, by income, race and ethnicity of applicant'
 		elif table_num == '5-4':
-			return
-		elif table_num == '5-5':
-			return
+			return 'Disposition of applications for home improvement loans, 1- to 4-family and manufactured home dwellings, by income, race and ethnicity of applicant'
 		elif table_num == '5-6':
-			return
+			return 'Disposition of applications from nonoccupants for home-purchase, home improvement, or refinancing loans, 1- to 4-family and manufactured home dwellings, by income, race and ethnicity of applicant'
 		elif table_num == '5-7':
-			return
+			return 'Disposition of applications for home-purchase, home improvement, or refinancing loans, manufactured home dwellings, by income, race and ethnicity of applicant'
 		elif table_num =='7-1':
 			return 'Disposition of applications for FHA, FSA/RHS, and VA home-purchase loans, 1- to 4-family and manufactured home dwellings, by characteristics of census tract in which property is located'
 		elif table_num =='7-2':
 			return 'Disposition of applications for conventional home-purchase loans, 1- to 4-family and manufactured home dwellings, by characteristics of census tract in which property is located'
 		elif table_num =='7-3':
-			return
+			return 'Disposition of applications to refinance loans on 1- to 4-family and manufactured home dwellings, by characteristics of census tract in which property is located'
 		elif table_num =='7-4':
-			return
+			return 'Disposition of applications for home improvement loans, 1- to 4-family and manufactured home dwellings, by characteristics of census tract in which property is located'
 		elif table_num =='7-5':
-			return
+			return 'Disposition of applications for loans on dwellings for 5 or more families, by characteristics of census tract in which property is located'
 		elif table_num =='7-6':
-			return
+			return 'Disposition of applicationss from nonoccupatns for home-purchase, home improvement, or refinancing loans, 1- to 4-family and manufactured home dwellings, by characteristics of census tract in which property is located'
 		elif table_num =='7-7':
-			return
+			return 'Disposition of applications for home-purchase, home improvement, or refinancing loans, manufactured home dwellings, by characteristics of census tract in which property is located'
+
 	def set_header(self, inputs, MSA, table_type, table_num): #sets the header information of the JSON object
 		now = foo.datetime.now()
 		d = now.day
