@@ -36,11 +36,11 @@
 				</tr>
 				{{#borrowercharacteristics}}
 					<tr class="characteristic">
-						<td colspan="13">{{characteristic}}</td>
+						<td colspan="13">{{#footnote}}{{characteristic}}{{/footnote}}</td>
 					</tr>
 					{{#races}}
 					<tr>
-						<td>{{race}}</td>
+						<td>{{#footnote}}{{race}}{{/footnote}}</td>
 						{{#dispositions}}
 						<td>{{#addCommas}}{{count}}{{/addCommas}}</td>
 						<td>{{#addCommas}}{{value}}{{/addCommas}}</td>
@@ -49,7 +49,7 @@
 					{{/races}}
 					{{#ethnicities}}
 					<tr>
-						<td>{{ethnicity}}</td>
+						<td>{{#footnote}}{{ethnicity}}{{/footnote}}</td>
 						{{#dispositions}}
 						<td>{{#addCommas}}{{count}}{{/addCommas}}</td>
 						<td>{{#addCommas}}{{value}}{{/addCommas}}</td>
@@ -58,7 +58,7 @@
 					{{/ethnicities}}
 					{{#minoritystatus}}
 					<tr>
-						<td>{{minoritystatus}}</td>
+						<td>{{#footnote}}{{minoritystatus}}{{/footnote}}</td>
 						{{#dispositions}}
 						<td>{{#addCommas}}{{count}}{{/addCommas}}</td>
 						<td>{{#addCommas}}{{value}}{{/addCommas}}</td>
