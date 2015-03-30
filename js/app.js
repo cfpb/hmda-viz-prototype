@@ -91,6 +91,9 @@ function getTableData(table) {
                     case 'no reported pricing data':
                         footnote = 15;
                         break;
+                    case 'all other tracts':
+                        footnote = 21;
+                        break;
                     case 'mean':
                         footnote = 30;
                         break;
@@ -124,6 +127,9 @@ function getTableData(table) {
         }
         if (table.charAt(0) === '5') {
             table = '5';    // all 5's, 5-1 through 5-7, use the same table layout
+        }
+        if (table.charAt(0) === '7') {
+            table = '7';    // all 7's, 7-1 through 7-7, use the same table layout
         }
         // get partials
         // table banner
