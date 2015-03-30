@@ -122,6 +122,9 @@ function getTableData(table) {
         if (table.charAt(0) === '4') {
             table = '4';    // all 4's, 4-1 through 4-7, use the same table layout
         }
+        if (table.charAt(0) === '5') {
+            table = '5';    // all 5's, 5-1 through 5-7, use the same table layout
+        }
         // get partials
         // table banner
         $.get('/hmda-viz-prototype/templates/partials-tables.html', function(templates) {
