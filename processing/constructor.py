@@ -41,7 +41,9 @@ class report_4x(constructor):
 		#for MSA in selector.report_list[report_number]: #take this loop out
 		build_X = build()
 		build_X.set_msa_names(cur) #builds a list of msa names as a dictionary
+
 		location = (MSA,) #pass the MSA nubmers as a tuple to Psycopg2 (doesn't take singletons)
+		self.parsed.inputs['small county flag'] = self.agg.get_small_county_flag(cur, location)
 		conditions = getattr(self.queries, ('table_' + self.report_number.replace(' ','_').replace('-','_') +'_conditions'))()
 		SQL = (self.queries.SQL_Count + conditions).format(year=self.year, MSA=MSA)
 		cur.execute(SQL, location)
@@ -49,7 +51,7 @@ class report_4x(constructor):
 
 		if count > 0:
 			print count, 'LAR rows in MSA %s, for report %s, in %s' %(MSA, self.report_number, self.year)
-			if self.report_number[2] == '4' or self.report_number[2] == '5':
+			if self.report_number[2] == '4' or self.report_number[2] == '5' or self.report_number[2] == '7':
 				self.report_number = self.report_number[:4] + 'x' #'A 4-1'
 			columns = getattr(self.queries, ('table_' + self.report_number[2:].replace(' ','_').replace('-','_')+'_columns'))()
 
@@ -58,9 +60,12 @@ class report_4x(constructor):
 			cur.execute(SQL, location)
 			for num in range(0, count):
 				row = cur.fetchone()
+
 				getattr(self.parsed, self.parse_function)(row)
+
 				if num == 0:
 					build_X.set_header(self.parsed.inputs, MSA, report_type, table_number)
+
 					table_X = getattr(build_X, self.json_builder)()
 
 				getattr(self.agg, self.aggregation)(table_X, self.parsed.inputs)
@@ -91,6 +96,8 @@ class report_4x(constructor):
 			return 'build_report4x'
 		elif report_number[:3] == 'A 5':
 			return 'build_report5x'
+		elif report_number[:3] == 'A 7':
+			return 'build_report7x'
 
 	def JSON_constructor_return(self, report_number):
 		if report_number == 'A 3-1':
@@ -101,6 +108,8 @@ class report_4x(constructor):
 			return 'table_4x_builder'
 		elif report_number[:3] == 'A 5':
 			return 'table_5x_builder'
+		elif report_number[:3] == 'A 7':
+			return 'table_7x_builder'
 
 	def parse_return(self, report_number):
 		if report_number == 'A 3-1':
@@ -111,5 +120,6 @@ class report_4x(constructor):
 			return 'parse_t4x'
 		elif report_number[:3] == 'A 5':
 			return 'parse_t5x'
-
+		elif report_number[:3] == 'A 7':
+			return 'parse_t7x'
 
