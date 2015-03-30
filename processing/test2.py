@@ -1,65 +1,67 @@
-
-    #build tract income levelimport json
-import psycopg2
-import psycopg2.extras
 from collections import OrderedDict
-#import the parse_inputs class to store the 'inputs' dictionary
-
-from A_D_library import parse_inputs as parse
-from A_D_library import connect_DB as connect
-from A_D_library import build_JSON as build
-from A_D_library import aggregate as agg
-from A_D_library import queries
-#instantiate library functions
-parsed = parse()
-connection = connect()
-build = build()
-queries = queries()
-agg = agg()
-
-#set cursor object
-cur = connection.connect()
-
-#set MSA list
-MSA = '36540'
-location = (MSA,)
-
-#get count for looping over rows in the MSA
-SQL = queries.count_rows_2012() #get query text for getting count of loans for the MSA
-cur.execute(SQL, location) #ping the database for numbers!
-count = cur.fetchone() #get cont of rows for the MSA
-end = int(count[0]) #set count to an integer from a list of long type
-print end
+end_points = ['count', 'value']
+dispositions_list = ['Applications Received', 'Loans Originated', 'Apps. Approved But Not Accepted', 'Aplications Denied', 'Applications Withdrawn', 'Files Closed For Incompleteness']
+tract_income = ['Low income', 'Moderate income', 'Middle income', 'Upper income']
+tract_pct_minority = ['Less than 10% minority', '10-19% minority', '20-49% minority', '50-79% minority', '80-100% minority']
+container = {}
 
 
-#if report 3-1 is selected: need a function to read in report generation parameters
-SQL = queries.table_3_1()
-cur.execute(SQL, location)
+def print_JSON(): #prints a json object to the terminal
+	import json
+	print json.dumps(container, indent=4)
 
-#json_data = open('JSON_out.json')
-#cont = OrderedDict(json.load(json_data))
-cont = build.build_JSON(parsed.inputs, MSA)
-print cont
-print json.dumps(cont, indent=4)
-for num in range(0,end):
-    #print "in loop"
-    #fetch one row from the LAR
-    row = cur.fetchone()
-    parsed.parse_t31(row) #parse the row and store in the inputs dictionary - parse_inputs.inputs
+def write_JSON(name, data): #writes a json object to file
+	with open(name, 'w') as outfile: #writes the JSON structure to a file for the path named by report's header structure
+		json.dump(data, outfile, indent=4, ensure_ascii = False)
 
-    #aggregate the loan into appropriate rows for the table
-    agg.by_race(cont, parsed.inputs) #aggregate loan by race
-    agg.by_ethnicity(cont, parsed.inputs) #aggregate loan by ethnicity
-    agg.by_minority_status(cont, parsed.inputs) #aggregate loan by minority status
-    agg.by_applicant_income(cont, parsed.inputs)
-    agg.by_minority_composition(cont, parsed.inputs)
-    agg.by_tract_income(cont, parsed.inputs)
-    agg.totals(cont, parsed.inputs) #aggregate totals for each purchaser
+def set_brackets(bracket_singular, bracket_list):
+	brackets = []
+	for bracket in bracket_list:
+		holding = OrderedDict({})
+		holding[bracket_singular] = "{}".format(bracket)
+		brackets.append(holding)
+	return brackets
 
-build.set_header(parsed.inputs, MSA)
-print "out of loop"
-print json.dumps(cont, indent=4)
-name = 'sample.json'
-#uild.write_JSON(name)
+def set_dispositions(end_points): #builds the dispositions of applications section of report 4-1 JSON
+	dispositions = []
+	for item in dispositions_list:
+		dispositionsholding = OrderedDict({})
+		dispositionsholding['disposition'] = "{}".format(item)
+		dispositions.append(dispositionsholding)
+		for point in end_points:
+			dispositionsholding[point] = 0
+	return dispositions
+def table_7x_builder():
+	#container['censuscharacteristics'] = set_brackets('race', tract_pct_minority)
+	container['censuscharacteristics'] = []
+	holding = OrderedDict({})
+	holding['characteristic'] = 'Race/Ethnic Composition'
+	holding['compositions'] = set_brackets('composition', tract_pct_minority)
+	container['censuscharacteristics'].append(holding)
+	holding = OrderedDict({})
+	holding['characteristic'] = 'Income Characteristics'
+	holding['incomes'] = set_brackets('income', tract_income)
+	container['censuscharacteristics'].append(holding)
+	holding = OrderedDict({})
+	holding['characteristic'] = 'Income & Racial/Ethnic Composition'
+	holding['incomes'] = set_brackets('income', tract_income)
+	for i in range(0, len(holding['incomes'])):
+		holding['incomes'][i]['compositions'] = set_brackets('composition', tract_pct_minority)
+		for j in range(0, len(holding['incomes'][i]['compositions'])):
+			holding['incomes'][i]['compositions'][j]['dispositions'] = set_dispositions(end_points)
 
+	container['censuscharacteristics'].append(holding)
+	for i in range(0,len(container['censuscharacteristics'][0]['compositions'])):
+		container['censuscharacteristics'][0]['compositions'][i]['dispositions'] = set_dispositions(end_points)
+	for i in range(0, len(container['censuscharacteristics'][1]['incomes'])):
+		container['censuscharacteristics'][1]['incomes'][i]['dispositions'] = set_dispositions(end_points)
+	'''
 
+	for i in range(0, len(container['income&racial/ethnic_composition'])):
+		container['income&racial/ethnic_composition'][i]['censuscharacteristics'] = set_brackets('race', tract_pct_minority)
+		for j in range(0, len(container['income&racial/ethnic_composition'][i]['censuscharacteristics'])):
+			container['income&racial/ethnic_composition'][i]['censuscharacteristics'][j]['disposition'] = set_dispositions(end_points)
+	'''
+table_7x_builder()
+
+print_JSON()
