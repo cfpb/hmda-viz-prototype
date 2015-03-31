@@ -617,6 +617,8 @@ class build_JSON(AD_report):
 			holding['incomes'][i]['dispositions'] = self.set_dispositions(self.end_points)
 		self.container['censuscharacteristics'].append(holding)
 
+		extra_level = []
+
 		holding = OrderedDict({})
 		holding['characteristic'] = 'Income & Racial/Ethnic Composition'
 		holding['incomes'] = self.set_brackets('income', self.tract_income)
@@ -624,7 +626,8 @@ class build_JSON(AD_report):
 			holding['incomes'][i]['compositions'] = self.set_brackets('composition', self.tract_pct_minority)
 			for j in range(0, len(holding['incomes'][i]['compositions'])):
 				holding['incomes'][i]['compositions'][j]['dispositions'] = self.set_dispositions(self.end_points)
-		self.container['censuscharacteristics'].append(holding)
+		extra_level.append(holding)
+		self.container['incomeRaces'] = extra_level
 
 		holding = OrderedDict({})
 		holding['type'] = 'Small County'
@@ -1333,10 +1336,10 @@ class aggregate(AD_report): #aggregates LAR rows by appropriate characteristics 
 		if inputs['action taken'] > 5 or inputs['tract income index'] > 3:
 			pass
 		else:
-			container['censuscharacteristics'][2]['incomes'][inputs['tract income index']]['compositions'][inputs['minority percent index']]['dispositions'][0]['count'] +=1
-			container['censuscharacteristics'][2]['incomes'][inputs['tract income index']]['compositions'][inputs['minority percent index']]['dispositions'][0]['value'] += int(inputs['loan value'])
-			container['censuscharacteristics'][2]['incomes'][inputs['tract income index']]['compositions'][inputs['minority percent index']]['dispositions'][inputs['action taken']]['count'] +=1
-			container['censuscharacteristics'][2]['incomes'][inputs['tract income index']]['compositions'][inputs['minority percent index']]['dispositions'][inputs['action taken']]['value'] += int(inputs['loan value'])
+			container['incomeRaces'][0]['incomes'][inputs['tract income index']]['compositions'][inputs['minority percent index']]['dispositions'][0]['count'] +=1
+			container['incomeRaces'][0]['incomes'][inputs['tract income index']]['compositions'][inputs['minority percent index']]['dispositions'][0]['value'] += int(inputs['loan value'])
+			container['incomeRaces'][0]['incomes'][inputs['tract income index']]['compositions'][inputs['minority percent index']]['dispositions'][inputs['action taken']]['count'] +=1
+			container['incomeRaces'][0]['incomes'][inputs['tract income index']]['compositions'][inputs['minority percent index']]['dispositions'][inputs['action taken']]['value'] += int(inputs['loan value'])
 
 	def get_small_county_flag(self, cur, MSA):
 		#msa can be either an MSA or the last 5 of a geoid?
