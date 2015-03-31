@@ -1286,6 +1286,16 @@ class aggregate(AD_report): #aggregates LAR rows by appropriate characteristics 
 			container['total'][inputs['action taken']]['count'] +=1
 			container['total'][inputs['action taken']]['value'] += int(inputs['loan value'])
 
+	def by_5x_totals(self, container, inputs):
+		if inputs['action taken'] > 5:
+			pass
+		else:
+			container['total'][0]['count'] +=1
+			container['total'][0]['value'] += int(inputs['loan value'])
+
+			container['total'][inputs['action taken']]['count'] +=1
+			container['total'][inputs['action taken']]['value'] += int(inputs['loan value'])
+
 	def by_5x_race(self, container, inputs):
 		#print inputs['race'], inputs['income bracket'], inputs['action taken']
 		if inputs['income bracket'] > 4 or inputs['action taken'] > 5:
@@ -1296,6 +1306,7 @@ class aggregate(AD_report): #aggregates LAR rows by appropriate characteristics 
 			container['applicantincomes'][inputs['income bracket']]['borrowercharacteristics'][0]['races'][inputs['race']]['dispositions'][0]['value'] += int(inputs['loan value']) #increment value of applications received
 			container['applicantincomes'][inputs['income bracket']]['borrowercharacteristics'][0]['races'][inputs['race']]['dispositions'][inputs['action taken']]['count'] +=1 #increment count of action taken by race category
 			container['applicantincomes'][inputs['income bracket']]['borrowercharacteristics'][0]['races'][inputs['race']]['dispositions'][inputs['action taken']]['value'] += int(inputs['loan value']) #increment value of action taken by race category
+
 	def by_5x_ethnicity(self, container, inputs):
 		if inputs['income bracket'] > 4 or inputs['action taken'] > 5:
 			pass
@@ -1388,6 +1399,7 @@ class aggregate(AD_report): #aggregates LAR rows by appropriate characteristics 
 		self.by_5x_race(table5x, inputs)
 		self.by_5x_ethnicity(table5x, inputs)
 		self.by_5x_minoritystatus(table5x, inputs)
+		self.by_5x_totals(table5x, inputs)
 
 	def build_report4x(self, table4x, inputs): #call functions to fill JSON object for table 4-1 (FHA, FSA, RHS, and VA home purchase loans)
 		self.by_race_4x(table4x, inputs) #aggregate loans by race, gender, and applicaiton disposition
