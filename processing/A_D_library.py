@@ -617,6 +617,8 @@ class build_JSON(AD_report):
 			holding['incomes'][i]['dispositions'] = self.set_dispositions(self.end_points)
 		self.container['censuscharacteristics'].append(holding)
 
+		extra_level = []
+
 		holding = OrderedDict({})
 		holding['characteristic'] = 'Income & Racial/Ethnic Composition'
 		holding['incomes'] = self.set_brackets('income', self.tract_income)
@@ -624,7 +626,8 @@ class build_JSON(AD_report):
 			holding['incomes'][i]['compositions'] = self.set_brackets('composition', self.tract_pct_minority)
 			for j in range(0, len(holding['incomes'][i]['compositions'])):
 				holding['incomes'][i]['compositions'][j]['dispositions'] = self.set_dispositions(self.end_points)
-		self.container['censuscharacteristics'].append(holding)
+		extra_level.append(holding)
+		self.container['incomeRaces'] = extra_level
 
 		holding = OrderedDict({})
 		holding['type'] = 'Small County'
@@ -1376,7 +1379,7 @@ class aggregate(AD_report): #aggregates LAR rows by appropriate characteristics 
 	def build_report7x(self, table7x, inputs):
 		self.by_minority_concentration(table7x, inputs)
 		self.by_tract_to_msa_income(table7x, inputs)
-		self.by_income_ethnic_combo(table7x, inputs)
+		#self.by_income_ethnic_combo(table7x, inputs)
 		self.by_small_county(table7x, inputs)
 		self.by_other_tracts(table7x, inputs)
 		self.totals_7x(table7x, inputs)
