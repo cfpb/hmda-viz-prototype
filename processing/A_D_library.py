@@ -1336,10 +1336,10 @@ class aggregate(AD_report): #aggregates LAR rows by appropriate characteristics 
 		if inputs['action taken'] > 5 or inputs['tract income index'] > 3:
 			pass
 		else:
-			container['censuscharacteristics'][2]['incomes'][inputs['tract income index']]['compositions'][inputs['minority percent index']]['dispositions'][0]['count'] +=1
-			container['censuscharacteristics'][2]['incomes'][inputs['tract income index']]['compositions'][inputs['minority percent index']]['dispositions'][0]['value'] += int(inputs['loan value'])
-			container['censuscharacteristics'][2]['incomes'][inputs['tract income index']]['compositions'][inputs['minority percent index']]['dispositions'][inputs['action taken']]['count'] +=1
-			container['censuscharacteristics'][2]['incomes'][inputs['tract income index']]['compositions'][inputs['minority percent index']]['dispositions'][inputs['action taken']]['value'] += int(inputs['loan value'])
+			container['incomeRaces'][0]['incomes'][inputs['tract income index']]['compositions'][inputs['minority percent index']]['dispositions'][0]['count'] +=1
+			container['incomeRaces'][0]['incomes'][inputs['tract income index']]['compositions'][inputs['minority percent index']]['dispositions'][0]['value'] += int(inputs['loan value'])
+			container['incomeRaces'][0]['incomes'][inputs['tract income index']]['compositions'][inputs['minority percent index']]['dispositions'][inputs['action taken']]['count'] +=1
+			container['incomeRaces'][0]['incomes'][inputs['tract income index']]['compositions'][inputs['minority percent index']]['dispositions'][inputs['action taken']]['value'] += int(inputs['loan value'])
 
 	def get_small_county_flag(self, cur, MSA):
 		#msa can be either an MSA or the last 5 of a geoid?
@@ -1379,7 +1379,7 @@ class aggregate(AD_report): #aggregates LAR rows by appropriate characteristics 
 	def build_report7x(self, table7x, inputs):
 		self.by_minority_concentration(table7x, inputs)
 		self.by_tract_to_msa_income(table7x, inputs)
-		#self.by_income_ethnic_combo(table7x, inputs)
+		self.by_income_ethnic_combo(table7x, inputs)
 		self.by_small_county(table7x, inputs)
 		self.by_other_tracts(table7x, inputs)
 		self.totals_7x(table7x, inputs)
