@@ -35,13 +35,13 @@
 					<td colspan="13">{{#footnote}}{{characteristic}}{{/footnote}}</td>
 				</tr>
 				{{#compositions}}
-				<tr>
-					<td>{{#footnote}}{{composition}}{{/footnote}}</td>
-					{{#dispositions}}
-					<td>{{#addCommas}}{{count}}{{/addCommas}}</td>
-					<td>{{#addCommas}}{{value}}{{/addCommas}}</td>
-					{{/dispositions}}
-				</tr>
+					<tr>
+						<td>{{#footnote}}{{composition}}{{/footnote}}</td>
+						{{#dispositions}}
+						<td>{{#addCommas}}{{count}}{{/addCommas}}</td>
+						<td>{{#addCommas}}{{value}}{{/addCommas}}</td>
+						{{/dispositions}}
+					</tr>
 				{{/compositions}}
 				{{#incomes}}
 					<tr>
@@ -52,29 +52,34 @@
 						{{/dispositions}}
 					</tr>
 				{{/incomes}}
-				{{#incomesRaces}}
+			{{/censuscharacteristics}}
+			{{#incomesRaces}}
 				<tr class="characteristic">
-					<td colspan="13">{{#footnote}}{{income}}{{/footnote}}</td>
+					<td colspan="13">{{#footnote}}{{characteristic}}{{/footnote}}</td>
 				</tr>
-				{{#compositions}}
-				<tr>
-					<td>{{composition}}</td>
+				{{#incomes}}
+					<tr class="characteristic">
+						<td colspan="13">{{#footnote}}{{income}}{{/footnote}}</td>
+					</tr>
+					{{#compositions}}
+						<tr>
+							<td>{{composition}}</td>
+							{{#dispositions}}
+								<td>{{#addCommas}}{{count}}{{/addCommas}}</td>
+								<td>{{#addCommas}}{{value}}{{/addCommas}}</td>
+							{{/dispositions}}
+						</tr>
+					{{/compositions}}
+				{{/incomes}}
+			{{/incomesRaces}}
+			{{#types}}
+				<tr class="characteristic">
+					<td>{{#footnote}}{{type}}{{/footnote}}</td>
 					{{#dispositions}}
-					<td>{{#addCommas}}{{count}}{{/addCommas}}</td>
-					<td>{{#addCommas}}{{value}}{{/addCommas}}</td>
+						<td>{{#addCommas}}{{count}}{{/addCommas}}</td>
+						<td>{{#addCommas}}{{value}}{{/addCommas}}</td>
 					{{/dispositions}}
 				</tr>
-				{{/compositions}}
-				{{/incomesRaces}}
-			{{/censuscharacteristics}}
-			{{#types}}
-			<tr class="characteristic">
-				<td>{{#footnote}}{{type}}{{/footnote}}</td>
-				{{#dispositions}}
-				<td>{{#addCommas}}{{count}}{{/addCommas}}</td>
-				<td>{{#addCommas}}{{value}}{{/addCommas}}</td>
-				{{/dispositions}}
-			</tr>
 			{{/types}}
 			<tr class="characteristic">
 				<td>Total <a href="/hmda-viz-prototype/footnotes/{{year}}/#14"><sup>14</sup></a></td>
