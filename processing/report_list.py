@@ -1,9 +1,10 @@
+from collections import OrderedDict
 import os.path
 import json
-class file_checker(object):
+class report_list(object):
 	pass
 
-class check_file(file_checker):
+class report_list_maker(report_list):
 
 	def __init__(self, build_object):
 		self.state_names = build_object.state_names #this is a dictionary in format {"DE":"Delaware"}
@@ -14,39 +15,32 @@ class check_file(file_checker):
 			json.dump(data, outfile, indent=4, ensure_ascii = False)
 
 
-	def is_file(self, report_type, report_year, report_list):
+	def report_lists(self, report_type, report_year, report_list):
 		#report_type is aggregate or disclosure
 		path_intro = '/Users/roellk/Desktop/HMDA/hmda-viz-prototype/'
-		for state, state_name in self.state_names.iteritems(): #loop states -- files live here
-			state_msas = {}
-			state_holding = []
+		for state, state_name in self.state_names.iteritems(): #loop states
+			msa_reports = OrderedDict({})
 			state_path = path_intro + report_type + '/' + report_year + '/' + self.state_names[state].replace(' ',  '-').lower()
-			#print state
-			for msa_code, msa_name in self.msa_names[state].iteritems(): #loop MSAs
-				#print msa_code, msa_name
+
+			for msa_code, msa_name in self.msa_names[state].iteritems(): #loop MSAs -- report list files live here
 				msa_path = state_path+ '/' + msa_name #needs to loop through MSAs in a state
+				msa = {}
+				msa_reports['id'] = msa_code #put the MSA number in the dict
+				msa_reports['name'] = msa_name #put the MSA name in the dict
+				report_holding = []
+
 				for report in report_list: #loop reports -- folder and file
 					file_directory = report[2:]
 					file_path = msa_path + '/' + file_directory + '/' + file_directory+'.json' #file directory and file path are the same string
-					#print file_path
+
 					if os.path.isfile(file_path) == True: #a report exists for the MSA, add the MSA name and id to the msa-mds.json file
-						print 'reports exist in {msa_name} for {state}'.format(msa_name = msa_name, state=state_name)
-						#print file_path, "*"*10, "huzzah it's here!\n"
-						#print msa_code, msa_name, "*"*50
-						msa = {}
-						msa['id'] = msa_code
-						msa['name'] = msa_name
-						state_holding.append(msa)
-						#print msa
-						break
-
-						#add id and name to msa-mds.json
+						print "adding report {report_number} to report list for {MSA_name} in {state}".format(report_number = file_directory, MSA_name = msa_name, state=state_name)
+						report_holding.append(file_directory) #add the report name to the list of reports in the MSA
 					else:
-
 						pass
+				msa_reports['reports'] = report_holding
 
-			state_msas['msa-mds'] = state_holding
-			#write msa-mds.json file
-			if not os.path.exists(state_path): #check if path exists
-				os.makedirs(state_path) #if path not present, create it
-			self.write_JSON('msa-mds.json', state_msas, state_path)
+				if not os.path.exists(msa_path): #check if path exists
+					os.makedirs(msa_path) #if path not present, create it
+				self.write_JSON('report_list.json', msa_reports, msa_path) #write report_list file
+
