@@ -563,7 +563,7 @@ class build_JSON(AD_report):
 		elif table_num =='7-5':
 			return 'Disposition of applications for loans on dwellings for 5 or more families, by characteristics of census tract in which property is located'
 		elif table_num =='7-6':
-			return 'Disposition of applicationss from nonoccupatns for home-purchase, home improvement, or refinancing loans, 1- to 4-family and manufactured home dwellings, by characteristics of census tract in which property is located'
+			return 'Disposition of applications from nonoccupatns for home-purchase, home improvement, or refinancing loans, 1- to 4-family and manufactured home dwellings, by characteristics of census tract in which property is located'
 		elif table_num =='7-7':
 			return 'Disposition of applications for home-purchase, home improvement, or refinancing loans, manufactured home dwellings, by characteristics of census tract in which property is located'
 
@@ -604,7 +604,7 @@ class build_JSON(AD_report):
 	def table_7x_builder(self):
 		self.container['censuscharacteristics'] = []
 		holding = OrderedDict({})
-		holding['characteristic'] = 'Race/Ethnic Composition'
+		holding['characteristic'] = 'Racial/Ethnic Composition'
 		holding['compositions'] = self.set_brackets('composition', self.tract_pct_minority)
 		for i in range(0, len(holding['compositions'])):
 			holding['compositions'][i]['dispositions'] = self.set_dispositions(self.end_points)
