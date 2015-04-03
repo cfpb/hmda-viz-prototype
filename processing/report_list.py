@@ -1,6 +1,8 @@
 from collections import OrderedDict
 import os.path
 import json
+from A_D_library import build_JSON as build
+
 class report_list(object):
 	pass
 
@@ -9,11 +11,10 @@ class report_list_maker(report_list):
 	def __init__(self, build_object):
 		self.state_names = build_object.state_names #this is a dictionary in format {"DE":"Delaware"}
 		self.msa_names = build_object.state_msa_list
-
+		self.build = build() #instantiate build_JSON object to retrieve table names
 	def write_JSON(self, name, data, path): #writes a json object to file
 		with open(os.path.join(path, name), 'w') as outfile: #writes the JSON structure to a file for the path named by report's header structure
 			json.dump(data, outfile, indent=4, ensure_ascii = False)
-
 
 	def report_lists(self, report_type, report_year, report_list):
 		#report_type is aggregate or disclosure
@@ -25,8 +26,8 @@ class report_list_maker(report_list):
 			for msa_code, msa_name in self.msa_names[state].iteritems(): #loop MSAs -- report list files live here
 				msa_path = state_path+ '/' + msa_name #needs to loop through MSAs in a state
 				msa = {}
-				msa_reports['id'] = msa_code #put the MSA number in the dict
-				msa_reports['name'] = msa_name #put the MSA name in the dict
+				#msa_reports['id'] = msa_code #put the MSA number in the dict
+				#msa_reports['name'] = msa_name #put the MSA name in the dict
 				report_holding = []
 
 				for report in report_list: #loop reports -- folder and file
@@ -35,7 +36,10 @@ class report_list_maker(report_list):
 
 					if os.path.isfile(file_path) == True: #a report exists for the MSA, add the MSA name and id to the msa-mds.json file
 						print "adding report {report_number} to report list for {MSA_name} in {state}".format(report_number = file_directory, MSA_name = msa_name, state=state_name)
-						report_holding.append(file_directory) #add the report name to the list of reports in the MSA
+						holding = OrderedDict({})
+						holding['id'] = file_directory
+						holding['name'] = self.build.table_headers(file_directory)
+						report_holding.append(holding) #add the report name to the list of reports in the MSA
 					else:
 						pass
 				msa_reports['reports'] = report_holding

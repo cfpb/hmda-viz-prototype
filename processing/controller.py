@@ -51,10 +51,10 @@ selector.report_list['A 7-5'] = AL_MSAs
 selector.report_list['A 7-6'] = AL_MSAs
 selector.report_list['A 7-7'] = AL_MSAs
 #selector.report_list['A 7-1'] = ['11500']
-report_list = ['A 7-1']
+#report_list = ['A 3-1']
 #report_list = ['A 5-1', 'A 5-2', 'A 5-3', 'A 5-4', 'A 5-5', 'A 5-7']
 #report_list = ['A 7-1', 'A 7-2', 'A 7-3', 'A 7-4', 'A 7-5', 'A 7-6', 'A 7-7']
-#report_list = ['A 3-1', 'A 3-2', 'A 4-1', 'A 4-2', 'A 4-3', 'A 4-4', 'A 4-5', 'A 4-6', 'A 4-7', 'A 5-1', 'A 5-2', 'A 5-3', 'A 5-4', 'A 5-5', 'A 5-7', 'A 7-1', 'A 7-2', 'A 7-3', 'A 7-4', 'A 7-5', 'A 7-6', 'A 7-7'] #this needs to be changed to read from the input file
+report_list = ['A 3-1', 'A 3-2', 'A 4-1', 'A 4-2', 'A 4-3', 'A 4-4', 'A 4-5', 'A 4-6', 'A 4-7', 'A 5-1', 'A 5-2', 'A 5-3', 'A 5-4', 'A 5-5', 'A 5-7', 'A 7-1', 'A 7-2', 'A 7-3', 'A 7-4', 'A 7-5', 'A 7-6', 'A 7-7'] #this needs to be changed to read from the input file
 
 
 for report in report_list: #loop over a list of report names
@@ -62,23 +62,7 @@ for report in report_list: #loop over a list of report names
 		report_x = report_4x(report, selector) #instantiate class and set function strings
 		report_x.report_x(MSA, cur) #variabalize funciton inputs!!!!
 
-#code to run a second set of reports with a different input file
-"state_list[state] = {'state': {'id':'name', 'id':'name'}}"
-'''
 
-report_list = ['A 3-1', 'A 3-2', 'A 4-1', 'A 4-2', 'A 4-3', 'A 4-4', 'A 4-5', 'A 4-6', 'A 4-7']
-selector.get_report_list('MSAinputs2012.csv')
-for report in report_list:
-	for MSA in selector.report_list[report]:
-		report_x = report_4x(report, selector)
-		report_x.report_x(MSA, cur)
-#selector.report_list['A 4-6'] = ['29620']
-#selector.report_list['A 4-5'] = ['29620']
-
-
-
-
-'''
 #check_file must be run after reports are generated
 report_list = ['A 3-1', 'A 3-2', 'A 4-1', 'A 4-2', 'A 4-3', 'A 4-4', 'A 4-5', 'A 4-6', 'A 4-7', 'A 5-1', 'A 5-2', 'A 5-3', 'A 5-4', 'A 5-5', 'A 5-7', 'A 7-1', 'A 7-2', 'A 7-3', 'A 7-4', 'A 7-5', 'A 7-6', 'A 7-7'] #this needs to be changed to read from the input file
 check_file = check_file(build_msa) #needs a report list, state list, and msa list

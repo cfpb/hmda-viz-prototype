@@ -243,7 +243,60 @@ class parse_inputs(AD_report):
 		self.inputs['minority percent'] = row['minoritypopulationpct'] #%of population that is minority
 		self.inputs['minority percent index'] = MSA_index.minority_percent(self.inputs) #sets the minority population percent to an index for aggregation
 		self.inputs['tract to MSA income'] = row['tract_to_msa_md_income'] #ratio of tract to msa/md income
-		self.inputs['tract income index'] = MSA_index.tract_to_MSA_income(self.inputs) #sets the tract to msa income ratio to an index for aggregation (low,
+		self.inputs['tract income index'] = MSA_index.tract_to_MSA_income(self.inputs) #sets the tract to msa income ratio to an index for aggregation (low, middle, moderate,  high
+
+class MSA_info(AD_report): #contains functions for setting aggregate information for the MSA
+
+	def app_income_to_MSA(self, inputs): #set income bracket index
+		if inputs['income'] == 'NA  ' or inputs['income'] == '    ':
+			return 5 #applicant income unavailable, feeds to 'income not available'
+		elif inputs['MSA median income'] == 'NA      ' or inputs['MSA median income'] == '        ' :
+			return 6 #placeholder for MSA median income unavailable, feeds to 'income not available'
+		else:
+			inputs['percent MSA income'] = (float(inputs['income']) / (float(inputs['MSA median income'] )/1000)) *100 #common size median income and create ##.##% format ratio
+			#determine income bracket for use as an index in the JSON object
+			if inputs['percent MSA income'] < 50:
+				return 0
+			elif inputs['percent MSA income'] <= 80:
+				return 1
+			elif inputs['percent MSA income'] <= 100:
+				return 2
+			elif inputs['percent MSA income'] <= 120:
+				return 3
+			elif inputs['percent MSA income'] >= 120:
+				return 4
+			else:
+				print 'error setting percent MSA income bracket for index'
+
+	def minority_percent(self, inputs): #set index codes for minority population percent
+		if inputs['minority percent'] == '      ' or inputs['minority percent'] == 'NA    ': #if no information is available use an out of bounds index
+			return  5
+		elif float(inputs['minority percent']) < 10.0:
+			return  0
+		elif float(inputs['minority percent']) <19.0:
+			return 1
+		elif float(inputs['minority percent'])  <= 49.0:
+			return  2
+		elif float(inputs['minority percent'])  <= 79.0:
+			return  3
+		elif float(inputs['minority percent'])  <= 100.0:
+			return  4
+		else:
+			print "minority percent index not set"
+
+	def tract_to_MSA_income(self, inputs): #set census MSA income level: low, moderate, middle, upper
+		if inputs['tract to MSA income'] == '      ' or inputs['tract to MSA income'] == 'NA    ': #if no information is available use an out of bounds index
+			return 4 #not stored in report 3-1
+		elif float(inputs['tract to MSA income']) < 50.0:
+			return 0
+		elif float(inputs['tract to MSA income']) <= 79.0:
+			return 1
+		elif float(inputs['tract to MSA income']) <= 119.0:
+			return 2
+		elif float(inputs['tract to MSA income']) >= 119.0:
+			return 3
+		else:
+			print "error setting tract to MSA income index"
 
 class demographics(AD_report):
 	#holds all the functions for setting race, minority status, and ethnicity for FFIEC A&D reports
@@ -309,11 +362,10 @@ class demographics(AD_report):
 			if race_list[i] < 5 and race_list[i] != 0:
 				return True #flag true if applicant listed a minority race
 				break
-			elif race_list[i] == 5:
-				return False #flag false if the only race listed was white (5)
 
-			#set default return to true or false and then only run 1 check
+
 	def set_joint(self, inputs): #takes a dictionary 'inputs' which is held in the controller(?) object and used to process each loan row
+		#set default return to true or false and then only run 1 check
 		#joint status exists if one borrower is white and one is non-white
 		#check to see if joint status exists
 		if inputs['app non white flag'] == False and inputs['co non white flag'] == False:
@@ -357,11 +409,12 @@ class demographics(AD_report):
 		#determine if loan is not hispanic or latino
 		elif inputs['a ethn'] == '2' and inputs['co ethn'] != '1': #applicant not hispanic (positive entry), co applicant not hispanic (all other codes)
 			return  1
-		elif inputs['a ethn'] != '1' and inputs['co ethn'] == '2': #co applicant not hispanic (positive entry), applicant not hispanic (all other codes)
-			return  1
+		#elif inputs['a ethn'] != '1' and inputs['co ethn'] == '2': #co applicant not hispanic (positive entry), applicant not hispanic (all other codes)
+		#	return  1
 		elif (inputs['a ethn'] == '3' or inputs['a ethn'] == '4') and (inputs['co ethn'] != '1' and inputs['co ethn'] != '2'): #no applicant ethnicity information, co applicant did not mark ethnicity positively
 			return  3
 		else:
+			return 3
 			print "error setting ethnicity"
 
 	def a_race_list(self, row):
@@ -399,7 +452,7 @@ class demographics(AD_report):
 			for i in range(1,5):
 				for r in range(0,5):
 					if race_list[r] == i:
-						return race_list[r] -1 #return first instance of minority race
+						return race_list[r] -1 #return first instance of minority race (-1 adjusts race code to race index in the JSON)
 						break
 
 class build_JSON(AD_report):
@@ -431,6 +484,7 @@ class build_JSON(AD_report):
 		self.dispositions_list = ['Applications Received', 'Loans Originated', 'Apps. Approved But Not Accepted', 'Applications Denied', 'Applications Withdrawn', 'Files Closed For Incompleteness']
 		self.gender_list = ['Male', 'Female', 'Joint (Male/Female)']
 		self.end_points = ['count', 'value']
+
 	def msas_in_state(self, cursor, selector, report_type):
 		#this function builds a list of MSA numbers and names in each state
 		#set sql query text to pull MSA names for each MSA number
@@ -531,7 +585,7 @@ class build_JSON(AD_report):
 		elif table_num == '4-2':
 			return 'Disposition of applications for conventional home-purchase loans 1- to 4- family and manufactured home dwellings, by race, ethnicity, gender and income of applicant'
 		elif table_num == '4-3':
-			return 'Disposition of applications to refinnace loans on 1- to 4- family and manufactured home dwellings, by race, ethnicity, gender and income of applicant'
+			return 'Disposition of applications to refinace loans on 1- to 4- family and manufactured home dwellings, by race, ethnicity, gender and income of applicant'
 		elif table_num == '4-4':
 			return 'Disposition of applications for home improvement loans, 1- to 4- family and manufactured home dwellings, by race, ethnicity, gender and income of applicant'
 		elif table_num == '4-5':
@@ -882,56 +936,6 @@ class connect_DB(AD_report): #connects to the SQL database
 			print "I am unable to connect to the database"
 		return conn.cursor(cursor_factory=psycopg2.extras.DictCursor) #return a dictionary cursor object
 
-class MSA_info(AD_report): #contains functions for setting aggregate information for the MSA
-
-	def app_income_to_MSA(self, inputs): #set income bracket index
-		if inputs['income'] == 'NA  ' or inputs['income'] == '    ':
-			return 5 #applicant income unavailable, feeds to 'income not available'
-		elif inputs['MSA median income'] == 'NA      ' or inputs['MSA median income'] == '        ' :
-			return 6 #placeholder for MSA median income unavailable, feeds to 'income not available'
-		else:
-			inputs['percent MSA income'] = (float(inputs['income']) / (float(inputs['MSA median income'] )/1000)) *100 #common size median income and create ##.##% format ratio
-			#determine income bracket for use as an index in the JSON object
-			if inputs['percent MSA income'] < 50:
-				return 0
-			elif inputs['percent MSA income'] <= 80:
-				return 1
-			elif inputs['percent MSA income'] <= 100:
-				return 2
-			elif inputs['percent MSA income'] <= 120:
-				return 3
-			elif inputs['percent MSA income'] >= 120:
-				return 4
-			else:
-				print 'error setting percent MSA income bracket for index'
-
-	def minority_percent(self, inputs): #set index codes for minority population percent
-		if inputs['minority percent'] == '      ' or inputs['minority percent'] == 'NA    ': #if no information is available use an out of bounds index
-			return  4
-		elif float(inputs['minority percent']) < 10.0:
-			return  0
-		elif float(inputs['minority percent'])  <= 49.0:
-			return  1
-		elif float(inputs['minority percent'])  <= 79.0:
-			return  2
-		elif float(inputs['minority percent'])  <= 100.0:
-			return  3
-		else:
-			print "minority percent index not set"
-
-	def tract_to_MSA_income(self, inputs): #set census MSA income level: low, moderate, middle, upper
-		if inputs['tract to MSA income'] == '      ' or inputs['tract to MSA income'] == 'NA    ': #if no information is available use an out of bounds index
-			return 4 #not stored in report 3-1
-		elif float(inputs['tract to MSA income']) < 50.0:
-			return 0
-		elif float(inputs['tract to MSA income']) <= 79.0:
-			return 1
-		elif float(inputs['tract to MSA income']) <= 119.0:
-			return 2
-		elif float(inputs['tract to MSA income']) >= 119.0:
-			return 3
-		else:
-			print "error setting tract to MSA income index"
 
 class queries(AD_report):
 	#can I decompose these query parts into lists and concatenate them prior to passing to the cursor?
@@ -1056,6 +1060,8 @@ class aggregate(AD_report): #aggregates LAR rows by appropriate characteristics 
 		container['borrowercharacteristics'][0]['races'][inputs['race']]['purchasers'][inputs['purchaser']]['value'] += inputs['loan value']
 
 	def by_ethnicity(self, container, inputs): #aggregate loans by enthicity status
+		if inputs['purchaser'] == 0:
+			pass
 		container['borrowercharacteristics'][1]['ethnicities'][inputs['ethnicity']]['purchasers'][inputs['purchaser']]['count'] += 1
 		container['borrowercharacteristics'][1]['ethnicities'][inputs['ethnicity']]['purchasers'][inputs['purchaser']]['value'] += int(inputs['loan value'])
 
@@ -1073,7 +1079,7 @@ class aggregate(AD_report): #aggregates LAR rows by appropriate characteristics 
 			container['borrowercharacteristics'][3]['applicantincomes'][inputs['income bracket']]['purchasers'][inputs['purchaser']]['value'] += int(inputs['loan value'])
 
 	def by_minority_composition(self, container, inputs): #aggregate loans by MSA minority population percent
-		if inputs['minority percent index'] == 4: #minority percent not available
+		if inputs['minority percent index'] > 4: #minority percent not available
 			pass
 		else:
 			container['censuscharacteristics'][0]['tractpctminorities'][inputs['minority percent index']]['purchasers'][inputs['purchaser']]['count'] += 1

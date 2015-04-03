@@ -33,7 +33,7 @@ def set_41_gender():
 		gendersholding['genders'][j]['dispositions'] = set_dispositions(holding_list)
 	return gendersholding
 
-def table_41_builder():
+def table_7x_builder():
 	set_41_races()
 	set_41_ethnicity()
 	set_41_minority()
@@ -84,10 +84,10 @@ def set_41_incomes():
 		#container['incomes'][i]['dispositions'] = set_41_gender()
 	container['total'] = set_41_dispositions(holding_list)
 
-table_41_builder()
+table_7x_builder()
 print json.dumps(container, indent=4)
-with open('41_json.json', 'w') as outfile:
+with open('7x_json.json', 'w') as outfile:
 	json.dump(container, outfile, indent=4, ensure_ascii = False)
-print len(container['ethnicities'])
+
 
 
