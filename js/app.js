@@ -79,11 +79,18 @@ function getTableData(table) {
                         footnote = 9;
                         break;
                     case 'racial&#x2f;ethnic composition':
+                    case 'race&#x2f;ethnic composition':
                         footnote = 11;
                         break;
                     case 'income':
+                    case 'income characteristics':
                         footnote = 12;
                         footnote2 = 13;
+                        break;
+                    case 'income &amp; racial&#x2f;ethnic composition':
+                        footnote = 11;
+                        footnote2 = 12;
+                        footnote3 = 13;
                         break;
                     case 'total':
                         footnote = 14;
@@ -111,6 +118,9 @@ function getTableData(table) {
                     url = render(string) + ' <a href="' + footnoteurl + footnote + '"><sup>' + footnote + '</sup></a>';
                     if (footnote2 != 0) {
                         url = url + ' <a href="' + footnoteurl + footnote2 + '"><sup>' + footnote2 + '</sup></a>';
+                    }
+                    if (footnote3 != 0) {
+                        url = url + ' <a href="' + footnoteurl + footnote3 + '"><sup>' + footnote3 + '</sup></a>';
                     }
                     console.log (url);
                     return url;
