@@ -272,7 +272,10 @@ $( document ).ready(function() {
             console.log('no ie');
             window.open('data:text/csv;charset=utf-8,' + escape(theCSV));
         } else {
-            theCSV = decodeURIComponent(theCSV);
+            console.log('no ie');
+            var blob = new Blob([theCSV], {type: 'text/csv'});
+            navigator.msSaveOrOpenBlob(blob, 'strings.csv');
+            /*theCSV = decodeURIComponent(theCSV);
 
             var iframe = document.getElementById('csvDownloadFrame');
             iframe = iframe.contentWindow || iframe.contentDocument;
@@ -285,7 +288,7 @@ $( document ).ready(function() {
             iframe.focus();
 
             iframe.document.execCommand('SaveAs', true, 'data.csv');
-            /*
+            
             var oWin = window.open();
             oWin.document.write('sep=,\r\n' + theCSV);
             oWin.document.close();
