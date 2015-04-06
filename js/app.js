@@ -56,82 +56,73 @@ function getTableData(table) {
         };
         data['footnote'] = function() {
             return function(string, render) {
-                var footnote = 0;
-                var footnote2 = 0;
-                var footnote3 = 0;
+                var footnotes = [];
                 var footnoteurl = '/hmda-viz-prototype/footnotes/' + data.year + '/#';
                 var url = '';
-                console.log(render(string).toLowerCase());
 
                 switch (render(string).toLowerCase()) {
                     case 'race':
-                        footnote = 5;
+                        footnotes.push(5);
                         break;
                     case 'not available':
                     case 'ethnicity not available':
                     case 'income not available':
                     case 'race not available':
-                        footnote = 6;
+                        footnotes.push(6);
                         break;
                     case 'ethnicity':
-                        footnote = 7;
+                        footnotes.push(7);
                         break;
                     case 'minority status':
-                        footnote = 8;
+                        footnotes.push(8);
                         break;
                     case 'applicant income':
                     case 'income of applicants':
-                        footnote = 9;
+                        footnotes.push(9);
                         break;
                     case 'racial&#x2f;ethnic composition':
                     case 'race&#x2f;ethnic composition':
-                        footnote = 11;
+                        footnotes.push(11);
                         break;
                     case 'income':
                     case 'income characteristics':
-                        footnote = 12;
-                        footnote2 = 13;
+                        footnotes.push(12);
+                        footnotes.push(13);
                         break;
                     case 'income &amp; racial&#x2f;ethnic composition':
-                        footnote = 11;
-                        footnote2 = 12;
-                        footnote3 = 13;
+                        footnotes.push(11);
+                        footnotes.push(12);
+                        footnotes.push(13);
                         break;
                     case 'total':
-                        footnote = 14;
+                        footnotes.push(14);
                         break;
                     case 'no reported pricing data':
-                        footnote = 15;
+                        footnotes.push(15);
                         break;
                     case 'all other tracts':
-                        footnote = 21;
+                        footnotes.push(21);
                         break;
                     case 'mean':
-                        footnote = 30;
+                        footnotes.push(30);
                         break;
                     case 'median':
-                        footnote = 31;
+                        footnotes.push(31);
                         break;
                     default:
-                        footnote = 0;
-                        footnote2 = 0;
-                        footnote3 = 0;
+                        footnotes = [];
                 }
 
                 // return
-                if (footnote != 0) {
-                    url = render(string) + ' <a href="' + footnoteurl + footnote + '"><sup>' + footnote + '</sup></a>';
-                    if (footnote2 != 0) {
-                        url = url + ' <a href="' + footnoteurl + footnote2 + '"><sup>' + footnote2 + '</sup></a>';
-                    }
-                    if (footnote3 != 0) {
-                        url = url + ' <a href="' + footnoteurl + footnote3 + '"><sup>' + footnote3 + '</sup></a>';
-                    }
-                    console.log (url);
-                    return url;
+                if (footnotes == undefined || footnotes == null || footnotes.length == 0) {
+                    return render(string);
                 }
                 else {
-                    return render(string);
+                    $.each(footnotes, function(index, value) {
+                        url = render(string) + ' <a href="' + footnoteurl + value + '"><sup>' + value + '</sup></a>';
+                    });
+                    footnotes = [];
+                    return url;
                 }
             }
         }
