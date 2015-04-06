@@ -267,7 +267,8 @@ $( document ).ready(function() {
 }
 
     $('#csv').click(function() {
-        if (detectIE !== false) {
+        //console.log(detectIE());
+        if (detectIE() === false) {
             console.log('no ie');
             window.open('data:text/csv;charset=utf-8,' + escape(theCSV));
         } else {
