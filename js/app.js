@@ -12,6 +12,11 @@ function getUIData() {
             // sort on the name if its the msas
             if (selectID === 'msa-mds') {
                 //console.log('sorting');
+                // do to upper first
+                $.each(data['msa-mds'], function(index, value) {
+                    value.name = value.name.toUpperCase();
+                });
+                // sort
                 data['msa-mds'].sort(function(a,b) {
                     if(a.name < b.name) return -1;
                     if(a.name > b.name) return 1;
