@@ -358,27 +358,33 @@ class demographics(AD_report):
 		return minority_count
 
 	def set_non_white(self, race_list): #pass in a list of length 5, return a boolean
+
 		for i in range(0,5):
 			if race_list[i] < 5 and race_list[i] != 0:
 				return True #flag true if applicant listed a minority race
-				break
+			else:
+				if race_list[i] < 6 and race_list[i] !=0:
+					return False
 
 
 	def set_joint(self, inputs): #takes a dictionary 'inputs' which is held in the controller(?) object and used to process each loan row
 		#set default return to true or false and then only run 1 check
 		#joint status exists if one borrower is white and one is non-white
 		#check to see if joint status exists
-		if inputs['app non white flag'] == False and inputs['co non white flag'] == False:
-			return False #flag false if both applicant and co-applicant are white
-		elif inputs['app non white flag'] == True and inputs['co non white flag'] == True:
-			return False #flag false if both applicant and co-applicant are minority
-		elif inputs['app non white flag'] == True and inputs['co non white flag'] ==  False:
+		inputs['joint status'] = False
+		#if inputs['app non white flag'] == False and inputs['co non white flag'] == False:
+		#	return False #flag false if both applicant and co-applicant are white
+		#elif inputs['app non white flag'] == True and inputs['co non white flag'] == True:
+		#	return False #flag false if both applicant and co-applicant are minority
+		if inputs['app non white flag'] == True and inputs['co non white flag'] ==  False:
 			return True #flag true if one applicant is minority and one is white
 		elif inputs['app non white flag'] == False and inputs['co non white flag'] == True:
-			return True #flag true if one applicant is minority and one is white
+			return True #flag true if one applicant is minority and one is
+
 
 	def set_minority_status(self, inputs):
 		#determine minority status, this is a binary category
+		'''Old code considering co-applicant
 		if inputs['app non white flag'] is None and inputs['co non white flag'] is None and int(inputs['a ethn']) > 2 and int(inputs['co ethn']) > 2:
 			return 2 #filter out non-natural person loans
 		elif inputs['app non white flag'] == True or inputs['co non white flag'] == True or inputs['a ethn'] == '1' or inputs['co ethn'] == '1':
@@ -387,12 +393,40 @@ class demographics(AD_report):
 			return 0 #if both applicants reported white race and non-hispanic/latino ethnicity then minority status is false
 		else:
 			print 'minority status not set'
+		'''
+		'''second attempt
+		if inputs['app non white flag'] is None and int(inputs['a ethn']) > 2:
+			return 2 #filter out non-natural person loans
+		elif inputs['app non white flag'] == True or inputs['a ethn'] == '1':
+			return 1
+		elif inputs['app non white flag'] != True and inputs['a ethn'] != '1':
+			return 0
+		else:
+			print 'minority status not set'
+		'''
 
-	def set_loan_ethn(self, inputs):
+		#not shown: non-hispanics with no race available, whites with no ethnicity available, and loans with no race/ethn available
+		if inputs['race'] == 7 and inputs['ethnicity'] !=0: #non-hispanics with no race info
+			return 3
+		elif inputs['race'] == 4 and inputs['ethnicity'] == 3: #whites with no ethnicity info
+			return 3
+		elif inputs['race'] == 7 and inputs['ethnicity'] == 3: #loans with no race and no ethn info
+			return 3
+
+		elif inputs['race'] == 4 and inputs['ethnicity'] != 0 and inputs['ethnicity'] != 2: #white non-hispanic
+			return 0
+		elif inputs['race'] < 7 or inputs['ethnicity'] ==0 or inputs['ethnicity'] == 2: #non white or hispanic
+			return 1
+		#elif inputs['race'] == 6 or inputs['race'] == 5: #joint status race
+		#	return 1
+		else:
+			print inputs['race'], inputs['ethnicity']
+			print 'minority status not set'
+ 	def set_loan_ethn(self, inputs):
 		#this function outputs a number code for ethnicity: 0 - hispanic or latino, 1 - not hispanic/latino
 		#2 - joint (1 applicant hispanic/latino 1 not), 3 - ethnicity not available
 		#if both ethnicity fields are blank report not available(3)
-		if inputs['a ethn'] == ' ' and inputs['co ethn'] == ' ':
+		if inputs['a ethn'] == ' ':# and inputs['co ethn'] == ' ':
 			return  3 #set to not available
 		#determine if the loan is joint hispanic/latino and non hispanic/latino(2)
 		elif inputs['a ethn'] == '1' and inputs['co ethn'] == '2':
@@ -422,7 +456,8 @@ class demographics(AD_report):
 		for i in range(0, 5): #convert ' ' entries to 0 for easier comparisons and loan aggregation
 			if a_race[i] == ' ':
 				a_race[i] = 0
-
+			else:
+				a_race[i] = int(a_race[i])
 		return [int(race) for race in a_race] #convert string entries to int for easier comparison and loan aggregation
 
 	def co_race_list(self, row):
@@ -430,6 +465,9 @@ class demographics(AD_report):
 		for i in range(0,5):
 			if co_race[i] == ' ':
 				co_race[i] = 0
+			else:
+				co_race[i] = int(co_race[i])
+
 		return [int(race) for race in co_race] #convert string entries to int for easier comparison and loan aggregation
 
 	def set_race(self, inputs, race_list): #sets the race to an integer index for loan aggregation
@@ -1361,10 +1399,9 @@ class aggregate(AD_report): #aggregates LAR rows by appropriate characteristics 
 	def get_small_county_flag(self, cur, MSA):
 		#msa can be either an MSA or the last 5 of a geoid?
 		SQL = '''SELECT small_county FROM tract_to_cbsa_2010 WHERE geoid_msa = %s;'''
-
 		cur.execute(SQL, MSA)
 		small_county_flag = cur.fetchall()[0]
-		#print small_county_flag
+
 
 	def by_small_county(self, container, inputs):
 		if inputs['small county flag'] == '1':
