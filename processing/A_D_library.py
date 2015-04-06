@@ -1249,16 +1249,48 @@ class aggregate(AD_report): #aggregates LAR rows by appropriate characteristics 
 			#first lien weighted median block
 			#print inputs[self.purchaser_first_lien_rates[n]], inputs[self.purchaser_first_lien_weight[n]]
 			if len(inputs[self.purchaser_first_lien_rates[n]]) >0 and len(inputs[self.purchaser_first_lien_weight[n]]) >0: #check to see if the array is populated
-				nd_first_rates = numpy.array(inputs[self.purchaser_first_lien_rates[n]]) #set arrays to nparrays
-				nd_first_values = numpy.array(inputs[self.purchaser_first_lien_weight[n]])
-				container['points'][9]['purchasers'][n]['firstlienvalue'] = round(weighted.median(nd_first_rates, nd_first_values),2) #for weighted median
+				nd_first_rates = inputs[self.purchaser_first_lien_rates[n]] #set arrays to nparrays
+				nd_first_values = inputs[self.purchaser_first_lien_weight[n]]
+				nd_first_rates, nd_first_values = zip(*sorted(zip(nd_first_rates, nd_first_values)))
+
+				step_size = round(float(sum(nd_first_values)) / len(nd_first_values),3)
+				steps_needed = (len(nd_first_values) / float(2))
+				nd_steps = [round(x/step_size,3) for x in nd_first_values]
+
+				count = 0
+				for i in range(0, len(nd_first_values)):
+					step_taken = nd_first_values[i] / float(step_size)
+					steps_needed -=step_taken
+					count +=1
+
+					if steps_needed <= 0:
+						#print nd_first_rates, "*"*10,nd_first_rates[count-1], count-1
+
+						container['points'][9]['purchasers'][n]['firstlienvalue'] = sorted(nd_first_rates)[count-1] #for weighted median
+						break
+
 			#junior lien weighted median block
-			#print self.purchaser_junior_lien_rates[n], inputs[self.purchaser_junior_lien_rates[n]]
-			#print self.purchaser_junior_lien_weight[n], inputs[self.purchaser_junior_lien_weight[n]]
 			if len(inputs[self.purchaser_junior_lien_rates[n]]) > 0 and len(inputs[self.purchaser_junior_lien_weight[n]]) >0: #check to see if the array is populated
-				nd_junior_rates = numpy.array(inputs[self.purchaser_junior_lien_rates[n]]) #set array to numpy array
-				nd_junior_values = numpy.array(inputs[self.purchaser_junior_lien_weight[n]]) #set arry to numpy array
-				container['points'][9]['purchasers'][n]['juniorlienvalue'] = round(weighted.median(nd_junior_rates, nd_junior_values),2)
+				nd_junior_rates = inputs[self.purchaser_junior_lien_rates[n]] #set array to numpy array
+				nd_junior_values = inputs[self.purchaser_junior_lien_weight[n]] #set arry to numpy array
+				nd_junior_rates, nd_junior_values = zip(*sorted(zip(nd_junior_rates, nd_junior_values)))
+
+				step_size = round(float(sum(nd_junior_values)) / len(nd_junior_values),3)
+				steps_needed = (len(nd_junior_values) / float(2))
+				nd_steps = [round(x/step_size,3) for x in nd_junior_values]
+
+				count = 0
+				for i in range(0, len(nd_junior_values)):
+					step_taken = nd_junior_values[i] / float(step_size)
+					steps_needed -=step_taken
+					count +=1
+
+					if steps_needed <= 0:
+						#print nd_junior_rates, "*"*10,nd_junior_rates[count-1], count-1
+
+						container['points'][9]['purchasers'][n]['juniorlienvalue'] = sorted(nd_junior_rates)[count-1] #for weighted median
+						break
+
 	def by_applicant_income_4x(self, container, inputs): #aggregate loans by applicant income index
 		if inputs['income bracket'] > 5 or inputs['action taken'] == ' ' or inputs['action taken'] > 5: #filter out of bounds indexes before calling aggregations
 			pass
