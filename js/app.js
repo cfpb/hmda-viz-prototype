@@ -261,6 +261,7 @@ $( document ).ready(function() {
         if (detectIE() === false) {
             window.open('data:text/csv;charset=utf-8,' + escape(theCSV));
         } else {
+            console.log(detectIE());
             var blob = new Blob([theCSV], {type: 'text/csv'});
             navigator.msSaveOrOpenBlob(blob, 'strings.csv');
         }
