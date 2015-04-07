@@ -115,13 +115,16 @@ function getTableData(table) {
 
                 // return
                 if (footnotes == undefined || footnotes == null || footnotes.length == 0) {
+                    console.log('here');
                     return render(string);
                 }
                 else {
+                    url = render(string);
                     $.each(footnotes, function(index, value) {
-                        url = render(string) + ' <a href="' + footnoteurl + value + '"><sup>' + value + '</sup></a>';
+                        url += ' <a href="' + footnoteurl + value + '"><sup>' + value + '</sup></a>';
+                        console.log(render(string) + ' = ' + index + ' and ' + value);
                     });
-                    footnotes = [];
+                    //footnotes = [];
                     return url;
                 }
             }
