@@ -1,9 +1,9 @@
 {
     "table": "7-6", 
     "type": "Aggregate", 
-    "desc": "Disposition of applicationss from nonoccupatns for home-purchase, home improvement, or refinancing loans, 1- to 4-family and manufactured home dwellings, by characteristics of census tract in which property is located", 
+    "desc": "Disposition of applications from nonoccupatns for home-purchase, home improvement, or refinancing loans, 1- to 4-family and manufactured home dwellings, by characteristics of census tract in which property is located", 
     "year": "2013", 
-    "report-date": "03/31/2015", 
+    "report-date": "04/06/2015", 
     "msa": {
         "id": "13820", 
         "name": "Birmingham-Hoover", 
@@ -12,7 +12,7 @@
     }, 
     "censuscharacteristics": [
         {
-            "characteristic": "Race/Ethnic Composition", 
+            "characteristic": "Racial/Ethnic Composition", 
             "compositions": [
                 {
                     "composition": "Less than 10% minority", 
@@ -54,38 +54,73 @@
                     "dispositions": [
                         {
                             "disposition": "Applications Received", 
-                            "count": 2340, 
-                            "value": 263490
+                            "count": 861, 
+                            "value": 101246
                         }, 
                         {
                             "disposition": "Loans Originated", 
-                            "count": 1421, 
-                            "value": 164400
+                            "count": 533, 
+                            "value": 63434
                         }, 
                         {
                             "disposition": "Apps. Approved But Not Accepted", 
-                            "count": 165, 
-                            "value": 18366
+                            "count": 64, 
+                            "value": 7365
                         }, 
                         {
                             "disposition": "Applications Denied", 
-                            "count": 478, 
-                            "value": 46907
+                            "count": 169, 
+                            "value": 18699
                         }, 
                         {
                             "disposition": "Applications Withdrawn", 
-                            "count": 206, 
-                            "value": 25679
+                            "count": 77, 
+                            "value": 9477
                         }, 
                         {
                             "disposition": "Files Closed For Incompleteness", 
-                            "count": 70, 
-                            "value": 8138
+                            "count": 18, 
+                            "value": 2271
                         }
                     ]
                 }, 
                 {
                     "composition": "20-49% minority", 
+                    "dispositions": [
+                        {
+                            "disposition": "Applications Received", 
+                            "count": 1479, 
+                            "value": 162244
+                        }, 
+                        {
+                            "disposition": "Loans Originated", 
+                            "count": 888, 
+                            "value": 100966
+                        }, 
+                        {
+                            "disposition": "Apps. Approved But Not Accepted", 
+                            "count": 101, 
+                            "value": 11001
+                        }, 
+                        {
+                            "disposition": "Applications Denied", 
+                            "count": 309, 
+                            "value": 28208
+                        }, 
+                        {
+                            "disposition": "Applications Withdrawn", 
+                            "count": 129, 
+                            "value": 16202
+                        }, 
+                        {
+                            "disposition": "Files Closed For Incompleteness", 
+                            "count": 52, 
+                            "value": 5867
+                        }
+                    ]
+                }, 
+                {
+                    "composition": "50-79% minority", 
                     "dispositions": [
                         {
                             "disposition": "Applications Received", 
@@ -116,41 +151,6 @@
                             "disposition": "Files Closed For Incompleteness", 
                             "count": 21, 
                             "value": 1779
-                        }
-                    ]
-                }, 
-                {
-                    "composition": "50-79% minority", 
-                    "dispositions": [
-                        {
-                            "disposition": "Applications Received", 
-                            "count": 509, 
-                            "value": 27002
-                        }, 
-                        {
-                            "disposition": "Loans Originated", 
-                            "count": 241, 
-                            "value": 14488
-                        }, 
-                        {
-                            "disposition": "Apps. Approved But Not Accepted", 
-                            "count": 26, 
-                            "value": 1135
-                        }, 
-                        {
-                            "disposition": "Applications Denied", 
-                            "count": 197, 
-                            "value": 8955
-                        }, 
-                        {
-                            "disposition": "Applications Withdrawn", 
-                            "count": 28, 
-                            "value": 1532
-                        }, 
-                        {
-                            "disposition": "Files Closed For Incompleteness", 
-                            "count": 17, 
-                            "value": 892
                         }
                     ]
                 }, 
@@ -419,6 +419,41 @@
                             "dispositions": [
                                 {
                                     "disposition": "Applications Received", 
+                                    "count": 0, 
+                                    "value": 0
+                                }, 
+                                {
+                                    "disposition": "Loans Originated", 
+                                    "count": 0, 
+                                    "value": 0
+                                }, 
+                                {
+                                    "disposition": "Apps. Approved But Not Accepted", 
+                                    "count": 0, 
+                                    "value": 0
+                                }, 
+                                {
+                                    "disposition": "Applications Denied", 
+                                    "count": 0, 
+                                    "value": 0
+                                }, 
+                                {
+                                    "disposition": "Applications Withdrawn", 
+                                    "count": 0, 
+                                    "value": 0
+                                }, 
+                                {
+                                    "disposition": "Files Closed For Incompleteness", 
+                                    "count": 0, 
+                                    "value": 0
+                                }
+                            ]
+                        }, 
+                        {
+                            "composition": "50-79% minority", 
+                            "dispositions": [
+                                {
+                                    "disposition": "Applications Received", 
                                     "count": 90, 
                                     "value": 5831
                                 }, 
@@ -450,7 +485,7 @@
                             ]
                         }, 
                         {
-                            "composition": "50-79% minority", 
+                            "composition": "80-100% minority", 
                             "dispositions": [
                                 {
                                     "disposition": "Applications Received", 
@@ -481,41 +516,6 @@
                                     "disposition": "Files Closed For Incompleteness", 
                                     "count": 4, 
                                     "value": 181
-                                }
-                            ]
-                        }, 
-                        {
-                            "composition": "80-100% minority", 
-                            "dispositions": [
-                                {
-                                    "disposition": "Applications Received", 
-                                    "count": 0, 
-                                    "value": 0
-                                }, 
-                                {
-                                    "disposition": "Loans Originated", 
-                                    "count": 0, 
-                                    "value": 0
-                                }, 
-                                {
-                                    "disposition": "Apps. Approved But Not Accepted", 
-                                    "count": 0, 
-                                    "value": 0
-                                }, 
-                                {
-                                    "disposition": "Applications Denied", 
-                                    "count": 0, 
-                                    "value": 0
-                                }, 
-                                {
-                                    "disposition": "Applications Withdrawn", 
-                                    "count": 0, 
-                                    "value": 0
-                                }, 
-                                {
-                                    "disposition": "Files Closed For Incompleteness", 
-                                    "count": 0, 
-                                    "value": 0
                                 }
                             ]
                         }
@@ -564,38 +564,73 @@
                             "dispositions": [
                                 {
                                     "disposition": "Applications Received", 
-                                    "count": 184, 
-                                    "value": 12703
+                                    "count": 46, 
+                                    "value": 3617
                                 }, 
                                 {
                                     "disposition": "Loans Originated", 
-                                    "count": 110, 
-                                    "value": 7667
+                                    "count": 25, 
+                                    "value": 1971
                                 }, 
                                 {
                                     "disposition": "Apps. Approved But Not Accepted", 
-                                    "count": 20, 
-                                    "value": 1308
+                                    "count": 5, 
+                                    "value": 228
                                 }, 
                                 {
                                     "disposition": "Applications Denied", 
-                                    "count": 37, 
-                                    "value": 1824
+                                    "count": 10, 
+                                    "value": 618
                                 }, 
                                 {
                                     "disposition": "Applications Withdrawn", 
-                                    "count": 12, 
-                                    "value": 1270
+                                    "count": 3, 
+                                    "value": 232
                                 }, 
                                 {
                                     "disposition": "Files Closed For Incompleteness", 
-                                    "count": 5, 
-                                    "value": 634
+                                    "count": 3, 
+                                    "value": 568
                                 }
                             ]
                         }, 
                         {
                             "composition": "20-49% minority", 
+                            "dispositions": [
+                                {
+                                    "disposition": "Applications Received", 
+                                    "count": 138, 
+                                    "value": 9086
+                                }, 
+                                {
+                                    "disposition": "Loans Originated", 
+                                    "count": 85, 
+                                    "value": 5696
+                                }, 
+                                {
+                                    "disposition": "Apps. Approved But Not Accepted", 
+                                    "count": 15, 
+                                    "value": 1080
+                                }, 
+                                {
+                                    "disposition": "Applications Denied", 
+                                    "count": 27, 
+                                    "value": 1206
+                                }, 
+                                {
+                                    "disposition": "Applications Withdrawn", 
+                                    "count": 9, 
+                                    "value": 1038
+                                }, 
+                                {
+                                    "disposition": "Files Closed For Incompleteness", 
+                                    "count": 2, 
+                                    "value": 66
+                                }
+                            ]
+                        }, 
+                        {
+                            "composition": "50-79% minority", 
                             "dispositions": [
                                 {
                                     "disposition": "Applications Received", 
@@ -630,7 +665,7 @@
                             ]
                         }, 
                         {
-                            "composition": "50-79% minority", 
+                            "composition": "80-100% minority", 
                             "dispositions": [
                                 {
                                     "disposition": "Applications Received", 
@@ -661,41 +696,6 @@
                                     "disposition": "Files Closed For Incompleteness", 
                                     "count": 8, 
                                     "value": 375
-                                }
-                            ]
-                        }, 
-                        {
-                            "composition": "80-100% minority", 
-                            "dispositions": [
-                                {
-                                    "disposition": "Applications Received", 
-                                    "count": 0, 
-                                    "value": 0
-                                }, 
-                                {
-                                    "disposition": "Loans Originated", 
-                                    "count": 0, 
-                                    "value": 0
-                                }, 
-                                {
-                                    "disposition": "Apps. Approved But Not Accepted", 
-                                    "count": 0, 
-                                    "value": 0
-                                }, 
-                                {
-                                    "disposition": "Applications Denied", 
-                                    "count": 0, 
-                                    "value": 0
-                                }, 
-                                {
-                                    "disposition": "Applications Withdrawn", 
-                                    "count": 0, 
-                                    "value": 0
-                                }, 
-                                {
-                                    "disposition": "Files Closed For Incompleteness", 
-                                    "count": 0, 
-                                    "value": 0
                                 }
                             ]
                         }
@@ -744,38 +744,73 @@
                             "dispositions": [
                                 {
                                     "disposition": "Applications Received", 
-                                    "count": 968, 
-                                    "value": 91502
+                                    "count": 371, 
+                                    "value": 35103
                                 }, 
                                 {
                                     "disposition": "Loans Originated", 
-                                    "count": 597, 
-                                    "value": 58026
+                                    "count": 235, 
+                                    "value": 22419
                                 }, 
                                 {
                                     "disposition": "Apps. Approved But Not Accepted", 
-                                    "count": 62, 
-                                    "value": 4887
+                                    "count": 27, 
+                                    "value": 1774
                                 }, 
                                 {
                                     "disposition": "Applications Denied", 
-                                    "count": 203, 
-                                    "value": 17091
+                                    "count": 73, 
+                                    "value": 6990
                                 }, 
                                 {
                                     "disposition": "Applications Withdrawn", 
-                                    "count": 76, 
-                                    "value": 8438
+                                    "count": 28, 
+                                    "value": 3029
                                 }, 
                                 {
                                     "disposition": "Files Closed For Incompleteness", 
-                                    "count": 30, 
-                                    "value": 3060
+                                    "count": 8, 
+                                    "value": 891
                                 }
                             ]
                         }, 
                         {
                             "composition": "20-49% minority", 
+                            "dispositions": [
+                                {
+                                    "disposition": "Applications Received", 
+                                    "count": 597, 
+                                    "value": 56399
+                                }, 
+                                {
+                                    "disposition": "Loans Originated", 
+                                    "count": 362, 
+                                    "value": 35607
+                                }, 
+                                {
+                                    "disposition": "Apps. Approved But Not Accepted", 
+                                    "count": 35, 
+                                    "value": 3113
+                                }, 
+                                {
+                                    "disposition": "Applications Denied", 
+                                    "count": 130, 
+                                    "value": 10101
+                                }, 
+                                {
+                                    "disposition": "Applications Withdrawn", 
+                                    "count": 48, 
+                                    "value": 5409
+                                }, 
+                                {
+                                    "disposition": "Files Closed For Incompleteness", 
+                                    "count": 22, 
+                                    "value": 2169
+                                }
+                            ]
+                        }, 
+                        {
+                            "composition": "50-79% minority", 
                             "dispositions": [
                                 {
                                     "disposition": "Applications Received", 
@@ -810,7 +845,7 @@
                             ]
                         }, 
                         {
-                            "composition": "50-79% minority", 
+                            "composition": "80-100% minority", 
                             "dispositions": [
                                 {
                                     "disposition": "Applications Received", 
@@ -841,41 +876,6 @@
                                     "disposition": "Files Closed For Incompleteness", 
                                     "count": 5, 
                                     "value": 336
-                                }
-                            ]
-                        }, 
-                        {
-                            "composition": "80-100% minority", 
-                            "dispositions": [
-                                {
-                                    "disposition": "Applications Received", 
-                                    "count": 0, 
-                                    "value": 0
-                                }, 
-                                {
-                                    "disposition": "Loans Originated", 
-                                    "count": 0, 
-                                    "value": 0
-                                }, 
-                                {
-                                    "disposition": "Apps. Approved But Not Accepted", 
-                                    "count": 0, 
-                                    "value": 0
-                                }, 
-                                {
-                                    "disposition": "Applications Denied", 
-                                    "count": 0, 
-                                    "value": 0
-                                }, 
-                                {
-                                    "disposition": "Applications Withdrawn", 
-                                    "count": 0, 
-                                    "value": 0
-                                }, 
-                                {
-                                    "disposition": "Files Closed For Incompleteness", 
-                                    "count": 0, 
-                                    "value": 0
                                 }
                             ]
                         }
@@ -924,38 +924,73 @@
                             "dispositions": [
                                 {
                                     "disposition": "Applications Received", 
-                                    "count": 1188, 
-                                    "value": 159285
+                                    "count": 444, 
+                                    "value": 62526
                                 }, 
                                 {
                                     "disposition": "Loans Originated", 
-                                    "count": 714, 
-                                    "value": 98707
+                                    "count": 273, 
+                                    "value": 39044
                                 }, 
                                 {
                                     "disposition": "Apps. Approved But Not Accepted", 
-                                    "count": 83, 
-                                    "value": 12171
+                                    "count": 32, 
+                                    "value": 5363
                                 }, 
                                 {
                                     "disposition": "Applications Denied", 
-                                    "count": 238, 
-                                    "value": 27992
+                                    "count": 86, 
+                                    "value": 11091
                                 }, 
                                 {
                                     "disposition": "Applications Withdrawn", 
-                                    "count": 118, 
-                                    "value": 15971
+                                    "count": 46, 
+                                    "value": 6216
                                 }, 
                                 {
                                     "disposition": "Files Closed For Incompleteness", 
-                                    "count": 35, 
-                                    "value": 4444
+                                    "count": 7, 
+                                    "value": 812
                                 }
                             ]
                         }, 
                         {
                             "composition": "20-49% minority", 
+                            "dispositions": [
+                                {
+                                    "disposition": "Applications Received", 
+                                    "count": 744, 
+                                    "value": 96759
+                                }, 
+                                {
+                                    "disposition": "Loans Originated", 
+                                    "count": 441, 
+                                    "value": 59663
+                                }, 
+                                {
+                                    "disposition": "Apps. Approved But Not Accepted", 
+                                    "count": 51, 
+                                    "value": 6808
+                                }, 
+                                {
+                                    "disposition": "Applications Denied", 
+                                    "count": 152, 
+                                    "value": 16901
+                                }, 
+                                {
+                                    "disposition": "Applications Withdrawn", 
+                                    "count": 72, 
+                                    "value": 9755
+                                }, 
+                                {
+                                    "disposition": "Files Closed For Incompleteness", 
+                                    "count": 28, 
+                                    "value": 3632
+                                }
+                            ]
+                        }, 
+                        {
+                            "composition": "50-79% minority", 
                             "dispositions": [
                                 {
                                     "disposition": "Applications Received", 
@@ -986,41 +1021,6 @@
                                     "disposition": "Files Closed For Incompleteness", 
                                     "count": 1, 
                                     "value": 68
-                                }
-                            ]
-                        }, 
-                        {
-                            "composition": "50-79% minority", 
-                            "dispositions": [
-                                {
-                                    "disposition": "Applications Received", 
-                                    "count": 0, 
-                                    "value": 0
-                                }, 
-                                {
-                                    "disposition": "Loans Originated", 
-                                    "count": 0, 
-                                    "value": 0
-                                }, 
-                                {
-                                    "disposition": "Apps. Approved But Not Accepted", 
-                                    "count": 0, 
-                                    "value": 0
-                                }, 
-                                {
-                                    "disposition": "Applications Denied", 
-                                    "count": 0, 
-                                    "value": 0
-                                }, 
-                                {
-                                    "disposition": "Applications Withdrawn", 
-                                    "count": 0, 
-                                    "value": 0
-                                }, 
-                                {
-                                    "disposition": "Files Closed For Incompleteness", 
-                                    "count": 0, 
-                                    "value": 0
                                 }
                             ]
                         }, 

@@ -43,6 +43,7 @@ class report_4x(constructor):
 		build_X.set_msa_names(cur) #builds a list of msa names as a dictionary
 
 		location = (MSA,) #pass the MSA nubmers as a tuple to Psycopg2 (doesn't take singletons)
+
 		self.parsed.inputs['small county flag'] = self.agg.get_small_county_flag(cur, location)
 		conditions = getattr(self.queries, ('table_' + self.report_number.replace(' ','_').replace('-','_') +'_conditions'))()
 		SQL = (self.queries.SQL_Count + conditions).format(year=self.year, MSA=MSA)

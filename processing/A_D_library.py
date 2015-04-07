@@ -243,7 +243,60 @@ class parse_inputs(AD_report):
 		self.inputs['minority percent'] = row['minoritypopulationpct'] #%of population that is minority
 		self.inputs['minority percent index'] = MSA_index.minority_percent(self.inputs) #sets the minority population percent to an index for aggregation
 		self.inputs['tract to MSA income'] = row['tract_to_msa_md_income'] #ratio of tract to msa/md income
-		self.inputs['tract income index'] = MSA_index.tract_to_MSA_income(self.inputs) #sets the tract to msa income ratio to an index for aggregation (low,
+		self.inputs['tract income index'] = MSA_index.tract_to_MSA_income(self.inputs) #sets the tract to msa income ratio to an index for aggregation (low, middle, moderate,  high
+
+class MSA_info(AD_report): #contains functions for setting aggregate information for the MSA
+
+	def app_income_to_MSA(self, inputs): #set income bracket index
+		if inputs['income'] == 'NA  ' or inputs['income'] == '    ':
+			return 5 #applicant income unavailable, feeds to 'income not available'
+		elif inputs['MSA median income'] == 'NA      ' or inputs['MSA median income'] == '        ' :
+			return 6 #placeholder for MSA median income unavailable, feeds to 'income not available'
+		else:
+			inputs['percent MSA income'] = (float(inputs['income']) / (float(inputs['MSA median income'] )/1000)) *100 #common size median income and create ##.##% format ratio
+			#determine income bracket for use as an index in the JSON object
+			if inputs['percent MSA income'] < 50:
+				return 0
+			elif inputs['percent MSA income'] <= 80:
+				return 1
+			elif inputs['percent MSA income'] <= 100:
+				return 2
+			elif inputs['percent MSA income'] <= 120:
+				return 3
+			elif inputs['percent MSA income'] >= 120:
+				return 4
+			else:
+				print 'error setting percent MSA income bracket for index'
+
+	def minority_percent(self, inputs): #set index codes for minority population percent
+		if inputs['minority percent'] == '      ' or inputs['minority percent'] == 'NA    ': #if no information is available use an out of bounds index
+			return  5
+		elif float(inputs['minority percent']) < 10.0:
+			return  0
+		elif float(inputs['minority percent']) <19.0:
+			return 1
+		elif float(inputs['minority percent'])  <= 49.0:
+			return  2
+		elif float(inputs['minority percent'])  <= 79.0:
+			return  3
+		elif float(inputs['minority percent'])  <= 100.0:
+			return  4
+		else:
+			print "minority percent index not set"
+
+	def tract_to_MSA_income(self, inputs): #set census MSA income level: low, moderate, middle, upper
+		if inputs['tract to MSA income'] == '      ' or inputs['tract to MSA income'] == 'NA    ': #if no information is available use an out of bounds index
+			return 4 #not stored in report 3-1
+		elif float(inputs['tract to MSA income']) < 50.0:
+			return 0
+		elif float(inputs['tract to MSA income']) <= 79.0:
+			return 1
+		elif float(inputs['tract to MSA income']) <= 119.0:
+			return 2
+		elif float(inputs['tract to MSA income']) >= 119.0:
+			return 3
+		else:
+			print "error setting tract to MSA income index"
 
 class demographics(AD_report):
 	#holds all the functions for setting race, minority status, and ethnicity for FFIEC A&D reports
@@ -305,28 +358,33 @@ class demographics(AD_report):
 		return minority_count
 
 	def set_non_white(self, race_list): #pass in a list of length 5, return a boolean
+
 		for i in range(0,5):
 			if race_list[i] < 5 and race_list[i] != 0:
 				return True #flag true if applicant listed a minority race
-				break
-			elif race_list[i] == 5:
-				return False #flag false if the only race listed was white (5)
+			else:
+				if race_list[i] < 6 and race_list[i] !=0:
+					return False
 
-			#set default return to true or false and then only run 1 check
+
 	def set_joint(self, inputs): #takes a dictionary 'inputs' which is held in the controller(?) object and used to process each loan row
+		#set default return to true or false and then only run 1 check
 		#joint status exists if one borrower is white and one is non-white
 		#check to see if joint status exists
-		if inputs['app non white flag'] == False and inputs['co non white flag'] == False:
-			return False #flag false if both applicant and co-applicant are white
-		elif inputs['app non white flag'] == True and inputs['co non white flag'] == True:
-			return False #flag false if both applicant and co-applicant are minority
-		elif inputs['app non white flag'] == True and inputs['co non white flag'] ==  False:
+		inputs['joint status'] = False
+		#if inputs['app non white flag'] == False and inputs['co non white flag'] == False:
+		#	return False #flag false if both applicant and co-applicant are white
+		#elif inputs['app non white flag'] == True and inputs['co non white flag'] == True:
+		#	return False #flag false if both applicant and co-applicant are minority
+		if inputs['app non white flag'] == True and inputs['co non white flag'] ==  False:
 			return True #flag true if one applicant is minority and one is white
 		elif inputs['app non white flag'] == False and inputs['co non white flag'] == True:
-			return True #flag true if one applicant is minority and one is white
+			return True #flag true if one applicant is minority and one is
+
 
 	def set_minority_status(self, inputs):
 		#determine minority status, this is a binary category
+		'''Old code considering co-applicant
 		if inputs['app non white flag'] is None and inputs['co non white flag'] is None and int(inputs['a ethn']) > 2 and int(inputs['co ethn']) > 2:
 			return 2 #filter out non-natural person loans
 		elif inputs['app non white flag'] == True or inputs['co non white flag'] == True or inputs['a ethn'] == '1' or inputs['co ethn'] == '1':
@@ -335,12 +393,40 @@ class demographics(AD_report):
 			return 0 #if both applicants reported white race and non-hispanic/latino ethnicity then minority status is false
 		else:
 			print 'minority status not set'
+		'''
+		'''second attempt
+		if inputs['app non white flag'] is None and int(inputs['a ethn']) > 2:
+			return 2 #filter out non-natural person loans
+		elif inputs['app non white flag'] == True or inputs['a ethn'] == '1':
+			return 1
+		elif inputs['app non white flag'] != True and inputs['a ethn'] != '1':
+			return 0
+		else:
+			print 'minority status not set'
+		'''
 
-	def set_loan_ethn(self, inputs):
+		#not shown: non-hispanics with no race available, whites with no ethnicity available, and loans with no race/ethn available
+		if inputs['race'] == 7 and inputs['ethnicity'] !=0: #non-hispanics with no race info
+			return 3
+		elif inputs['race'] == 4 and inputs['ethnicity'] == 3: #whites with no ethnicity info
+			return 3
+		elif inputs['race'] == 7 and inputs['ethnicity'] == 3: #loans with no race and no ethn info
+			return 3
+
+		elif inputs['race'] == 4 and inputs['ethnicity'] != 0 and inputs['ethnicity'] != 2: #white non-hispanic
+			return 0
+		elif inputs['race'] < 7 or inputs['ethnicity'] ==0 or inputs['ethnicity'] == 2: #non white or hispanic
+			return 1
+		#elif inputs['race'] == 6 or inputs['race'] == 5: #joint status race
+		#	return 1
+		else:
+			print inputs['race'], inputs['ethnicity']
+			print 'minority status not set'
+ 	def set_loan_ethn(self, inputs):
 		#this function outputs a number code for ethnicity: 0 - hispanic or latino, 1 - not hispanic/latino
 		#2 - joint (1 applicant hispanic/latino 1 not), 3 - ethnicity not available
 		#if both ethnicity fields are blank report not available(3)
-		if inputs['a ethn'] == ' ' and inputs['co ethn'] == ' ':
+		if inputs['a ethn'] == ' ':# and inputs['co ethn'] == ' ':
 			return  3 #set to not available
 		#determine if the loan is joint hispanic/latino and non hispanic/latino(2)
 		elif inputs['a ethn'] == '1' and inputs['co ethn'] == '2':
@@ -357,11 +443,12 @@ class demographics(AD_report):
 		#determine if loan is not hispanic or latino
 		elif inputs['a ethn'] == '2' and inputs['co ethn'] != '1': #applicant not hispanic (positive entry), co applicant not hispanic (all other codes)
 			return  1
-		elif inputs['a ethn'] != '1' and inputs['co ethn'] == '2': #co applicant not hispanic (positive entry), applicant not hispanic (all other codes)
-			return  1
+		#elif inputs['a ethn'] != '1' and inputs['co ethn'] == '2': #co applicant not hispanic (positive entry), applicant not hispanic (all other codes)
+		#	return  1
 		elif (inputs['a ethn'] == '3' or inputs['a ethn'] == '4') and (inputs['co ethn'] != '1' and inputs['co ethn'] != '2'): #no applicant ethnicity information, co applicant did not mark ethnicity positively
 			return  3
 		else:
+			return 3
 			print "error setting ethnicity"
 
 	def a_race_list(self, row):
@@ -369,7 +456,8 @@ class demographics(AD_report):
 		for i in range(0, 5): #convert ' ' entries to 0 for easier comparisons and loan aggregation
 			if a_race[i] == ' ':
 				a_race[i] = 0
-
+			else:
+				a_race[i] = int(a_race[i])
 		return [int(race) for race in a_race] #convert string entries to int for easier comparison and loan aggregation
 
 	def co_race_list(self, row):
@@ -377,6 +465,9 @@ class demographics(AD_report):
 		for i in range(0,5):
 			if co_race[i] == ' ':
 				co_race[i] = 0
+			else:
+				co_race[i] = int(co_race[i])
+
 		return [int(race) for race in co_race] #convert string entries to int for easier comparison and loan aggregation
 
 	def set_race(self, inputs, race_list): #sets the race to an integer index for loan aggregation
@@ -399,7 +490,7 @@ class demographics(AD_report):
 			for i in range(1,5):
 				for r in range(0,5):
 					if race_list[r] == i:
-						return race_list[r] -1 #return first instance of minority race
+						return race_list[r] -1 #return first instance of minority race (-1 adjusts race code to race index in the JSON)
 						break
 
 class build_JSON(AD_report):
@@ -431,6 +522,7 @@ class build_JSON(AD_report):
 		self.dispositions_list = ['Applications Received', 'Loans Originated', 'Apps. Approved But Not Accepted', 'Applications Denied', 'Applications Withdrawn', 'Files Closed For Incompleteness']
 		self.gender_list = ['Male', 'Female', 'Joint (Male/Female)']
 		self.end_points = ['count', 'value']
+		self.denial_reasons = ['Debt-to-Income Ratio', 'Employment History', 'Credit History', 'Collateral', 'Insufficient Cash', 'Unverifiable Information', 'Credit Ap. Incomplete', 'Mortgage Insurance Denied', 'Other', 'Total']
 	def msas_in_state(self, cursor, selector, report_type):
 		#this function builds a list of MSA numbers and names in each state
 		#set sql query text to pull MSA names for each MSA number
@@ -473,14 +565,11 @@ class build_JSON(AD_report):
 			state_msas['msa-mds'] = msas
 			name = 'msa-mds-all.json'
 			#this year path uses the year from the input file
-			#aggregate needs to be variablalized
-
 
 			path = '../'+report_type+"/"+selector.report_list['year'][1]+"/"+self.state_names[state].replace(' ', '-').lower()
 			print path #change this to a log file write
 			if not os.path.exists(path): #check if path exists
 				os.makedirs(path) #if path not present, create it
-			#self.write_JSON(name, state_msas, path)
 			self.jekyll_for_state(path) #create and write jekyll file to state path
 
 	def jekyll_for_msa(self, path):
@@ -531,7 +620,7 @@ class build_JSON(AD_report):
 		elif table_num == '4-2':
 			return 'Disposition of applications for conventional home-purchase loans 1- to 4- family and manufactured home dwellings, by race, ethnicity, gender and income of applicant'
 		elif table_num == '4-3':
-			return 'Disposition of applications to refinnace loans on 1- to 4- family and manufactured home dwellings, by race, ethnicity, gender and income of applicant'
+			return 'Disposition of applications to refinace loans on 1- to 4- family and manufactured home dwellings, by race, ethnicity, gender and income of applicant'
 		elif table_num == '4-4':
 			return 'Disposition of applications for home improvement loans, 1- to 4- family and manufactured home dwellings, by race, ethnicity, gender and income of applicant'
 		elif table_num == '4-5':
@@ -563,7 +652,7 @@ class build_JSON(AD_report):
 		elif table_num =='7-5':
 			return 'Disposition of applications for loans on dwellings for 5 or more families, by characteristics of census tract in which property is located'
 		elif table_num =='7-6':
-			return 'Disposition of applicationss from nonoccupatns for home-purchase, home improvement, or refinancing loans, 1- to 4-family and manufactured home dwellings, by characteristics of census tract in which property is located'
+			return 'Disposition of applications from nonoccupatns for home-purchase, home improvement, or refinancing loans, 1- to 4-family and manufactured home dwellings, by characteristics of census tract in which property is located'
 		elif table_num =='7-7':
 			return 'Disposition of applications for home-purchase, home improvement, or refinancing loans, manufactured home dwellings, by characteristics of census tract in which property is located'
 
@@ -585,36 +674,20 @@ class build_JSON(AD_report):
 		self.container['msa'] = self.msa
 		return self.container
 
-	def set_stuff(self, thing_list, thing_singular):
-		listyness = []
-		for thing in thing_list:
-			things_holding = OrderedDict({})
-			things_holding[thing_singular] = "{}".format(thing)
-			listyness.append(things_holding)
-		return listyness
-
-	def set_brackets(self, bracket_singular, bracket_list):
-		brackets = []
-		for bracket in bracket_list:
-			holding = OrderedDict({})
-			holding[bracket_singular] = "{}".format(bracket)
-			brackets.append(holding)
-		return brackets
-
 	def table_7x_builder(self):
 		self.container['censuscharacteristics'] = []
 		holding = OrderedDict({})
-		holding['characteristic'] = 'Race/Ethnic Composition'
+		holding['characteristic'] = 'Racial/Ethnic Composition'
 		holding['compositions'] = self.set_brackets('composition', self.tract_pct_minority)
 		for i in range(0, len(holding['compositions'])):
-			holding['compositions'][i]['dispositions'] = self.set_dispositions(self.end_points)
+			holding['compositions'][i]['dispositions'] = self.set_list(self.end_points, self.dispositions_list, 'disposition')
 		self.container['censuscharacteristics'].append(holding)
 
 		holding = OrderedDict({})
 		holding['characteristic'] = 'Income Characteristics'
 		holding['incomes'] = self.set_brackets('income', self.tract_income)
 		for i in range(0, len(holding['incomes'])):
-			holding['incomes'][i]['dispositions'] = self.set_dispositions(self.end_points)
+			holding['incomes'][i]['dispositions'] = self.set_list(self.end_points, self.dispositions_list, 'disposition')
 		self.container['censuscharacteristics'].append(holding)
 
 		extra_level = []
@@ -625,21 +698,21 @@ class build_JSON(AD_report):
 		for i in range(0, len(holding['incomes'])):
 			holding['incomes'][i]['compositions'] = self.set_brackets('composition', self.tract_pct_minority)
 			for j in range(0, len(holding['incomes'][i]['compositions'])):
-				holding['incomes'][i]['compositions'][j]['dispositions'] = self.set_dispositions(self.end_points)
+				holding['incomes'][i]['compositions'][j]['dispositions'] = self.set_list(self.end_points, self.dispositions_list, 'disposition')
 		extra_level.append(holding)
 		self.container['incomeRaces'] = extra_level
 
 		holding = OrderedDict({})
 		holding['type'] = 'Small County'
-		holding['dispositions'] = self.set_dispositions(self.end_points)
+		holding['dispositions'] = self.set_list(self.end_points, self.dispositions_list, 'disposition')
 		self.container['types'] = []
 		self.container['types'].append(holding)
 
 		holding = OrderedDict({})
 		holding['type'] = 'All Other Tracts'
-		holding['dispositions'] = self.set_dispositions(self.end_points)
+		holding['dispositions'] = self.set_list(self.end_points, self.dispositions_list, 'disposition')
 		self.container['types'].append(holding)
-		self.container['total'] = self.set_dispositions(self.end_points)
+		self.container['total'] = self.set_list(self.end_points, self.dispositions_list, 'disposition')
 
 
 		return self.container
@@ -649,21 +722,21 @@ class build_JSON(AD_report):
 		self.container['applicantincomes'] = self.set_brackets('applicantincome', self.applicant_income_bracket[:-1])
 		race_holding = OrderedDict({})
 		race_holding['characteristic'] = 'Race'
-		race_holding['races'] = self.set_stuff(self.race_names, 'race')
+		race_holding['races'] = self.set_brackets('race', self.race_names)
 		for i in range(0,len(race_holding['races'])):
-			race_holding['races'][i]['dispositions'] = self.set_dispositions(self.end_points)
+			race_holding['races'][i]['dispositions'] = self.set_list(self.end_points, self.dispositions_list, 'disposition')
 
 		ethnicity_holding = OrderedDict({})
 		ethnicity_holding['characteristic'] = 'Ethnicity'
-		ethnicity_holding['ethnicities'] = self.set_stuff(self.ethnicity_names, 'ethnicity')
+		ethnicity_holding['ethnicities'] = self.set_brackets('ethnicity', self.ethnicity_names)
 		for i in range(0,len(ethnicity_holding['ethnicities'])):
-			ethnicity_holding['ethnicities'][i]['dispositions'] = self.set_dispositions(self.end_points)
+			ethnicity_holding['ethnicities'][i]['dispositions'] = self.set_list(self.end_points, self.dispositions_list, 'disposition')
 
 		minoritystatus_holding = OrderedDict({})
 		minoritystatus_holding['characteristic'] = 'Minority Status'
-		minoritystatus_holding['minoritystatus'] = self.set_stuff(self.minority_statuses, 'minoritystatus')
+		minoritystatus_holding['minoritystatus'] = self.set_brackets('minoritystatus', self.minority_statuses)
 		for i in range(0,len(minoritystatus_holding['minoritystatus'])):
-			minoritystatus_holding['minoritystatus'][i]['dispositions'] = self.set_dispositions(self.end_points)
+			minoritystatus_holding['minoritystatus'][i]['dispositions'] = self.set_list(self.end_points, self.dispositions_list, 'disposition')
 		#make lists of borrower characterisitics
 		for i in range(0,len(self.container['applicantincomes'])):
 			self.container['applicantincomes'][i]['borrowercharacteristics'] = []
@@ -671,18 +744,9 @@ class build_JSON(AD_report):
 			self.container['applicantincomes'][i]['borrowercharacteristics'].append(ethnicity_holding)
 			self.container['applicantincomes'][i]['borrowercharacteristics'].append(minoritystatus_holding)
 
-		self.container['total'] = self.set_dispositions(self.end_points)
+		self.container['total'] = self.set_list(self.end_points, self.dispositions_list, 'disposition')
 		return self.container
 
-	def set_dispositions(self, end_points): #builds the dispositions of applications section of report 4-1 JSON
-		dispositions = []
-		for item in self.dispositions_list:
-			dispositionsholding = OrderedDict({})
-			dispositionsholding['disposition'] = "{}".format(item)
-			dispositions.append(dispositionsholding)
-			for point in end_points:
-				dispositionsholding[point] = 0
-		return dispositions
 
 	def set_4x_gender(self): #creates the gender portion of table 4-1 JSON
 		genders = []
@@ -695,13 +759,13 @@ class build_JSON(AD_report):
 	def set_gender_disps(self):
 		for i in range(0, len(self.race_names)):
 			for g in range(0, len(self.gender_list)):
-				self.container['races'][i]['genders'][g]['dispositions'] = self.set_dispositions(['count', 'value'])
+				self.container['races'][i]['genders'][g]['dispositions'] = self.set_list(self.end_points, self.dispositions_list, 'disposition')
 		for i in range(0, len(self.ethnicity_names)):
 			for g in range(0, len(self.gender_list)):
-				self.container['ethnicities'][i]['genders'][g]['dispositions'] = self.set_dispositions(['count', 'value'])
+				self.container['ethnicities'][i]['genders'][g]['dispositions'] = self.set_list(self.end_points, self.dispositions_list, 'disposition')
 		for i in range(0, len(self.minority_statuses)):
 			for g in range(0, len(self.gender_list)):
-				self.container['minoritystatuses'][i]['genders'][g]['dispositions'] = self.set_dispositions(['count', 'value'])
+				self.container['minoritystatuses'][i]['genders'][g]['dispositions'] = self.set_list(self.end_points, self.dispositions_list, 'disposition')
 	def set_4x_races(self):
 		races = []
 		for race in self.race_names:
@@ -710,7 +774,7 @@ class build_JSON(AD_report):
 			races.append(holding)
 		self.container['races'] = races
 		for i in range(0,len(self.container['races'])):
-			self.container['races'][i]['dispositions'] = self.set_dispositions(['count', 'value'])
+			self.container['races'][i]['dispositions'] = self.set_list(self.end_points, self.dispositions_list, 'disposition')
 			self.container['races'][i]['genders'] = self.set_4x_gender()
 
 	def set_4x_ethnicity(self):
@@ -721,7 +785,7 @@ class build_JSON(AD_report):
 			ethnicities.append(holding)
 		self.container['ethnicities'] = ethnicities
 		for i in range(0, len(self.container['ethnicities'])):
-			self.container['ethnicities'][i]['dispositions'] = self.set_dispositions(['count', 'value'])
+			self.container['ethnicities'][i]['dispositions'] = self.set_list(self.end_points, self.dispositions_list, 'disposition')
 			self.container['ethnicities'][i]['genders'] = self.set_4x_gender()
 
 	def set_4x_minority(self):
@@ -732,7 +796,7 @@ class build_JSON(AD_report):
 			minoritystatuses.append(holding)
 		self.container['minoritystatuses'] = minoritystatuses
 		for i in range(0, len(self.container['minoritystatuses'])):
-			self.container['minoritystatuses'][i]['dispositions'] = self.set_dispositions(['count', 'value'])
+			self.container['minoritystatuses'][i]['dispositions'] = self.set_list(self.end_points, self.dispositions_list, 'disposition')
 			self.container['minoritystatuses'][i]['genders'] = self.set_4x_gender()
 
 	def set_4x_incomes(self):
@@ -743,8 +807,8 @@ class build_JSON(AD_report):
 			applicantincomes.append(holding)
 		self.container['incomes'] = applicantincomes
 		for i in range(0, len(self.container['incomes'])):
-			self.container['incomes'][i]['dispositions'] = self.set_dispositions(['count', 'value'])
-		self.container['total'] = self.set_dispositions(['count', 'value'])
+			self.container['incomes'][i]['dispositions'] = self.set_list(self.end_points, self.dispositions_list, 'disposition')
+		self.container['total'] = self.set_list(self.end_points, self.dispositions_list, 'disposition')
 
 	def table_4x_builder(self): #builds the table 4-1 JSON object: disposition of application by race and gender
 		self.set_4x_races()
@@ -754,15 +818,25 @@ class build_JSON(AD_report):
 		self.set_gender_disps()
 		return self.container
 
-	def set_purchasers(self, holding_list): #this function sets the purchasers section of report 3-2
-		purchasers = []
-		for item in self.purchaser_names:
-			purchasersholding = OrderedDict({})
-			purchasersholding['name'] = "{}".format(item)
-			for item in holding_list: #pass in the appropriate holding list for each set_purchasers call
-				purchasersholding[item] = 0
-			purchasers.append(purchasersholding)
-		return purchasers
+	def set_brackets(self, bracket_singular, bracket_list):
+		brackets = []
+		for bracket in bracket_list:
+			holding = OrderedDict({})
+			holding[bracket_singular] = "{}".format(bracket)
+			brackets.append(holding)
+		return brackets
+
+
+
+	def set_list(self, end_points, key_list, key_name):
+		holding_list = []
+		for item in key_list:
+			holding_dict = OrderedDict({})
+			holding_dict[key_name] = "{}".format(item)
+			for point in end_points:
+				holding_dict[point] = 0
+			holding_list.append(holding_dict)
+		return holding_list
 
 	def set_purchasers_NA(self, holding_list):
 		purchasers = []
@@ -785,7 +859,8 @@ class build_JSON(AD_report):
 			if self.table32_rates.index(rate) < 4:
 				holding['purchasers'] = self.set_purchasers_NA(['firstliencount', 'firstlienvalue', 'juniorliencount', 'juniorlienvalue'])
 			else:
-				holding['purchasers'] = self.set_purchasers(['firstliencount', 'firstlienvalue', 'juniorliencount', 'juniorlienvalue'])
+				#holding['purchasers'] = self.set_purchasers(['firstliencount', 'firstlienvalue', 'juniorliencount', 'juniorlienvalue'])
+				holding['purchasers'] = self.set_list(['firstliencount', 'firstlienvalue', 'juniorliencount', 'juniorlienvalue'], self.purchaser_names, 'name')
 			spreads.append(holding)
 		return spreads
 
@@ -800,7 +875,7 @@ class build_JSON(AD_report):
 				top[container_name] = []
 			Header = False
 			holding[container[container_name]] = "{}".format(item)
-			holding['purchasers'] = self.set_purchasers(['count', 'value'])
+			holding['purchasers'] = self.set_list(self.end_points, self.purchaser_names, 'name')
 			top[container_name].append(holding)
 		self.borrowercharacteristics.append(top)
 
@@ -815,7 +890,7 @@ class build_JSON(AD_report):
 				top[container_name] = []
 			Header = False
 			holding[container[container_name]] = "{}".format(item)
-			holding['purchasers'] = self.set_purchasers(['count', 'value'])
+			holding['purchasers'] = self.set_list(self.end_points, self.purchaser_names, 'name')
 			top[container_name].append(holding)
 		self.censuscharacteristics.append(top)
 
@@ -825,7 +900,7 @@ class build_JSON(AD_report):
 		for cat in categories:
 			holding = OrderedDict({})
 			holding['pricing']= "{}".format(cat)
-			holding['purchasers']  = self.set_purchasers(['firstliencount', 'firstlienvalue', 'juniorliencount', 'juniorlienvalue']) #purchasers is overwritten each pass in the holding dictionary
+			holding['purchasers']  = self.set_list(['firstliencount', 'firstlienvalue', 'juniorliencount', 'juniorlienvalue'], self.purchaser_names, 'name') #purchasers is overwritten each pass in the holding dictionary
 			pricinginformation.append(holding)
 		self.container['pricinginformation'] = pricinginformation
 		holding = OrderedDict({})
@@ -833,7 +908,7 @@ class build_JSON(AD_report):
 		self.container['points'] = points
 		hoepa = OrderedDict({})
 		hoepa['pricing'] = 'hoepa loans'
-		hoepa['purchasers'] = self.set_purchasers(['firstliencount', 'firstlienvalue', 'juniorliencount', 'juniorlienvalue'])
+		hoepa['purchasers'] = self.set_list(['firstliencount', 'firstlienvalue', 'juniorliencount', 'juniorlienvalue'], self.purchaser_names, 'name')
 		self.container['hoepa'] = hoepa
 		return self.container
 
@@ -849,7 +924,7 @@ class build_JSON(AD_report):
 		totals = {} #totals sums all the loan counts and values for each purchaser
 		top = OrderedDict({})
 		holding = OrderedDict({})
-		totals['purchasers'] = self.set_purchasers(['count', 'value'])
+		totals['purchasers'] = self.set_list(self.end_points, self.purchaser_names, 'name')
 		self.container['total'] = totals
 		return self.container
 
@@ -882,56 +957,6 @@ class connect_DB(AD_report): #connects to the SQL database
 			print "I am unable to connect to the database"
 		return conn.cursor(cursor_factory=psycopg2.extras.DictCursor) #return a dictionary cursor object
 
-class MSA_info(AD_report): #contains functions for setting aggregate information for the MSA
-
-	def app_income_to_MSA(self, inputs): #set income bracket index
-		if inputs['income'] == 'NA  ' or inputs['income'] == '    ':
-			return 5 #applicant income unavailable, feeds to 'income not available'
-		elif inputs['MSA median income'] == 'NA      ' or inputs['MSA median income'] == '        ' :
-			return 6 #placeholder for MSA median income unavailable, feeds to 'income not available'
-		else:
-			inputs['percent MSA income'] = (float(inputs['income']) / (float(inputs['MSA median income'] )/1000)) *100 #common size median income and create ##.##% format ratio
-			#determine income bracket for use as an index in the JSON object
-			if inputs['percent MSA income'] < 50:
-				return 0
-			elif inputs['percent MSA income'] <= 80:
-				return 1
-			elif inputs['percent MSA income'] <= 100:
-				return 2
-			elif inputs['percent MSA income'] <= 120:
-				return 3
-			elif inputs['percent MSA income'] >= 120:
-				return 4
-			else:
-				print 'error setting percent MSA income bracket for index'
-
-	def minority_percent(self, inputs): #set index codes for minority population percent
-		if inputs['minority percent'] == '      ' or inputs['minority percent'] == 'NA    ': #if no information is available use an out of bounds index
-			return  4
-		elif float(inputs['minority percent']) < 10.0:
-			return  0
-		elif float(inputs['minority percent'])  <= 49.0:
-			return  1
-		elif float(inputs['minority percent'])  <= 79.0:
-			return  2
-		elif float(inputs['minority percent'])  <= 100.0:
-			return  3
-		else:
-			print "minority percent index not set"
-
-	def tract_to_MSA_income(self, inputs): #set census MSA income level: low, moderate, middle, upper
-		if inputs['tract to MSA income'] == '      ' or inputs['tract to MSA income'] == 'NA    ': #if no information is available use an out of bounds index
-			return 4 #not stored in report 3-1
-		elif float(inputs['tract to MSA income']) < 50.0:
-			return 0
-		elif float(inputs['tract to MSA income']) <= 79.0:
-			return 1
-		elif float(inputs['tract to MSA income']) <= 119.0:
-			return 2
-		elif float(inputs['tract to MSA income']) >= 119.0:
-			return 3
-		else:
-			print "error setting tract to MSA income index"
 
 class queries(AD_report):
 	#can I decompose these query parts into lists and concatenate them prior to passing to the cursor?
@@ -1056,6 +1081,8 @@ class aggregate(AD_report): #aggregates LAR rows by appropriate characteristics 
 		container['borrowercharacteristics'][0]['races'][inputs['race']]['purchasers'][inputs['purchaser']]['value'] += inputs['loan value']
 
 	def by_ethnicity(self, container, inputs): #aggregate loans by enthicity status
+		if inputs['purchaser'] == 0:
+			pass
 		container['borrowercharacteristics'][1]['ethnicities'][inputs['ethnicity']]['purchasers'][inputs['purchaser']]['count'] += 1
 		container['borrowercharacteristics'][1]['ethnicities'][inputs['ethnicity']]['purchasers'][inputs['purchaser']]['value'] += int(inputs['loan value'])
 
@@ -1073,7 +1100,7 @@ class aggregate(AD_report): #aggregates LAR rows by appropriate characteristics 
 			container['borrowercharacteristics'][3]['applicantincomes'][inputs['income bracket']]['purchasers'][inputs['purchaser']]['value'] += int(inputs['loan value'])
 
 	def by_minority_composition(self, container, inputs): #aggregate loans by MSA minority population percent
-		if inputs['minority percent index'] == 4: #minority percent not available
+		if inputs['minority percent index'] > 4: #minority percent not available
 			pass
 		else:
 			container['censuscharacteristics'][0]['tractpctminorities'][inputs['minority percent index']]['purchasers'][inputs['purchaser']]['count'] += 1
@@ -1205,16 +1232,48 @@ class aggregate(AD_report): #aggregates LAR rows by appropriate characteristics 
 			#first lien weighted median block
 			#print inputs[self.purchaser_first_lien_rates[n]], inputs[self.purchaser_first_lien_weight[n]]
 			if len(inputs[self.purchaser_first_lien_rates[n]]) >0 and len(inputs[self.purchaser_first_lien_weight[n]]) >0: #check to see if the array is populated
-				nd_first_rates = numpy.array(inputs[self.purchaser_first_lien_rates[n]]) #set arrays to nparrays
-				nd_first_values = numpy.array(inputs[self.purchaser_first_lien_weight[n]])
-				container['points'][9]['purchasers'][n]['firstlienvalue'] = round(weighted.median(nd_first_rates, nd_first_values),2) #for weighted median
+				nd_first_rates = inputs[self.purchaser_first_lien_rates[n]] #set arrays to nparrays
+				nd_first_values = inputs[self.purchaser_first_lien_weight[n]]
+				nd_first_rates, nd_first_values = zip(*sorted(zip(nd_first_rates, nd_first_values)))
+
+				step_size = round(float(sum(nd_first_values)) / len(nd_first_values),3)
+				steps_needed = (len(nd_first_values) / float(2))
+				nd_steps = [round(x/step_size,3) for x in nd_first_values]
+
+				count = 0
+				for i in range(0, len(nd_first_values)):
+					step_taken = nd_first_values[i] / float(step_size)
+					steps_needed -=step_taken
+					count +=1
+
+					if steps_needed <= 0:
+						#print nd_first_rates, "*"*10,nd_first_rates[count-1], count-1
+
+						container['points'][9]['purchasers'][n]['firstlienvalue'] = sorted(nd_first_rates)[count-1] #for weighted median
+						break
+
 			#junior lien weighted median block
-			#print self.purchaser_junior_lien_rates[n], inputs[self.purchaser_junior_lien_rates[n]]
-			#print self.purchaser_junior_lien_weight[n], inputs[self.purchaser_junior_lien_weight[n]]
 			if len(inputs[self.purchaser_junior_lien_rates[n]]) > 0 and len(inputs[self.purchaser_junior_lien_weight[n]]) >0: #check to see if the array is populated
-				nd_junior_rates = numpy.array(inputs[self.purchaser_junior_lien_rates[n]]) #set array to numpy array
-				nd_junior_values = numpy.array(inputs[self.purchaser_junior_lien_weight[n]]) #set arry to numpy array
-				container['points'][9]['purchasers'][n]['juniorlienvalue'] = round(weighted.median(nd_junior_rates, nd_junior_values),2)
+				nd_junior_rates = inputs[self.purchaser_junior_lien_rates[n]] #set array to numpy array
+				nd_junior_values = inputs[self.purchaser_junior_lien_weight[n]] #set arry to numpy array
+				nd_junior_rates, nd_junior_values = zip(*sorted(zip(nd_junior_rates, nd_junior_values)))
+
+				step_size = round(float(sum(nd_junior_values)) / len(nd_junior_values),3)
+				steps_needed = (len(nd_junior_values) / float(2))
+				nd_steps = [round(x/step_size,3) for x in nd_junior_values]
+
+				count = 0
+				for i in range(0, len(nd_junior_values)):
+					step_taken = nd_junior_values[i] / float(step_size)
+					steps_needed -=step_taken
+					count +=1
+
+					if steps_needed <= 0:
+						#print nd_junior_rates, "*"*10,nd_junior_rates[count-1], count-1
+
+						container['points'][9]['purchasers'][n]['juniorlienvalue'] = sorted(nd_junior_rates)[count-1] #for weighted median
+						break
+
 	def by_applicant_income_4x(self, container, inputs): #aggregate loans by applicant income index
 		if inputs['income bracket'] > 5 or inputs['action taken'] == ' ' or inputs['action taken'] > 5: #filter out of bounds indexes before calling aggregations
 			pass
@@ -1286,6 +1345,16 @@ class aggregate(AD_report): #aggregates LAR rows by appropriate characteristics 
 			container['total'][inputs['action taken']]['count'] +=1
 			container['total'][inputs['action taken']]['value'] += int(inputs['loan value'])
 
+	def by_5x_totals(self, container, inputs):
+		if inputs['action taken'] > 5:
+			pass
+		else:
+			container['total'][0]['count'] +=1
+			container['total'][0]['value'] += int(inputs['loan value'])
+
+			container['total'][inputs['action taken']]['count'] +=1
+			container['total'][inputs['action taken']]['value'] += int(inputs['loan value'])
+
 	def by_5x_race(self, container, inputs):
 		#print inputs['race'], inputs['income bracket'], inputs['action taken']
 		if inputs['income bracket'] > 4 or inputs['action taken'] > 5:
@@ -1296,6 +1365,7 @@ class aggregate(AD_report): #aggregates LAR rows by appropriate characteristics 
 			container['applicantincomes'][inputs['income bracket']]['borrowercharacteristics'][0]['races'][inputs['race']]['dispositions'][0]['value'] += int(inputs['loan value']) #increment value of applications received
 			container['applicantincomes'][inputs['income bracket']]['borrowercharacteristics'][0]['races'][inputs['race']]['dispositions'][inputs['action taken']]['count'] +=1 #increment count of action taken by race category
 			container['applicantincomes'][inputs['income bracket']]['borrowercharacteristics'][0]['races'][inputs['race']]['dispositions'][inputs['action taken']]['value'] += int(inputs['loan value']) #increment value of action taken by race category
+
 	def by_5x_ethnicity(self, container, inputs):
 		if inputs['income bracket'] > 4 or inputs['action taken'] > 5:
 			pass
@@ -1344,10 +1414,9 @@ class aggregate(AD_report): #aggregates LAR rows by appropriate characteristics 
 	def get_small_county_flag(self, cur, MSA):
 		#msa can be either an MSA or the last 5 of a geoid?
 		SQL = '''SELECT small_county FROM tract_to_cbsa_2010 WHERE geoid_msa = %s;'''
-
 		cur.execute(SQL, MSA)
 		small_county_flag = cur.fetchall()[0]
-		#print small_county_flag
+
 
 	def by_small_county(self, container, inputs):
 		if inputs['small county flag'] == '1':
@@ -1388,6 +1457,7 @@ class aggregate(AD_report): #aggregates LAR rows by appropriate characteristics 
 		self.by_5x_race(table5x, inputs)
 		self.by_5x_ethnicity(table5x, inputs)
 		self.by_5x_minoritystatus(table5x, inputs)
+		self.by_5x_totals(table5x, inputs)
 
 	def build_report4x(self, table4x, inputs): #call functions to fill JSON object for table 4-1 (FHA, FSA, RHS, and VA home purchase loans)
 		self.by_race_4x(table4x, inputs) #aggregate loans by race, gender, and applicaiton disposition
