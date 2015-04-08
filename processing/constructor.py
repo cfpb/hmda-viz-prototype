@@ -52,7 +52,7 @@ class report_4x(constructor):
 
 		if count > 0:
 			print count, 'LAR rows in MSA %s, for report %s, in %s' %(MSA, self.report_number, self.year)
-			if self.report_number[2] == '4' or self.report_number[2] == '5' or self.report_number[2] == '7':
+			if self.report_number[2] == '4' or self.report_number[2] == '5' or self.report_number[2] == '7' or self.report_number[2] == '8':
 				self.report_number = self.report_number[:4] + 'x' #'A 4-1'
 			columns = getattr(self.queries, ('table_' + self.report_number[2:].replace(' ','_').replace('-','_')+'_columns'))()
 
@@ -77,6 +77,13 @@ class report_4x(constructor):
 				self.agg.by_weighted_median(table_X, self.parsed.inputs)
 				self.agg.by_mean(table_X, self.parsed.inputs)
 
+			if self.report_number[2] == '8': #reports 8-x requires out of loop calculation of denial reason percents
+				self.agg.by_race_percent(table_X, self.parsed.inputs)
+				self.agg.by_ethnicity_percent(table_X, self.parsed.inputs)
+				self.agg.by_minority_status_percent(table_X, self.parsed.inputs)
+				self.agg.by_gender_percent(table_X, self.parsed.inputs)
+				self.agg.by_income_percent(table_X, self.parsed.inputs)
+
 			path = "../" +table_X['type']+"/"+table_X['year']+"/"+build_X.get_state_name(table_X['msa']['state']).replace(' ', '-').lower()+"/"+build_X.msa_names[MSA].replace(' ', '-').lower()+"/"+table_X['table']
 			if not os.path.exists(path): #check if path exists
 				os.makedirs(path) #if path not present, create it
@@ -99,6 +106,8 @@ class report_4x(constructor):
 			return 'build_report5x'
 		elif report_number[:3] == 'A 7':
 			return 'build_report7x'
+		elif report_number[:3] == 'A 8':
+			return 'build_report8x'
 
 	def JSON_constructor_return(self, report_number):
 		if report_number == 'A 3-1':
@@ -111,6 +120,8 @@ class report_4x(constructor):
 			return 'table_5x_builder'
 		elif report_number[:3] == 'A 7':
 			return 'table_7x_builder'
+		elif report_number[:3] == 'A 8':
+			return 'table_8x_builder'
 
 	def parse_return(self, report_number):
 		if report_number == 'A 3-1':
@@ -123,4 +134,6 @@ class report_4x(constructor):
 			return 'parse_t5x'
 		elif report_number[:3] == 'A 7':
 			return 'parse_t7x'
+		elif report_number[:3] == 'A 8':
+			return 'parse_t8x'
 

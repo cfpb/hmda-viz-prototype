@@ -40,7 +40,7 @@ class build_JSON(AD_report):
 		self.dispositions_list = ['Applications Received', 'Loans Originated', 'Apps. Approved But Not Accepted', 'Applications Denied', 'Applications Withdrawn', 'Files Closed For Incompleteness']
 		self.gender_list = ['Male', 'Female', 'Joint (Male/Female)']
 		self.end_points = ['count', 'value']
-		self.denial_reasons = ['Debt-to-Income Ratio', 'Employment History', 'Credit History', 'Collateral', 'Insufficient Cash', 'Unverifiable Information', 'Credit Ap. Incomplete', 'Mortgage Insurance Denied', 'Other', 'Total']
+		self.denial_reasons = ['Debt-to-Income Ratio', 'Employment History', 'Credit History', 'Collateral', 'Insufficient Cash', 'Unverifiable Information', 'Credit App. Incomplete', 'Mortgage Insurance Denied', 'Other', 'Total']
 	def msas_in_state(self, cursor, selector, report_type):
 		#this function builds a list of MSA numbers and names in each state
 		#set sql query text to pull MSA names for each MSA number
@@ -438,8 +438,8 @@ class build_JSON(AD_report):
 		import json
 		print json.dumps(self.container, indent=4)
 
-	def write_JSON(self, name, data, path): #writes a json object to file
-		with open(os.path.join(path, name), 'w') as outfile: #writes the JSON structure to a file for the path named by report's header structure
+	def write_JSON(self, name, data): #writes a json object to file
+		with open(name, 'w') as outfile: #writes the JSON structure to a file for the path named by report's header structure
 			json.dump(data, outfile, indent=4, ensure_ascii = False)
 
 build = build_JSON()
@@ -455,3 +455,4 @@ build = build_JSON()
 #build.print_JSON()
 table_8x = build.table_8x_builder()
 build.print_JSON()
+build.write_JSON('report8.json', table_8x)
