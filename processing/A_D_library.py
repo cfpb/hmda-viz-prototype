@@ -1490,86 +1490,28 @@ class aggregate(AD_report): #aggregates LAR rows by appropriate characteristics 
 			container['total'][inputs['action taken']]['count'] += 1
 			container['total'][inputs['action taken']]['value'] += int(inputs['loan value'])
 
-	def by_race_reason(self, container, inputs):
+	def by_denial_percent(self, container, inputs, key, ):
+		for j in range(0, len(container[key])):
+			for i in range(0, len(container[key][j]['denialreasons'])):
+				if float(container[key][j]['denialreasons'][9]['count']) >0:
+					container[key][j]['denialreasons'][i]['value'] = int(round((container[key][j]['denialreasons'][i]['count'] / float(container[key][j]['denialreasons'][9]['count'])) *100,0))
+
+	def by_denial_reason(self, container, inputs, key, key_singular):
 		for reason in inputs['denial_list']:
 			if reason is None:
 				pass
 			else:
-				container['races'][inputs['race']]['denialreasons'][9]['count'] +=1 #add to totals
-				container['races'][inputs['race']]['denialreasons'][reason]['count'] +=1 #adds to race/reason cell
-
-	def by_race_percent(self, container, inputs):
-		for j in range(0, len(container['races'])):
-			for i in range(0, len(container['races'][inputs['race']]['denialreasons'])):
-				if float(container['races'][j]['denialreasons'][9]['count']) >0:
-					container['races'][j]['denialreasons'][i]['value'] = int(round((container['races'][j]['denialreasons'][i]['count'] / float(container['races'][j]['denialreasons'][9]['count'])) *100,0))
-
-	def by_ethnicity_reason(self, container, inputs):
-		for reason in inputs['denial_list']:
-			if reason is None:
-				pass
-			else:
-				container['ethnicities'][inputs['ethnicity']]['denialreasons'][9]['count'] +=1 #adds to totals
-				container['ethnicities'][inputs['ethnicity']]['denialreasons'][reason]['count'] +=1 #adds to ethnicity/reason cell
-
-	def by_ethnicity_percent(self, container, inputs):
-		for j in range(0, len(container['ethnicities'])):
-			for i in range(0, len(container['ethnicities'][inputs['ethnicity']]['denialreasons'])):
-				if float(container['ethnicities'][j]['denialreasons'][9]['count']) >0:
-					container['ethnicities'][j]['denialreasons'][i]['value'] = int(round((container['ethnicities'][j]['denialreasons'][i]['count'] / float(container['ethnicities'][j]['denialreasons'][9]['count'])) *100,0))
-
-	def by_minority_status_reason(self, container, inputs):
-		if inputs['minority status'] < 2:
-			for reason in inputs['denial_list']:
-						if reason is None:
-							pass
-						else:
-							container['minoritystatuses'][inputs['minority status']]['denialreasons'][9]['count'] +=1 #adds to totals
-							container['minoritystatuses'][inputs['minority status']]['denialreasons'][reason]['count'] +=1 #adds to ethnicity/reason cell
-
-
-	def by_minority_status_percent(self, container, inputs):
-			for j in range(0, len(container['minoritystatuses'])):
-				for i in range(0, len(container['minoritystatuses'][j]['denialreasons'])):
-					if float(container['minoritystatuses'][j]['denialreasons'][9]['count']) >0:
-						container['minoritystatuses'][j]['denialreasons'][i]['value'] = int(round((container['minoritystatuses'][j]['denialreasons'][i]['count'] / float(container['minoritystatuses'][j]['denialreasons'][9]['count'])) *100,0))
-
-	def by_gender_reason(self, container, inputs):
-		for reason in inputs['denial_list']:
-					if reason is None:
-						pass
-					else:
-						container['genders'][inputs['gender']]['denialreasons'][9]['count'] +=1 #adds to totals
-						container['genders'][inputs['gender']]['denialreasons'][reason]['count'] +=1 #adds to ethnicity/reason cell
-
-	def by_gender_percent(self, container, inputs):
-			for j in range(0, len(container['genders'])):
-				for i in range(0, len(container['genders'][j]['denialreasons'])):
-					if float(container['genders'][j]['denialreasons'][9]['count']) >0:
-						container['genders'][j]['denialreasons'][i]['value'] = int(round((container['genders'][j]['denialreasons'][i]['count'] / float(container['genders'][j]['denialreasons'][9]['count'])) *100,0))
-
-	def by_income_reason(self, container, inputs):
-
-		for reason in inputs['denial_list']:
-					if reason is None:
-						pass
-					else:
-						if inputs['income bracket'] <6:
-							container['incomes'][inputs['income bracket']]['denialreasons'][9]['count'] +=1 #adds to totals
-							container['incomes'][inputs['income bracket']]['denialreasons'][reason]['count'] +=1 #adds to ethnicity/reason cell
-
-	def by_income_percent(self, container, inputs):
-			for j in range(0, len(container['incomes'])):
-				for i in range(0, len(container['incomes'][j]['denialreasons'])):
-					if float(container['incomes'][j]['denialreasons'][9]['count']) >0:
-						container['incomes'][j]['denialreasons'][i]['value'] = int(round((container['incomes'][j]['denialreasons'][i]['count'] / float(container['incomes'][j]['denialreasons'][9]['count'])) *100,0))
+				container[key][inputs[key_singular]]['denialreasons'][9]['count'] +=1 #add to totals
+				container[key][inputs[key_singular]]['denialreasons'][reason]['count'] +=1 #adds to race/reason cell
 
 	def build_report8x(self, table8x, inputs):
-		self.by_race_reason(table8x, inputs)
-		self.by_ethnicity_reason(table8x, inputs)
-		self.by_minority_status_reason(table8x, inputs)
-		self.by_gender_reason(table8x, inputs)
-		self.by_income_reason(table8x, inputs)
+		self.by_denial_reason(table8x, inputs, 'races', 'race')
+		self.by_denial_reason(table8x, inputs, 'ethnicities', 'ethnicity')
+		if inputs['minority status'] <2: #pass on loans with no minority status information
+			self.by_denial_reason(table8x, inputs, 'minoritystatuses', 'minority status')
+		self.by_denial_reason(table8x, inputs, 'genders', 'gender')
+		if inputs['income bracket'] <6:
+			self.by_denial_reason(table8x, inputs, 'incomes', 'income bracket')
 
 	def build_report7x(self, table7x, inputs):
 		self.by_minority_concentration(table7x, inputs)

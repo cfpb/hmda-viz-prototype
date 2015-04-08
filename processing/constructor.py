@@ -78,11 +78,14 @@ class report_4x(constructor):
 				self.agg.by_mean(table_X, self.parsed.inputs)
 
 			if self.report_number[2] == '8': #reports 8-x requires out of loop calculation of denial reason percents
-				self.agg.by_race_percent(table_X, self.parsed.inputs)
-				self.agg.by_ethnicity_percent(table_X, self.parsed.inputs)
-				self.agg.by_minority_status_percent(table_X, self.parsed.inputs)
-				self.agg.by_gender_percent(table_X, self.parsed.inputs)
-				self.agg.by_income_percent(table_X, self.parsed.inputs)
+
+				percent_list = ['races', 'ethnicities', 'minoritystatuses', 'genders', 'incomes']
+				for item in percent_list:
+					self.agg.by_denial_percent(table_X, self.parsed.inputs, item)
+				#self.agg.by_ethnicity_percent(table_X, self.parsed.inputs)
+				#self.agg.by_minority_status_percent(table_X, self.parsed.inputs)
+				#self.agg.by_gender_percent(table_X, self.parsed.inputs)
+				#self.agg.by_income_percent(table_X, self.parsed.inputs)
 
 			path = "../" +table_X['type']+"/"+table_X['year']+"/"+build_X.get_state_name(table_X['msa']['state']).replace(' ', '-').lower()+"/"+build_X.msa_names[MSA].replace(' ', '-').lower()+"/"+table_X['table']
 			if not os.path.exists(path): #check if path exists
