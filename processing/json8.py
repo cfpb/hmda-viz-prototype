@@ -328,17 +328,6 @@ class build_JSON(AD_report):
 			purchasers.append(purchasersholding)
 		return purchasers
 
-	def set_list(self, end_points, key_list, key_name, ends_bool):
-		holding_list = []
-		for item in key_list:
-			holding_dict = OrderedDict({})
-			holding_dict[key_name] = "{}".format(item)
-			if ends_bool == True:
-				for point in end_points:
-					holding_dict[point] = 0
-			holding_list.append(holding_dict)
-		return holding_list
-
 	def build_rate_spreads(self): #builds the rate spreads section of the report 3-2 JSON
 		spreads = []
 		for rate in self.table32_rates:
@@ -416,6 +405,35 @@ class build_JSON(AD_report):
 		self.container['total'] = totals
 		return self.container
 
+	def set_list(self, end_points, key_list, key_name, ends_bool):
+		holding_list = []
+		for item in key_list:
+			holding_dict = OrderedDict({})
+			holding_dict[key_name] = "{}".format(item)
+			if ends_bool == True:
+				for point in end_points:
+					holding_dict[point] = 0
+			holding_list.append(holding_dict)
+		return holding_list
+
+	def table_8x_builder(self):
+		self.container['races'] = self.set_list(self.end_points, self.race_names, 'race', False)
+		for i in range(0,len(self.container['races'])):
+			self.container['races'][i]['denialreasons'] = self.set_list(self.end_points, self.denial_reasons, 'denialreason', True)
+		self.container['ethnicities'] = self.set_list(self.end_points, self.ethnicity_names, 'ethnicity', False)
+		for i in range(0, len(self.container['ethnicities'])):
+			self.container['ethnicities'][i]['denialreasons'] = self.set_list(self.end_points, self.denial_reasons, 'denialreason', True)
+		self.container['minoritystatuses'] = self.set_list(self.end_points, self.minority_statuses, 'minoritystatus', False)
+		for i in range(0, len(self.container['minoritystatuses'])):
+			self.container['minoritystatuses'][i]['denialreasons'] = self.set_list(self.end_points, self.denial_reasons, 'denialreason', True)
+		self.container['genders'] = self.set_list(self.end_points, self.gender_list, 'gender', False)
+		for i in range(0, len(self.container['genders'])):
+			self.container['genders'][i]['denialreasons'] = self.set_list(self.end_points, self.denial_reasons, 'denialreason', True)
+		self.container['incomes'] = self.set_list(self.end_points, self.applicant_income_bracket, 'income', False)
+		for i in range(0, len(self.container['incomes'])):
+			self.container['incomes'][i]['denialreasons'] = self.set_list(self.end_points, self.denial_reasons, 'denialreason', True)
+		return self.container
+
 	def print_JSON(self): #prints a json object to the terminal
 		import json
 		print json.dumps(self.container, indent=4)
@@ -429,10 +447,11 @@ build = build_JSON()
 #build.print_JSON()
 #table_32 = build.table_32_builder()
 #build.print_JSON()
-table_4x = build.table_4x_builder()
-build.print_JSON()
+#table_4x = build.table_4x_builder()
+#build.print_JSON()
 #table_5x = build.table_5x_builder()
 #build.print_JSON()
 #table_7x = build.table_7x_builder()
 #build.print_JSON()
-
+table_8x = build.table_8x_builder()
+build.print_JSON()

@@ -269,11 +269,13 @@ class MSA_info(AD_report): #contains functions for setting aggregate information
 				print 'error setting percent MSA income bracket for index'
 
 	def minority_percent(self, inputs): #set index codes for minority population percent
-		if inputs['minority percent'] == '      ' or inputs['minority percent'] == 'NA    ': #if no information is available use an out of bounds index
+		if inputs['minority percent'] == '      ':#if no information is available use an out of bounds index
 			return  5
+		elif inputs['minority percent'] == 'NA    ': #if tract minority percent is NA then it is aggregated as <10%
+			return 0
 		elif float(inputs['minority percent']) < 10.0:
 			return  0
-		elif float(inputs['minority percent']) <19.0:
+		elif float(inputs['minority percent']) <=19.0:
 			return 1
 		elif float(inputs['minority percent'])  <= 49.0:
 			return  2
@@ -406,17 +408,17 @@ class demographics(AD_report):
 		'''
 
 		#not shown: non-hispanics with no race available, whites with no ethnicity available, and loans with no race/ethn available
-		if inputs['race'] == 7 and inputs['ethnicity'] !=0: #non-hispanics with no race info
+		if inputs['race'] == 7 and inputs['ethnicity'] !=0 and inputs['ethnicity'] != 2: #non-hispanics with no race info
 			return 3
 		elif inputs['race'] == 4 and inputs['ethnicity'] == 3: #whites with no ethnicity info
 			return 3
 		elif inputs['race'] == 7 and inputs['ethnicity'] == 3: #loans with no race and no ethn info
 			return 3
 
-		elif inputs['race'] == 4 and inputs['ethnicity'] != 0 and inputs['ethnicity'] != 2: #white non-hispanic
-			return 0
-		elif inputs['race'] < 7 or inputs['ethnicity'] ==0 or inputs['ethnicity'] == 2: #non white or hispanic
-			return 1
+		elif inputs['race'] == 4 and inputs['ethnicity'] != 0 and inputs['ethnicity'] != 2:
+			return 0 #white non-hispanic
+		elif inputs['race'] <=7 or inputs['ethnicity'] ==0 or inputs['ethnicity'] == 2:
+			return 1 #Others including hispanic
 		#elif inputs['race'] == 6 or inputs['race'] == 5: #joint status race
 		#	return 1
 		else:
@@ -685,6 +687,24 @@ class build_JSON(AD_report):
 		self.msa['state'] = inputs['state name'] #this is the two digit abbreviation
 		self.msa['state_name'] = self.state_names[self.msa['state']]
 		self.container['msa'] = self.msa
+		return self.container
+
+	def table_8x_builder(self):
+		self.container['races'] = self.set_list(self.end_points, self.race_names, 'race', False)
+		for i in range(0,len(self.container['races'])):
+			self.container['races'][i]['denialreasons'] = self.set_list(self.end_points, self.denial_reasons, 'denialreason', True)
+		self.container['ethnicities'] = self.set_list(self.end_points, self.ethnicity_names, 'ethnicity', False)
+		for i in range(0, len(self.container['ethnicities'])):
+			self.container['ethnicities'][i]['denialreasons'] = self.set_list(self.end_points, self.denial_reasons, 'denialreason', True)
+		self.container['minoritystatuses'] = self.set_list(self.end_points, self.minority_statuses, 'minoritystatus', False)
+		for i in range(0, len(self.container['minoritystatuses'])):
+			self.container['minoritystatuses'][i]['denialreasons'] = self.set_list(self.end_points, self.denial_reasons, 'denialreason', True)
+		self.container['genders'] = self.set_list(self.end_points, self.gender_list, 'gender', False)
+		for i in range(0, len(self.container['genders'])):
+			self.container['genders'][i]['denialreasons'] = self.set_list(self.end_points, self.denial_reasons, 'denialreason', True)
+		self.container['incomes'] = self.set_list(self.end_points, self.applicant_income_bracket, 'income', False)
+		for i in range(0, len(self.container['incomes'])):
+			self.container['incomes'][i]['denialreasons'] = self.set_list(self.end_points, self.denial_reasons, 'denialreason', True)
 		return self.container
 
 	def table_7x_builder(self):
@@ -1007,6 +1027,24 @@ class queries(AD_report):
 	def table_A_7_7_conditions(self):
 		return '''and propertytype ='3';'''
 
+	def table_A_8_1_conditions(self):
+		return ''''''
+
+	def table_A_8_2_conditions(self):
+		return ''''''
+
+	def table_A_8_3_conditions(self):
+		return ''''''
+
+	def table_A_8_4_conditions(self):
+		return ''''''
+
+	def table_A_8_6_conditions(self):
+		return ''''''
+
+	def table_A_8_7_conditions(self):
+		return ''''''
+
 	def table_3_1_columns(self):
 		return '''censustractnumber, applicantrace1, applicantrace2, applicantrace3, applicantrace4, applicantrace5,
 			coapplicantrace1, coapplicantrace2, coapplicantrace3, coapplicantrace4, coapplicantrace5,
@@ -1032,6 +1070,9 @@ class queries(AD_report):
 
 	def table_7_x_columns(self):
 		return '''minoritypopulationpct, actiontype, loanamount, ffiec_median_family_income, tract_to_msa_md_income, asofdate, statecode, statename '''
+
+	def table_8_x_columns(self):
+		return ''' '''
 class aggregate(AD_report): #aggregates LAR rows by appropriate characteristics to fill the JSON files
 
 	def __init__(self):
