@@ -493,6 +493,7 @@ class demographics(AD_report):
 						return race_list[r] -1 #return first instance of minority race (-1 adjusts race code to race index in the JSON)
 						break
 
+
 class build_JSON(AD_report):
 
 	def __init__(self):
@@ -655,6 +656,18 @@ class build_JSON(AD_report):
 			return 'Disposition of applications from nonoccupatns for home-purchase, home improvement, or refinancing loans, 1- to 4-family and manufactured home dwellings, by characteristics of census tract in which property is located'
 		elif table_num =='7-7':
 			return 'Disposition of applications for home-purchase, home improvement, or refinancing loans, manufactured home dwellings, by characteristics of census tract in which property is located'
+		elif table_num =='8-1':
+			return 'Reasons for denial of applications for FHA, FSA/RHS, and VA home-purchase loans, 1- to 4-family and manufacutred home dwellings, by race, ethnicity, gender and income of applicant'
+		elif table_num =='8-2':
+			return 'Reasons for denial of applications for conventional home-purchase loans, 1- to 4-family and manufactured home dwellings, by race, ethnicity, gender and income of applicant'
+		elif table_num =='8-3':
+			return 'Reasons for denial of applications to refinance loans on 1- to 4-family and manufactured home dwellings, by race, ethnicity, gender and income of applicant'
+		elif table_num =='8-4':
+			return 'Reasons for denial of applications for home improvement loans, 1- to 4-family and manufactured home dwellings, by race, ethinicity, gender and income of applicant'
+		elif table_num =='8-6':
+			return 'Reasons for denial of applications from nonoccupants for home-purchase, home improvement, or refinancing loans, 1- to 4- family and manufactured home dwellings, by race, ehtnicity, gender and income of applicant'
+		elif table_num =='8-7':
+			return 'Reasons for denial of applications for home-purchase, home improvement, or refinancing loans, manufactured home dwellings, by race, ethinicity, gender and income of applicant'
 
 	def set_header(self, inputs, MSA, table_type, table_num): #sets the header information of the JSON object
 		now = foo.datetime.now()
@@ -678,65 +691,61 @@ class build_JSON(AD_report):
 		self.container['censuscharacteristics'] = []
 		holding = OrderedDict({})
 		holding['characteristic'] = 'Racial/Ethnic Composition'
-		holding['compositions'] = self.set_brackets('composition', self.tract_pct_minority)
+		holding['compositions'] = self.set_list(self.end_points, self.tract_pct_minority, 'composition', False)
 		for i in range(0, len(holding['compositions'])):
-			holding['compositions'][i]['dispositions'] = self.set_list(self.end_points, self.dispositions_list, 'disposition')
+			holding['compositions'][i]['dispositions'] = self.set_list(self.end_points, self.dispositions_list, 'disposition', True)
 		self.container['censuscharacteristics'].append(holding)
 
 		holding = OrderedDict({})
 		holding['characteristic'] = 'Income Characteristics'
-		holding['incomes'] = self.set_brackets('income', self.tract_income)
+		holding['incomes'] = self.set_list(self.end_points, self.tract_income, 'income', False)
 		for i in range(0, len(holding['incomes'])):
-			holding['incomes'][i]['dispositions'] = self.set_list(self.end_points, self.dispositions_list, 'disposition')
+			holding['incomes'][i]['dispositions'] = self.set_list(self.end_points, self.dispositions_list, 'disposition', True)
 		self.container['censuscharacteristics'].append(holding)
 
 		extra_level = []
-
 		holding = OrderedDict({})
 		holding['characteristic'] = 'Income & Racial/Ethnic Composition'
-		holding['incomes'] = self.set_brackets('income', self.tract_income)
+		holding['incomes'] = self.set_list(self.end_points, self.tract_income, 'income', False)
 		for i in range(0, len(holding['incomes'])):
-			holding['incomes'][i]['compositions'] = self.set_brackets('composition', self.tract_pct_minority)
+			holding['incomes'][i]['compositions'] = self.set_list(self.end_points, self.tract_pct_minority, 'composition', False)
 			for j in range(0, len(holding['incomes'][i]['compositions'])):
-				holding['incomes'][i]['compositions'][j]['dispositions'] = self.set_list(self.end_points, self.dispositions_list, 'disposition')
+				holding['incomes'][i]['compositions'][j]['dispositions'] = self.set_list(self.end_points, self.dispositions_list, 'disposition', True)
 		extra_level.append(holding)
 		self.container['incomeRaces'] = extra_level
 
 		holding = OrderedDict({})
 		holding['type'] = 'Small County'
-		holding['dispositions'] = self.set_list(self.end_points, self.dispositions_list, 'disposition')
+		holding['dispositions'] = self.set_list(self.end_points, self.dispositions_list, 'disposition', True)
 		self.container['types'] = []
 		self.container['types'].append(holding)
 
 		holding = OrderedDict({})
 		holding['type'] = 'All Other Tracts'
-		holding['dispositions'] = self.set_list(self.end_points, self.dispositions_list, 'disposition')
+		holding['dispositions'] = self.set_list(self.end_points, self.dispositions_list, 'disposition', True)
 		self.container['types'].append(holding)
-		self.container['total'] = self.set_list(self.end_points, self.dispositions_list, 'disposition')
-
-
+		self.container['total'] = self.set_list(self.end_points, self.dispositions_list, 'disposition', True)
 		return self.container
 
 	def table_5x_builder(self):
-
-		self.container['applicantincomes'] = self.set_brackets('applicantincome', self.applicant_income_bracket[:-1])
+		self.container['applicantincomes'] = self.set_list(self.end_points, self.applicant_income_bracket[:-1], 'applicantincome', False)
 		race_holding = OrderedDict({})
 		race_holding['characteristic'] = 'Race'
-		race_holding['races'] = self.set_brackets('race', self.race_names)
+		race_holding['races'] = self.set_list(self.end_points, self.race_names, 'race', False)
 		for i in range(0,len(race_holding['races'])):
-			race_holding['races'][i]['dispositions'] = self.set_list(self.end_points, self.dispositions_list, 'disposition')
+			race_holding['races'][i]['dispositions'] = self.set_list(self.end_points, self.dispositions_list, 'disposition', True)
 
 		ethnicity_holding = OrderedDict({})
 		ethnicity_holding['characteristic'] = 'Ethnicity'
-		ethnicity_holding['ethnicities'] = self.set_brackets('ethnicity', self.ethnicity_names)
+		ethnicity_holding['ethnicities'] = self.set_list(self.end_points, self.ethnicity_names, 'ethnicity', False)
 		for i in range(0,len(ethnicity_holding['ethnicities'])):
-			ethnicity_holding['ethnicities'][i]['dispositions'] = self.set_list(self.end_points, self.dispositions_list, 'disposition')
+			ethnicity_holding['ethnicities'][i]['dispositions'] = self.set_list(self.end_points, self.dispositions_list, 'disposition', True)
 
 		minoritystatus_holding = OrderedDict({})
 		minoritystatus_holding['characteristic'] = 'Minority Status'
-		minoritystatus_holding['minoritystatus'] = self.set_brackets('minoritystatus', self.minority_statuses)
+		minoritystatus_holding['minoritystatus'] = self.set_list(self.end_points, self.minority_statuses, 'minoritystatus', False)
 		for i in range(0,len(minoritystatus_holding['minoritystatus'])):
-			minoritystatus_holding['minoritystatus'][i]['dispositions'] = self.set_list(self.end_points, self.dispositions_list, 'disposition')
+			minoritystatus_holding['minoritystatus'][i]['dispositions'] = self.set_list(self.end_points, self.dispositions_list, 'disposition', True)
 		#make lists of borrower characterisitics
 		for i in range(0,len(self.container['applicantincomes'])):
 			self.container['applicantincomes'][i]['borrowercharacteristics'] = []
@@ -744,71 +753,42 @@ class build_JSON(AD_report):
 			self.container['applicantincomes'][i]['borrowercharacteristics'].append(ethnicity_holding)
 			self.container['applicantincomes'][i]['borrowercharacteristics'].append(minoritystatus_holding)
 
-		self.container['total'] = self.set_list(self.end_points, self.dispositions_list, 'disposition')
+		self.container['total'] = self.set_list(self.end_points, self.dispositions_list, 'disposition', True)
 		return self.container
-
-
-	def set_4x_gender(self): #creates the gender portion of table 4-1 JSON
-		genders = []
-		for gender in self.gender_list:
-			holding = OrderedDict({})
-			holding['gender'] = "{}".format(gender)
-			genders.append(holding)
-		return genders
 
 	def set_gender_disps(self):
 		for i in range(0, len(self.race_names)):
 			for g in range(0, len(self.gender_list)):
-				self.container['races'][i]['genders'][g]['dispositions'] = self.set_list(self.end_points, self.dispositions_list, 'disposition')
+				self.container['races'][i]['genders'][g]['dispositions'] = self.set_list(self.end_points, self.dispositions_list, 'disposition', True)
 		for i in range(0, len(self.ethnicity_names)):
 			for g in range(0, len(self.gender_list)):
-				self.container['ethnicities'][i]['genders'][g]['dispositions'] = self.set_list(self.end_points, self.dispositions_list, 'disposition')
+				self.container['ethnicities'][i]['genders'][g]['dispositions'] = self.set_list(self.end_points, self.dispositions_list, 'disposition', True)
 		for i in range(0, len(self.minority_statuses)):
 			for g in range(0, len(self.gender_list)):
-				self.container['minoritystatuses'][i]['genders'][g]['dispositions'] = self.set_list(self.end_points, self.dispositions_list, 'disposition')
+				self.container['minoritystatuses'][i]['genders'][g]['dispositions'] = self.set_list(self.end_points, self.dispositions_list, 'disposition', True)
 	def set_4x_races(self):
-		races = []
-		for race in self.race_names:
-			holding = OrderedDict({})
-			holding['race'] = "{}".format(race)
-			races.append(holding)
-		self.container['races'] = races
+		self.container['races'] = self.set_list(self.end_points, self.race_names, 'race', False)
 		for i in range(0,len(self.container['races'])):
-			self.container['races'][i]['dispositions'] = self.set_list(self.end_points, self.dispositions_list, 'disposition')
-			self.container['races'][i]['genders'] = self.set_4x_gender()
+			self.container['races'][i]['dispositions'] = self.set_list(self.end_points, self.dispositions_list, 'disposition', True)
+			self.container['races'][i]['genders'] = self.set_list(self.end_points, self.gender_list, 'gender', False)
 
 	def set_4x_ethnicity(self):
-		ethnicities = []
-		for ethnicity in self.ethnicity_names:
-			holding = OrderedDict({})
-			holding['ethnicity'] = "{}".format(ethnicity)
-			ethnicities.append(holding)
-		self.container['ethnicities'] = ethnicities
+		self.container['ethnicities'] = self.set_list(self.end_points, self.ethnicity_names, 'ethnicity', False)
 		for i in range(0, len(self.container['ethnicities'])):
-			self.container['ethnicities'][i]['dispositions'] = self.set_list(self.end_points, self.dispositions_list, 'disposition')
-			self.container['ethnicities'][i]['genders'] = self.set_4x_gender()
+			self.container['ethnicities'][i]['dispositions'] = self.set_list(self.end_points, self.dispositions_list, 'disposition', True)
+			self.container['ethnicities'][i]['genders'] = self.set_list(self.end_points, self.gender_list, 'gender', False)
 
 	def set_4x_minority(self):
-		minoritystatuses = []
-		for status in self.minority_statuses:
-			holding = OrderedDict({})
-			holding['minoritystatus'] = "{}".format(status)
-			minoritystatuses.append(holding)
-		self.container['minoritystatuses'] = minoritystatuses
+		self.container['minoritystatuses'] = self.set_list(self.end_points, self.minority_statuses, 'minoritystatus', False)
 		for i in range(0, len(self.container['minoritystatuses'])):
-			self.container['minoritystatuses'][i]['dispositions'] = self.set_list(self.end_points, self.dispositions_list, 'disposition')
-			self.container['minoritystatuses'][i]['genders'] = self.set_4x_gender()
+			self.container['minoritystatuses'][i]['dispositions'] = self.set_list(self.end_points, self.dispositions_list, 'disposition', True)
+			self.container['minoritystatuses'][i]['genders'] = self.set_list(self.end_points, self.gender_list, 'gender', False)
 
 	def set_4x_incomes(self):
-		applicantincomes = []
-		for income in self.applicant_income_bracket:
-			holding = OrderedDict({})
-			holding['income'] = "{}".format(income)
-			applicantincomes.append(holding)
-		self.container['incomes'] = applicantincomes
+		self.container['incomes'] = self.set_list(self.end_points, self.applicant_income_bracket, 'income', False)
 		for i in range(0, len(self.container['incomes'])):
-			self.container['incomes'][i]['dispositions'] = self.set_list(self.end_points, self.dispositions_list, 'disposition')
-		self.container['total'] = self.set_list(self.end_points, self.dispositions_list, 'disposition')
+			self.container['incomes'][i]['dispositions'] = self.set_list(self.end_points, self.dispositions_list, 'disposition', True)
+		self.container['total'] = self.set_list(self.end_points, self.dispositions_list, 'disposition', True)
 
 	def table_4x_builder(self): #builds the table 4-1 JSON object: disposition of application by race and gender
 		self.set_4x_races()
@@ -817,26 +797,6 @@ class build_JSON(AD_report):
 		self.set_4x_incomes()
 		self.set_gender_disps()
 		return self.container
-
-	def set_brackets(self, bracket_singular, bracket_list):
-		brackets = []
-		for bracket in bracket_list:
-			holding = OrderedDict({})
-			holding[bracket_singular] = "{}".format(bracket)
-			brackets.append(holding)
-		return brackets
-
-
-
-	def set_list(self, end_points, key_list, key_name):
-		holding_list = []
-		for item in key_list:
-			holding_dict = OrderedDict({})
-			holding_dict[key_name] = "{}".format(item)
-			for point in end_points:
-				holding_dict[point] = 0
-			holding_list.append(holding_dict)
-		return holding_list
 
 	def set_purchasers_NA(self, holding_list):
 		purchasers = []
@@ -851,6 +811,17 @@ class build_JSON(AD_report):
 			purchasers.append(purchasersholding)
 		return purchasers
 
+	def set_list(self, end_points, key_list, key_name, ends_bool):
+		holding_list = []
+		for item in key_list:
+			holding_dict = OrderedDict({})
+			holding_dict[key_name] = "{}".format(item)
+			if ends_bool == True:
+				for point in end_points:
+					holding_dict[point] = 0
+			holding_list.append(holding_dict)
+		return holding_list
+
 	def build_rate_spreads(self): #builds the rate spreads section of the report 3-2 JSON
 		spreads = []
 		for rate in self.table32_rates:
@@ -860,7 +831,7 @@ class build_JSON(AD_report):
 				holding['purchasers'] = self.set_purchasers_NA(['firstliencount', 'firstlienvalue', 'juniorliencount', 'juniorlienvalue'])
 			else:
 				#holding['purchasers'] = self.set_purchasers(['firstliencount', 'firstlienvalue', 'juniorliencount', 'juniorlienvalue'])
-				holding['purchasers'] = self.set_list(['firstliencount', 'firstlienvalue', 'juniorliencount', 'juniorlienvalue'], self.purchaser_names, 'name')
+				holding['purchasers'] = self.set_list(['firstliencount', 'firstlienvalue', 'juniorliencount', 'juniorlienvalue'], self.purchaser_names, 'name', True)
 			spreads.append(holding)
 		return spreads
 
@@ -875,7 +846,7 @@ class build_JSON(AD_report):
 				top[container_name] = []
 			Header = False
 			holding[container[container_name]] = "{}".format(item)
-			holding['purchasers'] = self.set_list(self.end_points, self.purchaser_names, 'name')
+			holding['purchasers'] = self.set_list(self.end_points, self.purchaser_names, 'name', True)
 			top[container_name].append(holding)
 		self.borrowercharacteristics.append(top)
 
@@ -890,7 +861,7 @@ class build_JSON(AD_report):
 				top[container_name] = []
 			Header = False
 			holding[container[container_name]] = "{}".format(item)
-			holding['purchasers'] = self.set_list(self.end_points, self.purchaser_names, 'name')
+			holding['purchasers'] = self.set_list(self.end_points, self.purchaser_names, 'name', True)
 			top[container_name].append(holding)
 		self.censuscharacteristics.append(top)
 
@@ -900,7 +871,7 @@ class build_JSON(AD_report):
 		for cat in categories:
 			holding = OrderedDict({})
 			holding['pricing']= "{}".format(cat)
-			holding['purchasers']  = self.set_list(['firstliencount', 'firstlienvalue', 'juniorliencount', 'juniorlienvalue'], self.purchaser_names, 'name') #purchasers is overwritten each pass in the holding dictionary
+			holding['purchasers']  = self.set_list(['firstliencount', 'firstlienvalue', 'juniorliencount', 'juniorlienvalue'], self.purchaser_names, 'name', True) #purchasers is overwritten each pass in the holding dictionary
 			pricinginformation.append(holding)
 		self.container['pricinginformation'] = pricinginformation
 		holding = OrderedDict({})
@@ -908,7 +879,7 @@ class build_JSON(AD_report):
 		self.container['points'] = points
 		hoepa = OrderedDict({})
 		hoepa['pricing'] = 'hoepa loans'
-		hoepa['purchasers'] = self.set_list(['firstliencount', 'firstlienvalue', 'juniorliencount', 'juniorlienvalue'], self.purchaser_names, 'name')
+		hoepa['purchasers'] = self.set_list(['firstliencount', 'firstlienvalue', 'juniorliencount', 'juniorlienvalue'], self.purchaser_names, 'name', True)
 		self.container['hoepa'] = hoepa
 		return self.container
 
@@ -924,7 +895,7 @@ class build_JSON(AD_report):
 		totals = {} #totals sums all the loan counts and values for each purchaser
 		top = OrderedDict({})
 		holding = OrderedDict({})
-		totals['purchasers'] = self.set_list(self.end_points, self.purchaser_names, 'name')
+		totals['purchasers'] = self.set_list(self.end_points, self.purchaser_names, 'name', True)
 		self.container['total'] = totals
 		return self.container
 
@@ -935,8 +906,6 @@ class build_JSON(AD_report):
 	def write_JSON(self, name, data, path): #writes a json object to file
 		with open(os.path.join(path, name), 'w') as outfile: #writes the JSON structure to a file for the path named by report's header structure
 			json.dump(data, outfile, indent=4, ensure_ascii = False)
-
-
 
 class connect_DB(AD_report): #connects to the SQL database
 	#this is currently hosted locally
