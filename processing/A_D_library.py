@@ -1433,21 +1433,9 @@ class aggregate(AD_report): #aggregates LAR rows by appropriate characteristics 
 		cur.execute(SQL, MSA)
 		small_county_flag = cur.fetchall()[0]
 
-	def by_small_county(self, container, inputs):
-		if inputs['small county flag'] == '1':
-			container['types'][0]['dispositions'][0]['count'] +=1
-			container['types'][0]['dispositions'][0]['value'] +=int(inputs['loan value'])
-			container['types'][0]['dispositions'][inputs['action taken']]['count'] +=1
-			container['types'][0]['dispositions'][inputs['action taken']]['value'] +=int(inputs['loan value'])
-		#this needs to reference tract_to_cbsa_2010
-
-	def by_other_tracts(self, container, inputs):
-		#refers to tracts for which Census income data is unavailable
-		if inputs['tract to MSA income'] == 4 and inputs['action taken'] < 6:
-			container['types'][1]['dispositions'][0]['count'] +=1
-			container['types'][1]['dispositions'][0]['value'] +=int(inputs['loan value'])
-			container['types'][1]['dispositions'][inputs['action taken']]['count'] +=1
-			container['types'][1]['dispositions'][inputs['action taken']]['value'] +=int(inputs['loan value'])
+	def by_geo_type(self, container, inputs, index_num, action_index):
+		container['types'][index_num]['dispositions'][action_index]['count'] +=1
+		container['types'][index_num]['dispositions'][action_index]['value'] +=int(inputs['loan value'])
 
 	def totals_7x(self, container, inputs):
 		if inputs['action taken'] > 5:
@@ -1486,8 +1474,12 @@ class aggregate(AD_report): #aggregates LAR rows by appropriate characteristics 
 		self.by_minority_concentration(table7x, inputs)
 		self.by_tract_to_msa_income(table7x, inputs)
 		self.by_income_ethnic_combo(table7x, inputs)
-		self.by_small_county(table7x, inputs)
-		self.by_other_tracts(table7x, inputs)
+		if inputs['small county flag'] == '1':
+			self.by_geo_type(table7x, inputs, 0, 0)
+			self.by_geo_type(table7x, inputs, 0, inputs['action taken'])
+		if inputs['tract to MSA income'] == 4 and inputs['action taken'] < 6:
+			self.by_geo_type(table7x, inputs, 1, 0)
+			self.by_geo_type(table7x, inputs, 1, inputs['action taken'])
 		self.totals_7x(table7x, inputs)
 
 	def build_report5x(self, table5x, inputs):
