@@ -755,7 +755,10 @@ class build_JSON(AD_report):
 	def table_8_helper(self, key, key_singular, row_list):
 		temp = OrderedDict({})
 		temp['characteristic'] = key
+		if key == 'Minority Status':
+			key = 'minoritystatuses'
 		temp[key.lower()] = self.set_list(self.end_points, row_list, key_singular, False)
+
 		for i in range(0, len(temp[key.lower()])):
 			temp[key.lower()][i]['denialreasons'] = self.set_list(self.end_points, self.denial_reasons, 'denialreason', True)
 		return temp
