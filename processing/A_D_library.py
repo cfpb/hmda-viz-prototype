@@ -1143,44 +1143,6 @@ class aggregate(AD_report): #aggregates LAR rows by appropriate characteristics 
 		container[section][section_index][key][key_index]['purchasers'][inputs['purchaser']]['count'] += 1
 		container[section][section_index][key][key_index]['purchasers'][inputs['purchaser']]['value'] += int(inputs['loan value'])
 
-	'''
-	def by_race(self, container, inputs): #aggregates loans by race category
-		container['borrowercharacteristics'][0]['races'][inputs['race']]['purchasers'][inputs['purchaser']]['count'] += 1
-		container['borrowercharacteristics'][0]['races'][inputs['race']]['purchasers'][inputs['purchaser']]['value'] +=int(inputs['loan value'])
-
-	def by_ethnicity(self, container, inputs): #aggregate loans by enthicity status
-
-		container['borrowercharacteristics'][1]['ethnicities'][inputs['ethnicity']]['purchasers'][inputs['purchaser']]['count'] += 1
-		container['borrowercharacteristics'][1]['ethnicities'][inputs['ethnicity']]['purchasers'][inputs['purchaser']]['value'] += int(inputs['loan value'])
-
-	def by_minority_status(self, container, inputs): #aggregate loans by minority status
-		if inputs['minority status'] < 2:
-			container['borrowercharacteristics'][2]['minoritystatuses'][inputs['minority status']]['purchasers'][inputs['purchaser']]['count'] += 1
-			container['borrowercharacteristics'][2]['minoritystatuses'][inputs['minority status']]['purchasers'][inputs['purchaser']]['value']+= int(inputs['loan value'])
-		else:
-			pass
-	'''
-	def by_applicant_income(self, container, inputs): #aggregate loans by applicant income index
-		if inputs['income bracket'] > 5: #income index outside bounds of report 3-1
-			pass
-		else:
-			container['borrowercharacteristics'][3]['applicantincomes'][inputs['income bracket']]['purchasers'][inputs['purchaser']]['count'] += 1
-			container['borrowercharacteristics'][3]['applicantincomes'][inputs['income bracket']]['purchasers'][inputs['purchaser']]['value'] += int(inputs['loan value'])
-
-	def by_minority_composition(self, container, inputs): #aggregate loans by MSA minority population percent
-		if inputs['minority percent index'] > 4: #minority percent not available
-			pass
-		else:
-			container['censuscharacteristics'][0]['tractpctminorities'][inputs['minority percent index']]['purchasers'][inputs['purchaser']]['count'] += 1
-			container['censuscharacteristics'][0]['tractpctminorities'][inputs['minority percent index']]['purchasers'][inputs['purchaser']]['value'] += int(inputs['loan value'])
-
-	def by_tract_income(self, container, inputs): #aggregate loans by tract to MSA income ratio
-		if inputs['tract income index'] > 3: #income ratio not available or outside report 3-1 bounds
-			pass
-		else:
-			container['censuscharacteristics'][1]['incomelevels'][inputs['tract income index']]['purchasers'][inputs['purchaser']]['count'] +=1
-			container['censuscharacteristics'][1]['incomelevels'][inputs['tract income index']]['purchasers'][inputs['purchaser']]['value'] += int(inputs['loan value'])
-
 	def totals(self, container, inputs): #aggregate total of purchased loans
 		container['total']['purchasers'][inputs['purchaser']]['count'] +=1
 		container['total']['purchasers'][inputs['purchaser']]['value'] += int(inputs['loan value'])
