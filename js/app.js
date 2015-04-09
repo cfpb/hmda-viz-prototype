@@ -12,6 +12,11 @@ function getUIData() {
             // sort on the name if its the msas
             if (selectID === 'msa-mds') {
                 //console.log('sorting');
+                // do to upper first
+                $.each(data['msa-mds'], function(index, value) {
+                    value.name = value.name.toUpperCase();
+                });
+                // sort
                 data['msa-mds'].sort(function(a,b) {
                     if(a.name < b.name) return -1;
                     if(a.name > b.name) return 1;
@@ -51,69 +56,76 @@ function getTableData(table) {
         };
         data['footnote'] = function() {
             return function(string, render) {
-                var footnote = 0;
-                var footnote2 = 0;
-                var footnote3 = 0;
+                var footnotes = [];
                 var footnoteurl = '/hmda-viz-prototype/footnotes/' + data.year + '/#';
                 var url = '';
-                console.log(render(string).toLowerCase());
 
                 switch (render(string).toLowerCase()) {
                     case 'race':
-                        footnote = 5;
+                        footnotes.push(5);
                         break;
                     case 'not available':
                     case 'ethnicity not available':
                     case 'income not available':
                     case 'race not available':
-                        footnote = 6;
+                        footnotes.push(6);
                         break;
                     case 'ethnicity':
-                        footnote = 7;
+                        footnotes.push(7);
                         break;
                     case 'minority status':
-                        footnote = 8;
+                        footnotes.push(8);
                         break;
                     case 'applicant income':
                     case 'income of applicants':
-                        footnote = 9;
+                        footnotes.push(9);
                         break;
                     case 'racial&#x2f;ethnic composition':
-                        footnote = 11;
+                    case 'race&#x2f;ethnic composition':
+                        footnotes.push(11);
                         break;
                     case 'income':
-                        footnote = 12;
-                        footnote2 = 13;
+                    case 'income characteristics':
+                        footnotes.push(12);
+                        footnotes.push(13);
+                        break;
+                    case 'income &amp; racial&#x2f;ethnic composition':
+                        footnotes.push(11);
+                        footnotes.push(12);
+                        footnotes.push(13);
                         break;
                     case 'total':
-                        footnote = 14;
+                        footnotes.push(14);
                         break;
                     case 'no reported pricing data':
-                        footnote = 15;
+                        footnotes.push(15);
+                        break;
+                    case 'all other tracts':
+                        footnotes.push(21);
                         break;
                     case 'mean':
-                        footnote = 30;
+                        footnotes.push(30);
                         break;
                     case 'median':
-                        footnote = 31;
+                        footnotes.push(31);
                         break;
                     default:
-                        footnote = 0;
-                        footnote2 = 0;
-                        footnote3 = 0;
+                        footnotes = [];
                 }
 
                 // return
-                if (footnote != 0) {
-                    url = render(string) + ' <a href="' + footnoteurl + footnote + '"><sup>' + footnote + '</sup></a>';
-                    if (footnote2 != 0) {
-                        url = url + ' <a href="' + footnoteurl + footnote2 + '"><sup>' + footnote2 + '</sup></a>';
-                    }
-                    console.log (url);
-                    return url;
+                if (footnotes == undefined || footnotes == null || footnotes.length == 0) {
+                    console.log('here');
+                    return render(string);
                 }
                 else {
-                    return render(string);
+                    url = render(string);
+                    $.each(footnotes, function(index, value) {
+                        url += ' <a href="' + footnoteurl + value + '"><sup>' + value + '</sup></a>';
+                        console.log(render(string) + ' = ' + index + ' and ' + value);
+                    });
+                    //footnotes = [];
+                    return url;
                 }
             }
         }
@@ -121,6 +133,12 @@ function getTableData(table) {
         // get the first charactire of the table #
         if (table.charAt(0) === '4') {
             table = '4';    // all 4's, 4-1 through 4-7, use the same table layout
+        }
+        if (table.charAt(0) === '5') {
+            table = '5';    // all 5's, 5-1 through 5-7, use the same table layout
+        }
+        if (table.charAt(0) === '7') {
+            table = '7';    // all 7's, 7-1 through 7-7, use the same table layout
         }
         // get partials
         // table banner
@@ -216,7 +234,39 @@ $( document ).ready(function() {
         }
     });
 
+    function detectIE() {
+        var ua = window.navigator.userAgent;
+
+        var msie = ua.indexOf('MSIE ');
+        if (msie > 0) {
+            // IE 10 or older => return version number
+            return parseInt(ua.substring(msie + 5, ua.indexOf('.', msie)), 10);
+        }
+
+        var trident = ua.indexOf('Trident/');
+        if (trident > 0) {
+            // IE 11 => return version number
+            var rv = ua.indexOf('rv:');
+            return parseInt(ua.substring(rv + 3, ua.indexOf('.', rv)), 10);
+        }
+
+        var edge = ua.indexOf('Edge/');
+        if (edge > 0) {
+           // IE 12 => return version number
+           return parseInt(ua.substring(edge + 5, ua.indexOf('.', edge)), 10);
+        }
+
+        // other browser
+        return false;
+}
+
     $('#csv').click(function() {
-        window.open('data:text/csv;charset=utf-8,' + escape(theCSV));
+        if (detectIE() === false) {
+            window.open('data:text/csv;charset=utf-8,' + escape(theCSV));
+        } else {
+            console.log(detectIE());
+            var blob = new Blob([theCSV], {type: 'text/csv'});
+            navigator.msSaveOrOpenBlob(blob, 'strings.csv');
+        }
     });
 });

@@ -1,0 +1,80 @@
+<script id="5" type="text/template">
+	{{> tablebanner}}
+
+	<table class="table report">
+		<thead>
+			<tr>
+				<th width="20%">Income, Race and Ethnicity</th>
+				<th class="purchaser" colspan="2" valign="bottom" width="13.33333%">Applications Received<a href="/hmda-viz-prototype/footnotes/{{year}}/#20"><sup>20</sup></a></th>
+				<th class="purchaser" colspan="2" valign="bottom" width="13.33333%">Loans Originated</th>
+				<th class="purchaser" colspan="2" valign="bottom" width="13.33333%">Apps. Approved But Not Accepted</th>
+				<th class="purchaser" colspan="2" valign="bottom" width="13.33333%">Appliations Denied</th>
+				<th class="purchaser" colspan="2" valign="bottom" width="13.33333%">Applications Withdrawn</th>
+				<th class="purchaser" colspan="2" valign="bottom" width="13.33333%">Files Closed For Incompleteness</th>
+			</tr>
+			<tr class="heading">
+				<th></th>
+				<th>Number</th>
+				<th>$000s</th>
+				<th>Number</th>
+				<th>$000s</th>
+				<th>Number</th>
+				<th>$000s</th>
+				<th>Number</th>
+				<th>$000s</th>
+				<th>Number</th>
+				<th>$000s</th>
+				<th>Number</th>
+				<th>$000s</th>
+			</tr>
+
+		</thead>
+		<tbody>
+			{{#applicantincomes}}
+				<tr class="characteristic">
+					<td colspan="13">{{applicantincome}}</td>
+				</tr>
+				{{#borrowercharacteristics}}
+					<tr class="characteristic">
+						<td colspan="13">{{#footnote}}{{characteristic}}{{/footnote}}</td>
+					</tr>
+					{{#races}}
+					<tr>
+						<td>{{#footnote}}{{race}}{{/footnote}}</td>
+						{{#dispositions}}
+						<td>{{#addCommas}}{{count}}{{/addCommas}}</td>
+						<td>{{#addCommas}}{{value}}{{/addCommas}}</td>
+						{{/dispositions}}
+					</tr>
+					{{/races}}
+					{{#ethnicities}}
+					<tr>
+						<td>{{#footnote}}{{ethnicity}}{{/footnote}}</td>
+						{{#dispositions}}
+						<td>{{#addCommas}}{{count}}{{/addCommas}}</td>
+						<td>{{#addCommas}}{{value}}{{/addCommas}}</td>
+						{{/dispositions}}
+					</tr>
+					{{/ethnicities}}
+					{{#minoritystatus}}
+					<tr>
+						<td>{{#footnote}}{{minoritystatus}}{{/footnote}}</td>
+						{{#dispositions}}
+						<td>{{#addCommas}}{{count}}{{/addCommas}}</td>
+						<td>{{#addCommas}}{{value}}{{/addCommas}}</td>
+						{{/dispositions}}
+					</tr>
+					{{/minoritystatus}}
+				{{/borrowercharacteristics}}
+			{{/applicantincomes}}
+			<tr class="characteristic">
+				<td>Total <a href="/hmda-viz-prototype/footnotes/{{year}}/#14"><sup>14</sup></a></td>
+				{{#total}}
+				<td>{{#addCommas}}{{count}}{{/addCommas}}</td>
+				<td>{{#addCommas}}{{value}}{{/addCommas}}</td>
+				{{/total}}
+			</tr>
+		</tbody>
+	</table>
+	{{> tabledate}}
+</script>

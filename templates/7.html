@@ -1,0 +1,94 @@
+<script id="7" type="text/template">
+	{{> tablebanner}}
+
+	<table class="table report">
+		<thead>
+			<tr>
+				<th width="20%">Type of Census Tract <a href="/hmda-viz-prototype/footnotes/{{year}}/#10"><sup>10</sup></a></th>
+				<th class="purchaser" colspan="2" valign="bottom" width="13.33333%">Applications Received <a href="/hmda-viz-prototype/footnotes/{{year}}/#20"><sup>20</sup></a></th>
+				<th class="purchaser" colspan="2" valign="bottom" width="13.33333%">Loans Originated</th>
+				<th class="purchaser" colspan="2" valign="bottom" width="13.33333%">Apps. Approved But Not Accepted</th>
+				<th class="purchaser" colspan="2" valign="bottom" width="13.33333%">Appliations Denied</th>
+				<th class="purchaser" colspan="2" valign="bottom" width="13.33333%">Applications Withdrawn</th>
+				<th class="purchaser" colspan="2" valign="bottom" width="13.33333%">Files Closed For Incompleteness</th>
+			</tr>
+			<tr class="heading">
+				<th></th>
+				<th>Number</th>
+				<th>$000s</th>
+				<th>Number</th>
+				<th>$000s</th>
+				<th>Number</th>
+				<th>$000s</th>
+				<th>Number</th>
+				<th>$000s</th>
+				<th>Number</th>
+				<th>$000s</th>
+				<th>Number</th>
+				<th>$000s</th>
+			</tr>
+
+		</thead>
+		<tbody>
+			{{#censuscharacteristics}}
+				<tr class="characteristic">
+					<td colspan="13">{{#footnote}}{{characteristic}}{{/footnote}}</td>
+				</tr>
+				{{#compositions}}
+					<tr>
+						<td>{{#footnote}}{{composition}}{{/footnote}}</td>
+						{{#dispositions}}
+						<td>{{#addCommas}}{{count}}{{/addCommas}}</td>
+						<td>{{#addCommas}}{{value}}{{/addCommas}}</td>
+						{{/dispositions}}
+					</tr>
+				{{/compositions}}
+				{{#incomes}}
+					<tr>
+						<td>{{#footnote}}{{income}}{{/footnote}}</td>
+						{{#dispositions}}
+						<td>{{#addCommas}}{{count}}{{/addCommas}}</td>
+						<td>{{#addCommas}}{{value}}{{/addCommas}}</td>
+						{{/dispositions}}
+					</tr>
+				{{/incomes}}
+			{{/censuscharacteristics}}
+			{{#incomeRaces}}
+				<tr class="characteristic">
+					<td colspan="13">{{#footnote}}{{characteristic}}{{/footnote}}</td>
+				</tr>
+				{{#incomes}}
+					<tr class="characteristic">
+						<td colspan="13">{{#footnote}}{{income}}{{/footnote}}</td>
+					</tr>
+					{{#compositions}}
+						<tr>
+							<td>{{#footnote}}{{composition}}{{/footnote}}</td>
+							{{#dispositions}}
+								<td>{{#addCommas}}{{count}}{{/addCommas}}</td>
+								<td>{{#addCommas}}{{value}}{{/addCommas}}</td>
+							{{/dispositions}}
+						</tr>
+					{{/compositions}}
+				{{/incomes}}
+			{{/incomeRaces}}
+			{{#types}}
+				<tr class="characteristic">
+					<td>{{#footnote}}{{type}}{{/footnote}}</td>
+					{{#dispositions}}
+						<td>{{#addCommas}}{{count}}{{/addCommas}}</td>
+						<td>{{#addCommas}}{{value}}{{/addCommas}}</td>
+					{{/dispositions}}
+				</tr>
+			{{/types}}
+			<tr class="characteristic">
+				<td>Total <a href="/hmda-viz-prototype/footnotes/{{year}}/#14"><sup>14</sup></a></td>
+				{{#total}}
+				<td>{{#addCommas}}{{count}}{{/addCommas}}</td>
+				<td>{{#addCommas}}{{value}}{{/addCommas}}</td>
+				{{/total}}
+			</tr>
+		</tbody>
+	</table>
+	{{> tabledate}}
+</script>
