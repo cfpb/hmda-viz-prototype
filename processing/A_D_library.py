@@ -725,23 +725,35 @@ class build_JSON(AD_report):
 	def table_8x_builder(self):
 		holding = OrderedDict({})
 		holding_list = []
+		self.container['applicantcharacteristics'] = []
 		holding['races'] = self.set_list(self.end_points, self.race_names, 'race', False)
 		for i in range(0,len(holding['races'])):
 			holding['races'][i]['denialreasons'] = self.set_list(self.end_points, self.denial_reasons, 'denialreason', True)
+		self.container['applicantcharacteristics'].append(holding)
+
+		holding = OrderedDict({})
 		holding['ethnicities'] = self.set_list(self.end_points, self.ethnicity_names, 'ethnicity', False)
 		for i in range(0, len(holding['ethnicities'])):
 			holding['ethnicities'][i]['denialreasons'] = self.set_list(self.end_points, self.denial_reasons, 'denialreason', True)
+		self.container['applicantcharacteristics'].append(holding)
+
+		holding = OrderedDict({})
 		holding['minoritystatuses'] = self.set_list(self.end_points, self.minority_statuses, 'minoritystatus', False)
 		for i in range(0, len(holding['minoritystatuses'])):
 			holding['minoritystatuses'][i]['denialreasons'] = self.set_list(self.end_points, self.denial_reasons, 'denialreason', True)
-		holding['genders'] = self.set_list(self.end_points, self.gender_list, 'gender', False)
+		self.container['applicantcharacteristics'].append(holding)
+
+		holding = OrderedDict({})
+		holding['genders'] = self.set_list(self.end_points, self.gender_list2, 'gender', False)
 		for i in range(0, len(holding['genders'])):
 			holding['genders'][i]['denialreasons'] = self.set_list(self.end_points, self.denial_reasons, 'denialreason', True)
+		self.container['applicantcharacteristics'].append(holding)
+
+		holding = OrderedDict({})
 		holding['incomes'] = self.set_list(self.end_points, self.applicant_income_bracket, 'income', False)
 		for i in range(0, len(holding['incomes'])):
 			holding['incomes'][i]['denialreasons'] = self.set_list(self.end_points, self.denial_reasons, 'denialreason', True)
-		holding_list.append(holding)
-		self.container['applicantcharacteristics'] = holding_list
+		self.container['applicantcharacteristics'].append(holding)
 		return self.container
 
 
@@ -1220,15 +1232,12 @@ class aggregate(AD_report): #aggregates LAR rows by appropriate characteristics 
 			print "HOEPA flag not present or outside parameters" #error message to be displayed if a loan falls outside logic parameters
 
 	def by_mean(self, container, inputs): #aggregate loans by mean of rate spread
-		#first_lien_purchasers = ['Fannie Mae first rates', 'Ginnie Mae first rates', 'Freddie Mac first rates', 'Farmer Mac first rates', 'Private Securitization first rates', 'Commercial bank, savings bank or association first rates', 'Life insurance co., credit union, finance co. first rates', 'Affiliate institution first rates', 'Other first rates']
-		#junior_lien_purchasers = ['Fannie Mae junior rates', 'Ginnie Mae junior rates', 'Freddie Mac junior rates', 'Farmer Mac junior rates', 'Private Securitization junior rates', 'Commercial bank, savings bank or association junior rates', 'Life insurance co., credit union, finance co. junior rates', 'Affiliate institution junior rates', 'Other junior rates']
 		for n in range(0,9):
 			if float(container['pricinginformation'][1]['purchasers'][n]['firstliencount']) > 0 and inputs[self.purchaser_first_lien_rates[n]] > 0: #bug fix for divide by 0 errors
 				container['points'][8]['purchasers'][n]['firstliencount'] = round(numpy.mean(numpy.array(inputs[self.purchaser_first_lien_rates[n]])),2)
 
 			if float(container['pricinginformation'][1]['purchasers'][n]['juniorliencount']) > 0 and inputs[self.purchaser_junior_lien_rates[n]] > 0: #bug fix for divide by 0 errors
 				container['points'][8]['purchasers'][n]['juniorliencount'] = round(numpy.mean(numpy.array(inputs[self.purchaser_junior_lien_rates[n]]), dtype=numpy.float64),2)
-
 
 	def by_weighted_mean(self, container, inputs): #aggregate loans by weighted mean of rate spread
 		for n in range(0,9):
@@ -1487,7 +1496,6 @@ class aggregate(AD_report): #aggregates LAR rows by appropriate characteristics 
 			container['types'][1]['dispositions'][inputs['action taken']]['value'] +=int(inputs['loan value'])
 
 	def totals_7x(self, container, inputs):
-
 		if inputs['action taken'] > 5:
 			pass
 		else:
@@ -1498,17 +1506,16 @@ class aggregate(AD_report): #aggregates LAR rows by appropriate characteristics 
 			container['total'][inputs['action taken']]['value'] += int(inputs['loan value'])
 
 	def by_denial_percent(self, container, inputs, index_num, key):
-		for j in range(0, len(container[key])):
-			for i in range(0, len(container[key][j]['denialreasons'])):
+		for j in range(0, len(container['applicantcharacteristics'][index_num][key])):
+			for i in range(0, len(container['applicantcharacteristics'][index_num][key][j]['denialreasons'])):
 				if float(container['applicantcharacteristics'][index_num][key][j]['denialreasons'][9]['count']) >0:
-					container['applicantcharacteristics'][index_num][key][j]['denialreasons'][i]['value'] = int(round((container[key][j]['denialreasons'][i]['count'] / float(container[key][j]['denialreasons'][9]['count'])) *100,0))
+					container['applicantcharacteristics'][index_num][key][j]['denialreasons'][i]['value'] = int(round((container['applicantcharacteristics'][index_num][key][j]['denialreasons'][i]['count'] / float(container['applicantcharacteristics'][index_num][key][j]['denialreasons'][9]['count'])) *100,0))
 
 	def by_denial_reason(self, container, inputs, index_num, key, key_singular):
 		for reason in inputs['denial_list']:
 			if reason is None:
 				pass
 			else:
-				print index_num, key, inputs[key_singular]
 				container['applicantcharacteristics'][index_num][key][inputs[key_singular]]['denialreasons'][9]['count'] +=1 #add to totals
 				container['applicantcharacteristics'][index_num][key][inputs[key_singular]]['denialreasons'][reason]['count'] +=1 #adds to race/reason cell
 

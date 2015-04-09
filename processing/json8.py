@@ -39,6 +39,7 @@ class build_JSON(AD_report):
 		self.state_msa_list = {} #holds a dictionary of msas in state by id number and name
 		self.dispositions_list = ['Applications Received', 'Loans Originated', 'Apps. Approved But Not Accepted', 'Applications Denied', 'Applications Withdrawn', 'Files Closed For Incompleteness']
 		self.gender_list = ['Male', 'Female', 'Joint (Male/Female)']
+		self.gender_list2 = ['Male', 'Female', 'Joint (Male/Female)', 'Gender Not Available']
 		self.end_points = ['count', 'value']
 		self.denial_reasons = ['Debt-to-Income Ratio', 'Employment History', 'Credit History', 'Collateral', 'Insufficient Cash', 'Unverifiable Information', 'Credit App. Incomplete', 'Mortgage Insurance Denied', 'Other', 'Total']
 	def msas_in_state(self, cursor, selector, report_type):
@@ -419,23 +420,35 @@ class build_JSON(AD_report):
 	def table_8x_builder(self):
 		holding = OrderedDict({})
 		holding_list = []
+		self.container['applicantcharacteristics'] = []
 		holding['races'] = self.set_list(self.end_points, self.race_names, 'race', False)
 		for i in range(0,len(holding['races'])):
 			holding['races'][i]['denialreasons'] = self.set_list(self.end_points, self.denial_reasons, 'denialreason', True)
+		self.container['applicantcharacteristics'].append(holding)
+
+		holding = OrderedDict({})
 		holding['ethnicities'] = self.set_list(self.end_points, self.ethnicity_names, 'ethnicity', False)
 		for i in range(0, len(holding['ethnicities'])):
 			holding['ethnicities'][i]['denialreasons'] = self.set_list(self.end_points, self.denial_reasons, 'denialreason', True)
+		self.container['applicantcharacteristics'].append(holding)
+
+		holding = OrderedDict({})
 		holding['minoritystatuses'] = self.set_list(self.end_points, self.minority_statuses, 'minoritystatus', False)
 		for i in range(0, len(holding['minoritystatuses'])):
 			holding['minoritystatuses'][i]['denialreasons'] = self.set_list(self.end_points, self.denial_reasons, 'denialreason', True)
-		holding['genders'] = self.set_list(self.end_points, self.gender_list, 'gender', False)
+		self.container['applicantcharacteristics'].append(holding)
+
+		holding = OrderedDict({})
+		holding['genders'] = self.set_list(self.end_points, self.gender_list2, 'gender', False)
 		for i in range(0, len(holding['genders'])):
 			holding['genders'][i]['denialreasons'] = self.set_list(self.end_points, self.denial_reasons, 'denialreason', True)
+		self.container['applicantcharacteristics'].append(holding)
+
+		holding = OrderedDict({})
 		holding['incomes'] = self.set_list(self.end_points, self.applicant_income_bracket, 'income', False)
 		for i in range(0, len(holding['incomes'])):
 			holding['incomes'][i]['denialreasons'] = self.set_list(self.end_points, self.denial_reasons, 'denialreason', True)
-		holding_list.append(holding)
-		self.container['applicantcharacteristics'] = holding_list
+		self.container['applicantcharacteristics'].append(holding)
 		return self.container
 
 	def print_JSON(self): #prints a json object to the terminal
@@ -460,3 +473,7 @@ build = build_JSON()
 table_8x = build.table_8x_builder()
 build.print_JSON()
 build.write_JSON('report8.json', table_8x)
+print build.container['applicantcharacteristics'][1]['ethnicities'][0]['denialreasons']
+
+
+
