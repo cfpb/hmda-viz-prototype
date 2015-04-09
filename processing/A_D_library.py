@@ -1139,13 +1139,17 @@ class aggregate(AD_report): #aggregates LAR rows by appropriate characteristics 
 		self.purchaser_first_lien_weight = ['Fannie Mae first weight', 'Ginnie Mae first weight', 'Freddie Mac first weight', 'Farmer Mac first weight', 'Private Securitization first weight', 'Commercial bank, savings bank or association first weight', 'Life insurance co., credit union, finance co. first weight', 'Affiliate institution first weight', 'Other first weight']
 		self.purchaser_junior_lien_weight = ['Fannie Mae junior weight', 'Ginnie Mae junior weight', 'Freddie Mac junior weight', 'Farmer Mac junior weight', 'Private Securitization junior weight', 'Commercial bank, savings bank or association junior weight', 'Life insurance co., credit union, finance co. junior weight', 'Affiliate institution junior weight', 'Other junior weight']
 
+	def by_demographics_3x(self, container, inputs, section, section_index, key, key_index):
+		container[section][section_index][key][key_index]['purchasers'][inputs['purchaser']]['count'] += 1
+		container[section][section_index][key][key_index]['purchasers'][inputs['purchaser']]['value'] += int(inputs['loan value'])
+
+	'''
 	def by_race(self, container, inputs): #aggregates loans by race category
 		container['borrowercharacteristics'][0]['races'][inputs['race']]['purchasers'][inputs['purchaser']]['count'] += 1
-		container['borrowercharacteristics'][0]['races'][inputs['race']]['purchasers'][inputs['purchaser']]['value'] += inputs['loan value']
+		container['borrowercharacteristics'][0]['races'][inputs['race']]['purchasers'][inputs['purchaser']]['value'] +=int(inputs['loan value'])
 
 	def by_ethnicity(self, container, inputs): #aggregate loans by enthicity status
-		if inputs['purchaser'] == 0:
-			pass
+
 		container['borrowercharacteristics'][1]['ethnicities'][inputs['ethnicity']]['purchasers'][inputs['purchaser']]['count'] += 1
 		container['borrowercharacteristics'][1]['ethnicities'][inputs['ethnicity']]['purchasers'][inputs['purchaser']]['value'] += int(inputs['loan value'])
 
@@ -1155,6 +1159,7 @@ class aggregate(AD_report): #aggregates LAR rows by appropriate characteristics 
 			container['borrowercharacteristics'][2]['minoritystatuses'][inputs['minority status']]['purchasers'][inputs['purchaser']]['value']+= int(inputs['loan value'])
 		else:
 			pass
+	'''
 	def by_applicant_income(self, container, inputs): #aggregate loans by applicant income index
 		if inputs['income bracket'] > 5: #income index outside bounds of report 3-1
 			pass
@@ -1282,12 +1287,12 @@ class aggregate(AD_report): #aggregates LAR rows by appropriate characteristics 
 		for n in range(0,9):
 			#first lien median block
 			if len(inputs[self.purchaser_first_lien_rates[n]]) > 0: #check to see if the array is populated
-				#container['points'][9]['purchasers'][n]['firstliencount'] = round(numpy.median(numpy.array(Decimal(inputs[self.purchaser_first_lien_rates[n]]))),3) #for normal median
-				pass
+				container['points'][9]['purchasers'][n]['firstliencount'] = round(numpy.median(numpy.array(inputs[self.purchaser_first_lien_rates[n]])),2) #for normal median
+
 			#junior lien median block
 			if len(inputs[self.purchaser_junior_lien_rates[n]]) > 0: #check to see if the array is populated
-				#container['points'][9]['purchasers'][n]['juniorliencount'] = numpy.median(numpy.array(inputs[self.purchaser_junior_lien_rates[n]])) #for normal median
-				pass
+				container['points'][9]['purchasers'][n]['juniorliencount'] = round(numpy.median(numpy.array(inputs[self.purchaser_junior_lien_rates[n]])),2) #for normal median
+
 	def by_weighted_median(self, container, inputs):
 		for n in range(0,9):
 			#first lien weighted median block
@@ -1398,25 +1403,12 @@ class aggregate(AD_report): #aggregates LAR rows by appropriate characteristics 
 			container['applicantincomes'][inputs['income bracket']]['borrowercharacteristics'][index_num][index_name][index_code]['dispositions'][inputs['action taken']]['count'] += 1 #increment count by action taken and minority status
 			container['applicantincomes'][inputs['income bracket']]['borrowercharacteristics'][index_num][index_name][index_code]['dispositions'][inputs['action taken']]['value'] += int(inputs['loan value'])
 
-	def by_minority_concentration(self, container, inputs):
-		if inputs['minority percent index'] > 3 or inputs['action taken'] > 5:
-			pass
-		else:
-			container['censuscharacteristics'][0]['compositions'][inputs['minority percent index']]['dispositions'][0]['count'] +=1
-			container['censuscharacteristics'][0]['compositions'][inputs['minority percent index']]['dispositions'][0]['value'] += int(inputs['loan value'])
-
-			container['censuscharacteristics'][0]['compositions'][inputs['minority percent index']]['dispositions'][inputs['action taken']]['count'] +=1
-			container['censuscharacteristics'][0]['compositions'][inputs['minority percent index']]['dispositions'][inputs['action taken']]['value'] += int(inputs['loan value'])
-
-	def by_tract_to_msa_income(self, container, inputs):
-		if inputs['action taken']>5 or inputs['tract income index'] > 3:
-			pass
-		else:
-			container['censuscharacteristics'][1]['incomes'][inputs['tract income index']]['dispositions'][0]['count'] +=1
-			container['censuscharacteristics'][1]['incomes'][inputs['tract income index']]['dispositions'][0]['value'] += int(inputs['loan value'])
-
-			container['censuscharacteristics'][1]['incomes'][inputs['tract income index']]['dispositions'][inputs['action taken']]['count'] +=1
-			container['censuscharacteristics'][1]['incomes'][inputs['tract income index']]['dispositions'][inputs['action taken']]['value'] += int(inputs['loan value'])
+	def by_tract_characteristics(self, container, inputs, json_index, key, key_index, action_index):
+		if action_index < 6 and key_index <4:
+			container['censuscharacteristics'][json_index][key][key_index]['dispositions'][0]['count'] +=1
+			container['censuscharacteristics'][json_index][key][key_index]['dispositions'][0]['value'] +=int(inputs['loan value'])
+			container['censuscharacteristics'][json_index][key][key_index]['dispositions'][action_index]['count'] +=1
+			container['censuscharacteristics'][json_index][key][key_index]['dispositions'][action_index]['value'] +=int(inputs['loan value'])
 
 	def by_income_ethnic_combo(self, container, inputs):
 		if inputs['action taken'] > 5 or inputs['tract income index'] > 3:
@@ -1441,7 +1433,6 @@ class aggregate(AD_report): #aggregates LAR rows by appropriate characteristics 
 		if inputs['action taken'] > 5:
 			pass
 		else:
-
 			container['total'][0]['count'] += 1
 			container['total'][0]['value'] += int(inputs['loan value'])
 			container['total'][inputs['action taken']]['count'] += 1
@@ -1471,8 +1462,8 @@ class aggregate(AD_report): #aggregates LAR rows by appropriate characteristics 
 			self.by_denial_reason(table8x, inputs, 4, 'incomes', 'income bracket')
 
 	def build_report7x(self, table7x, inputs):
-		self.by_minority_concentration(table7x, inputs)
-		self.by_tract_to_msa_income(table7x, inputs)
+		self.by_tract_characteristics(table7x, inputs, 0, 'compositions', inputs['minority percent index'], inputs['action taken'])
+		self.by_tract_characteristics(table7x, inputs, 1, 'incomes', inputs['tract income index'], inputs['action taken'])
 		self.by_income_ethnic_combo(table7x, inputs)
 		if inputs['small county flag'] == '1':
 			self.by_geo_type(table7x, inputs, 0, 0)
@@ -1489,23 +1480,24 @@ class aggregate(AD_report): #aggregates LAR rows by appropriate characteristics 
 		self.by_5x_totals(table5x, inputs)
 
 	def build_report4x(self, table4x, inputs): #call functions to fill JSON object for table 4-1 (FHA, FSA, RHS, and VA home purchase loans)
-		#def by_4x_demographics(self, container, inputs, key, key_index):
 		self.by_4x_demographics(table4x, inputs, 'races', inputs['race'])
 		self.by_4x_demographics(table4x, inputs, 'ethnicities', inputs['ethnicity'])
 		self.by_4x_demographics(table4x, inputs, 'minoritystatuses', inputs['minority status'])
-		#self.by_race_4x(table4x, inputs) #aggregate loans by race, gender, and applicaiton disposition
-		#self.by_ethnicity_4x(table4x, inputs)#aggregate loans by ethnicity, gender, and applicaiton disposition
-		#self.by_minority_status_4x(table4x, inputs)#aggregate loans by minority status, gender, and applicaiton disposition
+
 		self.by_applicant_income_4x(table4x, inputs) #aggregate loans by applicant income to MSA income ratio
 		self.totals_4x(table4x, inputs) #totals of applications by application disposition
 
 	def build_report_31(self, table31, inputs):  #calls aggregation functions to fill JSON object for table 3-1
-		self.by_race(table31, inputs) #aggregate loan by race
-		self.by_ethnicity(table31, inputs) #aggregate loan by ethnicity
-		self.by_minority_status(table31, inputs) #aggregate loan by minority status (binary determined by race and ethnicity)
-		self.by_applicant_income(table31, inputs) #aggregates by ratio of appicant income to tract median income (census)
-		self.by_minority_composition(table31, inputs) #aggregates loans by percent of minority residents (census)
-		self.by_tract_income(table31, inputs) #aggregates loans by census tract income rating - low/moderate/middle/upper
+		self.by_demographics_3x(table31, inputs, 'borrowercharacteristics', 0, 'races', inputs['race'])#aggregate loan by race
+		self.by_demographics_3x(table31, inputs, 'borrowercharacteristics', 1, 'ethnicities', inputs['ethnicity'])#aggregate loan by ethnicity
+		if inputs['minority status'] < 2:
+			self.by_demographics_3x(table31, inputs, 'borrowercharacteristics', 2, 'minoritystatuses', inputs['minority status'])#aggregate loan by minority status (binary determined by race and ethnicity)
+		if inputs['income bracket'] > 5: #income index outside bounds of report 3-1
+			self.by_demographics_3x(table31, inputs, 'censuscharacteristics', 3, 'applicantincomes', inputs['income bracket'])#aggregates by ratio of appicant income to tract median income (census)
+		if inputs['minority percent index'] > 4: #minority percent not available
+			self.by_demographics_3x(table31, inputs, 'censuscharacteristics', 0, 'tractpctminorities', inputs['minority percent index'])#aggregates loans by percent of minority residents (census)
+		if inputs['tract income index'] < 4: #income ratio not available or outside report 3-1 bounds
+			self.by_demographics_3x(table31, inputs, 'censuscharacteristics', 1, 'incomelevels', inputs['tract income index']) #aggregates loans by census tract income rating - low/moderate/middle/upper
 		self.totals(table31, inputs) #aggregate totals for each purchaser
 		return table31
 
