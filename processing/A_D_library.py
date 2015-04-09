@@ -1,4 +1,5 @@
 #this file holds the classes used to create the A&D reports using the HMDA LAR files combined with Census demographic information
+from decimal import Decimal
 import datetime as foo
 import numpy
 import weighted
@@ -722,22 +723,27 @@ class build_JSON(AD_report):
 		return self.container
 
 	def table_8x_builder(self):
-		self.container['races'] = self.set_list(self.end_points, self.race_names, 'race', False)
-		for i in range(0,len(self.container['races'])):
-			self.container['races'][i]['denialreasons'] = self.set_list(self.end_points, self.denial_reasons, 'denialreason', True)
-		self.container['ethnicities'] = self.set_list(self.end_points, self.ethnicity_names, 'ethnicity', False)
-		for i in range(0, len(self.container['ethnicities'])):
-			self.container['ethnicities'][i]['denialreasons'] = self.set_list(self.end_points, self.denial_reasons, 'denialreason', True)
-		self.container['minoritystatuses'] = self.set_list(self.end_points, self.minority_statuses, 'minoritystatus', False)
-		for i in range(0, len(self.container['minoritystatuses'])):
-			self.container['minoritystatuses'][i]['denialreasons'] = self.set_list(self.end_points, self.denial_reasons, 'denialreason', True)
-		self.container['genders'] = self.set_list(self.end_points, self.gender_list2, 'gender', False)
-		for i in range(0, len(self.container['genders'])):
-			self.container['genders'][i]['denialreasons'] = self.set_list(self.end_points, self.denial_reasons, 'denialreason', True)
-		self.container['incomes'] = self.set_list(self.end_points, self.applicant_income_bracket, 'income', False)
-		for i in range(0, len(self.container['incomes'])):
-			self.container['incomes'][i]['denialreasons'] = self.set_list(self.end_points, self.denial_reasons, 'denialreason', True)
+		holding = OrderedDict({})
+		holding_list = []
+		holding['races'] = self.set_list(self.end_points, self.race_names, 'race', False)
+		for i in range(0,len(holding['races'])):
+			holding['races'][i]['denialreasons'] = self.set_list(self.end_points, self.denial_reasons, 'denialreason', True)
+		holding['ethnicities'] = self.set_list(self.end_points, self.ethnicity_names, 'ethnicity', False)
+		for i in range(0, len(holding['ethnicities'])):
+			holding['ethnicities'][i]['denialreasons'] = self.set_list(self.end_points, self.denial_reasons, 'denialreason', True)
+		holding['minoritystatuses'] = self.set_list(self.end_points, self.minority_statuses, 'minoritystatus', False)
+		for i in range(0, len(holding['minoritystatuses'])):
+			holding['minoritystatuses'][i]['denialreasons'] = self.set_list(self.end_points, self.denial_reasons, 'denialreason', True)
+		holding['genders'] = self.set_list(self.end_points, self.gender_list, 'gender', False)
+		for i in range(0, len(holding['genders'])):
+			holding['genders'][i]['denialreasons'] = self.set_list(self.end_points, self.denial_reasons, 'denialreason', True)
+		holding['incomes'] = self.set_list(self.end_points, self.applicant_income_bracket, 'income', False)
+		for i in range(0, len(holding['incomes'])):
+			holding['incomes'][i]['denialreasons'] = self.set_list(self.end_points, self.denial_reasons, 'denialreason', True)
+		holding_list.append(holding)
+		self.container['applicantcharacteristics'] = holding_list
 		return self.container
+
 
 	def table_7x_builder(self):
 		self.container['censuscharacteristics'] = []
@@ -1218,23 +1224,24 @@ class aggregate(AD_report): #aggregates LAR rows by appropriate characteristics 
 		#junior_lien_purchasers = ['Fannie Mae junior rates', 'Ginnie Mae junior rates', 'Freddie Mac junior rates', 'Farmer Mac junior rates', 'Private Securitization junior rates', 'Commercial bank, savings bank or association junior rates', 'Life insurance co., credit union, finance co. junior rates', 'Affiliate institution junior rates', 'Other junior rates']
 		for n in range(0,9):
 			if float(container['pricinginformation'][1]['purchasers'][n]['firstliencount']) > 0 and inputs[self.purchaser_first_lien_rates[n]] > 0: #bug fix for divide by 0 errors
-				#container['points'][8]['purchasers'][n]['first lien'] = 0
-				container['points'][8]['purchasers'][n]['firstliencount'] = round(numpy.mean(numpy.array(inputs[self.purchaser_first_lien_rates[n]])),2)#round(self.inputs[first_lien_rates[n]]/float(container['pricinginformation'][1]['purchasers'][n]['firstliencount']),2)
+				container['points'][8]['purchasers'][n]['firstliencount'] = round(numpy.mean(numpy.array(inputs[self.purchaser_first_lien_rates[n]])),2)
 
 			if float(container['pricinginformation'][1]['purchasers'][n]['juniorliencount']) > 0 and inputs[self.purchaser_junior_lien_rates[n]] > 0: #bug fix for divide by 0 errors
-				#container['points'][8]['purchasers'][n]['junior lien'] = 0
-				#print inputs[self.purchaser_junior_lien_rates[n]], "junior lien rates"
-				container['points'][8]['purchasers'][n]['juniorliencount'] = round(numpy.mean(numpy.array(inputs[self.purchaser_junior_lien_rates[n]])),2)#round(inputs[self.junior_lien_rates[n]]/float(container['pricinginformation'][1]['purchasers'][n]['juniorliencount']),2)
+				container['points'][8]['purchasers'][n]['juniorliencount'] = round(numpy.mean(numpy.array(inputs[self.purchaser_junior_lien_rates[n]]), dtype=numpy.float64),2)
+
 
 	def by_weighted_mean(self, container, inputs): #aggregate loans by weighted mean of rate spread
-		#first_lien_purchasers = ['Fannie Mae first weight', 'Ginnie Mae first weight', 'Freddie Mac first weight', 'Farmer Mac first weight', 'Private Securitization first weight', 'Commercial bank, savings bank or association first weight', 'Life insurance co., credit union, finance co. first weight', 'Affiliate institution first weight', 'Other first weight']
-		#junior_lien_purchasers = ['Fannie Mae junior weight', 'Ginnie Mae junior weight', 'Freddie Mac junior weight', 'Farmer Mac junior weight', 'Private Securitization junior weight', 'Commercial bank, savings bank or association junior weight', 'Life insurance co., credit union, finance co. junior weight', 'Affiliate institution junior weight', 'Other junior weight']
 		for n in range(0,9):
 			if float(container['pricinginformation'][1]['purchasers'][n]['firstliencount']) > 0 and inputs[self.purchaser_first_lien_weight[n]] > 0: #bug fix for divide by 0 errors
+				'''
+				s = [['123.123','23'],['2323.212','123123.21312']]
+				decimal_s = [[decimal.Decimal(x) for x in y] for y in s]
+				ss = numpy.array(decimal_s)
+				'''
 				nd_first_rates = numpy.array(inputs[self.purchaser_first_lien_rates[n]])
+				#nd_first_rates = [[Decimal(x) for x in inputs[self.purchaser_first_lien_rates[n]]]]
+				#nd_first_rates_np = numpy.array(nd_first_rates)
 				nd_first_weights = numpy.array(inputs[self.purchaser_first_lien_weight[n]])
-				#print nd_first_rates
-				#print nd_first_weights
 				container['points'][8]['purchasers'][n]['firstlienvalue'] = round(numpy.average(nd_first_rates, weights=nd_first_weights),2)#round(inputs[self.purchaser_first_lien_weight[n]]/float(container['pricinginformation'][1]['purchasers'][n]['firstlienvalue']),2)
 
 			if float(container['pricinginformation'][1]['purchasers'][n]['juniorliencount']) > 0 and inputs[self.purchaser_junior_lien_weight[n]] > 0: #bug fix for divide by 0 errors
@@ -1266,12 +1273,12 @@ class aggregate(AD_report): #aggregates LAR rows by appropriate characteristics 
 		for n in range(0,9):
 			#first lien median block
 			if len(inputs[self.purchaser_first_lien_rates[n]]) > 0: #check to see if the array is populated
-				container['points'][9]['purchasers'][n]['firstliencount'] = round(numpy.median(numpy.array(inputs[self.purchaser_first_lien_rates[n]])),2) #for normal median
-				#container['points'][9]['purchasers'][n]['firstlienvalue'] = round(numpy.median(numpy.array(inputs[purchaser_first_lien_rates[n]])),2) #for weighted median
+				#container['points'][9]['purchasers'][n]['firstliencount'] = round(numpy.median(numpy.array(Decimal(inputs[self.purchaser_first_lien_rates[n]]))),3) #for normal median
+				pass
 			#junior lien median block
 			if len(inputs[self.purchaser_junior_lien_rates[n]]) > 0: #check to see if the array is populated
-				container['points'][9]['purchasers'][n]['juniorliencount'] = round(numpy.median(numpy.array(inputs[self.purchaser_junior_lien_rates[n]])),2) #for normal median
-				#container['points'][9]['purchasers'][n]['juniorlienvalue'] = round(numpy.median(numpy.array(inputs[purchaser_junior_lien_rates[n]])),2) #for weighted median
+				#container['points'][9]['purchasers'][n]['juniorliencount'] = numpy.median(numpy.array(inputs[self.purchaser_junior_lien_rates[n]])) #for normal median
+				pass
 	def by_weighted_median(self, container, inputs):
 		for n in range(0,9):
 			#first lien weighted median block
@@ -1490,28 +1497,29 @@ class aggregate(AD_report): #aggregates LAR rows by appropriate characteristics 
 			container['total'][inputs['action taken']]['count'] += 1
 			container['total'][inputs['action taken']]['value'] += int(inputs['loan value'])
 
-	def by_denial_percent(self, container, inputs, key, ):
+	def by_denial_percent(self, container, inputs, index_num, key):
 		for j in range(0, len(container[key])):
 			for i in range(0, len(container[key][j]['denialreasons'])):
-				if float(container[key][j]['denialreasons'][9]['count']) >0:
-					container[key][j]['denialreasons'][i]['value'] = int(round((container[key][j]['denialreasons'][i]['count'] / float(container[key][j]['denialreasons'][9]['count'])) *100,0))
+				if float(container['applicantcharacteristics'][index_num][key][j]['denialreasons'][9]['count']) >0:
+					container['applicantcharacteristics'][index_num][key][j]['denialreasons'][i]['value'] = int(round((container[key][j]['denialreasons'][i]['count'] / float(container[key][j]['denialreasons'][9]['count'])) *100,0))
 
-	def by_denial_reason(self, container, inputs, key, key_singular):
+	def by_denial_reason(self, container, inputs, index_num, key, key_singular):
 		for reason in inputs['denial_list']:
 			if reason is None:
 				pass
 			else:
-				container[key][inputs[key_singular]]['denialreasons'][9]['count'] +=1 #add to totals
-				container[key][inputs[key_singular]]['denialreasons'][reason]['count'] +=1 #adds to race/reason cell
+				print index_num, key, inputs[key_singular]
+				container['applicantcharacteristics'][index_num][key][inputs[key_singular]]['denialreasons'][9]['count'] +=1 #add to totals
+				container['applicantcharacteristics'][index_num][key][inputs[key_singular]]['denialreasons'][reason]['count'] +=1 #adds to race/reason cell
 
 	def build_report8x(self, table8x, inputs):
-		self.by_denial_reason(table8x, inputs, 'races', 'race')
-		self.by_denial_reason(table8x, inputs, 'ethnicities', 'ethnicity')
+		self.by_denial_reason(table8x, inputs, 0, 'races', 'race')
+		self.by_denial_reason(table8x, inputs, 1, 'ethnicities', 'ethnicity')
 		if inputs['minority status'] <2: #pass on loans with no minority status information
-			self.by_denial_reason(table8x, inputs, 'minoritystatuses', 'minority status')
-		self.by_denial_reason(table8x, inputs, 'genders', 'gender')
+			self.by_denial_reason(table8x, inputs, 2, 'minoritystatuses', 'minority status')
+		self.by_denial_reason(table8x, inputs, 3, 'genders', 'gender')
 		if inputs['income bracket'] <6:
-			self.by_denial_reason(table8x, inputs, 'incomes', 'income bracket')
+			self.by_denial_reason(table8x, inputs, 4, 'incomes', 'income bracket')
 
 	def build_report7x(self, table7x, inputs):
 		self.by_minority_concentration(table7x, inputs)

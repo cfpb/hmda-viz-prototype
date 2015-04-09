@@ -417,21 +417,25 @@ class build_JSON(AD_report):
 		return holding_list
 
 	def table_8x_builder(self):
-		self.container['races'] = self.set_list(self.end_points, self.race_names, 'race', False)
-		for i in range(0,len(self.container['races'])):
-			self.container['races'][i]['denialreasons'] = self.set_list(self.end_points, self.denial_reasons, 'denialreason', True)
-		self.container['ethnicities'] = self.set_list(self.end_points, self.ethnicity_names, 'ethnicity', False)
-		for i in range(0, len(self.container['ethnicities'])):
-			self.container['ethnicities'][i]['denialreasons'] = self.set_list(self.end_points, self.denial_reasons, 'denialreason', True)
-		self.container['minoritystatuses'] = self.set_list(self.end_points, self.minority_statuses, 'minoritystatus', False)
-		for i in range(0, len(self.container['minoritystatuses'])):
-			self.container['minoritystatuses'][i]['denialreasons'] = self.set_list(self.end_points, self.denial_reasons, 'denialreason', True)
-		self.container['genders'] = self.set_list(self.end_points, self.gender_list, 'gender', False)
-		for i in range(0, len(self.container['genders'])):
-			self.container['genders'][i]['denialreasons'] = self.set_list(self.end_points, self.denial_reasons, 'denialreason', True)
-		self.container['incomes'] = self.set_list(self.end_points, self.applicant_income_bracket, 'income', False)
-		for i in range(0, len(self.container['incomes'])):
-			self.container['incomes'][i]['denialreasons'] = self.set_list(self.end_points, self.denial_reasons, 'denialreason', True)
+		holding = OrderedDict({})
+		holding_list = []
+		holding['races'] = self.set_list(self.end_points, self.race_names, 'race', False)
+		for i in range(0,len(holding['races'])):
+			holding['races'][i]['denialreasons'] = self.set_list(self.end_points, self.denial_reasons, 'denialreason', True)
+		holding['ethnicities'] = self.set_list(self.end_points, self.ethnicity_names, 'ethnicity', False)
+		for i in range(0, len(holding['ethnicities'])):
+			holding['ethnicities'][i]['denialreasons'] = self.set_list(self.end_points, self.denial_reasons, 'denialreason', True)
+		holding['minoritystatuses'] = self.set_list(self.end_points, self.minority_statuses, 'minoritystatus', False)
+		for i in range(0, len(holding['minoritystatuses'])):
+			holding['minoritystatuses'][i]['denialreasons'] = self.set_list(self.end_points, self.denial_reasons, 'denialreason', True)
+		holding['genders'] = self.set_list(self.end_points, self.gender_list, 'gender', False)
+		for i in range(0, len(holding['genders'])):
+			holding['genders'][i]['denialreasons'] = self.set_list(self.end_points, self.denial_reasons, 'denialreason', True)
+		holding['incomes'] = self.set_list(self.end_points, self.applicant_income_bracket, 'income', False)
+		for i in range(0, len(holding['incomes'])):
+			holding['incomes'][i]['denialreasons'] = self.set_list(self.end_points, self.denial_reasons, 'denialreason', True)
+		holding_list.append(holding)
+		self.container['applicantcharacteristics'] = holding_list
 		return self.container
 
 	def print_JSON(self): #prints a json object to the terminal

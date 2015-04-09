@@ -80,12 +80,10 @@ class report_4x(constructor):
 			if self.report_number[2] == '8': #reports 8-x requires out of loop calculation of denial reason percents
 
 				percent_list = ['races', 'ethnicities', 'minoritystatuses', 'genders', 'incomes']
+				index_num = 0
 				for item in percent_list:
-					self.agg.by_denial_percent(table_X, self.parsed.inputs, item)
-				#self.agg.by_ethnicity_percent(table_X, self.parsed.inputs)
-				#self.agg.by_minority_status_percent(table_X, self.parsed.inputs)
-				#self.agg.by_gender_percent(table_X, self.parsed.inputs)
-				#self.agg.by_income_percent(table_X, self.parsed.inputs)
+					self.agg.by_denial_percent(table_X, self.parsed.inputs, index_num, item)
+					index_num +=1
 
 			path = "../" +table_X['type']+"/"+table_X['year']+"/"+build_X.get_state_name(table_X['msa']['state']).replace(' ', '-').lower()+"/"+build_X.msa_names[MSA].replace(' ', '-').lower()+"/"+table_X['table']
 			if not os.path.exists(path): #check if path exists
