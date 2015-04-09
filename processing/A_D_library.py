@@ -726,30 +726,35 @@ class build_JSON(AD_report):
 		holding = OrderedDict({})
 		holding_list = []
 		self.container['applicantcharacteristics'] = []
+		holding['characteristic'] = 'Races'
 		holding['races'] = self.set_list(self.end_points, self.race_names, 'race', False)
 		for i in range(0,len(holding['races'])):
 			holding['races'][i]['denialreasons'] = self.set_list(self.end_points, self.denial_reasons, 'denialreason', True)
 		self.container['applicantcharacteristics'].append(holding)
 
 		holding = OrderedDict({})
+		holding['characteristic'] = 'Ethnicity'
 		holding['ethnicities'] = self.set_list(self.end_points, self.ethnicity_names, 'ethnicity', False)
 		for i in range(0, len(holding['ethnicities'])):
 			holding['ethnicities'][i]['denialreasons'] = self.set_list(self.end_points, self.denial_reasons, 'denialreason', True)
 		self.container['applicantcharacteristics'].append(holding)
 
 		holding = OrderedDict({})
+		holding['characteristic'] = 'Minority Status'
 		holding['minoritystatuses'] = self.set_list(self.end_points, self.minority_statuses, 'minoritystatus', False)
 		for i in range(0, len(holding['minoritystatuses'])):
 			holding['minoritystatuses'][i]['denialreasons'] = self.set_list(self.end_points, self.denial_reasons, 'denialreason', True)
 		self.container['applicantcharacteristics'].append(holding)
 
 		holding = OrderedDict({})
+		holding['characteristic'] = 'Gender'
 		holding['genders'] = self.set_list(self.end_points, self.gender_list2, 'gender', False)
 		for i in range(0, len(holding['genders'])):
 			holding['genders'][i]['denialreasons'] = self.set_list(self.end_points, self.denial_reasons, 'denialreason', True)
 		self.container['applicantcharacteristics'].append(holding)
 
 		holding = OrderedDict({})
+		holding['characteristic'] = 'Income'
 		holding['incomes'] = self.set_list(self.end_points, self.applicant_income_bracket, 'income', False)
 		for i in range(0, len(holding['incomes'])):
 			holding['incomes'][i]['denialreasons'] = self.set_list(self.end_points, self.denial_reasons, 'denialreason', True)
@@ -1142,44 +1147,6 @@ class aggregate(AD_report): #aggregates LAR rows by appropriate characteristics 
 	def by_demographics_3x(self, container, inputs, section, section_index, key, key_index):
 		container[section][section_index][key][key_index]['purchasers'][inputs['purchaser']]['count'] += 1
 		container[section][section_index][key][key_index]['purchasers'][inputs['purchaser']]['value'] += int(inputs['loan value'])
-
-	'''
-	def by_race(self, container, inputs): #aggregates loans by race category
-		container['borrowercharacteristics'][0]['races'][inputs['race']]['purchasers'][inputs['purchaser']]['count'] += 1
-		container['borrowercharacteristics'][0]['races'][inputs['race']]['purchasers'][inputs['purchaser']]['value'] +=int(inputs['loan value'])
-
-	def by_ethnicity(self, container, inputs): #aggregate loans by enthicity status
-
-		container['borrowercharacteristics'][1]['ethnicities'][inputs['ethnicity']]['purchasers'][inputs['purchaser']]['count'] += 1
-		container['borrowercharacteristics'][1]['ethnicities'][inputs['ethnicity']]['purchasers'][inputs['purchaser']]['value'] += int(inputs['loan value'])
-
-	def by_minority_status(self, container, inputs): #aggregate loans by minority status
-		if inputs['minority status'] < 2:
-			container['borrowercharacteristics'][2]['minoritystatuses'][inputs['minority status']]['purchasers'][inputs['purchaser']]['count'] += 1
-			container['borrowercharacteristics'][2]['minoritystatuses'][inputs['minority status']]['purchasers'][inputs['purchaser']]['value']+= int(inputs['loan value'])
-		else:
-			pass
-	'''
-	def by_applicant_income(self, container, inputs): #aggregate loans by applicant income index
-		if inputs['income bracket'] > 5: #income index outside bounds of report 3-1
-			pass
-		else:
-			container['borrowercharacteristics'][3]['applicantincomes'][inputs['income bracket']]['purchasers'][inputs['purchaser']]['count'] += 1
-			container['borrowercharacteristics'][3]['applicantincomes'][inputs['income bracket']]['purchasers'][inputs['purchaser']]['value'] += int(inputs['loan value'])
-
-	def by_minority_composition(self, container, inputs): #aggregate loans by MSA minority population percent
-		if inputs['minority percent index'] > 4: #minority percent not available
-			pass
-		else:
-			container['censuscharacteristics'][0]['tractpctminorities'][inputs['minority percent index']]['purchasers'][inputs['purchaser']]['count'] += 1
-			container['censuscharacteristics'][0]['tractpctminorities'][inputs['minority percent index']]['purchasers'][inputs['purchaser']]['value'] += int(inputs['loan value'])
-
-	def by_tract_income(self, container, inputs): #aggregate loans by tract to MSA income ratio
-		if inputs['tract income index'] > 3: #income ratio not available or outside report 3-1 bounds
-			pass
-		else:
-			container['censuscharacteristics'][1]['incomelevels'][inputs['tract income index']]['purchasers'][inputs['purchaser']]['count'] +=1
-			container['censuscharacteristics'][1]['incomelevels'][inputs['tract income index']]['purchasers'][inputs['purchaser']]['value'] += int(inputs['loan value'])
 
 	def totals(self, container, inputs): #aggregate total of purchased loans
 		container['total']['purchasers'][inputs['purchaser']]['count'] +=1

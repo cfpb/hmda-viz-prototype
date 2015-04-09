@@ -421,30 +421,35 @@ class build_JSON(AD_report):
 		holding = OrderedDict({})
 		holding_list = []
 		self.container['applicantcharacteristics'] = []
+		holding['characteristic'] = 'Races'
 		holding['races'] = self.set_list(self.end_points, self.race_names, 'race', False)
 		for i in range(0,len(holding['races'])):
 			holding['races'][i]['denialreasons'] = self.set_list(self.end_points, self.denial_reasons, 'denialreason', True)
 		self.container['applicantcharacteristics'].append(holding)
 
 		holding = OrderedDict({})
+		holding['characteristic'] = 'Ethnicity'
 		holding['ethnicities'] = self.set_list(self.end_points, self.ethnicity_names, 'ethnicity', False)
 		for i in range(0, len(holding['ethnicities'])):
 			holding['ethnicities'][i]['denialreasons'] = self.set_list(self.end_points, self.denial_reasons, 'denialreason', True)
 		self.container['applicantcharacteristics'].append(holding)
 
 		holding = OrderedDict({})
+		holding['characteristic'] = 'Minority Status'
 		holding['minoritystatuses'] = self.set_list(self.end_points, self.minority_statuses, 'minoritystatus', False)
 		for i in range(0, len(holding['minoritystatuses'])):
 			holding['minoritystatuses'][i]['denialreasons'] = self.set_list(self.end_points, self.denial_reasons, 'denialreason', True)
 		self.container['applicantcharacteristics'].append(holding)
 
 		holding = OrderedDict({})
+		holding['characteristic'] = 'Gender'
 		holding['genders'] = self.set_list(self.end_points, self.gender_list2, 'gender', False)
 		for i in range(0, len(holding['genders'])):
 			holding['genders'][i]['denialreasons'] = self.set_list(self.end_points, self.denial_reasons, 'denialreason', True)
 		self.container['applicantcharacteristics'].append(holding)
 
 		holding = OrderedDict({})
+		holding['characteristic'] = 'Income'
 		holding['incomes'] = self.set_list(self.end_points, self.applicant_income_bracket, 'income', False)
 		for i in range(0, len(holding['incomes'])):
 			holding['incomes'][i]['denialreasons'] = self.set_list(self.end_points, self.denial_reasons, 'denialreason', True)
