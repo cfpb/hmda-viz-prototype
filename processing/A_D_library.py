@@ -285,6 +285,7 @@ class parse_inputs(AD_report):
 		self.inputs['minority status'] = demo.set_minority_status(self.inputs) #requires non white flags be set prior to running set_minority_status
 		self.inputs['gender'] = demo.set_gender(self.inputs)
 		self.inputs['denial_list'] = self.denial_reasons_list(self.inputs['denial reason1'], self.inputs['denial reason2'], self.inputs['denial reason3'])
+
 	def adjust_denial_index(self, reason):
 		if reason != ' ':
 			return int(reason) - 1
@@ -295,6 +296,18 @@ class parse_inputs(AD_report):
 		denial_list.append(reason2)
 		denial_list.append(reason3)
 		return denial_list
+
+	def parse_t9x(self, row):
+		self.inputs['year'] = row['asofdate'] #year or application or origination
+		self.inputs['state code'] = row['statecode'] #two digit state code
+		self.inputs['state name'] = row['statename'] #two character state abbreviation
+		self.inputs['census tract'] = row['censustractnumber'] # this is currently the 7 digit tract used by the FFIEC, it includes a decimal prior to the last two digits
+		self.inputs['action taken'] = int(row['actiontype']) #disposition of the loan application
+		self.inputs['property type'] = row['propertytype']
+		self.inputs['loan purpose'] = row['loan purpose']
+		self.inputs['loan type'] = row['loantype']
+
+
 
 class MSA_info(AD_report): #contains functions for setting aggregate information for the MSA
 
@@ -703,6 +716,8 @@ class build_JSON(AD_report):
 			return 'Reasons for denial of applications from nonoccupants for home-purchase, home improvement, or refinancing loans, 1- to 4- family and manufactured home dwellings, by race, ehtnicity, gender and income of applicant'
 		elif table_num =='8-7':
 			return 'Reasons for denial of applications for home-purchase, home improvement, or refinancing loans, manufactured home dwellings, by race, ethinicity, gender and income of applicant'
+		elif table_num == '9':
+			return 'Disposition of loan applications, by median age of homes in census tract in which property is located and type of loan'
 
 	def set_header(self, inputs, MSA, table_type, table_num): #sets the header information of the JSON object
 		now = foo.datetime.now()
@@ -724,43 +739,26 @@ class build_JSON(AD_report):
 
 	def table_8x_builder(self):
 		holding = OrderedDict({})
-		holding_list = []
 		self.container['applicantcharacteristics'] = []
-		holding['characteristic'] = 'Races'
-		holding['races'] = self.set_list(self.end_points, self.race_names, 'race', False)
-		for i in range(0,len(holding['races'])):
-			holding['races'][i]['denialreasons'] = self.set_list(self.end_points, self.denial_reasons, 'denialreason', True)
+		holding = self.table_8_helper('Races', 'race', self.race_names)
 		self.container['applicantcharacteristics'].append(holding)
-
-		holding = OrderedDict({})
-		holding['characteristic'] = 'Ethnicity'
-		holding['ethnicities'] = self.set_list(self.end_points, self.ethnicity_names, 'ethnicity', False)
-		for i in range(0, len(holding['ethnicities'])):
-			holding['ethnicities'][i]['denialreasons'] = self.set_list(self.end_points, self.denial_reasons, 'denialreason', True)
+		holding = self.table_8_helper('Ethnicities', 'ethnicity', self.ethnicity_names)
 		self.container['applicantcharacteristics'].append(holding)
-
-		holding = OrderedDict({})
-		holding['characteristic'] = 'Minority Status'
-		holding['minoritystatuses'] = self.set_list(self.end_points, self.minority_statuses, 'minoritystatus', False)
-		for i in range(0, len(holding['minoritystatuses'])):
-			holding['minoritystatuses'][i]['denialreasons'] = self.set_list(self.end_points, self.denial_reasons, 'denialreason', True)
+		holding = self.table_8_helper('Minority Status', 'minoritystatus', self.minority_statuses)
 		self.container['applicantcharacteristics'].append(holding)
-
-		holding = OrderedDict({})
-		holding['characteristic'] = 'Gender'
-		holding['genders'] = self.set_list(self.end_points, self.gender_list2, 'gender', False)
-		for i in range(0, len(holding['genders'])):
-			holding['genders'][i]['denialreasons'] = self.set_list(self.end_points, self.denial_reasons, 'denialreason', True)
+		holding = self.table_8_helper('Genders', 'gender', self.gender_list2)
 		self.container['applicantcharacteristics'].append(holding)
-
-		holding = OrderedDict({})
-		holding['characteristic'] = 'Income'
-		holding['incomes'] = self.set_list(self.end_points, self.applicant_income_bracket, 'income', False)
-		for i in range(0, len(holding['incomes'])):
-			holding['incomes'][i]['denialreasons'] = self.set_list(self.end_points, self.denial_reasons, 'denialreason', True)
+		holding = self.table_8_helper('Incomes', 'income', self.applicant_income_bracket)
 		self.container['applicantcharacteristics'].append(holding)
 		return self.container
 
+	def table_8_helper(self, key, key_singular, row_list):
+		temp = OrderedDict({})
+		temp['characteristic'] = key
+		temp[key.lower()] = self.set_list(self.end_points, row_list, key_singular, False)
+		for i in range(0, len(temp[key.lower()])):
+			temp[key.lower()][i]['denialreasons'] = self.set_list(self.end_points, self.denial_reasons, 'denialreason', True)
+		return temp
 
 	def table_7x_builder(self):
 		self.container['censuscharacteristics'] = []
@@ -1103,6 +1101,9 @@ class queries(AD_report):
 	def table_A_8_7_conditions(self):
 		return '''and propertytype = '2';'''
 
+	def table_A_9_conditions(self):
+		return '''and actiontaken != '6' and actiontaken != '7' and actiontaken != '8' and actiontaken != '9';'''
+
 	def table_3_1_columns(self):
 		return '''censustractnumber, applicantrace1, applicantrace2, applicantrace3, applicantrace4, applicantrace5,
 			coapplicantrace1, coapplicantrace2, coapplicantrace3, coapplicantrace4, coapplicantrace5,
@@ -1135,6 +1136,11 @@ class queries(AD_report):
 			applicantethnicity, coapplicantethnicity, applicantincome, asofdate, applicantsex,
 			coapplicantsex, denialreason1, denialreason2, denialreason3, ffiec_median_family_income,
 			statecode, statename, censustractnumber, countycode, countyname '''
+
+	def table_9_x_columns(self):
+		return '''loantype, loanpurpose, propertytype, actiontype, asofdate, censustractnumber, statecode, statename
+			msaofproperty '''
+
 
 class aggregate(AD_report): #aggregates LAR rows by appropriate characteristics to fill the JSON files
 
