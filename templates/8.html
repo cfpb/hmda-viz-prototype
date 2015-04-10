@@ -46,22 +46,49 @@
 				<tr class="characteristic">
 					<td colspan="21">{{#footnote}}{{characteristic}}{{/footnote}}</td>
 				</tr>
-				{{#compositions}}
+				{{#races}}
 					<tr>
-						<td>{{#footnote}}{{composition}}{{/footnote}}</td>
-						{{#dispositions}}
+						<td>{{#footnote}}{{race}}{{/footnote}}</td>
+						{{#denialreasons}}
 						<td>{{#addCommas}}{{count}}{{/addCommas}}</td>
 						<td>{{#addCommas}}{{value}}{{/addCommas}}</td>
-						{{/dispositions}}
+						{{/denialreasons}}
 					</tr>
-				{{/compositions}}
+				{{/races}}
+				{{#ethnicities}}
+					<tr>
+						<td>{{#footnote}}{{ethnicity}}{{/footnote}}</td>
+						{{#denialreasons}}
+						<td>{{#addCommas}}{{count}}{{/addCommas}}</td>
+						<td>{{#addCommas}}{{value}}{{/addCommas}}</td>
+						{{/denialreasons}}
+					</tr>
+				{{/ethnicities}}
+				{{#minoritystatuses}}
+					<tr>
+						<td>{{#footnote}}{{minoritystatus}}{{/footnote}}</td>
+						{{#denialreasons}}
+						<td>{{#addCommas}}{{count}}{{/addCommas}}</td>
+						<td>{{#addCommas}}{{value}}{{/addCommas}}</td>
+						{{/denialreasons}}
+					</tr>
+				{{/minoritystatuses}}
+				{{#genders}}
+					<tr>
+						<td>{{#footnote}}{{gender}}{{/footnote}}</td>
+						{{#denialreasons}}
+						<td>{{#addCommas}}{{count}}{{/addCommas}}</td>
+						<td>{{#addCommas}}{{value}}{{/addCommas}}</td>
+						{{/denialreasons}}
+					</tr>
+				{{/genders}}
 				{{#incomes}}
 					<tr>
 						<td>{{#footnote}}{{income}}{{/footnote}}</td>
-						{{#dispositions}}
+						{{#denialreasons}}
 						<td>{{#addCommas}}{{count}}{{/addCommas}}</td>
 						<td>{{#addCommas}}{{value}}{{/addCommas}}</td>
-						{{/dispositions}}
+						{{/denialreasons}}
 					</tr>
 				{{/incomes}}
 			{{/applicantcharacteristics}}
