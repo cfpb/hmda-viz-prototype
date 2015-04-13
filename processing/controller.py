@@ -61,9 +61,9 @@ selector.report_list['A 8-6'] = AL_MSAs
 selector.report_list['A 8-7'] = AL_MSAs
 
 
-selector.report_list['A 4-6'] = ['33660']
-report_list = ['A 4-6']
-#report_list = ['A 4-1', 'A 4-2', 'A 4-3', 'A 4-4', 'A 4-6', 'A 4-7']
+#selector.report_list['A 4-6'] = ['33660']
+#report_list = ['A 4-6']
+report_list = ['A 4-1', 'A 4-2', 'A 4-3', 'A 4-4', 'A 4-6', 'A 4-7']
 #report_list = ['A 5-1', 'A 5-2', 'A 5-3', 'A 5-4', 'A 5-5', 'A 5-7']
 #report_list = ['A 7-1', 'A 7-2', 'A 7-3', 'A 7-4', 'A 7-5', 'A 7-6', 'A 7-7']
 #report_list = ['A 8-1', 'A 8-2', 'A 8-3', 'A 8-4', 'A 8-5', 'A 8-6', 'A 8-7']
