@@ -188,8 +188,8 @@ class parse_inputs(AD_report):
 		self.inputs['ethnicity'] = demo.set_loan_ethn(self.inputs) #requires  ethnicity be parsed prior to running set_loan_ethn
 		self.inputs['minority status'] = demo.set_minority_status(self.inputs) #requires non white flags be set prior to running set_minority_status
 		self.inputs['gender'] = demo.set_gender(self.inputs)
-		if self.inputs['race'] == 0:
-			print a_race, co_race, self.inputs['race'], self.inputs['ethnicity'], self.inputs['gender'], self.inputs['sequence'], self.inputs['loan value']
+		if self.inputs['race'] == 1:
+			print a_race, co_race, self.inputs['race'], self.inputs['ethnicity'], self.inputs['gender'], self.inputs['sequence'], self.inputs['loan value'], self.inputs['app non white flag'], self.inputs['co non white flag']
 	def parse_t5x(self, row):
 
 		#self.inputs will be used in the aggregation functions
@@ -435,10 +435,11 @@ class demographics(AD_report):
 			if race_list[i] == 5
 		'''
 		for i in range(1, 5):
+			#print race_list, i in race_list
 			if i in race_list:
 				return True
-			elif 5 in race_list:
-				return False
+		if 5 in race_list:
+			return False
 
 	def set_joint(self, inputs): #takes a dictionary 'inputs' which is held in the controller(?) object and used to process each loan row
 		#set default return to true or false and then only run 1 check
