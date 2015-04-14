@@ -338,15 +338,15 @@ class MSA_info(AD_report): #contains functions for setting aggregate information
 			return  5
 		elif inputs['minority percent'] == 'NA    ': #if tract minority percent is NA then it is aggregated as <10%
 			return 0
-		elif float(inputs['minority percent']) < 10.0:
+		elif float(inputs['minority percent']) < 10.0: #less than 10%
 			return  0
-		elif float(inputs['minority percent']) <=19.0:
+		elif float(inputs['minority percent']) <20.0: # 10-19%
 			return 1
-		elif float(inputs['minority percent'])  <= 49.0:
+		elif float(inputs['minority percent'])  < 50.0: # 20-49%
 			return  2
-		elif float(inputs['minority percent'])  <= 79.0:
+		elif float(inputs['minority percent'])  < 80.0: # 50-79
 			return  3
-		elif float(inputs['minority percent'])  <= 100.0:
+		elif float(inputs['minority percent'])  <= 100.0: # 80-100
 			return  4
 		else:
 			print "minority percent index not set"
