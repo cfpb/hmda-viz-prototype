@@ -1,0 +1,98 @@
+<script id="8" type="text/template">
+	{{> tablebanner}}
+
+	<table class="table report">
+		<thead>
+			<tr>
+				<th width="20%">Applicant Characteristics Type of Census Tract</th>
+				<th class="purchaser" colspan="2" valign="bottom" width="8%">Debt-to-Income Ratio</th>
+				<th class="purchaser" colspan="2" valign="bottom" width="8%">Employment History</th>
+				<th class="purchaser" colspan="2" valign="bottom" width="8%">Credit History</th>
+				<th class="purchaser" colspan="2" valign="bottom" width="8%">Collateral</th>
+				<th class="purchaser" colspan="2" valign="bottom" width="8%">Insufficient Cash</th>
+				<th class="purchaser" colspan="2" valign="bottom" width="8%">Unverifiable Information</th>
+				<th class="purchaser" colspan="2" valign="bottom" width="8%">Credit App. Incomplete</th>
+				<th class="purchaser" colspan="2" valign="bottom" width="8%">Mortgage Insurance Denied</th>
+				<th class="purchaser" colspan="2" valign="bottom" width="8%">Other</th>
+				<th class="purchaser" colspan="2" valign="bottom" width="8%">Total <a href="/hmda-viz-prototype/footnotes/{{year}}/#22"><sup>22</sup></a></th>
+			</tr>
+			<tr class="heading">
+				<th></th>
+				<th>Number</th>
+				<th>%</th>
+				<th>Number</th>
+				<th>%</th>
+				<th>Number</th>
+				<th>%</th>
+				<th>Number</th>
+				<th>%</th>
+				<th>Number</th>
+				<th>%</th>
+				<th>Number</th>
+				<th>%</th>
+				<th>Number</th>
+				<th>%</th>
+				<th>Number</th>
+				<th>%</th>
+				<th>Number</th>
+				<th>%</th>
+				<th>Number</th>
+				<th>%</th>
+			</tr>
+
+		</thead>
+		<tbody>
+			{{#applicantcharacteristics}}
+				<tr class="characteristic">
+					<td colspan="21">{{#footnote}}{{characteristic}}{{/footnote}}</td>
+				</tr>
+				{{#races}}
+					<tr>
+						<td>{{#footnote}}{{race}}{{/footnote}}</td>
+						{{#denialreasons}}
+						<td>{{#addCommas}}{{count}}{{/addCommas}}</td>
+						<td>{{#addCommas}}{{value}}{{/addCommas}}</td>
+						{{/denialreasons}}
+					</tr>
+				{{/races}}
+				{{#ethnicities}}
+					<tr>
+						<td>{{#footnote}}{{ethnicity}}{{/footnote}}</td>
+						{{#denialreasons}}
+						<td>{{#addCommas}}{{count}}{{/addCommas}}</td>
+						<td>{{#addCommas}}{{value}}{{/addCommas}}</td>
+						{{/denialreasons}}
+					</tr>
+				{{/ethnicities}}
+				{{#minoritystatuses}}
+					<tr>
+						<td>{{#footnote}}{{minoritystatus}}{{/footnote}}</td>
+						{{#denialreasons}}
+						<td>{{#addCommas}}{{count}}{{/addCommas}}</td>
+						<td>{{#addCommas}}{{value}}{{/addCommas}}</td>
+						{{/denialreasons}}
+					</tr>
+				{{/minoritystatuses}}
+				{{#genders}}
+					<tr>
+						<td>{{#footnote}}{{gender}}{{/footnote}}</td>
+						{{#denialreasons}}
+						<td>{{#addCommas}}{{count}}{{/addCommas}}</td>
+						<td>{{#addCommas}}{{value}}{{/addCommas}}</td>
+						{{/denialreasons}}
+					</tr>
+				{{/genders}}
+				{{#incomes}}
+					<tr>
+						<td>{{#footnote}}{{income}}{{/footnote}}</td>
+						{{#denialreasons}}
+						<td>{{#addCommas}}{{count}}{{/addCommas}}</td>
+						<td>{{#addCommas}}{{value}}{{/addCommas}}</td>
+						{{/denialreasons}}
+					</tr>
+				{{/incomes}}
+			{{/applicantcharacteristics}}
+		</tbody>
+	</table>
+	{{> tabledate}}
+</script>
