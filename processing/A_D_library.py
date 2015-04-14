@@ -828,29 +828,32 @@ class build_JSON(AD_report):
 		return self.container
 
 	def table_5x_builder(self):
+		#note to self: you have to re-instantiate all the ordered dicts or else they will be linked to each other during aggregation
 		self.container['applicantincomes'] = self.set_list(self.end_points, self.applicant_income_bracket[:-1], 'applicantincome', False)
-		race_holding = OrderedDict({})
-		race_holding['characteristic'] = 'Race'
-		race_holding['races'] = self.set_list(self.end_points, self.race_names, 'race', False)
-		for i in range(0,len(race_holding['races'])):
-			race_holding['races'][i]['dispositions'] = self.set_list(self.end_points, self.dispositions_list, 'disposition', True)
 
-		ethnicity_holding = OrderedDict({})
-		ethnicity_holding['characteristic'] = 'Ethnicity'
-		ethnicity_holding['ethnicities'] = self.set_list(self.end_points, self.ethnicity_names, 'ethnicity', False)
-		for i in range(0,len(ethnicity_holding['ethnicities'])):
-			ethnicity_holding['ethnicities'][i]['dispositions'] = self.set_list(self.end_points, self.dispositions_list, 'disposition', True)
-
-		minoritystatus_holding = OrderedDict({})
-		minoritystatus_holding['characteristic'] = 'Minority Status'
-		minoritystatus_holding['minoritystatus'] = self.set_list(self.end_points, self.minority_statuses, 'minoritystatus', False)
-		for i in range(0,len(minoritystatus_holding['minoritystatus'])):
-			minoritystatus_holding['minoritystatus'][i]['dispositions'] = self.set_list(self.end_points, self.dispositions_list, 'disposition', True)
-		#make lists of borrower characterisitics
 		for i in range(0,len(self.container['applicantincomes'])):
+
 			self.container['applicantincomes'][i]['borrowercharacteristics'] = []
+
+			race_holding = OrderedDict({})
+			race_holding['characteristic'] = 'Race'
+			race_holding['races'] = self.set_list(self.end_points, self.race_names, 'race', False)
+			for j in range(0,len(race_holding['races'])):
+				race_holding['races'][j]['dispositions'] = self.set_list(self.end_points, self.dispositions_list, 'disposition', True)
 			self.container['applicantincomes'][i]['borrowercharacteristics'].append(race_holding)
+
+			ethnicity_holding = OrderedDict({})
+			ethnicity_holding['characteristic'] = 'Ethnicity'
+			ethnicity_holding['ethnicities'] = self.set_list(self.end_points, self.ethnicity_names, 'ethnicity', False)
+			for j in range(0,len(ethnicity_holding['ethnicities'])):
+				ethnicity_holding['ethnicities'][j]['dispositions'] = self.set_list(self.end_points, self.dispositions_list, 'disposition', True)
 			self.container['applicantincomes'][i]['borrowercharacteristics'].append(ethnicity_holding)
+
+			minoritystatus_holding = OrderedDict({})
+			minoritystatus_holding['characteristic'] = 'Minority Status'
+			minoritystatus_holding['minoritystatus'] = self.set_list(self.end_points, self.minority_statuses, 'minoritystatus', False)
+			for j in range(0,len(minoritystatus_holding['minoritystatus'])):
+				minoritystatus_holding['minoritystatus'][j]['dispositions'] = self.set_list(self.end_points, self.dispositions_list, 'disposition', True)
 			self.container['applicantincomes'][i]['borrowercharacteristics'].append(minoritystatus_holding)
 
 		self.container['total'] = self.set_list(self.end_points, self.dispositions_list, 'disposition', True)
@@ -1395,13 +1398,18 @@ class aggregate(AD_report): #aggregates LAR rows by appropriate characteristics 
 		#index_num: the index of the primary list in the dictionary
 		#index_name: the key corresponding to the index number
 		#index_code: the code from the inputs dictionary for the row being aggregated
-		if inputs['income bracket'] > 4 or inputs['action taken'] > 5 or inputs['minority status'] > 1:
-			pass
-		else:
+		if inputs['income bracket'] < 5 and inputs['action taken'] < 6:
 			container['applicantincomes'][inputs['income bracket']]['borrowercharacteristics'][index_num][index_name][index_code]['dispositions'][0]['count'] += 1 #increment count of applications received by minority status
 			container['applicantincomes'][inputs['income bracket']]['borrowercharacteristics'][index_num][index_name][index_code]['dispositions'][0]['value'] += int(inputs['loan value'])
 			container['applicantincomes'][inputs['income bracket']]['borrowercharacteristics'][index_num][index_name][index_code]['dispositions'][inputs['action taken']]['count'] += 1 #increment count by action taken and minority status
 			container['applicantincomes'][inputs['income bracket']]['borrowercharacteristics'][index_num][index_name][index_code]['dispositions'][inputs['action taken']]['value'] += int(inputs['loan value'])
+
+	def build_report5x(self, table5x, inputs):
+		self.by_5x_demographics(table5x, inputs, 0, 'races', inputs['race'])
+		self.by_5x_demographics(table5x, inputs, 1, 'ethnicities', inputs['ethnicity'])
+		if inputs['minority status'] < 2:
+			self.by_5x_demographics(table5x, inputs, 2, 'minoritystatus', inputs['minority status'])
+		self.by_5x_totals(table5x, inputs)
 
 	def by_tract_characteristics(self, container, inputs, json_index, key, key_index, action_index):
 		if action_index < 6 and key_index <4:
@@ -1472,12 +1480,6 @@ class aggregate(AD_report): #aggregates LAR rows by appropriate characteristics 
 			self.by_geo_type(table7x, inputs, 1, 0)
 			self.by_geo_type(table7x, inputs, 1, inputs['action taken'])
 		self.totals_7x(table7x, inputs)
-
-	def build_report5x(self, table5x, inputs):
-		self.by_5x_demographics(table5x, inputs, 0, 'races', inputs['race'])
-		self.by_5x_demographics(table5x, inputs, 1, 'ethnicities', inputs['ethnicity'])
-		self.by_5x_demographics(table5x, inputs, 2, 'minoritystatus', inputs['minority status'])
-		self.by_5x_totals(table5x, inputs)
 
 	def build_report4x(self, table4x, inputs): #call functions to fill JSON object for table 4-1 (FHA, FSA, RHS, and VA home purchase loans)
 		self.by_4x_demographics(table4x, inputs, 'races', inputs['race'])
