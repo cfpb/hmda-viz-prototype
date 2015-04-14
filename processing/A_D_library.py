@@ -712,7 +712,7 @@ class build_JSON(AD_report):
 		elif table_num =='7-7':
 			return 'Disposition of applications for home-purchase, home improvement, or refinancing loans, manufactured home dwellings, by characteristics of census tract in which property is located'
 		elif table_num =='8-1':
-			return 'Reasons for denial of applications for FHA, FSA/RHS, and VA home-purchase loans, 1- to 4-family and manufacutred home dwellings, by race, ethnicity, gender and income of applicant'
+			return 'Reasons for denial of applications for FHA, FSA/RHS, and VA home-purchase loans, 1- to 4-family and manufactured home dwellings, by race, ethnicity, gender and income of applicant'
 		elif table_num =='8-2':
 			return 'Reasons for denial of applications for conventional home-purchase loans, 1- to 4-family and manufactured home dwellings, by race, ethnicity, gender and income of applicant'
 		elif table_num =='8-3':
