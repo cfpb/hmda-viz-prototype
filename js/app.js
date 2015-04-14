@@ -68,6 +68,7 @@ function getTableData(table) {
                     case 'ethnicity not available':
                     case 'income not available':
                     case 'race not available':
+                    case 'gender not available':
                         footnotes.push(6);
                         break;
                     case 'ethnicity':
@@ -86,8 +87,12 @@ function getTableData(table) {
                         break;
                     case 'income':
                     case 'income characteristics':
-                        footnotes.push(12);
-                        footnotes.push(13);
+                        if (table === '8') {
+                            footnotes.push(9);
+                        } else {
+                            footnotes.push(12);
+                            footnotes.push(13);
+                        }
                         break;
                     case 'income &amp; racial&#x2f;ethnic composition':
                         footnotes.push(11);
@@ -99,6 +104,9 @@ function getTableData(table) {
                         break;
                     case 'no reported pricing data':
                         footnotes.push(15);
+                        break;
+                    case 'gender':
+                        footnotes.push(19);
                         break;
                     case 'all other tracts':
                         footnotes.push(21);
@@ -139,6 +147,9 @@ function getTableData(table) {
         }
         if (table.charAt(0) === '7') {
             table = '7';    // all 7's, 7-1 through 7-7, use the same table layout
+        }
+        if (table.charAt(0) === '8') {
+            table = '8';    // all 8's, 8-1 through 8-7, use the same table layout
         }
         // get partials
         // table banner
