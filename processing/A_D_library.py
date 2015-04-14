@@ -188,8 +188,7 @@ class parse_inputs(AD_report):
 		self.inputs['ethnicity'] = demo.set_loan_ethn(self.inputs) #requires  ethnicity be parsed prior to running set_loan_ethn
 		self.inputs['minority status'] = demo.set_minority_status(self.inputs) #requires non white flags be set prior to running set_minority_status
 		self.inputs['gender'] = demo.set_gender(self.inputs)
-		if self.inputs['race'] == 1:
-			print a_race, co_race, self.inputs['race'], self.inputs['ethnicity'], self.inputs['gender'], self.inputs['sequence'], self.inputs['loan value'], self.inputs['app non white flag'], self.inputs['co non white flag']
+
 	def parse_t5x(self, row):
 
 		#self.inputs will be used in the aggregation functions
