@@ -555,8 +555,6 @@ class build_JSON(AD_report):
 	def __init__(self):
 		self.container = OrderedDict({}) #master container for the JSON structure
 		self.msa = OrderedDict({}) #stores header information for the MSA
-		self.borrowercharacteristics = [] #holds all the borrower lists and dicts for the borrower portion of table 3-1
-		self.censuscharacteristics = [] #censuscharacteristics holds all the lists and dicts for the census portion of the table 3-1
 		self.table32_categories = ['pricinginformation', 'points', 'hoepa']
 		self.table32_rates = ['1.50 - 1.99', '2.00 - 2.49', '2.50 - 2.99', '3.00 - 3.49', '3.50 - 4.49', '4.50 - 5.49', '5.50 - 6.49', '6.5 or more', 'Mean', 'Median']
 		self.purchaser_names = ['Fannie Mae', 'Ginnie Mae', 'Freddie Mac', 'Farmer Mac', 'Private Securitization', 'Commercial bank, savings bank or association', 'Life insurance co., credit union, finance co.', 'Affiliate institution', 'Other']
@@ -938,7 +936,7 @@ class build_JSON(AD_report):
 		return spreads
 
 	def table_31_borrower_characteristics(self, characteristic, container_name, item_list): #builds the borrower characteristics section of the report 3-1 JSON
-		container = {'ethnicities':'ethnicity', 'minoritystatuses':'minoritystatus', 'races':'race', 'applicantincomes':'applicantincome'}
+		container = {'ethnicities':'ethnicity', 'minoritystatuses':'minoritystatus', 'races':'race', 'applicantincomes':'applicantincome', 'incomelevels':'incomelevel', 'tractpctminorities':'tractpctminority'}
 		top = OrderedDict({})
 		top['characteristic'] = characteristic
 		top[container_name] = []
@@ -947,19 +945,7 @@ class build_JSON(AD_report):
 			holding[container[container_name]] = "{}".format(item)
 			holding['purchasers'] = self.set_list(self.end_points, self.purchaser_names, 'name', True)
 			top[container_name].append(holding)
-		self.borrowercharacteristics.append(top)
-
-	def table_31_census_characteristics(self, characteristic, container_name, item_list): #builds the census characteristics section of the report 3-1 JSON
-		container = {'incomelevels':'incomelevel', 'tractpctminorities':'tractpctminority'}
-		top = OrderedDict({})
-		top['characteristic'] = characteristic
-		top[container_name] = []
-		for item in item_list:
-			holding = OrderedDict({})
-			holding[container[container_name]] = "{}".format(item)
-			holding['purchasers'] = self.set_list(self.end_points, self.purchaser_names, 'name', True)
-			top[container_name].append(holding)
-		self.censuscharacteristics.append(top)
+		return top
 
 	def table_32_builder(self): #builds the JSON structure for report 3-2
 		pricinginformation = []
@@ -980,14 +966,16 @@ class build_JSON(AD_report):
 		return self.container
 
 	def table_31_builder(self): #assembles all components of the 3-1 JSON object, appends totals section
-		self.table_31_borrower_characteristics('Race', 'races', self.race_names)
-		self.table_31_borrower_characteristics('Ethnicity', 'ethnicities', self.ethnicity_names)
-		self.table_31_borrower_characteristics('Minority Status', 'minoritystatuses', self.minority_statuses)
-		self.table_31_borrower_characteristics('Applicant Income', 'applicantincomes', self.applicant_income_bracket)
-		self.table_31_census_characteristics('Racial/Ethnic Composition', 'tractpctminorities', self.tract_pct_minority)
-		self.table_31_census_characteristics('Income', 'incomelevels', self.tract_income)
-		self.container['borrowercharacteristics'] = self.borrowercharacteristics
-		self.container['censuscharacteristics'] = self.censuscharacteristics
+		borrowercharacteristics = []
+		censuscharacteristics = []
+		borrowercharacteristics.append(self.table_31_borrower_characteristics('Race', 'races', self.race_names))
+		borrowercharacteristics.append(self.table_31_borrower_characteristics('Ethnicity', 'ethnicities', self.ethnicity_names))
+		borrowercharacteristics.append(self.table_31_borrower_characteristics('Minority Status', 'minoritystatuses', self.minority_statuses))
+		borrowercharacteristics.append(self.table_31_borrower_characteristics('Applicant Income', 'applicantincomes', self.applicant_income_bracket))
+		censuscharacteristics.append(self.table_31_borrower_characteristics('Racial/Ethnic Composition', 'tractpctminorities', self.tract_pct_minority))
+		censuscharacteristics.append(self.table_31_borrower_characteristics('Income', 'incomelevels', self.tract_income))
+		self.container['borrowercharacteristics'] = borrowercharacteristics
+		self.container['censuscharacteristics'] = censuscharacteristics
 		totals = {} #totals sums all the loan counts and values for each purchaser
 		top = OrderedDict({})
 		holding = OrderedDict({})
