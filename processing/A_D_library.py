@@ -1492,9 +1492,9 @@ class aggregate(AD_report): #aggregates LAR rows by appropriate characteristics 
 		self.by_demographics_3x(table31, inputs, 'borrowercharacteristics', 1, 'ethnicities', inputs['ethnicity'])#aggregate loan by ethnicity
 		if inputs['minority status'] < 2:
 			self.by_demographics_3x(table31, inputs, 'borrowercharacteristics', 2, 'minoritystatuses', inputs['minority status'])#aggregate loan by minority status (binary determined by race and ethnicity)
-		if inputs['income bracket'] > 5: #income index outside bounds of report 3-1
-			self.by_demographics_3x(table31, inputs, 'censuscharacteristics', 3, 'applicantincomes', inputs['income bracket'])#aggregates by ratio of appicant income to tract median income (census)
-		if inputs['minority percent index'] > 4: #minority percent not available
+		if inputs['income bracket'] < 6: #income index outside bounds of report 3-1
+			self.by_demographics_3x(table31, inputs, 'borrowercharacteristics', 3, 'applicantincomes', inputs['income bracket'])#aggregates by ratio of appicant income to tract median income (census)
+		if inputs['minority percent index'] < 5: #minority percent not available
 			self.by_demographics_3x(table31, inputs, 'censuscharacteristics', 0, 'tractpctminorities', inputs['minority percent index'])#aggregates loans by percent of minority residents (census)
 		if inputs['tract income index'] < 4: #income ratio not available or outside report 3-1 bounds
 			self.by_demographics_3x(table31, inputs, 'censuscharacteristics', 1, 'incomelevels', inputs['tract income index']) #aggregates loans by census tract income rating - low/moderate/middle/upper
