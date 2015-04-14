@@ -939,14 +939,11 @@ class build_JSON(AD_report):
 
 	def table_31_borrower_characteristics(self, characteristic, container_name, item_list): #builds the borrower characteristics section of the report 3-1 JSON
 		container = {'ethnicities':'ethnicity', 'minoritystatuses':'minoritystatus', 'races':'race', 'applicantincomes':'applicantincome'}
-		Header = True
 		top = OrderedDict({})
+		top['characteristic'] = characteristic
+		top[container_name] = []
 		for item in item_list:
 			holding = OrderedDict({})
-			if Header == True:
-				top['characteristic'] = characteristic
-				top[container_name] = []
-			Header = False
 			holding[container[container_name]] = "{}".format(item)
 			holding['purchasers'] = self.set_list(self.end_points, self.purchaser_names, 'name', True)
 			top[container_name].append(holding)
@@ -954,14 +951,11 @@ class build_JSON(AD_report):
 
 	def table_31_census_characteristics(self, characteristic, container_name, item_list): #builds the census characteristics section of the report 3-1 JSON
 		container = {'incomelevels':'incomelevel', 'tractpctminorities':'tractpctminority'}
-		Header = True
 		top = OrderedDict({})
+		top['characteristic'] = characteristic
+		top[container_name] = []
 		for item in item_list:
 			holding = OrderedDict({})
-			if Header == True:
-				top['characteristic'] = characteristic
-				top[container_name] = []
-			Header = False
 			holding[container[container_name]] = "{}".format(item)
 			holding['purchasers'] = self.set_list(self.end_points, self.purchaser_names, 'name', True)
 			top[container_name].append(holding)
@@ -973,7 +967,7 @@ class build_JSON(AD_report):
 		for cat in categories:
 			holding = OrderedDict({})
 			holding['pricing']= "{}".format(cat)
-			holding['purchasers']  = self.set_list(['firstliencount', 'firstlienvalue', 'juniorliencount', 'juniorlienvalue'], self.purchaser_names, 'name', True) #purchasers is overwritten each pass in the holding dictionary
+			holding['purchasers']  = self.set_list(['firstliencount', 'firstlienvalue', 'juniorliencount', 'juniorlienvalue'], self.purchaser_names, 'name', True)
 			pricinginformation.append(holding)
 		self.container['pricinginformation'] = pricinginformation
 		holding = OrderedDict({})
