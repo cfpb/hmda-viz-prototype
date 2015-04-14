@@ -208,7 +208,7 @@ class build_JSON(AD_report):
 	def table_8x_builder(self):
 		holding = OrderedDict({})
 		self.container['applicantcharacteristics'] = []
-		holding = self.table_8_helper('Race', 'race', self.race_names)
+		holding = self.table_8_helper('Races', 'race', self.race_names)
 		self.container['applicantcharacteristics'].append(holding)
 		holding = self.table_8_helper('Ethnicities', 'ethnicity', self.ethnicity_names)
 		self.container['applicantcharacteristics'].append(holding)
@@ -221,8 +221,9 @@ class build_JSON(AD_report):
 		return self.container
 
 	def table_8_helper(self, key, key_singular, row_list):
+		#singles = {'ethnicities':'ethnicity', 'minoritystatuses':'minoritystatus', 'races':'race', 'applicantincomes':'applicantincome', 'incomelevels':'incomelevel', 'tractpctminorities':'tractpctminority'}
 		temp = OrderedDict({})
-		temp['characteristic'] = key
+		temp['characteristic'] = key_singular
 		if key == 'Minority Status':
 			key = 'minoritystatuses'
 		temp[key.lower()] = self.set_list(self.end_points, row_list, key_singular, False)
@@ -479,14 +480,14 @@ build = build_JSON()
 #build.print_JSON()
 #table_7x = build.table_7x_builder()
 #build.print_JSON()
-#table_8x = build.table_8x_builder()
-#build.print_JSON()
+table_8x = build.table_8x_builder()
+build.print_JSON()
 #build.write_JSON('report8.json', table_8x)
 #table_9x = build.table_9x_builder()
 #build.print_JSON()
 #table_5x['applicantincomes'][0]['borrowercharacteristics'][0]['races'][2]['dispositions'][1]['count'] +=100
-table_11x = build.table_11x_builder()
-build.write_JSON('report11.json', table_11x)
+#table_11x = build.table_11x_builder()
+#build.write_JSON('report11.json', table_11x)
 
 
 

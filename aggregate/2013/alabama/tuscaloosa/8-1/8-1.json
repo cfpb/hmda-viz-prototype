@@ -1,9 +1,9 @@
 {
     "table": "8-1", 
     "type": "Aggregate", 
-    "desc": "Reasons for denial of applications for FHA, FSA/RHS, and VA home-purchase loans, 1- to 4-family and manufacutred home dwellings, by race, ethnicity, gender and income of applicant", 
+    "desc": "Reasons for denial of applications for FHA, FSA/RHS, and VA home-purchase loans, 1- to 4-family and manufactured home dwellings, by race, ethnicity, gender and income of applicant", 
     "year": "2013", 
-    "report-date": "04/09/2015", 
+    "report-date": "04/14/2015", 
     "msa": {
         "id": "46220", 
         "name": "Tuscaloosa", 
@@ -12,7 +12,7 @@
     }, 
     "applicantcharacteristics": [
         {
-            "characteristic": "Races", 
+            "characteristic": "Race", 
             "races": [
                 {
                     "race": "American Indian/Alaska Native", 
@@ -457,15 +457,15 @@
             ]
         }, 
         {
-            "characteristic": "Ethnicities", 
+            "characteristic": "Ethnicity", 
             "ethnicities": [
                 {
                     "ethnicity": "Hispanic or Latino", 
                     "denialreasons": [
                         {
                             "denialreason": "Debt-to-Income Ratio", 
-                            "count": 1, 
-                            "value": 50
+                            "count": 0, 
+                            "value": 0
                         }, 
                         {
                             "denialreason": "Employment History", 
@@ -504,13 +504,13 @@
                         }, 
                         {
                             "denialreason": "Other", 
-                            "count": 1, 
-                            "value": 50
+                            "count": 0, 
+                            "value": 0
                         }, 
                         {
                             "denialreason": "Total", 
-                            "count": 2, 
-                            "value": 100
+                            "count": 0, 
+                            "value": 0
                         }
                     ]
                 }, 
@@ -629,18 +629,18 @@
                     "denialreasons": [
                         {
                             "denialreason": "Debt-to-Income Ratio", 
-                            "count": 4, 
-                            "value": 22
+                            "count": 5, 
+                            "value": 25
                         }, 
                         {
                             "denialreason": "Employment History", 
                             "count": 2, 
-                            "value": 11
+                            "value": 10
                         }, 
                         {
                             "denialreason": "Credit History", 
                             "count": 5, 
-                            "value": 28
+                            "value": 25
                         }, 
                         {
                             "denialreason": "Collateral", 
@@ -650,7 +650,7 @@
                         {
                             "denialreason": "Insufficient Cash", 
                             "count": 2, 
-                            "value": 11
+                            "value": 10
                         }, 
                         {
                             "denialreason": "Unverifiable Information", 
@@ -660,7 +660,7 @@
                         {
                             "denialreason": "Credit App. Incomplete", 
                             "count": 2, 
-                            "value": 11
+                            "value": 10
                         }, 
                         {
                             "denialreason": "Mortgage Insurance Denied", 
@@ -669,12 +669,12 @@
                         }, 
                         {
                             "denialreason": "Other", 
-                            "count": 3, 
-                            "value": 17
+                            "count": 4, 
+                            "value": 20
                         }, 
                         {
                             "denialreason": "Total", 
-                            "count": 18, 
+                            "count": 20, 
                             "value": 100
                         }
                     ]
@@ -682,7 +682,7 @@
             ]
         }, 
         {
-            "characteristic": "Minority Status", 
+            "characteristic": "Minoritystatus", 
             "minoritystatuses": [
                 {
                     "minoritystatus": "White Non-Hispanic", 
@@ -744,8 +744,8 @@
                     "denialreasons": [
                         {
                             "denialreason": "Debt-to-Income Ratio", 
-                            "count": 24, 
-                            "value": 31
+                            "count": 23, 
+                            "value": 30
                         }, 
                         {
                             "denialreason": "Employment History", 
@@ -755,7 +755,7 @@
                         {
                             "denialreason": "Credit History", 
                             "count": 25, 
-                            "value": 32
+                            "value": 33
                         }, 
                         {
                             "denialreason": "Collateral", 
@@ -784,12 +784,12 @@
                         }, 
                         {
                             "denialreason": "Other", 
-                            "count": 11, 
-                            "value": 14
+                            "count": 10, 
+                            "value": 13
                         }, 
                         {
                             "denialreason": "Total", 
-                            "count": 78, 
+                            "count": 76, 
                             "value": 100
                         }
                     ]
@@ -797,7 +797,7 @@
             ]
         }, 
         {
-            "characteristic": "Genders", 
+            "characteristic": "Gender", 
             "genders": [
                 {
                     "gender": "Male", 
@@ -1022,7 +1022,7 @@
             ]
         }, 
         {
-            "characteristic": "Incomes", 
+            "characteristic": "Income", 
             "incomes": [
                 {
                     "income": "Less than 50% of MSA/MD median", 

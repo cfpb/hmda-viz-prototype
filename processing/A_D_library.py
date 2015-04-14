@@ -747,24 +747,24 @@ class build_JSON(AD_report):
 	def table_8x_builder(self):
 		holding = OrderedDict({})
 		self.container['applicantcharacteristics'] = []
-		holding = self.table_8_helper('Race', 'race', self.race_names)
+		holding = self.table_8_helper('Races', 'Race', self.race_names)
 		self.container['applicantcharacteristics'].append(holding)
-		holding = self.table_8_helper('Ethnicities', 'ethnicity', self.ethnicity_names)
+		holding = self.table_8_helper('Ethnicities', 'Ethnicity', self.ethnicity_names)
 		self.container['applicantcharacteristics'].append(holding)
-		holding = self.table_8_helper('Minority Status', 'minoritystatus', self.minority_statuses)
+		holding = self.table_8_helper('Minority Status', 'Minoritystatus', self.minority_statuses)
 		self.container['applicantcharacteristics'].append(holding)
-		holding = self.table_8_helper('Genders', 'gender', self.gender_list2)
+		holding = self.table_8_helper('Genders', 'Gender', self.gender_list2)
 		self.container['applicantcharacteristics'].append(holding)
-		holding = self.table_8_helper('Incomes', 'income', self.applicant_income_bracket)
+		holding = self.table_8_helper('Incomes', 'Income', self.applicant_income_bracket)
 		self.container['applicantcharacteristics'].append(holding)
 		return self.container
 
 	def table_8_helper(self, key, key_singular, row_list):
 		temp = OrderedDict({})
-		temp['characteristic'] = key
+		temp['characteristic'] = key_singular
 		if key == 'Minority Status':
 			key = 'minoritystatuses'
-		temp[key.lower()] = self.set_list(self.end_points, row_list, key_singular, False)
+		temp[key.lower()] = self.set_list(self.end_points, row_list, key_singular.lower(), False)
 
 		for i in range(0, len(temp[key.lower()])):
 			temp[key.lower()][i]['denialreasons'] = self.set_list(self.end_points, self.denial_reasons, 'denialreason', True)
