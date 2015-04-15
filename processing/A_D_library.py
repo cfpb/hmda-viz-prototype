@@ -725,6 +725,26 @@ class build_JSON(AD_report):
 			return 'Reasons for denial of applications for home-purchase, home improvement, or refinancing loans, manufactured home dwellings, by race, ethinicity, gender and income of applicant'
 		elif table_num == '9':
 			return 'Disposition of loan applications, by median age of homes in census tract in which property is located and type of loan'
+		elif table_num == '11-1':
+			return 'Pricing information for FHA home-purchase loans, first lien, 1- to 4-family owner-occupied dwelling (excludes manufactured homes), by borrower or census tract characteristics'
+		elif table_num == '11-2':
+			return 'Pricing information for VA home-purhcase loans, first lien, 1- to 4-family owner-occupied dwelling (excludes manufactured homes), by borrower or census tract characteristics'
+		elif table_num == '11-3':
+			return 'Pricing information for conventional home-purchase loans, first lien, 1- to 4-family owner-occupied dwelling (excludes manufactured homes), by borrower or census tract characteristics'
+		elif table_num == '11-4':
+			return 'Pricing information for conventional home-purchase loans, junior lien, 1- to 4-family owner-occupied dwelling (excludes manufactured homes), by borrower or census tract characteristics'
+		elif table_num == '11-5':
+			return 'Pricing information for FHA refinancing loans, first lien, 1- to 4-family owner-occupied dwelling (excludes manufactured homes), by borrower or census tract characteristics'
+		elif table_num == '11-6':
+			return 'Pricing information for VA refinancing loans, first lien, 1- to 4-family owner-occupied dwelling (excludes manufactured homes), by borrower or census tract characteristics'
+		elif table_num == '11-7':
+			return 'Pricing information for conventional refinancing loans, first lien, 1- to 4-family owner-occupied dwelling (excludes manufactured homes), by borrower or census tract characteristics'
+		elif table_num == '11-8':
+			return 'Pricing information for conventional refinancing loans, first lien, 1- to 4-family owner-occupied dwelling (excludes manufactured homes), by borrower or census tract characteristics'
+		elif table_num == '11-9':
+			return 'Pricing information for conventional home improvement loans, first lien, 1- to 4-family owner-occupied dwelling (excludes manufactured homes), by borrower or census tract characteristics'
+		elif table_num == '11-10':
+			return 'Pricing information for conventional refinancing loans, junior lien, 1- to 4-family owner-occupied dwelling (excludes manufactured homes), by borrower or census tract characteristics'
 
 	def set_header(self, inputs, MSA, table_type, table_num): #sets the header information of the JSON object
 		now = foo.datetime.now()

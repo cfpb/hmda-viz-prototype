@@ -17,7 +17,8 @@ class build_JSON(AD_report):
 		self.container = OrderedDict({}) #master container for the JSON structure
 		self.msa = OrderedDict({}) #stores header information for the MSA
 		self.table32_categories = ['pricinginformation', 'points', 'hoepa']
-		self.table32_rates = ['1.50 - 1.99', '2.00 - 2.49', '2.50 - 2.99', '3.00 - 3.49', '3.50 - 4.49', '4.50 - 5.49', '5.50 - 6.49', '6.5 or more', 'Mean', 'Median']
+		self.table32_rates = self.rate_spreads[2:]
+		self.rate_spreads = ['No Reported Pricing Data', 'Reported Pricing Data', '1.50 - 1.99', '2.00 - 2.49', '2.50 - 2.99', '3.00 - 3.49', '3.50 - 4.49', '4.50 - 5.49', '5.50 - 6.49', '6.5 or more', 'Mean', 'Median']
 		self.purchaser_names = ['Fannie Mae', 'Ginnie Mae', 'Freddie Mac', 'Farmer Mac', 'Private Securitization', 'Commercial bank, savings bank or association', 'Life insurance co., credit union, finance co.', 'Affiliate institution', 'Other']
 		self.race_names = ['American Indian/Alaska Native', 'Asian', 'Black or African American', 'Native Hawaiian or Other Pacific Islander', 'White', '2 or more minority races', 'Joint (White/Minority Race)', 'Race Not Available']
 		self.ethnicity_names = ['Hispanic or Latino', 'Not Hispanic or Latino', 'Joint (Hispanic or Latino/Not Hispanic or Latino)', 'Ethnicity Not Available']
@@ -465,6 +466,7 @@ class build_JSON(AD_report):
 		'''
 
 		self.container['borrowercharacteristics'] =self.table_11x_characteristics('races', self.race_names, 'race', 'pricinginformation', 'pricing', self.table32_rates)
+		self.container['borrowercharacteristics'] =self.table_11x_characteristics('ethnicities', self.ethnicity_names, 'ethnicity', 'pricinginformation', 'pricing', self.table32_rates)
 		return self.container
 
 	def set_list(self, end_points, key_list, key_name, ends_bool):

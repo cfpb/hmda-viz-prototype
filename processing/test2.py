@@ -55,13 +55,7 @@ def table_7x_builder():
 		container['censuscharacteristics'][0]['compositions'][i]['dispositions'] = set_dispositions(end_points)
 	for i in range(0, len(container['censuscharacteristics'][1]['incomes'])):
 		container['censuscharacteristics'][1]['incomes'][i]['dispositions'] = set_dispositions(end_points)
-	'''
 
-	for i in range(0, len(container['income&racial/ethnic_composition'])):
-		container['income&racial/ethnic_composition'][i]['censuscharacteristics'] = set_brackets('race', tract_pct_minority)
-		for j in range(0, len(container['income&racial/ethnic_composition'][i]['censuscharacteristics'])):
-			container['income&racial/ethnic_composition'][i]['censuscharacteristics'][j]['disposition'] = set_dispositions(end_points)
-	'''
 table_7x_builder()
 
 print_JSON()

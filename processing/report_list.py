@@ -26,8 +26,6 @@ class report_list_maker(report_list):
 			for msa_code, msa_name in self.msa_names[state].iteritems(): #loop MSAs -- report list files live here
 				msa_path = state_path+ '/' + msa_name #needs to loop through MSAs in a state
 				msa = {}
-				#msa_reports['id'] = msa_code #put the MSA number in the dict
-				#msa_reports['name'] = msa_name #put the MSA name in the dict
 				report_holding = []
 
 				for report in report_list: #loop reports -- folder and file
@@ -43,9 +41,6 @@ class report_list_maker(report_list):
 					else:
 						pass
 				msa_reports['reports'] = report_holding
-
-				#if not os.path.exists(msa_path): #check if path exists
-				#	os.makedirs(msa_path) #if path not present, create it
 				if os.path.exists(msa_path): #check if path exists
 					self.write_JSON('report-list.json', msa_reports, msa_path) #write report_list file
 

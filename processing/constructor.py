@@ -96,6 +96,7 @@ class report_4x(constructor):
 			build_X.jekyll_for_msa(path2) #create and write jekyll file to the msa path
 
 
+	'''find a way to rename the functions in the A_D libary so that string manipulation chan be used to call them insead of having the functions below'''
 	def aggregation_return(self, year, report_number):
 		if report_number == 'A 3-1':
 			return 'build_report_31'
@@ -109,6 +110,10 @@ class report_4x(constructor):
 			return 'build_report7x'
 		elif report_number[:3] == 'A 8':
 			return 'build_report8x'
+		elif report_number[:3] == 'A 9':
+			return 'build_report9x'
+		elif report_number[:4] == 'A 11':
+			return 'build_report11x'
 
 	def JSON_constructor_return(self, report_number):
 		if report_number == 'A 3-1':
@@ -123,6 +128,10 @@ class report_4x(constructor):
 			return 'table_7x_builder'
 		elif report_number[:3] == 'A 8':
 			return 'table_8x_builder'
+		elif report_number[:3] == 'A 9':
+			return 'table_9x_builder'
+		elif report_number[:4] == 'A 11':
+			return 'table_11x_builder'
 
 	def parse_return(self, report_number):
 		if report_number == 'A 3-1':
@@ -137,4 +146,8 @@ class report_4x(constructor):
 			return 'parse_t7x'
 		elif report_number[:3] == 'A 8':
 			return 'parse_t8x'
+		elif report_number[:3] == 'A 9':
+			return 'parse_t9x'
+		elif report_number[:4] == 'A 11':
+			return 'parse_t11x'
 
