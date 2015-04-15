@@ -4,7 +4,7 @@ class file_checker(object):
 	pass
 
 class check_file(file_checker):
-
+	#creates msa-mds.json files that show which MSAs or MDs have reports generated
 	def __init__(self, build_object):
 		self.state_names = build_object.state_names #this is a dictionary in format {"DE":"Delaware"}
 		self.msa_names = build_object.state_msa_list
@@ -35,11 +35,11 @@ class check_file(file_checker):
 						msa['name'] = msa_name
 						state_holding.append(msa)
 						#print msa
+						state_msas['msa-mds'] = state_holding
+						#write msa-mds.json file
+						if not os.path.exists(state_path): #check if path exists
+							os.makedirs(state_path) #if path not present, create it
+						self.write_JSON('msa-mds.json', state_msas, state_path)
 						break
 					else:
 						pass
-			state_msas['msa-mds'] = state_holding
-			#write msa-mds.json file
-			if not os.path.exists(state_path): #check if path exists
-				os.makedirs(state_path) #if path not present, create it
-			self.write_JSON('msa-mds.json', state_msas, state_path)

@@ -221,7 +221,6 @@ class build_JSON(AD_report):
 		return self.container
 
 	def table_8_helper(self, key, key_singular, row_list):
-		#singles = {'ethnicities':'ethnicity', 'minoritystatuses':'minoritystatus', 'races':'race', 'applicantincomes':'applicantincome', 'incomelevels':'incomelevel', 'tractpctminorities':'tractpctminority'}
 		temp = OrderedDict({})
 		temp['characteristic'] = key_singular
 		if key == 'Minority Status':
@@ -239,6 +238,7 @@ class build_JSON(AD_report):
 		for i in range(0, len(temp[key])):
 			temp[key][i][end_key] = self.set_list(self.end_points, end_point_list, end_key_singular, end_bool2)
 		return temp
+
 	def table_7x_builder(self):
 		self.container['censuscharacteristics'] = []
 
@@ -373,29 +373,7 @@ class build_JSON(AD_report):
 			purchasers.append(purchasersholding)
 		return purchasers
 
-	def set_list(self, end_points, key_list, key_name, ends_bool):
-		holding_list = []
-		for item in key_list:
-			holding_dict = OrderedDict({})
-			holding_dict[key_name] = "{}".format(item)
-			if ends_bool == True:
-				for point in end_points:
-					holding_dict[point] = 0
-			holding_list.append(holding_dict)
-		return holding_list
 
-	def build_rate_spreads(self): #builds the rate spreads section of the report 3-2 JSON
-		spreads = []
-		for rate in self.table32_rates:
-			holding = OrderedDict({})
-			holding['point'] = "{}".format(rate)
-			if self.table32_rates.index(rate) < 4:
-				holding['purchasers'] = self.set_purchasers_NA(['firstliencount', 'firstlienvalue', 'juniorliencount', 'juniorlienvalue'])
-			else:
-				#holding['purchasers'] = self.set_purchasers(['firstliencount', 'firstlienvalue', 'juniorliencount', 'juniorlienvalue'])
-				holding['purchasers'] = self.set_list(['firstliencount', 'firstlienvalue', 'juniorliencount', 'juniorlienvalue'], self.purchaser_names, 'name', True)
-			spreads.append(holding)
-		return spreads
 
 	def table_31_characteristics(self, characteristic, container_name, item_list): #builds the borrower characteristics section of the report 3-1 JSON
 		container = {'ethnicities':'ethnicity', 'minoritystatuses':'minoritystatus', 'races':'race', 'applicantincomes':'applicantincome', 'incomelevels':'incomelevel', 'tractpctminorities':'tractpctminority'}
@@ -409,7 +387,17 @@ class build_JSON(AD_report):
 			top[container_name].append(holding)
 		return top
 
-
+	def build_rate_spreads(self): #builds the rate spreads section of the report 3-2 JSON
+		spreads = []
+		for rate in self.table32_rates:
+			holding = OrderedDict({})
+			holding['point'] = "{}".format(rate)
+			if self.table32_rates.index(rate) < 4:
+				holding['purchasers'] = self.set_purchasers_NA(['firstliencount', 'firstlienvalue', 'juniorliencount', 'juniorlienvalue'])
+			else:
+				holding['purchasers'] = self.set_list(['firstliencount', 'firstlienvalue', 'juniorliencount', 'juniorlienvalue'], self.purchaser_names, 'name', True)
+			spreads.append(holding)
+		return spreads
 
 	def table_32_builder(self): #builds the JSON structure for report 3-2
 		pricinginformation = []
@@ -446,27 +434,56 @@ class build_JSON(AD_report):
 		totals['purchasers'] = self.set_list(self.end_points, self.purchaser_names, 'name', True)
 		self.container['total'] = totals
 		return self.container
-	def table_11x_characteristics(self, ):
-		container = {'ethnicities':'ethnicity', 'minoritystatuses':'minoritystatus', 'races':'race', 'applicantincomes':'applicantincome', 'incomelevels':'incomelevel', 'tractpctminorities':'tractpctminority'}
-		temp = OrderedDict({})
-		temp['characteristic'] = characteristic
-		temp[container_name] = []
-		for item in item_list:
-			holding = OrderedDict({})
-			holding[container[container_name]] = "{}".format(item)
-			holding['ratespread'] = self.set_list(self.end_points, self.purchaser_names, 'name', True)
-			temp[container_name].append(holding)
-		return temp
 
-	def tabe_11x_builder(self):
+	def table_11x_characteristics(self, list_header, item_list, item_name, layer_2_key, layer_2_name, layer_2_list):
+
+		#borrowercharacteristics = []
+		characteristic_list = []
+		temp = OrderedDict({})
+
+		temp[list_header] = self.set_list(self.end_points, item_list, item_name, False)
+		for i in range(0, len(temp[list_header])): #make this loop a separate function
+			temp_dict = OrderedDict({})
+			temp[list_header][i][layer_2_key] = self.set_list(self.end_points, layer_2_list, layer_2_name, True)
+		characteristic_list.append(temp)
+		return characteristic_list
+
+	def table_11x_builder(self):
+		borrower_list = ['Race', 'Ethnicity' , 'Minority Status', 'Income', 'Gender']
+		census_list = ['Racial/Ethnic Composition', 'Income Characteristics']
+
+
+		'''
 		borrowercharacteristics = []
-		borrowercharacteristics.append(self.table_11x_characteristics('Race', 'races', self.race_names))
+		censuscharacteristics = []
+		races = OrderedDict({})
+		races['races'] = self.set_list(self.end_points, self.race_names, 'race', False)
+		for i in range(0,len(races['races'])):
+			pricing_information = OrderedDict({})
+			races['races'][i]['pricinginformation']=self.set_list(self.end_points, self.table32_rates, 'pricing', True)
+		borrowercharacteristics.append(races)
+		'''
+
+		self.container['borrowercharacteristics'] =self.table_11x_characteristics('races', self.race_names, 'race', 'pricinginformation', 'pricing', self.table32_rates)
+		return self.container
+
+	def set_list(self, end_points, key_list, key_name, ends_bool):
+		holding_list = []
+		for item in key_list:
+			holding_dict = OrderedDict({})
+			holding_dict[key_name] = "{}".format(item)
+			if ends_bool == True:
+				for point in end_points:
+					holding_dict[point] = 0
+			holding_list.append(holding_dict)
+		return holding_list
+
 	def print_JSON(self): #prints a json object to the terminal
 		import json
 		print json.dumps(self.container, indent=4)
 
-	def write_JSON(self, name, data, path): #writes a json object to file
-		with open(os.path.join(path, name), 'w') as outfile: #writes the JSON structure to a file for the path named by report's header structure
+	def write_JSON(self, name, data): #writes a json object to file
+		with open(name, 'w') as outfile: #writes the JSON structure to a file for the path named by report's header structure
 			json.dump(data, outfile, indent=4, ensure_ascii = False)
 
 build = build_JSON()
@@ -480,14 +497,14 @@ build = build_JSON()
 #build.print_JSON()
 #table_7x = build.table_7x_builder()
 #build.print_JSON()
-table_8x = build.table_8x_builder()
-build.print_JSON()
+#table_8x = build.table_8x_builder()
+#build.print_JSON()
 #build.write_JSON('report8.json', table_8x)
 #table_9x = build.table_9x_builder()
 #build.print_JSON()
 #table_5x['applicantincomes'][0]['borrowercharacteristics'][0]['races'][2]['dispositions'][1]['count'] +=100
-#table_11x = build.table_11x_builder()
-#build.write_JSON('report11.json', table_11x)
+table_11x = build.table_11x_builder()
+build.write_JSON('report11.json', table_11x)
 
 
 

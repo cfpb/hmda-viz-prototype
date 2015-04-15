@@ -7,7 +7,7 @@ class report_list(object):
 	pass
 
 class report_list_maker(report_list):
-
+	#generates a list of reports that were created for an MSA or MD. This list is stored in report-list.json in the MSA or MD folder.
 	def __init__(self, build_object):
 		self.state_names = build_object.state_names #this is a dictionary in format {"DE":"Delaware"}
 		self.msa_names = build_object.state_msa_list
@@ -44,7 +44,8 @@ class report_list_maker(report_list):
 						pass
 				msa_reports['reports'] = report_holding
 
-				if not os.path.exists(msa_path): #check if path exists
-					os.makedirs(msa_path) #if path not present, create it
-				self.write_JSON('report_list.json', msa_reports, msa_path) #write report_list file
+				#if not os.path.exists(msa_path): #check if path exists
+				#	os.makedirs(msa_path) #if path not present, create it
+				if os.path.exists(msa_path): #check if path exists
+					self.write_JSON('report-list.json', msa_reports, msa_path) #write report_list file
 
