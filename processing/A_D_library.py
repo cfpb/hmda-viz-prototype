@@ -345,6 +345,45 @@ class parse_inputs(AD_report):
 		self.inputs['minority status'] = demo.set_minority_status(self.inputs) #requires non white flags be set prior to running set_minority_status
 		self.inputs['gender'] = demo.set_gender(self.inputs)
 
+	def parse_t12x(self, row):
+		MSA_index = MSA_info() #contains functions for census tract characteristics
+		demo=demographics() #contains functions for borrower characteristics
+		a_race = [] #race lists will hold 5 integers with 0 replacing a blank entry
+		co_race = [] #race lists will hold 5 integers with 0 replacing a blank entry
+		#fill race lists from the demographics class
+		a_race = demo.a_race_list(row) #put applicant race codes in a list 0-5, 0 is blank field
+		co_race = demo.co_race_list(row) #put co-applicant race codes in a list 0-5, 0 is blank field
+		#add data elements to dictionary
+		self.inputs['a_race'] = a_race
+		self.inputs['co_race'] = co_race
+		self.inputs['a ethn'] = row['applicantethnicity'] #ethnicity of the applicant
+		self.inputs['co ethn'] = row['coapplicantethnicity'] #ethnicity of the co-applicant
+		self.inputs['income'] = row['applicantincome'] #relied upon income rounded to the nearest thousand
+		self.inputs['rate spread'] = row['ratespread'] # interest rate spread over APOR if spread is greater than 1.5%
+		self.inputs['loan value'] = float(row['loanamount']) #loan value rounded to the nearest thousand
+		self.inputs['year'] = row['asofdate'] #year or application or origination
+		self.inputs['state code'] = row['statecode'] #two digit state code
+		self.inputs['state name'] = row['statename'] #two character state abbreviation
+		self.inputs['app sex'] = row['applicantsex']
+		self.inputs['co app sex'] = row['coapplicantsex']
+		self.inputs['MSA median income'] = row['ffiec_median_family_income'] #median income for the tract/msa
+		self.inputs['minority percent'] = row['minoritypopulationpct'] #%of population that is minority
+		self.inputs['tract to MSA income'] = row['tract_to_msa_md_income'] #ratio of tract to msa/md income
+		self.inputs['sequence'] = row['sequencenumber'] #the sequence number of the loan, used for checking errors
+		self.inputs['tract income index'] = MSA_index.tract_to_MSA_income(self.inputs) #sets the applicant income to an index number for aggregation
+		self.inputs['income bracket'] = MSA_index.app_income_to_MSA(self.inputs) #sets the applicant income as an index by an applicant's income as a percent of MSA median
+		self.inputs['action taken'] = int(row['actiontype'])
+		self.inputs['rate spread index'] = demo.rate_spread_index_11x(self.inputs['rate spread']) #index of the rate spread for use in the JSON structure
+		self.inputs['minority percent index'] = MSA_index.minority_percent(self.inputs) #sets the minority population percent to an index for aggregation
+		self.inputs['app non white flag'] = demo.set_non_white(a_race) #flags the applicant as non-white if true, used in setting minority status and race
+		self.inputs['co non white flag'] = demo.set_non_white(co_race) #flags the co applicant as non-white if true, used in setting minority status and race
+		self.inputs['minority count'] = demo.minority_count(a_race) #determines if the number of minority races claimed by the applicant is 2 or greater
+		self.inputs['joint status'] = demo.set_joint(self.inputs) #requires non white status flags be set prior to running set_joint
+		self.inputs['race'] = demo.set_race(self.inputs, a_race) #requires joint status be set prior to running set_race
+		self.inputs['ethnicity'] = demo.set_loan_ethn(self.inputs) #requires  ethnicity be parsed prior to running set_loan_ethn
+		self.inputs['minority status'] = demo.set_minority_status(self.inputs) #requires non white flags be set prior to running set_minority_status
+		self.inputs['gender'] = demo.set_gender(self.inputs)
+
 class MSA_info(AD_report): #contains functions for setting aggregate information for the MSA
 
 	def app_income_to_MSA(self, inputs): #set income bracket index
@@ -1043,27 +1082,7 @@ class build_JSON(AD_report):
 		characteristic_list.append(temp)
 		return_dict = characteristic_list[0]
 		return return_dict
-	'''
-	def table_11x_builder(self):
-		borrower_list = ['Race', 'Ethnicity' , 'Minority Status', 'Income', 'Gender']
-		census_list = ['Racial/Ethnic Composition', 'Income Characteristics']
-		plural_list = ['races', 'ethnicities', 'minoritystatuses', 'incomes', 'genders']
-		single_list = ['race', 'ethnicity', 'minoritystatus', 'income', 'gender']
-		borrower_input_list = [self.race_names, self.ethnicity_names, self.minority_statuses, self.applicant_income_bracket, self.gender_names2]
-		census_input_list = [self.tract_pct_minority, self.tract_income]
-		census_plural_list = ['compositions', 'incomes']
-		census_single_list = ['composition', 'income']
-		self.container['borrowercharacteristics'] = [''] * len(borrower_list)
-		self.container['censuscharacteristics'] = [''] * len(census_list)
 
-		for i in range(0, len(borrower_list)):
-			self.container['borrowercharacteristics'][i] = self.table_11x_characteristics(borrower_list[i], plural_list[i], borrower_input_list[i], single_list[i], 'pricinginformation', 'pricing', self.rate_spreads)
-
-		for i in range(0, len(census_list)):
-			self.container['censuscharacteristics'][i] = self.table_11x_characteristics(census_list[i], census_plural_list[i], census_input_list[i], census_single_list[i], 'pricinginformation', 'pricing', self.rate_spreads)
-
-		return self.container
-	'''
 	def table_31_characteristics(self, characteristic, container_name, item_list): #builds the borrower characteristics section of the report 3-1 JSON
 		container = {'ethnicities':'ethnicity', 'minoritystatuses':'minoritystatus', 'races':'race', 'applicantincomes':'applicantincome', 'incomelevels':'incomelevel', 'tractpctminorities':'tractpctminority'}
 		top = OrderedDict({})
@@ -1079,12 +1098,15 @@ class build_JSON(AD_report):
 	def table_11x_builder(self):
 		self.table_11_12_helper('pricinginformation', 'pricing', self.rate_spreads)
 		return self.container
+
 	def table_12_1_builder(self):
 		self.table_11_12_helper('dispositions', 'disposition', self.dispositions_list)
 		return self.container
+
 	def table_12_2_builder(self):
 		self.table_11_12_helper('pricinginformation', 'pricing', self.rate_spreads)
 		return self.container
+
 	def table_11_12_helper(self, key, key_singular, end_point_list):
 		borrower_list = ['Race', 'Ethnicity' , 'Minority Status', 'Income', 'Gender']
 		census_list = ['Racial/Ethnic Composition', 'Income Characteristics']
@@ -1104,7 +1126,6 @@ class build_JSON(AD_report):
 			self.container['censuscharacteristics'][i] = self.table_11x_characteristics(census_list[i], census_plural_list[i], census_input_list[i], census_single_list[i], key, key_singular, end_point_list)
 
 		return self.container
-
 
 	def set_list(self, end_points, key_list, key_name, ends_bool):
 		holding_list = []
@@ -1280,6 +1301,12 @@ class queries(AD_report):
 	def table_A_11_10_conditions(self):
 		return '''and loantype = '1' and loanpurpose = '2' and lienstatus = '2' and propertytype = '1' and occupancy = '1' ;'''
 
+	def table_A_12_1_conditions(self):
+		return ''' and loantype = '1' and propertytype = '2' and loanpurpose = '1' and lienstatus = '1' and occupancy = '1';'''
+
+	def table_A_12_2_conditions(self):
+		return ''' and loantype = '1' and propertytype = '2' and loanpurpose = '1' and lienstatus = '1' and occupancy = '1'; '''
+
 	def table_3_1_columns(self):
 		return '''censustractnumber, applicantrace1, applicantrace2, applicantrace3, applicantrace4, applicantrace5,
 			coapplicantrace1, coapplicantrace2, coapplicantrace3, coapplicantrace4, coapplicantrace5,
@@ -1323,6 +1350,13 @@ class queries(AD_report):
 			applicantethnicity, coapplicantethnicity, applicantincome, applicantsex, coapplicantsex,
 			minoritypopulationpct, ffiec_median_family_income, statename, statecode, loanamount,
 			sequencenumber, asofdate, ratespread, tract_to_msa_md_income '''
+
+	def table_12_x_columns(self):
+		return '''applicantrace1, applicantrace2, applicantrace3, applicantrace4, applicantrace5,
+			coapplicantrace1, coapplicantrace2, coapplicantrace3, coapplicantrace4, coapplicantrace5,
+			applicantethnicity, coapplicantethnicity, applicantincome, applicantsex, coapplicantsex,
+			minoritypopulationpct, ffiec_median_family_income, statename, statecode, loanamount,
+			sequencenumber, asofdate, ratespread, tract_to_msa_md_income, actiontype '''
 
 class aggregate(AD_report): #aggregates LAR rows by appropriate characteristics to fill the JSON files
 
@@ -1399,11 +1433,6 @@ class aggregate(AD_report): #aggregates LAR rows by appropriate characteristics 
 	def by_weighted_mean(self, container, inputs): #aggregate loans by weighted mean of rate spread
 		for n in range(0,9):
 			if float(container['pricinginformation'][1]['purchasers'][n]['firstliencount']) > 0 and inputs[self.purchaser_first_lien_weight[n]] > 0: #bug fix for divide by 0 errors
-				'''
-				s = [['123.123','23'],['2323.212','123123.21312']]
-				decimal_s = [[decimal.Decimal(x) for x in y] for y in s]
-				ss = numpy.array(decimal_s)
-				'''
 				nd_first_rates = numpy.array(inputs[self.purchaser_first_lien_rates[n]])
 				#nd_first_rates = [[Decimal(x) for x in inputs[self.purchaser_first_lien_rates[n]]]]
 				#nd_first_rates_np = numpy.array(nd_first_rates)
@@ -1424,8 +1453,6 @@ class aggregate(AD_report): #aggregates LAR rows by appropriate characteristics 
 				inputs[self.purchaser_junior_lien_weight[inputs['purchaser']]].append(int(inputs['loan value']))
 
 	def fill_rate_lists(self, inputs): #add all rate spreads to a list to find the mean and median rate spreads
-		#purchaser_first_lien_rates = ['Fannie Mae first lien list', 'Ginnie Mae first lien list', 'Freddie Mac first lien list', 'Farmer Mac first lien list', 'Private Securitization first lien list', 'Commercial bank, savings bank or association first lien list', 'Life insurance co., credit union, finance co. first lien list', 'Affiliate institution first lien list', 'Other first lien list']
-		#purchaser_junior_lien_rates = ['Fannie Mae junior lien list', 'Ginnie Mae junior lien list', 'Freddie Mac junior lien list', 'Farmer Mac junior lien list', 'Private Securitization junior lien list', 'Commercial bank, savings bank or association junior lien list', 'Life insurance co., credit union, finance co. junior lien list', 'Affiliate institution junior lien list', 'Other junior lien list']
 		if inputs['rate spread'] == 'NA   ' or inputs['rate spread'] == '     ':
 			pass
 		elif inputs['lien status'] == '1': #add to first lien rate spread list
@@ -1434,8 +1461,6 @@ class aggregate(AD_report): #aggregates LAR rows by appropriate characteristics 
 			inputs[self.purchaser_junior_lien_rates[inputs['purchaser']]].append(float(inputs['rate spread']))
 
 	def by_median(self, container, inputs): #puts the median rate spread in the JSON object
-		#purchaser_first_lien_rates = ['Fannie Mae first lien list', 'Ginnie Mae first lien list', 'Freddie Mac first lien list', 'Farmer Mac first lien list', 'Private Securitization first lien list', 'Commercial bank, savings bank or association first lien list', 'Life insurance co., credit union, finance co. first lien list', 'Affiliate institution first lien list', 'Other first lien list']
-		#purchaser_junior_lien_rates = ['Fannie Mae junior lien list', 'Ginnie Mae junior lien list', 'Freddie Mac junior lien list', 'Farmer Mac junior lien list', 'Private Securitization junior lien list', 'Commercial bank, savings bank or association junior lien list', 'Life insurance co., credit union, finance co. junior lien list', 'Affiliate institution junior lien list', 'Other junior lien list']
 		for n in range(0,9):
 			#first lien median block
 			if len(inputs[self.purchaser_first_lien_rates[n]]) > 0: #check to see if the array is populated
@@ -1665,6 +1690,36 @@ class aggregate(AD_report): #aggregates LAR rows by appropriate characteristics 
 		#mean and median functions are not called here
 		#mean and median function must be called outside the control loop
 		return table32
+
+	def build_report12_1(self, table12x, inputs):
+		self.by_characteristics(table12x, inputs, 'borrowercharacteristics', 0, 'races', inputs['race'], 'dispositions', inputs['action taken'])
+		self.by_characteristics(table12x, inputs, 'borrowercharacteristics', 1, 'ethnicities', inputs['ethnicity'], 'dispositions', inputs['action taken'])
+		if inputs['minority status'] < 2:
+			self.by_characteristics(table12x, inputs, 'borrowercharacteristics', 2, 'minoritystatuses', inputs['minority status'], 'dispositions', inputs['action taken'])
+		if inputs['income bracket'] < 6:
+			self.by_characteristics(table12x, inputs, 'borrowercharacteristics', 3, 'incomes', inputs['income bracket'], 'dispositions', inputs['action taken'])
+		self.by_characteristics(table12x, inputs, 'borrowercharacteristics', 4, 'genders', inputs['gender'], 'dispositions', inputs['action taken'])
+		if inputs['minority percent index'] <5:
+			self.by_characteristics(table12x, inputs, 'censuscharacteristics', 0, 'compositions', inputs['minority percent index'], 'dispositions', inputs['action taken'])
+		if inputs['tract income index'] < 4:
+			self.by_characteristics(table12x, inputs, 'censuscharacteristics', 1, 'incomes', inputs['tract income index'], 'dispositions', inputs['action taken'])
+
+		if inputs['action taken'] < 6:
+			self.by_characteristics(table12x, inputs, 'borrowercharacteristics', 0, 'races', inputs['race'], 'dispositions', 0)
+			self.by_characteristics(table12x, inputs, 'borrowercharacteristics', 1, 'ethnicities', inputs['ethnicity'], 'dispositions', 0)
+
+			if inputs['minority status'] <2:
+				self.by_characteristics(table12x, inputs, 'borrowercharacteristics', 2, 'minoritystatuses', inputs['minority status'], 'dispositions', 0)
+
+			if inputs['income bracket'] < 6:
+				self.by_characteristics(table12x, inputs, 'borrowercharacteristics', 3, 'incomes', inputs['income bracket'], 'dispositions', 0)
+			self.by_characteristics(table12x, inputs, 'borrowercharacteristics', 4, 'genders', inputs['gender'], 'dispositions', 0)
+
+			if inputs['minority percent index'] < 5:
+				self.by_characteristics(table12x, inputs, 'censuscharacteristics', 0, 'compositions', inputs['minority percent index'], 'dispositions', 0)
+
+			if inputs['tract income index'] < 4:
+				self.by_characteristics(table12x, inputs, 'censuscharacteristics', 1, 'incomes', inputs['tract income index'], 'dispositions', 0)
 
 	def build_report11x(self, table11x, inputs):
 		#reported vs not reported
