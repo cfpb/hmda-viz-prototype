@@ -791,6 +791,10 @@ class build_JSON(AD_report):
 			return 'Pricing information for conventional home improvement loans, first lien, 1- to 4-family owner-occupied dwelling (excludes manufactured homes), by borrower or census tract characteristics'
 		elif table_num == '11-10':
 			return 'Pricing information for conventional refinancing loans, junior lien, 1- to 4-family owner-occupied dwelling (excludes manufactured homes), by borrower or census tract characteristics'
+		elif table_num == '12-1':
+			return 'Disposition of applications for conventional manufactured home-purchas loans, first lien, owner-occupied dwelling, by borrower or census tract characteristics'
+		elif table_num == '12-2':
+			return 'Pricing information for conventional manufactured home-purchase loans, first lien, owner-occupied dwelling, by borrower or census tract characteristics'
 
 	def set_header(self, inputs, MSA, table_type, table_num): #sets the header information of the JSON object
 		now = foo.datetime.now()
@@ -1039,7 +1043,7 @@ class build_JSON(AD_report):
 		characteristic_list.append(temp)
 		return_dict = characteristic_list[0]
 		return return_dict
-
+	'''
 	def table_11x_builder(self):
 		borrower_list = ['Race', 'Ethnicity' , 'Minority Status', 'Income', 'Gender']
 		census_list = ['Racial/Ethnic Composition', 'Income Characteristics']
@@ -1059,7 +1063,7 @@ class build_JSON(AD_report):
 			self.container['censuscharacteristics'][i] = self.table_11x_characteristics(census_list[i], census_plural_list[i], census_input_list[i], census_single_list[i], 'pricinginformation', 'pricing', self.rate_spreads)
 
 		return self.container
-
+	'''
 	def table_31_characteristics(self, characteristic, container_name, item_list): #builds the borrower characteristics section of the report 3-1 JSON
 		container = {'ethnicities':'ethnicity', 'minoritystatuses':'minoritystatus', 'races':'race', 'applicantincomes':'applicantincome', 'incomelevels':'incomelevel', 'tractpctminorities':'tractpctminority'}
 		top = OrderedDict({})
@@ -1071,6 +1075,36 @@ class build_JSON(AD_report):
 			holding['purchasers'] = self.set_list(self.end_points, self.purchaser_names, 'name', True)
 			top[container_name].append(holding)
 		return top
+
+	def table_11x_builder(self):
+		self.table_11_12_helper('pricinginformation', 'pricing', self.rate_spreads)
+		return self.container
+	def table_12_1_builder(self):
+		self.table_11_12_helper('dispositions', 'disposition', self.dispositions_list)
+		return self.container
+	def table_12_2_builder(self):
+		self.table_11_12_helper('pricinginformation', 'pricing', self.rate_spreads)
+		return self.container
+	def table_11_12_helper(self, key, key_singular, end_point_list):
+		borrower_list = ['Race', 'Ethnicity' , 'Minority Status', 'Income', 'Gender']
+		census_list = ['Racial/Ethnic Composition', 'Income Characteristics']
+		plural_list = ['races', 'ethnicities', 'minoritystatuses', 'incomes', 'genders']
+		single_list = ['race', 'ethnicity', 'minoritystatus', 'income', 'gender']
+		borrower_input_list = [self.race_names, self.ethnicity_names, self.minority_statuses, self.applicant_income_bracket, self.gender_names2]
+		census_input_list = [self.tract_pct_minority, self.tract_income]
+		census_plural_list = ['compositions', 'incomes']
+		census_single_list = ['composition', 'income']
+		self.container['borrowercharacteristics'] = [''] * len(borrower_list)
+		self.container['censuscharacteristics'] = [''] * len(census_list)
+
+		for i in range(0, len(borrower_list)):
+			self.container['borrowercharacteristics'][i] = self.table_11x_characteristics(borrower_list[i], plural_list[i], borrower_input_list[i], single_list[i], key, key_singular, end_point_list)
+
+		for i in range(0, len(census_list)):
+			self.container['censuscharacteristics'][i] = self.table_11x_characteristics(census_list[i], census_plural_list[i], census_input_list[i], census_single_list[i], key, key_singular, end_point_list)
+
+		return self.container
+
 
 	def set_list(self, end_points, key_list, key_name, ends_bool):
 		holding_list = []

@@ -114,6 +114,8 @@ class report_4x(constructor):
 			return 'build_report9x'
 		elif report_number[:4] == 'A 11':
 			return 'build_report11x'
+		elif report_number[:4] == 'A 12':
+			return 'build_report12x'
 
 	def JSON_constructor_return(self, report_number):
 		if report_number == 'A 3-1':
@@ -132,6 +134,8 @@ class report_4x(constructor):
 			return 'table_9x_builder'
 		elif report_number[:4] == 'A 11':
 			return 'table_11x_builder'
+		elif report_number[:4] == 'A 12':
+			return 'table_12x_builder'
 
 	def parse_return(self, report_number):
 		if report_number == 'A 3-1':
@@ -150,4 +154,6 @@ class report_4x(constructor):
 			return 'parse_t9x'
 		elif report_number[:4] == 'A 11':
 			return 'parse_t11x'
+		elif report_number[:4] == 'A 12':
+			return 'parse_t12x'
 
