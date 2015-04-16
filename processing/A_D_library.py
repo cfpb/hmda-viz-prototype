@@ -285,7 +285,8 @@ class parse_inputs(AD_report):
 		self.inputs['minority status'] = demo.set_minority_status(self.inputs) #requires non white flags be set prior to running set_minority_status
 		self.inputs['gender'] = demo.set_gender(self.inputs)
 		self.inputs['denial_list'] = self.denial_reasons_list(self.inputs['denial reason1'], self.inputs['denial reason2'], self.inputs['denial reason3'])
-
+		print row['denialreason1'], row['denialreason2'], row['denialreason3'], 'blurp'
+		print self.inputs['denial_list'], self.inputs['race'], self.inputs['ethnicity']
 	def adjust_denial_index(self, reason):
 		if reason != ' ':
 			return int(reason) - 1
@@ -802,6 +803,8 @@ class build_JSON(AD_report):
 			return 'Reasons for denial of applications for conventional home-purchase loans, 1- to 4-family and manufactured home dwellings, by race, ethnicity, gender and income of applicant'
 		elif table_num =='8-3':
 			return 'Reasons for denial of applications to refinance loans on 1- to 4-family and manufactured home dwellings, by race, ethnicity, gender and income of applicant'
+		elif table_num =='8-5':
+			return 'Reasons for denial of applications for loans on dwellings for 5 or more families, by race, ethnicity, gender and income of applicant'
 		elif table_num =='8-4':
 			return 'Reasons for denial of applications for home improvement loans, 1- to 4-family and manufactured home dwellings, by race, ethinicity, gender and income of applicant'
 		elif table_num =='8-6':
@@ -862,7 +865,7 @@ class build_JSON(AD_report):
 		self.container['applicantcharacteristics'].append(holding)
 		holding = self.table_8_helper('Minority Status', 'minoritystatus', self.minority_statuses)
 		self.container['applicantcharacteristics'].append(holding)
-		holding = self.table_8_helper('Genders', 'gender', self.gender_list2)
+		holding = self.table_8_helper('Genders', 'gender', self.gender_names2)
 		self.container['applicantcharacteristics'].append(holding)
 		holding = self.table_8_helper('Incomes', 'income', self.applicant_income_bracket)
 		self.container['applicantcharacteristics'].append(holding)
@@ -1691,72 +1694,26 @@ class aggregate(AD_report): #aggregates LAR rows by appropriate characteristics 
 		#mean and median function must be called outside the control loop
 		return table32
 
-	def build_report12_1(self, table12x, inputs):
-		self.by_characteristics(table12x, inputs, 'borrowercharacteristics', 0, 'races', inputs['race'], 'dispositions', inputs['action taken'])
-		self.by_characteristics(table12x, inputs, 'borrowercharacteristics', 1, 'ethnicities', inputs['ethnicity'], 'dispositions', inputs['action taken'])
+	def report_11_12_aggregator(self, table, inputs, key, key_index):
+		self.by_characteristics(table, inputs, 'borrowercharacteristics', 0, 'races', inputs['race'], key, key_index)
+		self.by_characteristics(table, inputs, 'borrowercharacteristics', 1, 'ethnicities', inputs['ethnicity'], key, key_index)
 		if inputs['minority status'] < 2:
-			self.by_characteristics(table12x, inputs, 'borrowercharacteristics', 2, 'minoritystatuses', inputs['minority status'], 'dispositions', inputs['action taken'])
+			self.by_characteristics(table, inputs, 'borrowercharacteristics', 2, 'minoritystatuses', inputs['minority status'], key, key_index)
 		if inputs['income bracket'] < 6:
-			self.by_characteristics(table12x, inputs, 'borrowercharacteristics', 3, 'incomes', inputs['income bracket'], 'dispositions', inputs['action taken'])
-		self.by_characteristics(table12x, inputs, 'borrowercharacteristics', 4, 'genders', inputs['gender'], 'dispositions', inputs['action taken'])
+			self.by_characteristics(table, inputs, 'borrowercharacteristics', 3, 'incomes', inputs['income bracket'], key, key_index)
+		self.by_characteristics(table, inputs, 'borrowercharacteristics', 4, 'genders', inputs['gender'], key, key_index)
 		if inputs['minority percent index'] <5:
-			self.by_characteristics(table12x, inputs, 'censuscharacteristics', 0, 'compositions', inputs['minority percent index'], 'dispositions', inputs['action taken'])
+			self.by_characteristics(table, inputs, 'censuscharacteristics', 0, 'compositions', inputs['minority percent index'], key, key_index)
 		if inputs['tract income index'] < 4:
-			self.by_characteristics(table12x, inputs, 'censuscharacteristics', 1, 'incomes', inputs['tract income index'], 'dispositions', inputs['action taken'])
+			self.by_characteristics(table, inputs, 'censuscharacteristics', 1, 'incomes', inputs['tract income index'], key, key_index)
 
+	def build_report12_1(self, table12x, inputs):
+		self.report_11_12_aggregator(table12x, inputs, 'dispositions', inputs['action taken'])
 		if inputs['action taken'] < 6:
-			self.by_characteristics(table12x, inputs, 'borrowercharacteristics', 0, 'races', inputs['race'], 'dispositions', 0)
-			self.by_characteristics(table12x, inputs, 'borrowercharacteristics', 1, 'ethnicities', inputs['ethnicity'], 'dispositions', 0)
-
-			if inputs['minority status'] <2:
-				self.by_characteristics(table12x, inputs, 'borrowercharacteristics', 2, 'minoritystatuses', inputs['minority status'], 'dispositions', 0)
-
-			if inputs['income bracket'] < 6:
-				self.by_characteristics(table12x, inputs, 'borrowercharacteristics', 3, 'incomes', inputs['income bracket'], 'dispositions', 0)
-			self.by_characteristics(table12x, inputs, 'borrowercharacteristics', 4, 'genders', inputs['gender'], 'dispositions', 0)
-
-			if inputs['minority percent index'] < 5:
-				self.by_characteristics(table12x, inputs, 'censuscharacteristics', 0, 'compositions', inputs['minority percent index'], 'dispositions', 0)
-
-			if inputs['tract income index'] < 4:
-				self.by_characteristics(table12x, inputs, 'censuscharacteristics', 1, 'incomes', inputs['tract income index'], 'dispositions', 0)
+			self.report_11_12_aggregator(table12x, inputs, 'dispositions', 0)
 
 	def build_report11x(self, table11x, inputs):
 		#reported vs not reported
-
-		self.by_characteristics(table11x, inputs, 'borrowercharacteristics', 0, 'races', inputs['race'], 'pricinginformation', inputs['rate spread index']) # offests for reported and no reported pricing data
-		self.by_characteristics(table11x, inputs, 'borrowercharacteristics', 1, 'ethnicities', inputs['ethnicity'], 'pricinginformation', inputs['rate spread index'])
-
-		if inputs['minority status'] <2:
-			self.by_characteristics(table11x, inputs, 'borrowercharacteristics', 2, 'minoritystatuses', inputs['minority status'], 'pricinginformation', inputs['rate spread index'])
-
-		if inputs['income bracket'] < 6:
-			self.by_characteristics(table11x, inputs, 'borrowercharacteristics', 3, 'incomes', inputs['income bracket'], 'pricinginformation', inputs['rate spread index'])
-
-		self.by_characteristics(table11x, inputs, 'borrowercharacteristics', 4, 'genders', inputs['gender'], 'pricinginformation', inputs['rate spread index']) # offests for
-
-		if inputs['minority percent index'] < 5:
-			self.by_characteristics(table11x, inputs, 'censuscharacteristics', 0, 'compositions', inputs['minority percent index'], 'pricinginformation', inputs['rate spread index'])
-
-		if inputs['tract income index'] < 4:
-			self.by_characteristics(table11x, inputs, 'censuscharacteristics', 1, 'incomes', inputs['tract income index'], 'pricinginformation', inputs['rate spread index'])
-
-		#aggregating 'reported pricing data'
+		self.report_11_12_aggregator(table11x, inputs, 'pricinginformation', inputs['rate spread index'])
 		if inputs['rate spread index'] > 0:
-			self.by_characteristics(table11x, inputs, 'borrowercharacteristics', 0, 'races', inputs['race'], 'pricinginformation', 1)
-			self.by_characteristics(table11x, inputs, 'borrowercharacteristics', 1, 'ethnicities', inputs['ethnicity'], 'pricinginformation', 1)
-
-			if inputs['minority status'] <2:
-				self.by_characteristics(table11x, inputs, 'borrowercharacteristics', 2, 'minoritystatuses', inputs['minority status'], 'pricinginformation', 1)
-
-			if inputs['income bracket'] < 6:
-				self.by_characteristics(table11x, inputs, 'borrowercharacteristics', 3, 'incomes', inputs['income bracket'], 'pricinginformation', 1)
-			self.by_characteristics(table11x, inputs, 'borrowercharacteristics', 4, 'genders', inputs['gender'], 'pricinginformation', 1)
-
-			if inputs['minority percent index'] < 5:
-				self.by_characteristics(table11x, inputs, 'censuscharacteristics', 0, 'compositions', inputs['minority percent index'], 'pricinginformation', 1)
-
-			if inputs['tract income index'] < 4:
-				self.by_characteristics(table11x, inputs, 'censuscharacteristics', 1, 'incomes', inputs['tract income index'], 'pricinginformation', 1)
-
-
+			self.report_11_12_aggregator(table11x, inputs, 'pricinginformation', 1)
