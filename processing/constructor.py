@@ -52,8 +52,10 @@ class report_4x(constructor):
 
 		if count > 0:
 			print count, 'LAR rows in MSA %s, for report %s, in %s' %(MSA, self.report_number, self.year)
-			if self.report_number[2] == '4' or self.report_number[2] == '5' or self.report_number[2] == '7' or self.report_number[2] == '8':
-				self.report_number = self.report_number[:4] + 'x' #'A 4-1'
+
+			if self.report_number[2] == '4' or self.report_number[2] == '5' or self.report_number[2] == '7' or self.report_number[2] == '8' or self.report_number[2:4] == '11' or self.report_number[2:4] == '12':
+				self.report_number = self.report_number[:self.report_number.index('-')+1] + 'x' # removes the 1 and adds an x to reports that share a json template for the series
+
 			columns = getattr(self.queries, ('table_' + self.report_number[2:].replace(' ','_').replace('-','_')+'_columns'))()
 
 			SQL = (self.queries.SQL_Query + conditions).format(columns=columns, year=self.year, MSA=MSA)
@@ -96,6 +98,7 @@ class report_4x(constructor):
 			build_X.jekyll_for_msa(path2) #create and write jekyll file to the msa path
 
 
+	'''find a way to rename the functions in the A_D libary so that string manipulation chan be used to call them insead of having the functions below'''
 	def aggregation_return(self, year, report_number):
 		if report_number == 'A 3-1':
 			return 'build_report_31'
@@ -109,6 +112,14 @@ class report_4x(constructor):
 			return 'build_report7x'
 		elif report_number[:3] == 'A 8':
 			return 'build_report8x'
+		elif report_number[:3] == 'A 9':
+			return 'build_report9x'
+		elif report_number[:4] == 'A 11':
+			return 'build_report11x'
+		elif report_number == 'A 12-1':
+			return 'build_report12_1'
+		elif report_number == 'A 12-2':
+			return 'build_report12_2'
 
 	def JSON_constructor_return(self, report_number):
 		if report_number == 'A 3-1':
@@ -123,6 +134,14 @@ class report_4x(constructor):
 			return 'table_7x_builder'
 		elif report_number[:3] == 'A 8':
 			return 'table_8x_builder'
+		elif report_number[:3] == 'A 9':
+			return 'table_9x_builder'
+		elif report_number[:4] == 'A 11':
+			return 'table_11x_builder'
+		elif report_number == 'A 12-1':
+			return 'table_12_1_builder'
+		elif report_number == 'A 12-2':
+			return 'table_12_2_builder'
 
 	def parse_return(self, report_number):
 		if report_number == 'A 3-1':
@@ -137,4 +156,10 @@ class report_4x(constructor):
 			return 'parse_t7x'
 		elif report_number[:3] == 'A 8':
 			return 'parse_t8x'
+		elif report_number[:3] == 'A 9':
+			return 'parse_t9x'
+		elif report_number[:4] == 'A 11':
+			return 'parse_t11x'
+		elif report_number[:4] == 'A 12':
+			return 'parse_t12x'
 
