@@ -76,8 +76,9 @@ selector.report_list['A 12-2'] = AL_MSAs
 
 
 
-#selector.report_list['A 7-1'] = ['33660']
-report_list = ['A 8-5']
+selector.report_list['A 11-1'] = ['33660']
+report_list = ['A 11-1']
+#report_list = ['A 3-2']
 #report_list = ['A 4-1', 'A 4-2', 'A 4-3', 'A 4-4', 'A 4-6', 'A 4-7']
 #report_list = ['A 5-1', 'A 5-2', 'A 5-3', 'A 5-4', 'A 5-5', 'A 5-7']
 #report_list = ['A 7-1', 'A 7-2', 'A 7-3', 'A 7-4', 'A 7-5', 'A 7-6', 'A 7-7']
@@ -97,9 +98,9 @@ for report in report_list: #loop over a list of report names
 total_time_end = time.clock()
 print total_time_end-total_time_start, 'time to run entire report selection'
 #check_file must be run after reports are generated
-report_list = ['A 3-1', 'A 3-2', 'A 4-1', 'A 4-2', 'A 4-3', 'A 4-4', 'A 4-5', 'A 4-6', 'A 4-7', 'A 5-1', 'A 5-2', 'A 5-3', 'A 5-4', 'A 5-5', 'A 5-7', 'A 7-1', 'A 7-2', 'A 7-3', 'A 7-4', 'A 7-5', 'A 7-6', 'A 7-7', 'A 8-1', 'A 8-2', 'A 8-3', 'A 8-4', 'A 8-5', 'A 8-6', 'A 8-7'] #this needs to be changed to read from the input file
-check_file = check_file(build_msa) #needs a report list, state list, and msa list
-check_file.is_file('aggregate', selector.report_list['year'][0], report_list)
-report_lists = report_list_maker(build_msa)
-report_lists.report_lists('aggregate', selector.report_list['year'][0], report_list)
+report_list = ['A 3-1', 'A 3-2', 'A 4-1', 'A 4-2', 'A 4-3', 'A 4-4', 'A 4-5', 'A 4-6', 'A 4-7', 'A 5-1', 'A 5-2', 'A 5-3', 'A 5-4', 'A 5-5', 'A 5-7', 'A 7-1', 'A 7-2', 'A 7-3', 'A 7-4', 'A 7-5', 'A 7-6', 'A 7-7', 'A 8-1', 'A 8-2', 'A 8-3', 'A 8-4', 'A 8-5', 'A 8-6', 'A 8-7', 'A 11-1', 'A 11-2', 'A 11-3', 'A 11-4', 'A 11-5', 'A 11-6', 'A 11-7', 'A 11-8', 'A 11-9', 'A 11-10', 'A 12-1', 'A 12-2'] #this needs to be changed to read from the input file
+#check_file = check_file(build_msa) #needs a report list, state list, and msa list
+#check_file.is_file('aggregate', selector.report_list['year'][0], report_list)
+#report_lists = report_list_maker(build_msa)
+#report_lists.report_lists('aggregate', selector.report_list['year'][0], report_list)
 

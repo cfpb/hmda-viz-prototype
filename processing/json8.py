@@ -17,8 +17,8 @@ class build_JSON(AD_report):
 		self.container = OrderedDict({}) #master container for the JSON structure
 		self.msa = OrderedDict({}) #stores header information for the MSA
 		self.table32_categories = ['pricinginformation', 'points', 'hoepa']
-		self.rate_spreads = ['No Reported Pricing Data', 'Reported Pricing Data', '1.50 - 1.99', '2.00 - 2.49', '2.50 - 2.99', '3.00 - 3.49', '3.50 - 4.49', '4.50 - 5.49', '5.50 - 6.49', '6.5 or more', 'Mean', 'Median']
-		self.table32_rates = self.rate_spreads[2:]
+		self.rate_spreads = ['No Reported Pricing Data', 'Reported Pricing Data', '1.50 - 1.99', '2.00 - 2.49', '2.50 - 2.99', '3.00 - 3.99', '4.00 - 4.99', '5.00 - 5.99', '6 or more', 'Mean', 'Median']
+		self.table32_rates = ['1.50 - 1.99', '2.00 - 2.49', '2.50 - 2.99', '3.00 - 3.49', '3.50 - 4.49', '4.50 - 5.49', '5.50 - 6.49', '6.5 or more', 'Mean', 'Median']
 		self.purchaser_names = ['Fannie Mae', 'Ginnie Mae', 'Freddie Mac', 'Farmer Mac', 'Private Securitization', 'Commercial bank, savings bank or association', 'Life insurance co., credit union, finance co.', 'Affiliate institution', 'Other']
 		self.race_names = ['American Indian/Alaska Native', 'Asian', 'Black or African American', 'Native Hawaiian or Other Pacific Islander', 'White', '2 or more minority races', 'Joint (White/Minority Race)', 'Race Not Available']
 		self.ethnicity_names = ['Hispanic or Latino', 'Not Hispanic or Latino', 'Joint (Hispanic or Latino/Not Hispanic or Latino)', 'Ethnicity Not Available']
@@ -475,30 +475,11 @@ class build_JSON(AD_report):
 			self.container['censuscharacteristics'][i] = self.table_11x_characteristics(census_list[i], census_plural_list[i], census_input_list[i], census_single_list[i], 'pricinginformation', 'pricing', self.rate_spreads)
 
 		return self.container
-	'''
-	def table_12x_builder(self):
-		borrower_list = ['Race', 'Ethnicity' , 'Minority Status', 'Income', 'Gender']
-		census_list = ['Racial/Ethnic Composition', 'Income Characteristics']
-		plural_list = ['races', 'ethnicities', 'minoritystatuses', 'incomes', 'genders']
-		single_list = ['race', 'ethnicity', 'minoritystatus', 'income', 'gender']
-		borrower_input_list = [self.race_names, self.ethnicity_names, self.minority_statuses, self.applicant_income_bracket, self.gender_names2]
-		census_input_list = [self.tract_pct_minority, self.tract_income]
-		census_plural_list = ['compositions', 'incomes']
-		census_single_list = ['composition', 'income']
-		self.container['borrowercharacteristics'] = [''] * len(borrower_list)
-		self.container['censuscharacteristics'] = [''] * len(census_list)
 
-		for i in range(0, len(borrower_list)):
-			self.container['borrowercharacteristics'][i] = self.table_11x_characteristics(borrower_list[i], plural_list[i], borrower_input_list[i], single_list[i], 'dispositions', 'disposition', self.dispositions_list)
-
-		for i in range(0, len(census_list)):
-			self.container['censuscharacteristics'][i] = self.table_11x_characteristics(census_list[i], census_plural_list[i], census_input_list[i], census_single_list[i], 'dispositions', 'disposition', self.dispositions_list)
-
-		return self.container
-	'''
 	def table_12x_builder(self):
 		self.table_11_12_helper('dispositions', 'disposition', self.dispositions_list)
 		return self.container
+
 	def table_11_12_helper(self, key, key_singular, end_point_list):
 		borrower_list = ['Race', 'Ethnicity' , 'Minority Status', 'Income', 'Gender']
 		census_list = ['Racial/Ethnic Composition', 'Income Characteristics']
