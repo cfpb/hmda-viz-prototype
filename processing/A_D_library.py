@@ -1721,12 +1721,21 @@ class aggregate(AD_report): #aggregates LAR rows by appropriate characteristics 
 			self.composition_rate_list[inputs['minority percent index']].append(Decimal(inputs['rate spread']))
 			self.tract_income_rate_list[inputs['tract income index']].append(Decimal(inputs['rate spread']))
 
-	def mean_11_12(self, container, list_name, section, section_index, key_plural, ratespread_list):
+	def calc_mean_11_12(self, container, list_name, section, section_index, key_plural, ratespread_list):
 		#print self.race_rate_list, 'race list in mean 11 12'
+
 		for x in range(0, len(list_name)):
 			if len(ratespread_list[x]) > 0: #check for divide by 0 errors
+				mean = round(numpy.array(ratespread_list[x]).sum() / len(ratespread_list[x]),2)
+				#print mean
 				container[section][section_index][key_plural][x]['pricinginformation'][9]['count'] = round(numpy.array(ratespread_list[x]).sum() / len(ratespread_list[x]),2)
 				#this access path needs to abstract to match the by_characteristics function
+	def calc_median_11_12(self, container, list_name, section, section_index, key_plural, ratespread_list):
+		for x in range(0, len(list_name)):
+			if len(ratespread_list[x]) > 0:
+				median = round(numpy.median(numpy.array(ratespread_list[x])),2)
+				print median
+				container[section][section_index][key_plural][x]['pricinginformation'][10]['count'] = round(numpy.median(numpy.array(ratespread_list[x])),2)
 
 	def by_characteristics(self, container, inputs, section, section_index, key, key_index, section2, section2_index):
 		container[section][section_index][key][key_index][section2][section2_index]['count'] += 1
@@ -1758,7 +1767,29 @@ class aggregate(AD_report): #aggregates LAR rows by appropriate characteristics 
 
 	def build_report11x(self, table11x, inputs):
 		self.fill_11_12_rates(inputs)
-
-		self.report_11_12_aggregator(table11x, inputs, 'pricinginformation', inputs['rate spread index'])
+		self.report_11_12_aggregator(table11x, inputs, 'pricinginformation', inputs['rate spread index']) #fill all columns except 'prciing infomraiton reported'
 		if inputs['rate spread index'] > 0:
-			self.report_11_12_aggregator(table11x, inputs, 'pricinginformation', 1)
+			self.report_11_12_aggregator(table11x, inputs, 'pricinginformation', 1) #fill the 'pricing information reported column'
+
+	def fill_means_11_12(self, table_X, build_X):
+		self.calc_mean_11_12(table_X, build_X.race_names, 'borrowercharacteristics', 0, 'races', self.race_rate_list)
+		self.calc_mean_11_12(table_X, build_X.ethnicity_names, 'borrowercharacteristics', 1, 'ethnicities', self.ethnicity_rate_list)
+		self.calc_mean_11_12(table_X, build_X.minority_statuses, 'borrowercharacteristics', 2, 'minoritystatuses', self.minority_rate_list)
+		self.calc_mean_11_12(table_X, build_X.applicant_income_bracket, 'borrowercharacteristics', 3, 'incomes', self.income_rate_list)
+		self.calc_mean_11_12(table_X, build_X.gender_names2, 'borrowercharacteristics', 4, 'genders', self.gender_rate_list)
+		self.calc_mean_11_12(table_X, build_X.tract_pct_minority, 'censuscharacteristics', 0, 'compositions', self.composition_rate_list)
+		self.calc_mean_11_12(table_X, build_X.income_bracket_names, 'censuscharacteristics', 1, 'incomes', self.tract_income_rate_list)
+
+	def fill_medians_11_12(self, table_X, build_X):
+		self.calc_median_11_12(table_X, build_X.race_names, 'borrowercharacteristics', 0, 'races', self.race_rate_list)
+		self.calc_median_11_12(table_X, build_X.ethnicity_names, 'borrowercharacteristics', 1, 'ethnicities', self.ethnicity_rate_list)
+		self.calc_median_11_12(table_X, build_X.minority_statuses, 'borrowercharacteristics', 2, 'minoritystatuses', self.minority_rate_list)
+		self.calc_median_11_12(table_X, build_X.applicant_income_bracket, 'borrowercharacteristics', 3, 'incomes', self.income_rate_list)
+		self.calc_median_11_12(table_X, build_X.gender_names2, 'borrowercharacteristics', 4, 'genders', self.gender_rate_list)
+		self.calc_median_11_12(table_X, build_X.tract_pct_minority, 'censuscharacteristics', 0, 'compositions', self.composition_rate_list)
+		self.calc_median_11_12(table_X, build_X.income_bracket_names, 'censuscharacteristics', 1, 'incomes', self.tract_income_rate_list)
+
+
+
+
+

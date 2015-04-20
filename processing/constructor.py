@@ -86,15 +86,10 @@ class report_4x(constructor):
 				for item in percent_list:
 					self.agg.by_denial_percent(table_X, self.parsed.inputs, index_num, item)
 					index_num +=1
-			if self.report_number[2:4] == '11':
-				self.agg.mean_11_12(table_X, build_X.race_names, 'borrowercharacteristics', 0, 'races', self.agg.race_rate_list)
-				self.agg.mean_11_12(table_X, build_X.ethnicity_names, 'borrowercharacteristics', 1, 'ethnicities', self.agg.ethnicity_rate_list)
-				self.agg.mean_11_12(table_X, build_X.minority_statuses, 'borrowercharacteristics', 2, 'minoritystatuses', self.agg.minority_rate_list)
-				self.agg.mean_11_12(table_X, build_X.applicant_income_bracket, 'borrowercharacteristics', 3, 'incomes', self.agg.income_rate_list)
-				self.agg.mean_11_12(table_X, build_X.gender_names2, 'borrowercharacteristics', 4, 'genders', self.agg.gender_rate_list)
-				self.agg.mean_11_12(table_X, build_X.tract_pct_minority, 'censuscharacteristics', 0, 'compositions', self.agg.composition_rate_list)
-				self.agg.mean_11_12(table_X, build_X.income_bracket_names, 'censuscharacteristics', 1, 'incomes', self.agg.tract_income_rate_list)
 
+			if self.report_number[2:4] == '11':
+				self.agg.fill_means_11_12(table_X, build_X)
+				self.agg.fill_medians_11_12(table_X, build_X)
 			path = "../" +table_X['type']+"/"+table_X['year']+"/"+build_X.get_state_name(table_X['msa']['state']).replace(' ', '-').lower()+"/"+build_X.msa_names[MSA].replace(' ', '-').lower()+"/"+table_X['table']
 			if not os.path.exists(path): #check if path exists
 				os.makedirs(path) #if path not present, create it
