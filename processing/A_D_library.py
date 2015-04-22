@@ -1397,30 +1397,31 @@ class aggregate(AD_report): #aggregates LAR rows by appropriate characteristics 
 		return new_list
 
 	def fill_weighted_medians_11_12(self, container, inputs):
-		print 'bleep'
+		#strings need to be converted to floats for external data requests
 		for i in range(0, len(self.race_rate_list)):
-			print self.calc_weighted_median(self.race_rate_list[i], self.race_weight_list[i])
+			#print self.calc_weighted_median(self.race_rate_list[i], self.race_weight_list[i])
 			container['borrowercharacteristics'][0]['races'][i]['pricinginformation'][10]['value'] = str(self.calc_weighted_median(self.race_rate_list[i], self.race_weight_list[i]))
 		for i in range(0, len(self.ethnicity_rate_list)):
-			print self.calc_weighted_median(self.ethnicity_rate_list[i], self.ethnicity_weight_list[i]), i
+			#print self.calc_weighted_median(self.ethnicity_rate_list[i], self.ethnicity_weight_list[i]), i
 			container['borrowercharacteristics'][1]['ethnicities'][i]['pricinginformation'][10]['value'] = str(self.calc_weighted_median(self.ethnicity_rate_list[i], self.ethnicity_weight_list[i]))
 		for i in range(0, len(self.minority_rate_list)):
 			print str(self.calc_weighted_median(self.minority_rate_list[i], self.minority_weight_list[i]))
 			container['borrowercharacteristics'][2]['minoritystatuses'][i]['pricinginformation'][10]['value'] = str(self.calc_weighted_median(self.minority_rate_list[i], self.minority_weight_list[i]))
 		for i in range(0, len(self.income_rate_list)):
-			print str(self.calc_weighted_median(self.income_rate_list[i], self.income_weight_list[i]))
+			#print str(self.calc_weighted_median(self.income_rate_list[i], self.income_weight_list[i]))
 			container['borrowercharacteristics'][3]['incomes'][i]['pricinginformation'][10]['value'] = str(self.calc_weighted_median(self.income_rate_list[i], self.income_weight_list[i]))
 		for i in range(0, len(self.gender_rate_list)):
-			print str(self.calc_weighted_median(self.gender_rate_list[i], self.gender_weight_list[i]))
+			#print str(self.calc_weighted_median(self.gender_rate_list[i], self.gender_weight_list[i]))
 			container['borrowercharacteristics'][4]['genders'][i]['pricinginformation'][10]['value'] = str(self.calc_weighted_median(self.gender_rate_list[i], self.gender_weight_list[i]))
 
 		for i in range(0, len(self.composition_rate_list)):
-			print str(self.calc_weighted_median(self.composition_rate_list[i], self.composition_weight_list[i]))
+			#print str(self.calc_weighted_median(self.composition_rate_list[i], self.composition_weight_list[i]))
 			container['censuscharacteristics'][0]['compositions'][i]['pricinginformation'][10]['value'] = str(self.calc_weighted_median(self.composition_rate_list[i], self.composition_weight_list[i]))
 
 		for i in range(0, len(self.tract_income_rate_list)):
-			print str(self.calc_weighted_median(self.tract_income_rate_list[i], self.tract_income_weight_list[i]))
+			#print str(self.calc_weighted_median(self.tract_income_rate_list[i], self.tract_income_weight_list[i]))
 			container['censuscharacteristics'][1]['incomes'][i]['pricinginformation'][10]['value'] = str(self.calc_weighted_median(self.tract_income_rate_list[i], self.tract_income_weight_list[i]))
+
 	def totals(self, container, inputs): #aggregate total of purchased loans
 		container['total']['purchasers'][inputs['purchaser']]['count'] +=1
 		container['total']['purchasers'][inputs['purchaser']]['value'] += int(inputs['loan value'])
@@ -1761,7 +1762,8 @@ class aggregate(AD_report): #aggregates LAR rows by appropriate characteristics 
 				self.income_weight_list[inputs['income bracket']].append(Decimal(inputs['loan value']))
 			self.gender_weight_list[inputs['gender']].append(Decimal(inputs['loan value']))
 			self.composition_weight_list[inputs['minority percent index']].append(Decimal(inputs['loan value']))
-			self.tract_income_weight_list[inputs['tract income index']].append(Decimal(inputs['loan value']))
+			if inputs['tract income index'] < 4:
+				self.tract_income_weight_list[inputs['tract income index']].append(Decimal(inputs['loan value']))
 
 	def fill_11_12_rates(self, inputs):
 		#race section
@@ -1774,7 +1776,8 @@ class aggregate(AD_report): #aggregates LAR rows by appropriate characteristics 
 				self.income_rate_list[inputs['income bracket']].append(Decimal(inputs['rate spread']))
 			self.gender_rate_list[inputs['gender']].append(Decimal(inputs['rate spread']))
 			self.composition_rate_list[inputs['minority percent index']].append(Decimal(inputs['rate spread']))
-			self.tract_income_rate_list[inputs['tract income index']].append(Decimal(inputs['rate spread']))
+			if inputs['tract income index'] < 4:
+				self.tract_income_rate_list[inputs['tract income index']].append(Decimal(inputs['rate spread']))
 
 	def calc_mean_11_12(self, container, list_name, section, section_index, key_plural, ratespread_list):
 		#print self.race_rate_list, 'race list in mean 11 12'
@@ -1814,7 +1817,8 @@ class aggregate(AD_report): #aggregates LAR rows by appropriate characteristics 
 			self.report_11_12_aggregator(table12x, inputs, 'dispositions', 0)
 
 	def build_report12_2(self, table12x, inputs):
-		self.fill_rate_lists(inputs)
+		self.fill_11_12_rates(inputs)
+		self.fill_11_12_weights(inputs)
 		self.report_11_12_aggregator(table12x, inputs, 'pricinginformation', inputs['rate spread index'])
 		if inputs['rate spread index'] > 0:
 			self.report_11_12_aggregator(table12x, inputs, 'pricinginformation', 1)

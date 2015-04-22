@@ -87,7 +87,7 @@ class report_4x(constructor):
 					self.agg.by_denial_percent(table_X, self.parsed.inputs, index_num, item)
 					index_num +=1
 
-			if self.report_number[2:4] == '11':
+			if self.report_number[2:4] == '11' or self.report_number[2:6] == '12-2':
 				self.agg.fill_means_11_12(table_X, build_X)
 				self.agg.fill_medians_11_12(table_X, build_X)
 				self.agg.fill_weighted_medians_11_12(table_X, self.parsed.inputs)
