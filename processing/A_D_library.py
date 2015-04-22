@@ -566,7 +566,7 @@ class demographics(AD_report):
 			print inputs['race'], inputs['ethnicity']
 			print 'minority status not set'
 
- 	def set_loan_ethn(self, inputs):
+	def set_loan_ethn(self, inputs):
 		#this function outputs a number code for ethnicity: 0 - hispanic or latino, 1 - not hispanic/latino
 		#2 - joint (1 applicant hispanic/latino 1 not), 3 - ethnicity not available
 		#if both ethnicity fields are blank report not available(3)
@@ -1382,11 +1382,34 @@ class aggregate(AD_report): #aggregates LAR rows by appropriate characteristics 
 		self.composition_rate_list = self.create_rate_lists(5)
 		self.tract_income_rate_list = self.create_rate_lists(4)
 
+		self.race_weight_list = self.create_rate_lists(len(self.race_names))
+		self.ethnicity_weight_list = self.create_rate_lists(4)
+		self.minority_weight_list = self.create_rate_lists(2)
+		self.income_weight_list = self.create_rate_lists(6)
+		self.gender_weight_list = self.create_rate_lists(4)
+		self.composition_weight_list = self.create_rate_lists(5)
+		self.tract_income_weight_list = self.create_rate_lists(4)
+
 	def create_rate_lists(self, length):
 		new_list = []
 		for x in range(0, length):
 			new_list.append([])
 		return new_list
+
+	def fill_weighted_medians_11_12(self, container, inputs):
+		print 'bleep'
+		for i in range(0, len(self.race_rate_list)):
+			print self.calc_weighted_median(self.race_rate_list[i], self.race_weight_list[i])
+			container['borrowercharacteristics'][0]['races'][i]['pricinginformation'][10]['value'] = str(self.calc_weighted_median(self.race_rate_list[i], self.race_weight_list[i]))
+		for i in range(0, len(self.ethnicity_rate_list)):
+			print self.calc_weighted_median(self.ethnicity_rate_list[i], self.ethnicity_weight_list[i]), i
+			container['borrowercharacteristics'][1]['ethnicities'][i]['pricinginformation'][10]['value'] = str(self.calc_weighted_median(self.ethnicity_rate_list[i], self.ethnicity_weight_list[i]))
+		for i in range(0, len(self.minority_rate_list)):
+			print str(self.calc_weighted_median(self.minority_rate_list[i], self.minority_weight_list[i]))
+			container['borrowercharacteristics'][2]['minoritystatuses'][i]['pricinginformation'][10]['value'] = str(self.calc_weighted_median(self.minority_rate_list[i], self.minority_weight_list[i]))
+		for i in range(0, len(self.income_rate_list)):
+			print str(self.calc_weighted_median(self.income_rate_list[i], self.income_weight_list[i]))
+			container['borrowercharacteristics'][3]['incomes'][i]['pricinginformation'][10]['value'] = str(self.calc_weighted_median(self.income_rate_list[i], self.income_weight_list[i]))
 
 	def totals(self, container, inputs): #aggregate total of purchased loans
 		container['total']['purchasers'][inputs['purchaser']]['count'] +=1
@@ -1502,7 +1525,7 @@ class aggregate(AD_report): #aggregates LAR rows by appropriate characteristics 
 
 				step_size = round(float(sum(nd_first_values)) / len(nd_first_values),3)
 				steps_needed = (len(nd_first_values) / float(2))
-				nd_steps = [round(x/step_size,3) for x in nd_first_values]
+				nd_steps = [round(x/step_size,3) for x in nd_first_values] #compute step size by weights (values) of loans
 
 				count = 0
 				for i in range(0, len(nd_first_values)):
@@ -1512,7 +1535,6 @@ class aggregate(AD_report): #aggregates LAR rows by appropriate characteristics 
 
 					if steps_needed <= 0:
 						#print nd_first_rates, "*"*10,nd_first_rates[count-1], count-1
-
 						container['points'][9]['purchasers'][n]['firstlienvalue'] = sorted(nd_first_rates)[count-1] #for weighted median
 						break
 
@@ -1531,12 +1553,51 @@ class aggregate(AD_report): #aggregates LAR rows by appropriate characteristics 
 					step_taken = nd_junior_values[i] / float(step_size)
 					steps_needed -=step_taken
 					count +=1
-
 					if steps_needed <= 0:
-						#print nd_junior_rates, "*"*10,nd_junior_rates[count-1], count-1
-
 						container['points'][9]['purchasers'][n]['juniorlienvalue'] = sorted(nd_junior_rates)[count-1] #for weighted median
 						break
+
+	def calc_weighted_median(self, rate_list, weight_list):
+		#print rate_list, 'rates', weight_list, 'weights'
+
+		if len(rate_list) > 0 and len(weight_list) > 0:#check for divide by 0 errors
+			rate_list, weight_list = zip(*sorted(zip(rate_list, weight_list))) #sort both lists by rate- this converts the lists to tuples
+			step_size = round(Decimal(sum(weight_list)) / len(weight_list),2) #get a managable decimal length
+			steps_needed = Decimal(round(len(weight_list) / Decimal(2),1))
+
+			print steps_needed, "initial needed value"
+			#if len(weight_list)%2 != 0:
+			#	steps_needed -=1
+			count = 0 #count is used to choose find the index of the rate for the median weight, can this be simplified?
+			#print weight_list
+			for i in range(0, len(weight_list)):
+				step_taken = Decimal(weight_list[i] / Decimal(step_size))
+				steps_needed -= step_taken
+				print count, 'count', step_taken, 'step taken', steps_needed, 'needed'
+
+
+
+				if round(steps_needed,2) <= 0:
+					#print rate_list
+					#print weight_list
+					#print count, 'count', steps_needed, 'steps needed', step_taken, 'step taken'
+
+					return rate_list[count]
+				count +=1
+		'''
+		if len(rate_list) > 0 and len(weight_list) > 0:#check for divide by 0 errors
+			rate_list, weight_list = zip(*sorted(zip(rate_list, weight_list))) #sort both lists by rate- this converts the lists to tuples
+			step_size = round(Decimal(sum(weight_list)) / len(weight_list),2) #get a managable decimal length
+			total = sum(weight_list)
+
+			count = 0 #count is used to choose find the index of the rate for the median weight, can this be simplified?
+			for i in range(0, len(weight_list)):
+				total -= weight_list[i]
+				#print count, 'count', step_taken, 'step taken', steps_needed, 'needed'
+				count +=1
+				if total <= 0:
+					return rate_list[count-1]
+		'''
 
 	def by_applicant_income_4x(self, container, inputs): #aggregate loans by applicant income index
 		if inputs['income bracket'] > 5 or inputs['action taken'] == ' ' or inputs['action taken'] > 5: #filter out of bounds indexes before calling aggregations
@@ -1708,6 +1769,18 @@ class aggregate(AD_report): #aggregates LAR rows by appropriate characteristics 
 		#mean and median function must be called outside the control loop
 		return table32
 
+	def fill_11_12_weights(self, inputs):
+		if inputs['rate spread'] != 'NA   ' and inputs['rate spread'] != '     ':
+			self.race_weight_list[inputs['race']].append(Decimal(inputs['loan value']))
+			self.ethnicity_weight_list[inputs['ethnicity']].append(Decimal(inputs['loan value']))
+			if inputs['minority status'] < 2:
+				self.minority_weight_list[inputs['minority status']].append(Decimal(inputs['loan value']))
+			if inputs['income bracket'] < 6:
+				self.income_weight_list[inputs['income bracket']].append(Decimal(inputs['loan value']))
+			self.gender_weight_list[inputs['gender']].append(Decimal(inputs['loan value']))
+			self.composition_weight_list[inputs['minority percent index']].append(Decimal(inputs['loan value']))
+			self.tract_income_weight_list[inputs['tract income index']].append(Decimal(inputs['loan value']))
+
 	def fill_11_12_rates(self, inputs):
 		#race section
 		if inputs['rate spread'] != 'NA   ' and inputs['rate spread'] != '     ':
@@ -1730,11 +1803,10 @@ class aggregate(AD_report): #aggregates LAR rows by appropriate characteristics 
 				#print mean
 				container[section][section_index][key_plural][x]['pricinginformation'][9]['count'] = round(numpy.array(ratespread_list[x]).sum() / len(ratespread_list[x]),2)
 				#this access path needs to abstract to match the by_characteristics function
+
 	def calc_median_11_12(self, container, list_name, section, section_index, key_plural, ratespread_list):
 		for x in range(0, len(list_name)):
 			if len(ratespread_list[x]) > 0:
-				median = round(numpy.median(numpy.array(ratespread_list[x])),2)
-				print median
 				container[section][section_index][key_plural][x]['pricinginformation'][10]['count'] = round(numpy.median(numpy.array(ratespread_list[x])),2)
 
 	def by_characteristics(self, container, inputs, section, section_index, key, key_index, section2, section2_index):
@@ -1767,6 +1839,7 @@ class aggregate(AD_report): #aggregates LAR rows by appropriate characteristics 
 
 	def build_report11x(self, table11x, inputs):
 		self.fill_11_12_rates(inputs)
+		self.fill_11_12_weights(inputs)
 		self.report_11_12_aggregator(table11x, inputs, 'pricinginformation', inputs['rate spread index']) #fill all columns except 'prciing infomraiton reported'
 		if inputs['rate spread index'] > 0:
 			self.report_11_12_aggregator(table11x, inputs, 'pricinginformation', 1) #fill the 'pricing information reported column'
@@ -1788,8 +1861,3 @@ class aggregate(AD_report): #aggregates LAR rows by appropriate characteristics 
 		self.calc_median_11_12(table_X, build_X.gender_names2, 'borrowercharacteristics', 4, 'genders', self.gender_rate_list)
 		self.calc_median_11_12(table_X, build_X.tract_pct_minority, 'censuscharacteristics', 0, 'compositions', self.composition_rate_list)
 		self.calc_median_11_12(table_X, build_X.income_bracket_names, 'censuscharacteristics', 1, 'incomes', self.tract_income_rate_list)
-
-
-
-
-
