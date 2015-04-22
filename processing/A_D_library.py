@@ -1410,7 +1410,17 @@ class aggregate(AD_report): #aggregates LAR rows by appropriate characteristics 
 		for i in range(0, len(self.income_rate_list)):
 			print str(self.calc_weighted_median(self.income_rate_list[i], self.income_weight_list[i]))
 			container['borrowercharacteristics'][3]['incomes'][i]['pricinginformation'][10]['value'] = str(self.calc_weighted_median(self.income_rate_list[i], self.income_weight_list[i]))
+		for i in range(0, len(self.gender_rate_list)):
+			print str(self.calc_weighted_median(self.gender_rate_list[i], self.gender_weight_list[i]))
+			container['borrowercharacteristics'][4]['genders'][i]['pricinginformation'][10]['value'] = str(self.calc_weighted_median(self.gender_rate_list[i], self.gender_weight_list[i]))
 
+		for i in range(0, len(self.composition_rate_list)):
+			print str(self.calc_weighted_median(self.composition_rate_list[i], self.composition_weight_list[i]))
+			container['censuscharacteristics'][0]['compositions'][i]['pricinginformation'][10]['value'] = str(self.calc_weighted_median(self.composition_rate_list[i], self.composition_weight_list[i]))
+
+		for i in range(0, len(self.tract_income_rate_list)):
+			print str(self.calc_weighted_median(self.tract_income_rate_list[i], self.tract_income_weight_list[i]))
+			container['censuscharacteristics'][1]['incomes'][i]['pricinginformation'][10]['value'] = str(self.calc_weighted_median(self.tract_income_rate_list[i], self.tract_income_weight_list[i]))
 	def totals(self, container, inputs): #aggregate total of purchased loans
 		container['total']['purchasers'][inputs['purchaser']]['count'] +=1
 		container['total']['purchasers'][inputs['purchaser']]['value'] += int(inputs['loan value'])
@@ -1558,46 +1568,18 @@ class aggregate(AD_report): #aggregates LAR rows by appropriate characteristics 
 						break
 
 	def calc_weighted_median(self, rate_list, weight_list):
-		#print rate_list, 'rates', weight_list, 'weights'
-
 		if len(rate_list) > 0 and len(weight_list) > 0:#check for divide by 0 errors
 			rate_list, weight_list = zip(*sorted(zip(rate_list, weight_list))) #sort both lists by rate- this converts the lists to tuples
 			step_size = round(Decimal(sum(weight_list)) / len(weight_list),2) #get a managable decimal length
 			steps_needed = Decimal(round(len(weight_list) / Decimal(2),1))
-
-			print steps_needed, "initial needed value"
-			#if len(weight_list)%2 != 0:
-			#	steps_needed -=1
 			count = 0 #count is used to choose find the index of the rate for the median weight, can this be simplified?
-			#print weight_list
 			for i in range(0, len(weight_list)):
 				step_taken = Decimal(weight_list[i] / Decimal(step_size))
 				steps_needed -= step_taken
-				print count, 'count', step_taken, 'step taken', steps_needed, 'needed'
-
-
-
+				#print count, 'count', step_taken, 'step taken', steps_needed, 'needed'
 				if round(steps_needed,2) <= 0:
-					#print rate_list
-					#print weight_list
-					#print count, 'count', steps_needed, 'steps needed', step_taken, 'step taken'
-
 					return rate_list[count]
 				count +=1
-		'''
-		if len(rate_list) > 0 and len(weight_list) > 0:#check for divide by 0 errors
-			rate_list, weight_list = zip(*sorted(zip(rate_list, weight_list))) #sort both lists by rate- this converts the lists to tuples
-			step_size = round(Decimal(sum(weight_list)) / len(weight_list),2) #get a managable decimal length
-			total = sum(weight_list)
-
-			count = 0 #count is used to choose find the index of the rate for the median weight, can this be simplified?
-			for i in range(0, len(weight_list)):
-				total -= weight_list[i]
-				#print count, 'count', step_taken, 'step taken', steps_needed, 'needed'
-				count +=1
-				if total <= 0:
-					return rate_list[count-1]
-		'''
 
 	def by_applicant_income_4x(self, container, inputs): #aggregate loans by applicant income index
 		if inputs['income bracket'] > 5 or inputs['action taken'] == ' ' or inputs['action taken'] > 5: #filter out of bounds indexes before calling aggregations
