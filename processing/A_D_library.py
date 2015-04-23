@@ -1,5 +1,6 @@
 #this file holds the classes used to create the A&D reports using the HMDA LAR files combined with Census demographic information
 from decimal import Decimal
+from decimal import *
 import datetime as foo
 import numpy
 import weighted
@@ -42,6 +43,7 @@ class report_selector(AD_report):
 class parse_inputs(AD_report):
 	inputs = {}
 	def __init__(self):
+
 		#initialize rate spread sum variables for first lien means
 		self.inputs['Fannie Mae first rates'] =[]
 		self.inputs['Ginnie Mae first rates'] =[]
@@ -116,7 +118,7 @@ class parse_inputs(AD_report):
 		self.inputs['minority percent'] = row['minoritypopulationpct'] #%of population that is minority
 		self.inputs['tract to MSA income'] = row['tract_to_msa_md_income'] #ratio of tract to msa/md income
 		self.inputs['sequence'] = row['sequencenumber'] #the sequence number of the loan, used for checking errors
-		self.inputs['tract income index'] = MSA_index.tract_to_MSA_income(self.inputs) #sets the applicant income to an index number for aggregation
+		self.inputs['tract income index'] = MSA_index.tract_to_MSA_income(self.inputs) #sets the tract to MSA median income ratio to an index number for aggregation
 		self.inputs['income bracket'] = MSA_index.app_income_to_MSA(self.inputs) #sets the applicant income as an index by an applicant's income as a percent of MSA median
 		self.inputs['minority percent index'] = MSA_index.minority_percent(self.inputs) #sets the minority population percent to an index for aggregation
 
@@ -333,7 +335,8 @@ class parse_inputs(AD_report):
 		self.inputs['minority percent'] = row['minoritypopulationpct'] #%of population that is minority
 		self.inputs['tract to MSA income'] = row['tract_to_msa_md_income'] #ratio of tract to msa/md income
 		self.inputs['sequence'] = row['sequencenumber'] #the sequence number of the loan, used for checking errors
-		self.inputs['tract income index'] = MSA_index.tract_to_MSA_income(self.inputs) #sets the applicant income to an index number for aggregation
+		self.inputs['lien status'] = row['lienstatus']
+		self.inputs['tract income index'] = MSA_index.tract_to_MSA_income(self.inputs) #sets the tract to MSA median income ratio to an index number for aggregation
 		self.inputs['income bracket'] = MSA_index.app_income_to_MSA(self.inputs) #sets the applicant income as an index by an applicant's income as a percent of MSA median
 		self.inputs['rate spread index'] = demo.rate_spread_index_11x(self.inputs['rate spread']) #index of the rate spread for use in the JSON structure
 		self.inputs['minority percent index'] = MSA_index.minority_percent(self.inputs) #sets the minority population percent to an index for aggregation
@@ -371,7 +374,7 @@ class parse_inputs(AD_report):
 		self.inputs['minority percent'] = row['minoritypopulationpct'] #%of population that is minority
 		self.inputs['tract to MSA income'] = row['tract_to_msa_md_income'] #ratio of tract to msa/md income
 		self.inputs['sequence'] = row['sequencenumber'] #the sequence number of the loan, used for checking errors
-		self.inputs['tract income index'] = MSA_index.tract_to_MSA_income(self.inputs) #sets the applicant income to an index number for aggregation
+		self.inputs['tract income index'] = MSA_index.tract_to_MSA_income(self.inputs) #sets the tract to MSA median income ratio to an index number for aggregation
 		self.inputs['income bracket'] = MSA_index.app_income_to_MSA(self.inputs) #sets the applicant income as an index by an applicant's income as a percent of MSA median
 		self.inputs['action taken'] = int(row['actiontype'])
 		self.inputs['rate spread index'] = demo.rate_spread_index_11x(self.inputs['rate spread']) #index of the rate spread for use in the JSON structure
@@ -504,9 +507,10 @@ class demographics(AD_report):
 			return 5
 		elif float(rate) >= 4.00 and float(rate) <= 4.99:
 			return 6
-		elif float(rate) >= 5.00:
+		elif float(rate) >= 5.00 and float(rate) <= 5.99:
 			return 7
-
+		elif float(rate) >=5.99:
+			return 8
 	def minority_count(self, a_race):
 		#the minority count is the count of minority races listed for the primary applicant
 		#if minority count is > 2, then the race is set to 2 minority
@@ -562,7 +566,7 @@ class demographics(AD_report):
 			print inputs['race'], inputs['ethnicity']
 			print 'minority status not set'
 
- 	def set_loan_ethn(self, inputs):
+	def set_loan_ethn(self, inputs):
 		#this function outputs a number code for ethnicity: 0 - hispanic or latino, 1 - not hispanic/latino
 		#2 - joint (1 applicant hispanic/latino 1 not), 3 - ethnicity not available
 		#if both ethnicity fields are blank report not available(3)
@@ -640,8 +644,8 @@ class build_JSON(AD_report):
 		self.container = OrderedDict({}) #master container for the JSON structure
 		self.msa = OrderedDict({}) #stores header information for the MSA
 		self.table32_categories = ['pricinginformation', 'points', 'hoepa']
-		self.rate_spreads = ['No Reported Pricing Data', 'Reported Pricing Data', '1.50 - 1.99', '2.00 - 2.49', '2.50 - 2.99', '3.00 - 3.49', '3.50 - 4.49', '4.50 - 5.49', '5.50 - 6.49', '6.5 or more', 'Mean', 'Median']
-		self.table32_rates = self.rate_spreads[2:]
+		self.rate_spreads = ['No Reported Pricing Data', 'Reported Pricing Data', '1.50 - 1.99', '2.00 - 2.49', '2.50 - 2.99', '3.00 - 3.99', '4.00 - 4.99', '5.00 - 5.99', '6 or more', 'Mean', 'Median']
+		self.table32_rates = ['1.50 - 1.99', '2.00 - 2.49', '2.50 - 2.99', '3.00 - 3.49', '3.50 - 4.49', '4.50 - 5.49', '5.50 - 6.49', '6.5 or more', 'Mean', 'Median']
 		self.purchaser_names = ['Fannie Mae', 'Ginnie Mae', 'Freddie Mac', 'Farmer Mac', 'Private Securitization', 'Commercial bank, savings bank or association', 'Life insurance co., credit union, finance co.', 'Affiliate institution', 'Other']
 		self.race_names = ['American Indian/Alaska Native', 'Asian', 'Black or African American', 'Native Hawaiian or Other Pacific Islander', 'White', '2 or more minority races', 'Joint (White/Minority Race)', 'Race Not Available']
 		self.ethnicity_names = ['Hispanic or Latino', 'Not Hispanic or Latino', 'Joint (Hispanic or Latino/Not Hispanic or Latino)', 'Ethnicity Not Available']
@@ -662,7 +666,7 @@ class build_JSON(AD_report):
 		self.dispositions_list = ['Applications Received', 'Loans Originated', 'Apps. Approved But Not Accepted', 'Applications Denied', 'Applications Withdrawn', 'Files Closed For Incompleteness']
 		self.gender_names2 = ['Male', 'Female', 'Joint (Male/Female)', 'Gender Not Available']
 		self.gender_names = self.gender_names2[:3]
-
+		self.income_bracket_names = ['Low Income', 'Moderate Income', 'Middle Income', 'Upper Income']
 		self.end_points = ['count', 'value']
 		self.denial_reasons = ['Debt-to-Income Ratio', 'Employment History', 'Credit History', 'Collateral', 'Insufficient Cash', 'Unverifiable Information', 'Credit App. Incomplete', 'Mortgage Insurance Denied', 'Other', 'Total']
 	def msas_in_state(self, cursor, selector, report_type):
@@ -1308,7 +1312,7 @@ class queries(AD_report):
 		return ''' and loantype = '1' and propertytype = '2' and loanpurpose = '1' and lienstatus = '1' and occupancy = '1';'''
 
 	def table_A_12_2_conditions(self):
-		return ''' and loantype = '1' and propertytype = '2' and loanpurpose = '1' and lienstatus = '1' and occupancy = '1'; '''
+		return ''' and loantype = '1' and propertytype = '2' and loanpurpose = '1' and lienstatus = '1' and occupancy = '1' and actiontype = '1'; '''
 
 	def table_3_1_columns(self):
 		return '''censustractnumber, applicantrace1, applicantrace2, applicantrace3, applicantrace4, applicantrace5,
@@ -1352,7 +1356,7 @@ class queries(AD_report):
 			coapplicantrace1, coapplicantrace2, coapplicantrace3, coapplicantrace4, coapplicantrace5,
 			applicantethnicity, coapplicantethnicity, applicantincome, applicantsex, coapplicantsex,
 			minoritypopulationpct, ffiec_median_family_income, statename, statecode, loanamount,
-			sequencenumber, asofdate, ratespread, tract_to_msa_md_income '''
+			sequencenumber, asofdate, ratespread, tract_to_msa_md_income, lienstatus'''
 
 	def table_12_x_columns(self):
 		return '''applicantrace1, applicantrace2, applicantrace3, applicantrace4, applicantrace5,
@@ -1368,7 +1372,55 @@ class aggregate(AD_report): #aggregates LAR rows by appropriate characteristics 
 		self.purchaser_junior_lien_rates = ['Fannie Mae junior rates', 'Ginnie Mae junior rates', 'Freddie Mac junior rates', 'Farmer Mac junior rates', 'Private Securitization junior rates', 'Commercial bank, savings bank or association junior rates', 'Life insurance co., credit union, finance co. junior rates', 'Affiliate institution junior rates', 'Other junior rates']
 		self.purchaser_first_lien_weight = ['Fannie Mae first weight', 'Ginnie Mae first weight', 'Freddie Mac first weight', 'Farmer Mac first weight', 'Private Securitization first weight', 'Commercial bank, savings bank or association first weight', 'Life insurance co., credit union, finance co. first weight', 'Affiliate institution first weight', 'Other first weight']
 		self.purchaser_junior_lien_weight = ['Fannie Mae junior weight', 'Ginnie Mae junior weight', 'Freddie Mac junior weight', 'Farmer Mac junior weight', 'Private Securitization junior weight', 'Commercial bank, savings bank or association junior weight', 'Life insurance co., credit union, finance co. junior weight', 'Affiliate institution junior weight', 'Other junior weight']
+		self.race_names = ['American Indian/Alaska Native', 'Asian', 'Black or African American', 'Native Hawaiian or Other Pacific Islander', 'White', '2 or more minority races', 'Joint (White/Minority Race)', 'Race Not Available']
 
+		self.race_rate_list = self.create_rate_lists(len(self.race_names))
+		self.ethnicity_rate_list = self.create_rate_lists(4)
+		self.minority_rate_list = self.create_rate_lists(2)
+		self.income_rate_list = self.create_rate_lists(6)
+		self.gender_rate_list = self.create_rate_lists(4)
+		self.composition_rate_list = self.create_rate_lists(5)
+		self.tract_income_rate_list = self.create_rate_lists(4)
+
+		self.race_weight_list = self.create_rate_lists(len(self.race_names))
+		self.ethnicity_weight_list = self.create_rate_lists(4)
+		self.minority_weight_list = self.create_rate_lists(2)
+		self.income_weight_list = self.create_rate_lists(6)
+		self.gender_weight_list = self.create_rate_lists(4)
+		self.composition_weight_list = self.create_rate_lists(5)
+		self.tract_income_weight_list = self.create_rate_lists(4)
+
+	def create_rate_lists(self, length):
+		new_list = []
+		for x in range(0, length):
+			new_list.append([])
+		return new_list
+
+	def fill_weighted_medians_11_12(self, container, inputs):
+		#strings need to be converted to floats for external data requests
+		for i in range(0, len(self.race_rate_list)):
+			#print self.calc_weighted_median(self.race_rate_list[i], self.race_weight_list[i])
+			container['borrowercharacteristics'][0]['races'][i]['pricinginformation'][10]['value'] = str(self.calc_weighted_median(self.race_rate_list[i], self.race_weight_list[i]))
+		for i in range(0, len(self.ethnicity_rate_list)):
+			#print self.calc_weighted_median(self.ethnicity_rate_list[i], self.ethnicity_weight_list[i]), i
+			container['borrowercharacteristics'][1]['ethnicities'][i]['pricinginformation'][10]['value'] = str(self.calc_weighted_median(self.ethnicity_rate_list[i], self.ethnicity_weight_list[i]))
+		for i in range(0, len(self.minority_rate_list)):
+			print str(self.calc_weighted_median(self.minority_rate_list[i], self.minority_weight_list[i]))
+			container['borrowercharacteristics'][2]['minoritystatuses'][i]['pricinginformation'][10]['value'] = str(self.calc_weighted_median(self.minority_rate_list[i], self.minority_weight_list[i]))
+		for i in range(0, len(self.income_rate_list)):
+			#print str(self.calc_weighted_median(self.income_rate_list[i], self.income_weight_list[i]))
+			container['borrowercharacteristics'][3]['incomes'][i]['pricinginformation'][10]['value'] = str(self.calc_weighted_median(self.income_rate_list[i], self.income_weight_list[i]))
+		for i in range(0, len(self.gender_rate_list)):
+			#print str(self.calc_weighted_median(self.gender_rate_list[i], self.gender_weight_list[i]))
+			container['borrowercharacteristics'][4]['genders'][i]['pricinginformation'][10]['value'] = str(self.calc_weighted_median(self.gender_rate_list[i], self.gender_weight_list[i]))
+
+		for i in range(0, len(self.composition_rate_list)):
+			#print str(self.calc_weighted_median(self.composition_rate_list[i], self.composition_weight_list[i]))
+			container['censuscharacteristics'][0]['compositions'][i]['pricinginformation'][10]['value'] = str(self.calc_weighted_median(self.composition_rate_list[i], self.composition_weight_list[i]))
+
+		for i in range(0, len(self.tract_income_rate_list)):
+			#print str(self.calc_weighted_median(self.tract_income_rate_list[i], self.tract_income_weight_list[i]))
+			container['censuscharacteristics'][1]['incomes'][i]['pricinginformation'][10]['value'] = str(self.calc_weighted_median(self.tract_income_rate_list[i], self.tract_income_weight_list[i]))
 
 	def totals(self, container, inputs): #aggregate total of purchased loans
 		container['total']['purchasers'][inputs['purchaser']]['count'] +=1
@@ -1484,7 +1536,7 @@ class aggregate(AD_report): #aggregates LAR rows by appropriate characteristics 
 
 				step_size = round(float(sum(nd_first_values)) / len(nd_first_values),3)
 				steps_needed = (len(nd_first_values) / float(2))
-				nd_steps = [round(x/step_size,3) for x in nd_first_values]
+				nd_steps = [round(x/step_size,3) for x in nd_first_values] #compute step size by weights (values) of loans
 
 				count = 0
 				for i in range(0, len(nd_first_values)):
@@ -1494,7 +1546,6 @@ class aggregate(AD_report): #aggregates LAR rows by appropriate characteristics 
 
 					if steps_needed <= 0:
 						#print nd_first_rates, "*"*10,nd_first_rates[count-1], count-1
-
 						container['points'][9]['purchasers'][n]['firstlienvalue'] = sorted(nd_first_rates)[count-1] #for weighted median
 						break
 
@@ -1513,12 +1564,23 @@ class aggregate(AD_report): #aggregates LAR rows by appropriate characteristics 
 					step_taken = nd_junior_values[i] / float(step_size)
 					steps_needed -=step_taken
 					count +=1
-
 					if steps_needed <= 0:
-						#print nd_junior_rates, "*"*10,nd_junior_rates[count-1], count-1
-
 						container['points'][9]['purchasers'][n]['juniorlienvalue'] = sorted(nd_junior_rates)[count-1] #for weighted median
 						break
+
+	def calc_weighted_median(self, rate_list, weight_list):
+		if len(rate_list) > 0 and len(weight_list) > 0:#check for divide by 0 errors
+			rate_list, weight_list = zip(*sorted(zip(rate_list, weight_list))) #sort both lists by rate- this converts the lists to tuples
+			step_size = round(Decimal(sum(weight_list)) / len(weight_list),2) #get a managable decimal length
+			steps_needed = Decimal(round(len(weight_list) / Decimal(2),1))
+			count = 0 #count is used to choose find the index of the rate for the median weight, can this be simplified?
+			for i in range(0, len(weight_list)):
+				step_taken = Decimal(weight_list[i] / Decimal(step_size))
+				steps_needed -= step_taken
+				#print count, 'count', step_taken, 'step taken', steps_needed, 'needed'
+				if round(steps_needed,2) <= 0:
+					return rate_list[count]
+				count +=1
 
 	def by_applicant_income_4x(self, container, inputs): #aggregate loans by applicant income index
 		if inputs['income bracket'] > 5 or inputs['action taken'] == ' ' or inputs['action taken'] > 5: #filter out of bounds indexes before calling aggregations
@@ -1680,10 +1742,6 @@ class aggregate(AD_report): #aggregates LAR rows by appropriate characteristics 
 		self.totals(table31, inputs) #aggregate totals for each purchaser
 		return table31
 
-	def by_characteristics(self, container, inputs, section, section_index, key, key_index, section2, section2_index):
-		container[section][section_index][key][key_index][section2][section2_index]['count'] += 1
-		container[section][section_index][key][key_index][section2][section2_index]['value'] += int(inputs['loan value'])
-
 	def build_report_32(self, table32, inputs): #calls aggregation functions to fill JSON object for table 3-2
 		self.by_pricing_status(table32, inputs) #aggregate count by lien status
 		self.by_rate_spread(table32, inputs) #aggregate loans by percentage points above APOR as ##.##%
@@ -1693,6 +1751,52 @@ class aggregate(AD_report): #aggregates LAR rows by appropriate characteristics 
 		#mean and median functions are not called here
 		#mean and median function must be called outside the control loop
 		return table32
+
+	def fill_11_12_weights(self, inputs):
+		if inputs['rate spread'] != 'NA   ' and inputs['rate spread'] != '     ':
+			self.race_weight_list[inputs['race']].append(Decimal(inputs['loan value']))
+			self.ethnicity_weight_list[inputs['ethnicity']].append(Decimal(inputs['loan value']))
+			if inputs['minority status'] < 2:
+				self.minority_weight_list[inputs['minority status']].append(Decimal(inputs['loan value']))
+			if inputs['income bracket'] < 6:
+				self.income_weight_list[inputs['income bracket']].append(Decimal(inputs['loan value']))
+			self.gender_weight_list[inputs['gender']].append(Decimal(inputs['loan value']))
+			self.composition_weight_list[inputs['minority percent index']].append(Decimal(inputs['loan value']))
+			if inputs['tract income index'] < 4:
+				self.tract_income_weight_list[inputs['tract income index']].append(Decimal(inputs['loan value']))
+
+	def fill_11_12_rates(self, inputs):
+		#race section
+		if inputs['rate spread'] != 'NA   ' and inputs['rate spread'] != '     ':
+			self.race_rate_list[inputs['race']].append(Decimal(inputs['rate spread']))
+			self.ethnicity_rate_list[inputs['ethnicity']].append(Decimal(inputs['rate spread']))
+			if inputs['minority status'] < 2:
+				self.minority_rate_list[inputs['minority status']].append(Decimal(inputs['rate spread']))
+			if inputs['income bracket'] < 6:
+				self.income_rate_list[inputs['income bracket']].append(Decimal(inputs['rate spread']))
+			self.gender_rate_list[inputs['gender']].append(Decimal(inputs['rate spread']))
+			self.composition_rate_list[inputs['minority percent index']].append(Decimal(inputs['rate spread']))
+			if inputs['tract income index'] < 4:
+				self.tract_income_rate_list[inputs['tract income index']].append(Decimal(inputs['rate spread']))
+
+	def calc_mean_11_12(self, container, list_name, section, section_index, key_plural, ratespread_list):
+		#print self.race_rate_list, 'race list in mean 11 12'
+
+		for x in range(0, len(list_name)):
+			if len(ratespread_list[x]) > 0: #check for divide by 0 errors
+				mean = round(numpy.array(ratespread_list[x]).sum() / len(ratespread_list[x]),2)
+				#print mean
+				container[section][section_index][key_plural][x]['pricinginformation'][9]['count'] = round(numpy.array(ratespread_list[x]).sum() / len(ratespread_list[x]),2)
+				#this access path needs to abstract to match the by_characteristics function
+
+	def calc_median_11_12(self, container, list_name, section, section_index, key_plural, ratespread_list):
+		for x in range(0, len(list_name)):
+			if len(ratespread_list[x]) > 0:
+				container[section][section_index][key_plural][x]['pricinginformation'][10]['count'] = round(numpy.median(numpy.array(ratespread_list[x])),2)
+
+	def by_characteristics(self, container, inputs, section, section_index, key, key_index, section2, section2_index):
+		container[section][section_index][key][key_index][section2][section2_index]['count'] += 1
+		container[section][section_index][key][key_index][section2][section2_index]['value'] += int(inputs['loan value'])
 
 	def report_11_12_aggregator(self, table, inputs, key, key_index):
 		self.by_characteristics(table, inputs, 'borrowercharacteristics', 0, 'races', inputs['race'], key, key_index)
@@ -1712,8 +1816,34 @@ class aggregate(AD_report): #aggregates LAR rows by appropriate characteristics 
 		if inputs['action taken'] < 6:
 			self.report_11_12_aggregator(table12x, inputs, 'dispositions', 0)
 
-	def build_report11x(self, table11x, inputs):
-		#reported vs not reported
-		self.report_11_12_aggregator(table11x, inputs, 'pricinginformation', inputs['rate spread index'])
+	def build_report12_2(self, table12x, inputs):
+		self.fill_11_12_rates(inputs)
+		self.fill_11_12_weights(inputs)
+		self.report_11_12_aggregator(table12x, inputs, 'pricinginformation', inputs['rate spread index'])
 		if inputs['rate spread index'] > 0:
-			self.report_11_12_aggregator(table11x, inputs, 'pricinginformation', 1)
+			self.report_11_12_aggregator(table12x, inputs, 'pricinginformation', 1)
+
+	def build_report11x(self, table11x, inputs):
+		self.fill_11_12_rates(inputs)
+		self.fill_11_12_weights(inputs)
+		self.report_11_12_aggregator(table11x, inputs, 'pricinginformation', inputs['rate spread index']) #fill all columns except 'prciing infomraiton reported'
+		if inputs['rate spread index'] > 0:
+			self.report_11_12_aggregator(table11x, inputs, 'pricinginformation', 1) #fill the 'pricing information reported column'
+
+	def fill_means_11_12(self, table_X, build_X):
+		self.calc_mean_11_12(table_X, build_X.race_names, 'borrowercharacteristics', 0, 'races', self.race_rate_list)
+		self.calc_mean_11_12(table_X, build_X.ethnicity_names, 'borrowercharacteristics', 1, 'ethnicities', self.ethnicity_rate_list)
+		self.calc_mean_11_12(table_X, build_X.minority_statuses, 'borrowercharacteristics', 2, 'minoritystatuses', self.minority_rate_list)
+		self.calc_mean_11_12(table_X, build_X.applicant_income_bracket, 'borrowercharacteristics', 3, 'incomes', self.income_rate_list)
+		self.calc_mean_11_12(table_X, build_X.gender_names2, 'borrowercharacteristics', 4, 'genders', self.gender_rate_list)
+		self.calc_mean_11_12(table_X, build_X.tract_pct_minority, 'censuscharacteristics', 0, 'compositions', self.composition_rate_list)
+		self.calc_mean_11_12(table_X, build_X.income_bracket_names, 'censuscharacteristics', 1, 'incomes', self.tract_income_rate_list)
+
+	def fill_medians_11_12(self, table_X, build_X):
+		self.calc_median_11_12(table_X, build_X.race_names, 'borrowercharacteristics', 0, 'races', self.race_rate_list)
+		self.calc_median_11_12(table_X, build_X.ethnicity_names, 'borrowercharacteristics', 1, 'ethnicities', self.ethnicity_rate_list)
+		self.calc_median_11_12(table_X, build_X.minority_statuses, 'borrowercharacteristics', 2, 'minoritystatuses', self.minority_rate_list)
+		self.calc_median_11_12(table_X, build_X.applicant_income_bracket, 'borrowercharacteristics', 3, 'incomes', self.income_rate_list)
+		self.calc_median_11_12(table_X, build_X.gender_names2, 'borrowercharacteristics', 4, 'genders', self.gender_rate_list)
+		self.calc_median_11_12(table_X, build_X.tract_pct_minority, 'censuscharacteristics', 0, 'compositions', self.composition_rate_list)
+		self.calc_median_11_12(table_X, build_X.income_bracket_names, 'censuscharacteristics', 1, 'incomes', self.tract_income_rate_list)
