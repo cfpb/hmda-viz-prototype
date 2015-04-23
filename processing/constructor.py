@@ -125,6 +125,16 @@ class report_4x(constructor):
 			return 'build_report12_1'
 		elif report_number == 'A 12-2':
 			return 'build_report12_2'
+		elif report_number == 'A1':
+			return 'build_reportAx'
+		elif report_number == 'A2':
+			return 'build_reportAx'
+		elif report_number == 'A3':
+			return 'build_reportAx'
+		elif report_number == 'A4'
+			return 'build_reportA4'
+		elif report_number == 'B'
+			return 'build_reportB'
 
 	def JSON_constructor_return(self, report_number):
 		if report_number == 'A 3-1':
@@ -147,6 +157,10 @@ class report_4x(constructor):
 			return 'table_12_1_builder'
 		elif report_number == 'A 12-2':
 			return 'table_12_2_builder'
+		elif report_number == 'A1' or report_number == 'A2' or report_number == 'A3':
+			return 'table_Ax_builder'
+		elif report_number == 'B':
+			return 'table_B_builder'
 
 	def parse_return(self, report_number):
 		if report_number == 'A 3-1':
@@ -167,4 +181,13 @@ class report_4x(constructor):
 			return 'parse_t11x'
 		elif report_number[:4] == 'A 12':
 			return 'parse_t12x'
-
+		elif report_number == 'A1':
+			return 'parse_tAx'
+		elif report_number == 'A2':
+			return 'parse_tAx'
+		elif report_number == 'A3':
+			return 'parse_tAx'
+		elif report_number == 'A4':
+			return 'parse_tA4'
+		elif report_number == 'B':
+			return 'parse_tBx'
