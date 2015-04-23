@@ -396,7 +396,7 @@ class parse_inputs(AD_report):
 		self.inputs['sequence'] = row['sequencenumber'] #the sequence number of the loan, used for checking errors
 		self.inputs['lien status'] = row['lienstatus']
 		self.inputs['action taken'] = int(row['actiontype']) #disposition of the loan application
-		self.inputs['property type'] = row['propertytype']
+		#self.inputs['property type'] = row['propertytype']
 		self.inputs['loan purpose'] = row['loanpurpose']
 		self.inputs['loan type'] = row['loantype']
 
@@ -732,6 +732,7 @@ class build_JSON(AD_report):
 		self.income_bracket_names = ['Low Income', 'Moderate Income', 'Middle Income', 'Upper Income']
 		self.end_points = ['count', 'value']
 		self.denial_reasons = ['Debt-to-Income Ratio', 'Employment History', 'Credit History', 'Collateral', 'Insufficient Cash', 'Unverifiable Information', 'Credit App. Incomplete', 'Mortgage Insurance Denied', 'Other', 'Total']
+
 	def msas_in_state(self, cursor, selector, report_type):
 		#this function builds a list of MSA numbers and names in each state
 		#set sql query text to pull MSA names for each MSA number
@@ -906,7 +907,7 @@ class build_JSON(AD_report):
 			return 'Pricing information for conventional manufactured home-purchase loans, first lien, owner-occupied dwelling, by borrower or census tract characteristics'
 		elif table_num == 'A1':
 			return 'Disposition of applications and loan sales by loan type, 1- to 4-family dwellings (Excludes manufactured homes)'
-		elif table_num == 'A2'
+		elif table_num == 'A2':
 			return 'Disposition of applications and loan sales by loan type, manufactured homes'
 		elif table_num == 'A3':
 			return 'Disposition of applications and loan sales by loan type, multifamily housing'
@@ -1187,6 +1188,11 @@ class build_JSON(AD_report):
 		self.table_11_12_helper('pricinginformation', 'pricing', self.rate_spreads)
 		return self.container
 
+	def table_A4_builder(self):
+		preapproval_names = ['Preapprovals reasulting in originations', 'Preapprovals approved but not accepted', 'Preapprovals denied']
+		self.table_11_12_helper('preapprovalstatuses', 'preapprovalstatus', preapproval_names)
+		return self.container
+
 	def table_11_12_helper(self, key, key_singular, end_point_list):
 		borrower_list = ['Race', 'Ethnicity' , 'Minority Status', 'Income', 'Gender']
 		census_list = ['Racial/Ethnic Composition', 'Income Characteristics']
@@ -1204,6 +1210,41 @@ class build_JSON(AD_report):
 
 		for i in range(0, len(census_list)):
 			self.container['censuscharacteristics'][i] = self.table_11x_characteristics(census_list[i], census_plural_list[i], census_input_list[i], census_single_list[i], key, key_singular, end_point_list)
+
+		return self.container
+
+	def table_Ax_builder(self):
+		loan_types = ['Conventional', 'FHA', 'VA', 'FSA/RHS']
+		loan_purposes = ['Home Purchase', 'Refinance', 'Home Improvement']
+		lien_statuses = ['firstliencount', 'juniorlien', 'noliencount']
+
+		self.container['dispositions'] = self.set_list(self.end_points, self.dispositions_list, 'disposition', False)
+		for i in range(0, len(self.container['dispositions'])):
+			self.container['dispositions'][i]['loantypes'] = self.set_list(self.end_points, loan_types, 'loantype', False)
+			for j in range(0, len(self.container['dispositions'][i]['loantypes'])):
+				if j+1 == len(self.container['dispositions'][i]['loantypes']):
+					self.container['dispositions'][i]['loantypes'][j]['purposes'] = self.set_list(lien_statuses, loan_purposes, 'purpose', True)
+				else:
+					self.container['dispositions'][i]['loantypes'][j]['purposes'] = self.set_list(lien_statuses[:-1], loan_purposes, 'purpose', True)
+		return self.container
+
+	def table_B_builder(self):
+		pricing_categories = ['No pricing reported', 'Pricing reported', 'Mean (points above average prime offer rate: only includes loans with APR above the threshold)', 'Median (points above the average prime offer rate: only includes loans with APR above the threshold)']
+		hoepa_statuses = ['HOEPA loan', 'Not a HOEPA loan']
+
+		self.container['singlefamily'] = self.set_list(self.end_points, ['pricinginformation', 'hoepastatuses'], 'pricinginformation', False)
+		self.container['singlefamily'][0]['characteristic'] = 'Incidence of Pricing'
+		self.container['singlefamily'][0]['pricinginformation'] = self.set_list(self.end_points, pricing_categories, 'pricing', False)
+
+		self.container['singlefamily'][1]['characteristic'] = 'HOEPA Status'
+		self.container['singlefamily'][1]['hoepastatus'] = self.set_list(self.end_points, hoepa_statuses, 'status', False)
+
+		self.container['manufactured'] = self.set_list(self.end_points, ['pricinginformation', 'hoepastatuses'], 'pricinginformation', False)
+		self.container['manufactured'][0]['characteristic'] = 'Incidence of Pricing'
+		self.container['manufactured'][0]['pricinginformation'] = self.set_list(self.end_points, pricing_categories, 'pricing', False)
+
+		self.container['manufactured'][1]['characteristic'] = 'HOEPA Status'
+		self.container['manufactured'][1]['hoepastatus'] = self.set_list(self.end_points, hoepa_statuses, 'status', False)
 
 		return self.container
 
@@ -1386,19 +1427,19 @@ class queries(AD_report):
 	def table_A_12_2_conditions(self):
 		return ''' and loantype = '1' and propertytype = '2' and loanpurpose = '1' and lienstatus = '1' and occupancy = '1' and actiontype = '1' ;'''
 
-	def table_A1_conditions(self):
+	def table_A_A1_conditions(self):
 		return ''' and propertytype = '1' ;'''
 
-	def table_A2_conditions(self):
+	def table_A_A2_conditions(self):
 		return ''' and propertytype = '2' ;'''
 
-	def table_A3_conditions(self):
+	def table_A_A3_conditions(self):
 		return ''' and propertytype = '3' ;'''
 
-	def table_A4_conditions(self):
+	def table_A_A4_conditions(self):
 		return ''' and loantype = '1' and loanpurpose = '1' and lienstatus = '1' and propertytype = '1' ;'''
 
-	def table_B_conditions(self):
+	def table_A_B_conditions(self):
 		return ''' and loantype = '1' ;'''
 
 	def table_3_1_columns(self):
@@ -1453,9 +1494,17 @@ class queries(AD_report):
 			sequencenumber, asofdate, ratespread, tract_to_msa_md_income, actiontype '''
 
 	def table_Ax_columns(self):
-		return '''loantype, lienstatus, loanpurpose, actiontype, loanamount,
+		return '''loantype, lienstatus, loanpurpose, actiontype, loanamount, propertytype
 			msaofproperty, statename, statecode, asofdate, sequencenumber
 			'''
+	def table_A4_columns(self):
+		return '''applicantrace1, applicantrace2, applicantrace3, applicantrace4, applicantrace5,
+			coapplicantrace1, coapplicantrace2, coapplicantrace3, coapplicantrace4, coapplicantrace5,
+			applicantethnicity, coapplicantethnicity, applicantincome, applicantsex, coapplicantsex,
+			minoritypopulationpct, ffiec_median_family_income, statename, statecode, loanamount,
+			sequencenumber, asofdate, ratespread, tract_to_msa_md_income, lienstatus, preapproval,
+			actiontype '''
+
 	def table_B_columns(self):
 		return '''loanpurpose, lienstatus, hoepastatus, ratespread, propertytype, msaofproperty
 			statecode, statename, asofdate
@@ -1944,3 +1993,8 @@ class aggregate(AD_report): #aggregates LAR rows by appropriate characteristics 
 		self.calc_median_11_12(table_X, build_X.gender_names2, 'borrowercharacteristics', 4, 'genders', self.gender_rate_list)
 		self.calc_median_11_12(table_X, build_X.tract_pct_minority, 'censuscharacteristics', 0, 'compositions', self.composition_rate_list)
 		self.calc_median_11_12(table_X, build_X.income_bracket_names, 'censuscharacteristics', 1, 'incomes', self.tract_income_rate_list)
+
+	def build_reportAx(self, table_X, build_X):
+		pass
+	def build_reportA4(self, table_X, build_X):
+		pass

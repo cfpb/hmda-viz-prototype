@@ -37,7 +37,8 @@ class report_4x(constructor):
 			report_type = 'Disclosure'
 		elif self.report_number[0] == 'N':
 			report_type = 'National'
-
+		else:
+			print 'report type not set'
 		#for MSA in selector.report_list[report_number]: #take this loop out
 		build_X = build()
 		build_X.set_msa_names(cur) #builds a list of msa names as a dictionary
@@ -45,17 +46,23 @@ class report_4x(constructor):
 		location = (MSA,) #pass the MSA nubmers as a tuple to Psycopg2 (doesn't take singletons)
 
 		self.parsed.inputs['small county flag'] = self.agg.get_small_county_flag(cur, location)
-		conditions = getattr(self.queries, ('table_' + self.report_number.replace(' ','_').replace('-','_') +'_conditions'))()
+
+		conditions = getattr(self.queries, ('table_' + self.report_number.replace(' ','_').replace('-','_') +'_conditions'))() #A 4-1 vs A A1
+		#print conditions
+
 		SQL = (self.queries.SQL_Count + conditions).format(year=self.year, MSA=MSA)
+		#print SQL
 		cur.execute(SQL, location)
 		count = int(cur.fetchone()[0])
 
 		if count > 0:
 			print count, 'LAR rows in MSA %s, for report %s, in %s' %(MSA, self.report_number, self.year)
+			#manipulate report name to call query and aggregation functions
 
 			if self.report_number[2] == '4' or self.report_number[2] == '5' or self.report_number[2] == '7' or self.report_number[2] == '8' or self.report_number[2:4] == '11' or self.report_number[2:4] == '12':
 				self.report_number = self.report_number[:self.report_number.index('-')+1] + 'x' # removes the 1 and adds an x to reports that share a json template for the series
-
+			elif self.report_number[2] == 'A' and self.report_number[3] != '4':
+				self.report_number = self.report_number[:-1] + 'x'
 			columns = getattr(self.queries, ('table_' + self.report_number[2:].replace(' ','_').replace('-','_')+'_columns'))()
 
 			SQL = (self.queries.SQL_Query + conditions).format(columns=columns, year=self.year, MSA=MSA)
@@ -64,12 +71,11 @@ class report_4x(constructor):
 			for num in range(0, count):
 				row = cur.fetchone()
 
-				getattr(self.parsed, self.parse_function)(row)
+				getattr(self.parsed, self.parse_function)(row) #returns the parse_function string from parse_return and calls it on self.parsed
 
 				if num == 0:
 					build_X.set_header(self.parsed.inputs, MSA, report_type, table_number)
-
-					table_X = getattr(build_X, self.json_builder)()
+					table_X = getattr(build_X, self.json_builder)() #returns a string from the JSON_constructor_return function and uses it to call the json building function from A_D_Library
 
 				getattr(self.agg, self.aggregation)(table_X, self.parsed.inputs)
 
@@ -91,6 +97,7 @@ class report_4x(constructor):
 				self.agg.fill_means_11_12(table_X, build_X)
 				self.agg.fill_medians_11_12(table_X, build_X)
 				self.agg.fill_weighted_medians_11_12(table_X, self.parsed.inputs)
+
 
 			path = "../" +table_X['type']+"/"+table_X['year']+"/"+build_X.get_state_name(table_X['msa']['state']).replace(' ', '-').lower()+"/"+build_X.msa_names[MSA].replace(' ', '-').lower()+"/"+table_X['table']
 			if not os.path.exists(path): #check if path exists
@@ -125,15 +132,15 @@ class report_4x(constructor):
 			return 'build_report12_1'
 		elif report_number == 'A 12-2':
 			return 'build_report12_2'
-		elif report_number == 'A1':
+		elif report_number == 'A A1':
 			return 'build_reportAx'
-		elif report_number == 'A2':
+		elif report_number == 'A A2':
 			return 'build_reportAx'
-		elif report_number == 'A3':
+		elif report_number == 'A A3':
 			return 'build_reportAx'
-		elif report_number == 'A4'
+		elif report_number == 'A A4':
 			return 'build_reportA4'
-		elif report_number == 'B'
+		elif report_number == 'B':
 			return 'build_reportB'
 
 	def JSON_constructor_return(self, report_number):
@@ -157,8 +164,10 @@ class report_4x(constructor):
 			return 'table_12_1_builder'
 		elif report_number == 'A 12-2':
 			return 'table_12_2_builder'
-		elif report_number == 'A1' or report_number == 'A2' or report_number == 'A3':
+		elif report_number == 'A A1' or report_number == 'A A2' or report_number == 'A A3':
 			return 'table_Ax_builder'
+		elif report_number == 'A A4':
+			return 'table_A4_builder'
 		elif report_number == 'B':
 			return 'table_B_builder'
 
@@ -181,13 +190,15 @@ class report_4x(constructor):
 			return 'parse_t11x'
 		elif report_number[:4] == 'A 12':
 			return 'parse_t12x'
-		elif report_number == 'A1':
+		elif report_number == 'A A1':
 			return 'parse_tAx'
-		elif report_number == 'A2':
+		elif report_number == 'A A2':
 			return 'parse_tAx'
-		elif report_number == 'A3':
+		elif report_number == 'A A3':
 			return 'parse_tAx'
-		elif report_number == 'A4':
+		elif report_number == 'A A4':
 			return 'parse_tA4'
-		elif report_number == 'B':
+		elif report_number == 'A B':
 			return 'parse_tBx'
+		else:
+			print 'parse return fail'

@@ -501,6 +501,7 @@ class build_JSON(AD_report):
 	def table_A4_builder(self):
 		preapproval_names = ['Preapprovals reasulting in originations', 'Preapprovals approved but not accepted', 'Preapprovals denied']
 		self.table_11_12_helper('preapprovalstatuses', 'preapprovalstatus', preapproval_names)
+		return self.container
 
 	def table_11_12_helper(self, key, key_singular, end_point_list):
 		borrower_list = ['Race', 'Ethnicity' , 'Minority Status', 'Income', 'Gender']
@@ -525,18 +526,36 @@ class build_JSON(AD_report):
 	def table_Ax_builder(self):
 		loan_types = ['Conventional', 'FHA', 'VA', 'FSA/RHS']
 		loan_purposes = ['Home Purchase', 'Refinance', 'Home Improvement']
-		lien_statuses = ['First Lien', 'Junior Lien', 'No Lien']
+		lien_statuses = ['firstliencount', 'juniorlien', 'noliencount']
 
-		self.container['actiontaken'] = self.set_list(self.end_points, self.dispositions_list, 'disposition', False)
-		for i in range(0, len(self.container['actiontaken'])):
-			self.container['actiontaken'][i]['loantypes'] = self.set_list(self.end_points, loan_types, 'loantype', False)
-			for j in range(0, len(self.container['actiontaken'][i]['loantypes'])):
-				self.container['actiontaken'][i]['loantypes'][j]['purposes'] = self.set_list(self.end_points, loan_purposes, 'purpose', False)
-				for y in range(0, len(self.container['actiontaken'][i]['loantypes'][j]['purposes'])):
-					if y+1 == len(self.container['actiontaken'][i]['loantypes'][j]['purposes']):
-						self.container['actiontaken'][i]['loantypes'][j]['purposes'][y]['lienstatuses'] = self.set_list(self.end_points[:-1], lien_statuses, 'lienstatus', True)
-					else:
-						self.container['actiontaken'][i]['loantypes'][j]['purposes'][y]['lienstatuses'] = self.set_list(self.end_points[:-1], lien_statuses[:-1], 'lienstatus', True)
+		self.container['dispositions'] = self.set_list(self.end_points, self.dispositions_list, 'disposition', False)
+		for i in range(0, len(self.container['dispositions'])):
+			self.container['dispositions'][i]['loantypes'] = self.set_list(self.end_points, loan_types, 'loantype', False)
+			for j in range(0, len(self.container['dispositions'][i]['loantypes'])):
+				if j+1 == len(self.container['dispositions'][i]['loantypes']):
+					self.container['dispositions'][i]['loantypes'][j]['purposes'] = self.set_list(lien_statuses, loan_purposes, 'purpose', True)
+				else:
+					self.container['dispositions'][i]['loantypes'][j]['purposes'] = self.set_list(lien_statuses[:-1], loan_purposes, 'purpose', True)
+		return self.container
+
+	def table_B_builder(self):
+		pricing_categories = ['No pricing reported', 'Pricing reported', 'Mean (points above average prime offer rate: only includes loans with APR above the threshold)', 'Median (points above the average prime offer rate: only includes loans with APR above the threshold)']
+		hoepa_statuses = ['HOEPA loan', 'Not a HOEPA loan']
+
+		self.container['singlefamily'] = self.set_list(self.end_points, ['pricinginformation', 'hoepastatuses'], 'pricinginformation', False)
+		self.container['singlefamily'][0]['characteristic'] = 'Incidence of Pricing'
+		self.container['singlefamily'][0]['pricinginformation'] = self.set_list(self.end_points, pricing_categories, 'pricing', False)
+
+		self.container['singlefamily'][1]['characteristic'] = 'HOEPA Status'
+		self.container['singlefamily'][1]['hoepastatus'] = self.set_list(self.end_points, hoepa_statuses, 'status', False)
+
+		self.container['manufactured'] = self.set_list(self.end_points, ['pricinginformation', 'hoepastatuses'], 'pricinginformation', False)
+		self.container['manufactured'][0]['characteristic'] = 'Incidence of Pricing'
+		self.container['manufactured'][0]['pricinginformation'] = self.set_list(self.end_points, pricing_categories, 'pricing', False)
+
+		self.container['manufactured'][1]['characteristic'] = 'HOEPA Status'
+		self.container['manufactured'][1]['hoepastatus'] = self.set_list(self.end_points, hoepa_statuses, 'status', False)
+
 		return self.container
 
 	def set_list(self, end_points, key_list, key_name, ends_bool):
@@ -580,7 +599,8 @@ build = build_JSON()
 #table_Ax = build.table_Ax_builder()
 #build.print_JSON()
 #build.write_JSON('reportA1.json', table_Ax)
-#table_A4 = build.table_A4_builder()
+table_A4 = build.table_A4_builder()
 #build.print_JSON()
 #build.write_JSON('reportA4.json', table_A4)
-
+#table_B = build.table_B_builder()
+build.print_JSON()
