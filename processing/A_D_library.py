@@ -441,7 +441,9 @@ class parse_inputs(AD_report):
 		self.inputs['minority status'] = demo.set_minority_status(self.inputs) #requires non white flags be set prior to running set_minority_status
 
 	def parse_tBx(self, row):
+		demo=demographics() #contains functions for borrower characteristics
 		self.inputs['year'] = row['asofdate'] #year or application or origination
+		self.inputs['rate spread'] = row['ratespread'] # interest rate spread over APOR if spread is greater than 1.5%
 		self.inputs['state code'] = row['statecode'] #two digit state code
 		self.inputs['state name'] = row['statename'] #two character state abbreviation
 		self.inputs['sequence'] = row['sequencenumber'] #the sequence number of the loan, used for checking errors
@@ -913,7 +915,7 @@ class build_JSON(AD_report):
 			return 'Disposition of applications and loan sales by loan type, multifamily housing'
 		elif table_num == 'A4':
 			return 'Disposition of preapprovals for conventional home-purchase loans, first lien, 1- to 4-family dwellings (excludes manufactured homes), by borrower or census tract characteristics'
-		elif tabe_num == 'B':
+		elif table_num == 'B':
 			return 'Loan pricing information for conventional loans by incidence and level'
 
 	def set_header(self, inputs, MSA, table_type, table_num): #sets the header information of the JSON object
@@ -1507,7 +1509,7 @@ class queries(AD_report):
 
 	def table_B_columns(self):
 		return '''loanpurpose, lienstatus, hoepastatus, ratespread, propertytype, msaofproperty
-			statecode, statename, asofdate
+			statecode, statename, asofdate, sequencenumber
 			'''
 
 class aggregate(AD_report): #aggregates LAR rows by appropriate characteristics to fill the JSON files
@@ -1997,4 +1999,6 @@ class aggregate(AD_report): #aggregates LAR rows by appropriate characteristics 
 	def build_reportAx(self, table_X, build_X):
 		pass
 	def build_reportA4(self, table_X, build_X):
+		pass
+	def build_reportB(self, table_X, build_X):
 		pass

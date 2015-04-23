@@ -140,7 +140,7 @@ class report_4x(constructor):
 			return 'build_reportAx'
 		elif report_number == 'A A4':
 			return 'build_reportA4'
-		elif report_number == 'B':
+		elif report_number == 'A B':
 			return 'build_reportB'
 
 	def JSON_constructor_return(self, report_number):
@@ -168,7 +168,7 @@ class report_4x(constructor):
 			return 'table_Ax_builder'
 		elif report_number == 'A A4':
 			return 'table_A4_builder'
-		elif report_number == 'B':
+		elif report_number == 'A B':
 			return 'table_B_builder'
 
 	def parse_return(self, report_number):

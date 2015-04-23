@@ -1,0 +1,75 @@
+{
+    "table": "B", 
+    "type": "Aggregate", 
+    "desc": "Loan pricing information for conventional loans by incidence and level", 
+    "year": "2013", 
+    "report-date": "04/23/2015", 
+    "msa": {
+        "id": "33660", 
+        "name": "Mobile", 
+        "state": "AL", 
+        "state_name": "Alabama"
+    }, 
+    "singlefamily": [
+        {
+            "pricinginformation": [
+                {
+                    "pricing": "No pricing reported"
+                }, 
+                {
+                    "pricing": "Pricing reported"
+                }, 
+                {
+                    "pricing": "Mean (points above average prime offer rate: only includes loans with APR above the threshold)"
+                }, 
+                {
+                    "pricing": "Median (points above the average prime offer rate: only includes loans with APR above the threshold)"
+                }
+            ], 
+            "characteristic": "Incidence of Pricing"
+        }, 
+        {
+            "pricinginformation": "hoepastatuses", 
+            "characteristic": "HOEPA Status", 
+            "hoepastatus": [
+                {
+                    "status": "HOEPA loan"
+                }, 
+                {
+                    "status": "Not a HOEPA loan"
+                }
+            ]
+        }
+    ], 
+    "manufactured": [
+        {
+            "pricinginformation": [
+                {
+                    "pricing": "No pricing reported"
+                }, 
+                {
+                    "pricing": "Pricing reported"
+                }, 
+                {
+                    "pricing": "Mean (points above average prime offer rate: only includes loans with APR above the threshold)"
+                }, 
+                {
+                    "pricing": "Median (points above the average prime offer rate: only includes loans with APR above the threshold)"
+                }
+            ], 
+            "characteristic": "Incidence of Pricing"
+        }, 
+        {
+            "pricinginformation": "hoepastatuses", 
+            "characteristic": "HOEPA Status", 
+            "hoepastatus": [
+                {
+                    "status": "HOEPA loan"
+                }, 
+                {
+                    "status": "Not a HOEPA loan"
+                }
+            ]
+        }
+    ]
+}
