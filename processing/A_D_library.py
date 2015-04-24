@@ -289,6 +289,7 @@ class parse_inputs(AD_report):
 		self.inputs['denial_list'] = self.denial_reasons_list(self.inputs['denial reason1'], self.inputs['denial reason2'], self.inputs['denial reason3'])
 		print row['denialreason1'], row['denialreason2'], row['denialreason3'], 'blurp'
 		print self.inputs['denial_list'], self.inputs['race'], self.inputs['ethnicity']
+
 	def adjust_denial_index(self, reason):
 		if reason != ' ':
 			return int(reason) - 1
@@ -395,10 +396,28 @@ class parse_inputs(AD_report):
 		self.inputs['state name'] = row['statename'] #two character state abbreviation
 		self.inputs['sequence'] = row['sequencenumber'] #the sequence number of the loan, used for checking errors
 		self.inputs['lien status'] = row['lienstatus']
-		self.inputs['action taken'] = int(row['actiontype']) #disposition of the loan application
+		self.inputs['action taken index'] = self.action_taken_index(int(row['actiontype']), row['preapproval']) #disposition of the loan application
+		self.inputs['purchaser'] = int(row['purchasertype'])
+		self.inputs['preapproval'] = row['preapproval']
 		#self.inputs['property type'] = row['propertytype']
-		self.inputs['loan purpose'] = row['loanpurpose']
-		self.inputs['loan type'] = row['loantype']
+		self.inputs['loan purpose'] = self.purpose_index(row['loanpurpose']) #adjust loan purpose down one to match index in JSON structure
+		self.inputs['loan type'] = int(row['loantype']) -1 #adjust loan purpose down one to match index in JSON structure
+
+	def action_taken_index(self, action_taken, preapproval):
+		if action_taken < 6:
+			return action_taken
+		elif action_taken == 6:
+			return 7
+		else:
+			return 8
+
+	def purpose_index(self, loantype):
+		if loantype == '1':
+			return 0 #purchase loans
+		elif loantype == '2':
+			return 2 #home improvement loans
+		elif loantype == '3':
+			return 1 #refinance loans
 
 	def parse_tA4(self, row):
 		MSA_index = MSA_info() #contains functions for census tract characteristics
@@ -1219,16 +1238,16 @@ class build_JSON(AD_report):
 	def table_Ax_builder(self):
 		loan_types = ['Conventional', 'FHA', 'VA', 'FSA/RHS']
 		loan_purposes = ['Home Purchase', 'Refinance', 'Home Improvement']
-		lien_statuses = ['firstliencount', 'juniorlien', 'noliencount']
-
-		self.container['dispositions'] = self.set_list(self.end_points, self.dispositions_list, 'disposition', False)
+		lien_statuses = ['firstliencount', 'juniorliencount', 'noliencount']
+		disp_list = self.dispositions_list + ['Preapprovals Resulting in Originations', 'Loans Sold']
+		self.container['dispositions'] = self.set_list(self.end_points, disp_list, 'disposition', False)
 		for i in range(0, len(self.container['dispositions'])):
 			self.container['dispositions'][i]['loantypes'] = self.set_list(self.end_points, loan_types, 'loantype', False)
 			for j in range(0, len(self.container['dispositions'][i]['loantypes'])):
-				if j+1 == len(self.container['dispositions'][i]['loantypes']):
-					self.container['dispositions'][i]['loantypes'][j]['purposes'] = self.set_list(lien_statuses, loan_purposes, 'purpose', True)
-				else:
-					self.container['dispositions'][i]['loantypes'][j]['purposes'] = self.set_list(lien_statuses[:-1], loan_purposes, 'purpose', True)
+				self.container['dispositions'][i]['loantypes'][j]['purposes'] = self.set_list(lien_statuses[:-1], loan_purposes, 'purpose', True)
+				self.container['dispositions'][i]['loantypes'][j]['purposes'][2]['noliencount'] = 0
+
+					#	self.container['dispositions'][i]['loantypes'][j]['purposes'] = self.set_list(lien_statuses[:-1], loan_purposes, 'purpose', True)
 		return self.container
 
 	def table_B_builder(self):
@@ -1498,7 +1517,7 @@ class queries(AD_report):
 
 	def table_Ax_columns(self):
 		return '''loantype, lienstatus, loanpurpose, actiontype, loanamount, propertytype
-			msaofproperty, statename, statecode, asofdate, sequencenumber
+			msaofproperty, statename, statecode, asofdate, sequencenumber, preapproval, purchasertype
 			'''
 	def table_A4_columns(self):
 		return '''applicantrace1, applicantrace2, applicantrace3, applicantrace4, applicantrace5,
@@ -1997,8 +2016,32 @@ class aggregate(AD_report): #aggregates LAR rows by appropriate characteristics 
 		self.calc_median_11_12(table_X, build_X.tract_pct_minority, 'censuscharacteristics', 0, 'compositions', self.composition_rate_list)
 		self.calc_median_11_12(table_X, build_X.income_bracket_names, 'censuscharacteristics', 1, 'incomes', self.tract_income_rate_list)
 
-	def build_reportAx(self, table_X, inputs):
-		pass
+	def build_reportAx(self, container, inputs):
+		if inputs['action taken index'] < 8:
+			if inputs['lien status'] == '1':
+				#if inputs['action taken index'] == 5:
+					#print inputs['action taken index'], inputs['loan purpose'], inputs['loan type']
+				container['dispositions'][0]['loantypes'][inputs['loan type']]['purposes'][inputs['loan purpose']]['firstliencount'] +=1
+				container['dispositions'][inputs['action taken index']]['loantypes'][inputs['loan type']]['purposes'][inputs['loan purpose']]['firstliencount']+=1
+				if inputs['purchaser'] >0:
+					container['dispositions'][7]['loantypes'][inputs['loan type']]['purposes'][inputs['loan purpose']]['firstliencount'] +=1
+				if inputs['action taken index'] == 1 and inputs['preapproval'] == '1':
+					container['dispositions'][6]['loantypes'][inputs['loan type']]['purposes'][inputs['loan purpose']]['firstliencount'] +=1
+
+			elif inputs['lien status'] == '2':
+				container['dispositions'][0]['loantypes'][inputs['loan type']]['purposes'][inputs['loan purpose']]['juniorliencount'] +=1
+				container['dispositions'][inputs['action taken index']]['loantypes'][inputs['loan type']]['purposes'][inputs['loan purpose']]['juniorliencount']+=1
+				if inputs['purchaser'] >0:
+					container['dispositions'][7]['loantypes'][inputs['loan type']]['purposes'][inputs['loan purpose']]['juniorliencount'] +=1
+				if inputs['action taken index'] == 1 and inputs['preapproval'] == '1':
+					container['dispositions'][6]['loantypes'][inputs['loan type']]['purposes'][inputs['loan purpose']]['juniorliencount'] +=1
+			elif inputs['lien status'] == '3':
+				container['dispositions'][0]['loantypes'][inputs['loan type']]['purposes'][inputs['loan purpose']]['noliencount'] +=1
+				container['dispositions'][inputs['action taken index']]['loantypes'][inputs['loan type']]['purposes'][inputs['loan purpose']]['noliencount']+=1
+				if inputs['purchaser'] >0:
+					container['dispositions'][7]['loantypes'][inputs['loan type']]['purposes'][inputs['loan purpose']]['noliencount'] +=1
+				if inputs['action taken index'] == 1 and inputs['preapproval'] == '1':
+					container['dispositions'][6]['loantypes'][inputs['loan type']]['purposes'][inputs['loan purpose']]['noliencount'] +=1
 	def build_reportA4(self, container, inputs):
 
 		if inputs['preapproval'] == '1' and inputs['action taken'] == '1':
@@ -2012,23 +2055,17 @@ class aggregate(AD_report): #aggregates LAR rows by appropriate characteristics 
 			self.by_characteristics(container, inputs, 'censuscharacteristics', 0, 'compositions', inputs['minority percent index'], 'preapprovalstatuses', 0)
 			self.by_characteristics(container, inputs, 'censuscharacteristics', 1, 'incomes', inputs['tract income index'], 'preapprovalstatuses', 0)
 		#fill NAs for MSA level reports
-		self.by_characteristics_NA(container, inputs, 'borrowercharacteristics', 0, 'races', inputs['race'], 'preapprovalstatuses', 1)
-		self.by_characteristics_NA(container, inputs, 'borrowercharacteristics', 0, 'races', inputs['race'], 'preapprovalstatuses', 2)
-		self.by_characteristics_NA(container, inputs, 'borrowercharacteristics', 1, 'ethnicities', inputs['ethnicity'], 'preapprovalstatuses', 1)
-		self.by_characteristics_NA(container, inputs, 'borrowercharacteristics', 1, 'ethnicities', inputs['ethnicity'], 'preapprovalstatuses', 2)
-		if inputs['minority status'] < 2:
- 			self.by_characteristics_NA(container, inputs, 'borrowercharacteristics', 2, 'minoritystatuses', inputs['minority status'], 'preapprovalstatuses', 1)
-			self.by_characteristics_NA(container, inputs, 'borrowercharacteristics', 2, 'minoritystatuses', inputs['minority status'], 'preapprovalstatuses', 2)
-		if inputs['income bracket'] < 6:
-			self.by_characteristics_NA(container, inputs, 'borrowercharacteristics', 3, 'incomes', inputs['income bracket'], 'preapprovalstatuses', 1)
-			self.by_characteristics_NA(container, inputs, 'borrowercharacteristics', 3, 'incomes', inputs['income bracket'], 'preapprovalstatuses', 2)
-		self.by_characteristics_NA(container, inputs, 'borrowercharacteristics', 4, 'genders', inputs['gender'], 'preapprovalstatuses', 1)
-		self.by_characteristics_NA(container, inputs, 'borrowercharacteristics', 4, 'genders', inputs['gender'], 'preapprovalstatuses', 2)
-		self.by_characteristics_NA(container, inputs, 'censuscharacteristics', 0, 'compositions', inputs['minority percent index'], 'preapprovalstatuses', 1)
-		self.by_characteristics_NA(container, inputs, 'censuscharacteristics', 0, 'compositions', inputs['minority percent index'], 'preapprovalstatuses', 2)
-		if inputs['tract income index'] < 4:
-			self.by_characteristics_NA(container, inputs, 'censuscharacteristics', 1, 'incomes', inputs['tract income index'], 'preapprovalstatuses', 1)
-			self.by_characteristics_NA(container, inputs, 'censuscharacteristics', 1, 'incomes', inputs['tract income index'], 'preapprovalstatuses', 2)
+		for i in range(1, 3):
+			self.by_characteristics_NA(container, inputs, 'borrowercharacteristics', 0, 'races', inputs['race'], 'preapprovalstatuses', i)
+			self.by_characteristics_NA(container, inputs, 'borrowercharacteristics', 1, 'ethnicities', inputs['ethnicity'], 'preapprovalstatuses', i)
+			if inputs['minority status'] < 2:
+	 			self.by_characteristics_NA(container, inputs, 'borrowercharacteristics', 2, 'minoritystatuses', inputs['minority status'], 'preapprovalstatuses', i)
+			if inputs['income bracket'] < 6:
+				self.by_characteristics_NA(container, inputs, 'borrowercharacteristics', 3, 'incomes', inputs['income bracket'], 'preapprovalstatuses', i)
+			self.by_characteristics_NA(container, inputs, 'borrowercharacteristics', 4, 'genders', inputs['gender'], 'preapprovalstatuses', i)
+			self.by_characteristics_NA(container, inputs, 'censuscharacteristics', 0, 'compositions', inputs['minority percent index'], 'preapprovalstatuses', i)
+			if inputs['tract income index'] < 4:
+				self.by_characteristics_NA(container, inputs, 'censuscharacteristics', 1, 'incomes', inputs['tract income index'], 'preapprovalstatuses', i)
 
 	def by_characteristics_NA(self, container, inputs, section, section_index, key, key_index, section2, section2_index):
 		container[section][section_index][key][key_index][section2][section2_index]['count'] = 'NA'
