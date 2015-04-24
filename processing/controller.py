@@ -80,7 +80,7 @@ selector.report_list['A B'] = AL_MSAs
 
 
 #selector.report_list['A A4'] = ['33660']
-report_list = ['A B']
+report_list = ['A A4']
 #report_list = ['A 3-2']
 #report_list = ['A 4-1', 'A 4-2', 'A 4-3', 'A 4-4', 'A 4-6', 'A 4-7']
 #report_list = ['A 5-1', 'A 5-2', 'A 5-3', 'A 5-4', 'A 5-5', 'A 5-7']

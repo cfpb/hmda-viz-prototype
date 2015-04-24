@@ -439,6 +439,7 @@ class parse_inputs(AD_report):
 		self.inputs['race'] = demo.set_race(self.inputs, a_race) #requires joint status be set prior to running set_race
 		self.inputs['ethnicity'] = demo.set_loan_ethn(self.inputs) #requires  ethnicity be parsed prior to running set_loan_ethn
 		self.inputs['minority status'] = demo.set_minority_status(self.inputs) #requires non white flags be set prior to running set_minority_status
+		self.inputs['gender'] = demo.set_gender(self.inputs)
 
 	def parse_tBx(self, row):
 		demo=demographics() #contains functions for borrower characteristics
@@ -1996,9 +1997,42 @@ class aggregate(AD_report): #aggregates LAR rows by appropriate characteristics 
 		self.calc_median_11_12(table_X, build_X.tract_pct_minority, 'censuscharacteristics', 0, 'compositions', self.composition_rate_list)
 		self.calc_median_11_12(table_X, build_X.income_bracket_names, 'censuscharacteristics', 1, 'incomes', self.tract_income_rate_list)
 
-	def build_reportAx(self, table_X, build_X):
+	def build_reportAx(self, table_X, inputs):
 		pass
-	def build_reportA4(self, table_X, build_X):
-		pass
+	def build_reportA4(self, container, inputs):
+
+		if inputs['preapproval'] == '1' and inputs['action taken'] == '1':
+			self.by_characteristics(container, inputs, 'borrowercharacteristics', 0, 'races', inputs['race'], 'preapprovalstatuses', 0)
+			self.by_characteristics(container, inputs, 'borrowercharacteristics', 1, 'ethnicities', inputs['ethnicity'], 'preapprovalstatuses', 0)
+			if inputs['minority status'] < 2:
+	 			self.by_characteristics(container, inputs, 'borrowercharacteristics', 2, 'minoritystatuses', inputs['minority status'], 'preapprovalstatuses', 0)
+			if inputs['income bracket'] < 6:
+				self.by_characteristics(container, inputs, 'borrowercharacteristics', 3, 'incomes', inputs['income bracket'], 'preapprovalstatuses',0)
+			self.by_characteristics(container, inputs, 'borrowercharacteristics', 4, 'genders', inputs['gender'], 'preapprovalstatuses', 0)
+			self.by_characteristics(container, inputs, 'censuscharacteristics', 0, 'compositions', inputs['minority percent index'], 'preapprovalstatuses', 0)
+			self.by_characteristics(container, inputs, 'censuscharacteristics', 1, 'incomes', inputs['tract income index'], 'preapprovalstatuses', 0)
+		#fill NAs for MSA level reports
+		self.by_characteristics_NA(container, inputs, 'borrowercharacteristics', 0, 'races', inputs['race'], 'preapprovalstatuses', 1)
+		self.by_characteristics_NA(container, inputs, 'borrowercharacteristics', 0, 'races', inputs['race'], 'preapprovalstatuses', 2)
+		self.by_characteristics_NA(container, inputs, 'borrowercharacteristics', 1, 'ethnicities', inputs['ethnicity'], 'preapprovalstatuses', 1)
+		self.by_characteristics_NA(container, inputs, 'borrowercharacteristics', 1, 'ethnicities', inputs['ethnicity'], 'preapprovalstatuses', 2)
+		if inputs['minority status'] < 2:
+ 			self.by_characteristics_NA(container, inputs, 'borrowercharacteristics', 2, 'minoritystatuses', inputs['minority status'], 'preapprovalstatuses', 1)
+			self.by_characteristics_NA(container, inputs, 'borrowercharacteristics', 2, 'minoritystatuses', inputs['minority status'], 'preapprovalstatuses', 2)
+		if inputs['income bracket'] < 6:
+			self.by_characteristics_NA(container, inputs, 'borrowercharacteristics', 3, 'incomes', inputs['income bracket'], 'preapprovalstatuses', 1)
+			self.by_characteristics_NA(container, inputs, 'borrowercharacteristics', 3, 'incomes', inputs['income bracket'], 'preapprovalstatuses', 2)
+		self.by_characteristics_NA(container, inputs, 'borrowercharacteristics', 4, 'genders', inputs['gender'], 'preapprovalstatuses', 1)
+		self.by_characteristics_NA(container, inputs, 'borrowercharacteristics', 4, 'genders', inputs['gender'], 'preapprovalstatuses', 2)
+		self.by_characteristics_NA(container, inputs, 'censuscharacteristics', 0, 'compositions', inputs['minority percent index'], 'preapprovalstatuses', 1)
+		self.by_characteristics_NA(container, inputs, 'censuscharacteristics', 0, 'compositions', inputs['minority percent index'], 'preapprovalstatuses', 2)
+		if inputs['tract income index'] < 4:
+			self.by_characteristics_NA(container, inputs, 'censuscharacteristics', 1, 'incomes', inputs['tract income index'], 'preapprovalstatuses', 1)
+			self.by_characteristics_NA(container, inputs, 'censuscharacteristics', 1, 'incomes', inputs['tract income index'], 'preapprovalstatuses', 2)
+
+	def by_characteristics_NA(self, container, inputs, section, section_index, key, key_index, section2, section2_index):
+		container[section][section_index][key][key_index][section2][section2_index]['count'] = 'NA'
+		container[section][section_index][key][key_index][section2][section2_index]['value'] = 'NA'
+
 	def build_reportB(self, table_X, build_X):
 		pass
