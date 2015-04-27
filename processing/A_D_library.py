@@ -1253,20 +1253,18 @@ class build_JSON(AD_report):
 	def table_B_builder(self):
 		pricing_categories = ['No pricing reported', 'Pricing reported', 'Mean (points above average prime offer rate: only includes loans with APR above the threshold)', 'Median (points above the average prime offer rate: only includes loans with APR above the threshold)']
 		hoepa_statuses = ['HOEPA loan', 'Not a HOEPA loan']
+		loan_purposes = ['Home Purchase', 'Refinance', 'Home Improvement']
+		lien_statuses = ['firstliencount', 'juniorlien', 'noliencount']
 
-		self.container['singlefamily'] = self.set_list(self.end_points, ['pricinginformation', 'hoepastatuses'], 'pricinginformation', False)
-		self.container['singlefamily'][0]['characteristic'] = 'Incidence of Pricing'
+		#self.container['singlefamily'] = self.set_list(self.end_points, ['pricinginformation', 'hoepastatuses'], 'pricinginformation', False)
+		self.container['singlefamily'] = [{'characteristic': 'Incidence of Pricing'}, {'characteristic':'HOEPA Status'}]
 		self.container['singlefamily'][0]['pricinginformation'] = self.set_list(self.end_points, pricing_categories, 'pricing', False)
+		for i in range(0, len(self.container['singlefamily'][0]['pricinginformation'])):
+			self.container['singlefamily'][0]['pricinginformation'][i]['purposes'] = self.set_list(lien_statuses, loan_purposes, 'purpose', True)
 
-		self.container['singlefamily'][1]['characteristic'] = 'HOEPA Status'
-		self.container['singlefamily'][1]['hoepastatus'] = self.set_list(self.end_points, hoepa_statuses, 'status', False)
-
-		self.container['manufactured'] = self.set_list(self.end_points, ['pricinginformation', 'hoepastatuses'], 'pricinginformation', False)
-		self.container['manufactured'][0]['characteristic'] = 'Incidence of Pricing'
-		self.container['manufactured'][0]['pricinginformation'] = self.set_list(self.end_points, pricing_categories, 'pricing', False)
-
-		self.container['manufactured'][1]['characteristic'] = 'HOEPA Status'
-		self.container['manufactured'][1]['hoepastatus'] = self.set_list(self.end_points, hoepa_statuses, 'status', False)
+		self.container['singlefamily'][1]['pricinginformation'] = self.set_list(self.end_points, hoepa_statuses, 'pricing', False)
+		for i in range(0, len(self.container['singlefamily'][1]['pricinginformation'])):
+			self.container['singlefamily'][1]['pricinginformation'][i]['purposes'] = self.set_list(lien_statuses, loan_purposes, 'purpose', True)
 
 		return self.container
 
@@ -1540,7 +1538,7 @@ class aggregate(AD_report): #aggregates LAR rows by appropriate characteristics 
 		self.purchaser_first_lien_weight = ['Fannie Mae first weight', 'Ginnie Mae first weight', 'Freddie Mac first weight', 'Farmer Mac first weight', 'Private Securitization first weight', 'Commercial bank, savings bank or association first weight', 'Life insurance co., credit union, finance co. first weight', 'Affiliate institution first weight', 'Other first weight']
 		self.purchaser_junior_lien_weight = ['Fannie Mae junior weight', 'Ginnie Mae junior weight', 'Freddie Mac junior weight', 'Farmer Mac junior weight', 'Private Securitization junior weight', 'Commercial bank, savings bank or association junior weight', 'Life insurance co., credit union, finance co. junior weight', 'Affiliate institution junior weight', 'Other junior weight']
 		self.race_names = ['American Indian/Alaska Native', 'Asian', 'Black or African American', 'Native Hawaiian or Other Pacific Islander', 'White', '2 or more minority races', 'Joint (White/Minority Race)', 'Race Not Available']
-
+		self.rate_spreads = ['No Reported Pricing Data', 'Reported Pricing Data', '1.50 - 1.99', '2.00 - 2.49', '2.50 - 2.99', '3.00 - 3.99', '4.00 - 4.99', '5.00 - 5.99', '6 or more', 'Mean', 'Median']
 		self.race_rate_list = self.create_rate_lists(len(self.race_names))
 		self.ethnicity_rate_list = self.create_rate_lists(4)
 		self.minority_rate_list = self.create_rate_lists(2)
@@ -2071,5 +2069,7 @@ class aggregate(AD_report): #aggregates LAR rows by appropriate characteristics 
 		container[section][section_index][key][key_index][section2][section2_index]['count'] = 'NA'
 		container[section][section_index][key][key_index][section2][section2_index]['value'] = 'NA'
 
-	def build_reportB(self, table_X, build_X):
-		pass
+	def build_reportB(self, container, inputs):
+		table_b_pricing = self.rate_spreads[0:2] + self.rate_spreads[-2:]
+
+		container['singlefamily'][0]['pricinginformation'][inputs[]]

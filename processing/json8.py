@@ -541,8 +541,22 @@ class build_JSON(AD_report):
 	def table_B_builder(self):
 		pricing_categories = ['No pricing reported', 'Pricing reported', 'Mean (points above average prime offer rate: only includes loans with APR above the threshold)', 'Median (points above the average prime offer rate: only includes loans with APR above the threshold)']
 		hoepa_statuses = ['HOEPA loan', 'Not a HOEPA loan']
+		loan_purposes = ['Home Purchase', 'Refinance', 'Home Improvement']
+		lien_statuses = ['firstliencount', 'juniorlien', 'noliencount']
 
+		#self.container['singlefamily'] = self.set_list(self.end_points, ['pricinginformation', 'hoepastatuses'], 'pricinginformation', False)
+		self.container['singlefamily'] = [{'characteristic': 'Incidence of Pricing'}, {'characteristic':'HOEPA Status'}]
+		self.container['singlefamily'][0]['pricinginformation'] = self.set_list(self.end_points, pricing_categories, 'pricing', False)
+		for i in range(0, len(self.container['singlefamily'][0]['pricinginformation'])):
+			self.container['singlefamily'][0]['pricinginformation'][i]['purposes'] = self.set_list(lien_statuses, loan_purposes, 'purpose', True)
+
+		self.container['singlefamily'][1]['pricinginformation'] = self.set_list(self.end_points, hoepa_statuses, 'pricing', False)
+		for i in range(0, len(self.container['singlefamily'][1]['pricinginformation'])):
+			self.container['singlefamily'][1]['pricinginformation'][i]['purposes'] = self.set_list(lien_statuses, loan_purposes, 'purpose', True)
+		#self.container['singlefamily']['pricinginformation'] = self.set_list(self.end_points, pricing_categories, 'pricing', False)
+		'''
 		self.container['singlefamily'] = self.set_list(self.end_points, ['pricinginformation', 'hoepastatuses'], 'pricinginformation', False)
+
 		self.container['singlefamily'][0]['characteristic'] = 'Incidence of Pricing'
 		self.container['singlefamily'][0]['pricinginformation'] = self.set_list(self.end_points, pricing_categories, 'pricing', False)
 
@@ -555,7 +569,7 @@ class build_JSON(AD_report):
 
 		self.container['manufactured'][1]['characteristic'] = 'HOEPA Status'
 		self.container['manufactured'][1]['hoepastatus'] = self.set_list(self.end_points, hoepa_statuses, 'status', False)
-
+		'''
 		return self.container
 
 	def set_list(self, end_points, key_list, key_name, ends_bool):
@@ -599,8 +613,8 @@ build = build_JSON()
 #table_Ax = build.table_Ax_builder()
 #build.print_JSON()
 #build.write_JSON('reportA1.json', table_Ax)
-table_A4 = build.table_A4_builder()
+#table_A4 = build.table_A4_builder()
 #build.print_JSON()
 #build.write_JSON('reportA4.json', table_A4)
-#table_B = build.table_B_builder()
+table_B = build.table_B_builder()
 build.print_JSON()
