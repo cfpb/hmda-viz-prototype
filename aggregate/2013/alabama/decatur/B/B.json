@@ -3,7 +3,7 @@
     "type": "Aggregate", 
     "desc": "Loan pricing information for conventional loans by incidence and level", 
     "year": "2013", 
-    "report-date": "04/23/2015", 
+    "report-date": "04/27/2015", 
     "msa": {
         "id": "19460", 
         "name": "Decatur", 
@@ -12,62 +12,300 @@
     }, 
     "singlefamily": [
         {
+            "characteristic": "Incidence of Pricing", 
             "pricinginformation": [
                 {
-                    "pricing": "No pricing reported"
+                    "pricing": "No pricing reported", 
+                    "purposes": [
+                        {
+                            "purpose": "Home Purchase", 
+                            "firstliencount": 421, 
+                            "juniorliencount": 10, 
+                            "noliencount": 0
+                        }, 
+                        {
+                            "purpose": "Refinance", 
+                            "firstliencount": 1406, 
+                            "juniorliencount": 33, 
+                            "noliencount": 0
+                        }, 
+                        {
+                            "purpose": "Home Improvement", 
+                            "firstliencount": 38, 
+                            "juniorliencount": 2, 
+                            "noliencount": 0
+                        }
+                    ]
                 }, 
                 {
-                    "pricing": "Pricing reported"
+                    "pricing": "Pricing reported", 
+                    "purposes": [
+                        {
+                            "purpose": "Home Purchase", 
+                            "firstliencount": 51, 
+                            "juniorliencount": 1, 
+                            "noliencount": 0
+                        }, 
+                        {
+                            "purpose": "Refinance", 
+                            "firstliencount": 97, 
+                            "juniorliencount": 4, 
+                            "noliencount": 0
+                        }, 
+                        {
+                            "purpose": "Home Improvement", 
+                            "firstliencount": 9, 
+                            "juniorliencount": 1, 
+                            "noliencount": 0
+                        }
+                    ]
                 }, 
                 {
-                    "pricing": "Mean (points above average prime offer rate: only includes loans with APR above the threshold)"
+                    "pricing": "Mean (points above average prime offer rate: only includes loans with APR above the threshold)", 
+                    "purposes": [
+                        {
+                            "purpose": "Home Purchase", 
+                            "firstliencount": 3.78, 
+                            "juniorliencount": 4.11, 
+                            "noliencount": 0
+                        }, 
+                        {
+                            "purpose": "Refinance", 
+                            "firstliencount": 2.9, 
+                            "juniorliencount": 5.35, 
+                            "noliencount": 0
+                        }, 
+                        {
+                            "purpose": "Home Improvement", 
+                            "firstliencount": 4.24, 
+                            "juniorliencount": 5.09, 
+                            "noliencount": 0
+                        }
+                    ]
                 }, 
                 {
-                    "pricing": "Median (points above the average prime offer rate: only includes loans with APR above the threshold)"
+                    "pricing": "Median (points above the average prime offer rate: only includes loans with APR above the threshold)", 
+                    "purposes": [
+                        {
+                            "purpose": "Home Purchase", 
+                            "firstliencount": 3.92, 
+                            "juniorliencount": 4.11, 
+                            "noliencount": 0
+                        }, 
+                        {
+                            "purpose": "Refinance", 
+                            "firstliencount": 2.48, 
+                            "juniorliencount": 5.61, 
+                            "noliencount": 0
+                        }, 
+                        {
+                            "purpose": "Home Improvement", 
+                            "firstliencount": 4.06, 
+                            "juniorliencount": 5.09, 
+                            "noliencount": 0
+                        }
+                    ]
                 }
-            ], 
-            "characteristic": "Incidence of Pricing"
+            ]
         }, 
         {
-            "pricinginformation": "hoepastatuses", 
             "characteristic": "HOEPA Status", 
-            "hoepastatus": [
+            "pricinginformation": [
                 {
-                    "status": "HOEPA loan"
+                    "pricing": "HOEPA loan", 
+                    "purposes": [
+                        {
+                            "purpose": "Home Purchase", 
+                            "firstliencount": 0, 
+                            "juniorliencount": 0, 
+                            "noliencount": 0
+                        }, 
+                        {
+                            "purpose": "Refinance", 
+                            "firstliencount": 1, 
+                            "juniorliencount": 0, 
+                            "noliencount": 0
+                        }, 
+                        {
+                            "purpose": "Home Improvement", 
+                            "firstliencount": 0, 
+                            "juniorliencount": 0, 
+                            "noliencount": 0
+                        }
+                    ]
                 }, 
                 {
-                    "status": "Not a HOEPA loan"
+                    "pricing": "Not a HOEPA loan", 
+                    "purposes": [
+                        {
+                            "purpose": "Home Purchase", 
+                            "firstliencount": 472, 
+                            "juniorliencount": 11, 
+                            "noliencount": 0
+                        }, 
+                        {
+                            "purpose": "Refinance", 
+                            "firstliencount": 1502, 
+                            "juniorliencount": 37, 
+                            "noliencount": 0
+                        }, 
+                        {
+                            "purpose": "Home Improvement", 
+                            "firstliencount": 47, 
+                            "juniorliencount": 3, 
+                            "noliencount": 0
+                        }
+                    ]
                 }
             ]
         }
     ], 
     "manufactured": [
         {
+            "characteristic": "Incidence of Pricing", 
             "pricinginformation": [
                 {
-                    "pricing": "No pricing reported"
+                    "pricing": "No pricing reported", 
+                    "purposes": [
+                        {
+                            "purpose": "Home Purchase", 
+                            "firstliencount": 10, 
+                            "juniorliencount": 0, 
+                            "noliencount": 0
+                        }, 
+                        {
+                            "purpose": "Refinance", 
+                            "firstliencount": 3, 
+                            "juniorliencount": 0, 
+                            "noliencount": 0
+                        }, 
+                        {
+                            "purpose": "Home Improvement", 
+                            "firstliencount": 4, 
+                            "juniorliencount": 0, 
+                            "noliencount": 0
+                        }
+                    ]
                 }, 
                 {
-                    "pricing": "Pricing reported"
+                    "pricing": "Pricing reported", 
+                    "purposes": [
+                        {
+                            "purpose": "Home Purchase", 
+                            "firstliencount": 89, 
+                            "juniorliencount": 0, 
+                            "noliencount": 0
+                        }, 
+                        {
+                            "purpose": "Refinance", 
+                            "firstliencount": 25, 
+                            "juniorliencount": 0, 
+                            "noliencount": 0
+                        }, 
+                        {
+                            "purpose": "Home Improvement", 
+                            "firstliencount": 6, 
+                            "juniorliencount": 0, 
+                            "noliencount": 0
+                        }
+                    ]
                 }, 
                 {
-                    "pricing": "Mean (points above average prime offer rate: only includes loans with APR above the threshold)"
+                    "pricing": "Mean (points above average prime offer rate: only includes loans with APR above the threshold)", 
+                    "purposes": [
+                        {
+                            "purpose": "Home Purchase", 
+                            "firstliencount": 6.67, 
+                            "juniorliencount": 0, 
+                            "noliencount": 0
+                        }, 
+                        {
+                            "purpose": "Refinance", 
+                            "firstliencount": 5.1, 
+                            "juniorliencount": 0, 
+                            "noliencount": 0
+                        }, 
+                        {
+                            "purpose": "Home Improvement", 
+                            "firstliencount": 6.03, 
+                            "juniorliencount": 0, 
+                            "noliencount": 0
+                        }
+                    ]
                 }, 
                 {
-                    "pricing": "Median (points above the average prime offer rate: only includes loans with APR above the threshold)"
+                    "pricing": "Median (points above the average prime offer rate: only includes loans with APR above the threshold)", 
+                    "purposes": [
+                        {
+                            "purpose": "Home Purchase", 
+                            "firstliencount": 6.77, 
+                            "juniorliencount": 0, 
+                            "noliencount": 0
+                        }, 
+                        {
+                            "purpose": "Refinance", 
+                            "firstliencount": 5.46, 
+                            "juniorliencount": 0, 
+                            "noliencount": 0
+                        }, 
+                        {
+                            "purpose": "Home Improvement", 
+                            "firstliencount": 6.59, 
+                            "juniorliencount": 0, 
+                            "noliencount": 0
+                        }
+                    ]
                 }
-            ], 
-            "characteristic": "Incidence of Pricing"
+            ]
         }, 
         {
-            "pricinginformation": "hoepastatuses", 
             "characteristic": "HOEPA Status", 
-            "hoepastatus": [
+            "pricinginformation": [
                 {
-                    "status": "HOEPA loan"
+                    "pricing": "HOEPA loan", 
+                    "purposes": [
+                        {
+                            "purpose": "Home Purchase", 
+                            "firstliencount": 0, 
+                            "juniorliencount": 0, 
+                            "noliencount": 0
+                        }, 
+                        {
+                            "purpose": "Refinance", 
+                            "firstliencount": 0, 
+                            "juniorliencount": 0, 
+                            "noliencount": 0
+                        }, 
+                        {
+                            "purpose": "Home Improvement", 
+                            "firstliencount": 0, 
+                            "juniorliencount": 0, 
+                            "noliencount": 0
+                        }
+                    ]
                 }, 
                 {
-                    "status": "Not a HOEPA loan"
+                    "pricing": "Not a HOEPA loan", 
+                    "purposes": [
+                        {
+                            "purpose": "Home Purchase", 
+                            "firstliencount": 99, 
+                            "juniorliencount": 0, 
+                            "noliencount": 0
+                        }, 
+                        {
+                            "purpose": "Refinance", 
+                            "firstliencount": 28, 
+                            "juniorliencount": 0, 
+                            "noliencount": 0
+                        }, 
+                        {
+                            "purpose": "Home Improvement", 
+                            "firstliencount": 10, 
+                            "juniorliencount": 0, 
+                            "noliencount": 0
+                        }
+                    ]
                 }
             ]
         }

@@ -98,6 +98,8 @@ class report_4x(constructor):
 				self.agg.fill_medians_11_12(table_X, build_X)
 				self.agg.fill_weighted_medians_11_12(table_X, self.parsed.inputs)
 
+			if self.report_number[2:] == 'B':
+				self.agg.table_B_mean(table_X, self.parsed.inputs)
 
 			path = "../" +table_X['type']+"/"+table_X['year']+"/"+build_X.get_state_name(table_X['msa']['state']).replace(' ', '-').lower()+"/"+build_X.msa_names[MSA].replace(' ', '-').lower()+"/"+table_X['table']
 			if not os.path.exists(path): #check if path exists
