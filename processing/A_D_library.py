@@ -10,6 +10,7 @@ from collections import OrderedDict
 import json
 import os
 import csv
+from median_age_api import median_age_API as age_API
 class AD_report(object): #parent class for A&D report library
 	pass
 
@@ -86,6 +87,9 @@ class parse_inputs(AD_report):
 		self.inputs['Life insurance co., credit union, finance co. junior weight'] =[]
 		self.inputs['Affiliate institution junior weight'] = []
 		self.inputs['Other junior weight'] =[]
+
+		#median age of housing by tract
+		self.tract_median_ages = {}
 
 	def parse_t31(self, row): #takes a row of tuples from a table 3-1 query and parses it to the inputs dictionary
 		#parsing inputs for report 3.1
@@ -302,6 +306,9 @@ class parse_inputs(AD_report):
 		return denial_list
 
 	def parse_t9x(self, row):
+		#instantiate API call object
+		#call on distinct tracts in MSA (or other geo)
+
 		self.inputs['year'] = row['asofdate'] #year or application or origination
 		self.inputs['state code'] = row['statecode'] #two digit state code
 		self.inputs['state name'] = row['statename'] #two character state abbreviation
@@ -310,6 +317,59 @@ class parse_inputs(AD_report):
 		self.inputs['property type'] = row['propertytype']
 		self.inputs['loan purpose'] = row['loanpurpose']
 		self.inputs['loan type'] = row['loantype']
+		#self.inputs['median age']
+	def median_tract_age(self, cur, MSA): #, state, county, tract
+		#calls the HMDA database and returns a distinct list of tracts for an MSA
+		#queries Census API to get median housing age for each tract
+		#adds the tract and age to self.
+		self.age_API = age_API() #initialize API call object, this object returns the median age of when passed state, county, and tract numbers.
+
+		state_string = '''SELECT DISTINCT(statecode) FROM hmdapub2013 WHERE msaofproperty = '{MSA}' ;'''
+		tract_string = '''SELECT DISTINCT(censustractnumber) FROM hmdapub2013 WHERE countycode = '{county}' and msaofproperty = '{MSA}' ;'''
+		county_string = '''SELECT DISTINCT(countycode) FROM hmdapub2013 WHERE statecode = '{statecode}' and msaofproperty = '{MSA}' ;'''
+
+		state_SQL = state_string.format(MSA = MSA)
+		cur.execute(state_SQL,)
+		states = cur.fetchall()[0]
+		print states
+		for state in states:
+			county_SQL = county_string.format(MSA = MSA, statecode = state)
+			cur.execute(county_SQL, MSA)
+			counties = cur.fetchall()[0] #counties is a list
+			print counties
+			for county in counties:
+				tract_SQL = tract_string.format(county = county, MSA = MSA)
+				cur.execute(tract_SQL,)
+
+				tract_list= cur.fetchall()
+				#print len(tract_list)
+				for i in range(0, len(tract_list)):
+					#print tract_list[i][0][:-3] + tract_list[i][0][5:]
+					tract = tract_list[i][0].replace('.', '')
+					tract_age = self.age_API.get_age(state, county, tract)
+					#print int(tract_age.strip('"'))
+					self.tract_median_ages[state+county+tract_list[i][0]] = int(tract_age.strip('"'))
+		print self.tract_median_ages
+					#print state + county+tract_list[i][0]
+
+		#SQL = (self.queries.SQL_Query + conditions).format(columns=columns, year=self.year, MSA=MSA)
+		#self.SQL_Count = '''SELECT COUNT(msaofproperty) FROM hmdapub{year} WHERE msaofproperty = '{MSA}' '''
+	def median_age_index(self, year):
+		#are new buckets added every 10 years?
+		#what will the unavailable index require?
+		if year <= 1969:
+			return 4
+		elif year <= 1979:
+			return 3
+		elif year <= 1989:
+			return 2
+		elif year <= 1999:
+			return 1
+		elif year <= 2010:
+			return 0
+		else:
+			print "no match found"
+			return 5
 
 	def parse_t11x(self, row):
 		MSA_index = MSA_info() #contains functions for census tract characteristics
@@ -1173,6 +1233,20 @@ class build_JSON(AD_report):
 		self.container['total'] = totals
 		return self.container
 
+	def table_9x_builder(self):
+			age_list = ['2000 - 2010', '1990 - 1999', '1980 - 1989', '1970 - 1979', '1969 or Earlier', 'Age Unknown']
+			loan_category = ['FHA, FSA/RHS & VA', 'Conventional', 'Refinancings', 'Home Improvement Loans', 'Loans on Dwellings For 5 or More Families', 'Nonoccupant Loans from Columns A, B, C & D', 'Loans on Manufactured Home Dwellings From Columns A, B, C & D']
+			#holding = OrderedDict({})
+			self.container['characteristic'] = 'Census Tracts by Median Age of Homes'
+			self.container['medianages'] = self.set_list(self.end_points, age_list, 'medianage', False)
+
+			for i in range(0, len(self.container['medianages'])):
+				self.container['medianages'][i]['loancategories'] = self.set_list(self.end_points, loan_category, 'loancategory', False)
+			for i in range(0, len(self.container['medianages'])):
+				for j in range(0, len(self.container['medianages'][i]['loancategories'])):
+					self.container['medianages'][i]['loancategories'][j]['dispositions'] = self.set_list(self.end_points, self.dispositions_list[:6], 'disposition', True)
+			return self.container
+
 	def table_11x_characteristics(self, characteristic, list_header, item_list, item_name, layer_2_key, layer_2_name, layer_2_list):
 		characteristic_list = []
 		temp = OrderedDict({})
@@ -1505,9 +1579,9 @@ class queries(AD_report):
 			coapplicantsex, denialreason1, denialreason2, denialreason3, ffiec_median_family_income,
 			statecode, statename, censustractnumber, countycode, countyname '''
 
-	def table_9_x_columns(self):
-		return '''loantype, loanpurpose, propertytype, actiontype, asofdate, censustractnumber, statecode, statename
-			msaofproperty '''
+	def table_9_columns(self):
+		return '''loantype, loanpurpose, propertytype, actiontype, asofdate, censustractnumber, statecode, statename,
+			msaofproperty, countyname, countycode'''
 
 	def table_11_x_columns(self):
 		return '''applicantrace1, applicantrace2, applicantrace3, applicantrace4, applicantrace5,
@@ -2160,3 +2234,5 @@ class aggregate(AD_report): #aggregates LAR rows by appropriate characteristics 
 
 			container['manufactured'][1]['pricinginformation'][inputs['hoepa flag']-1]['purposes'][inputs['loan purpose']]['juniorliencount'] += 1
 
+	def build_report9x(self, container, inputs):
+		pass

@@ -42,7 +42,8 @@ class report_4x(constructor):
 		#for MSA in selector.report_list[report_number]: #take this loop out
 		build_X = build()
 		build_X.set_msa_names(cur) #builds a list of msa names as a dictionary
-
+		if self.report_number[2] == '9':
+			self.parsed.median_tract_age(cur, MSA)
 		location = (MSA,) #pass the MSA nubmers as a tuple to Psycopg2 (doesn't take singletons)
 
 		self.parsed.inputs['small county flag'] = self.agg.get_small_county_flag(cur, location)

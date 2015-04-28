@@ -567,6 +567,20 @@ class build_JSON(AD_report):
 			holding_list.append(holding_dict)
 		return holding_list
 
+	def table_9x_builder(self):
+			age_list = ['2000 - 2010', '1990 - 1999', '1980 - 1989', '1970 - 1979', '1969 or Earlier', 'Age Unknown']
+			loan_category = ['FHA, FSA/RHS & VA', 'Conventional', 'Refinancings', 'Home Improvement Loans', 'Loans on Dwellings For 5 or More Families', 'Nonoccupant Loans from Columns A, B, C & D', 'Loans on Manufactured Home Dwellings From Columns A, B, C & D']
+			#holding = OrderedDict({})
+			self.container['characteristic'] = 'Census Tracts by Median Age of Homes'
+			self.container['medianages'] = self.set_list(self.end_points, age_list, 'medianage', False)
+
+			for i in range(0, len(self.container['medianages'])):
+				self.container['medianages'][i]['loancategories'] = self.set_list(self.end_points, loan_category, 'loancategory', False)
+			for i in range(0, len(self.container['medianages'])):
+				for j in range(0, len(self.container['medianages'][i]['loancategories'])):
+					self.container['medianages'][i]['loancategories'][j]['dispositions'] = self.set_list(self.end_points, self.dispositions_list[:6], 'disposition', True)
+			return self.container
+
 	def print_JSON(self): #prints a json object to the terminal
 		import json
 		print json.dumps(self.container, indent=4)
@@ -589,8 +603,8 @@ build = build_JSON()
 #table_8x = build.table_8x_builder()
 #build.print_JSON()
 #build.write_JSON('report8.json', table_8x)
-#table_9x = build.table_9x_builder()
-#build.print_JSON()
+table_9x = build.table_9x_builder()
+build.print_JSON()
 #table_5x['applicantincomes'][0]['borrowercharacteristics'][0]['races'][2]['dispositions'][1]['count'] +=100
 #table_12x = build.table_12x_builder()
 #build.write_JSON('report12.json', table_12x)
@@ -600,6 +614,6 @@ build = build_JSON()
 #table_A4 = build.table_A4_builder()
 #build.print_JSON()
 #build.write_JSON('reportA4.json', table_A4)
-table_B = build.table_B_builder()
-build.write_JSON('reportAB.json', table_B)
-build.print_JSON()
+#table_B = build.table_B_builder()
+#build.write_JSON('reportAB.json', table_B)
+#build.print_JSON()
