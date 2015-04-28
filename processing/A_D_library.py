@@ -289,6 +289,7 @@ class parse_inputs(AD_report):
 		self.inputs['denial_list'] = self.denial_reasons_list(self.inputs['denial reason1'], self.inputs['denial reason2'], self.inputs['denial reason3'])
 		print row['denialreason1'], row['denialreason2'], row['denialreason3'], 'blurp'
 		print self.inputs['denial_list'], self.inputs['race'], self.inputs['ethnicity']
+
 	def adjust_denial_index(self, reason):
 		if reason != ' ':
 			return int(reason) - 1
@@ -307,7 +308,7 @@ class parse_inputs(AD_report):
 		self.inputs['census tract'] = row['censustractnumber'] # this is currently the 7 digit tract used by the FFIEC, it includes a decimal prior to the last two digits
 		self.inputs['action taken'] = int(row['actiontype']) #disposition of the loan application
 		self.inputs['property type'] = row['propertytype']
-		self.inputs['loan purpose'] = row['loan purpose']
+		self.inputs['loan purpose'] = row['loanpurpose']
 		self.inputs['loan type'] = row['loantype']
 
 	def parse_t11x(self, row):
@@ -387,6 +388,91 @@ class parse_inputs(AD_report):
 		self.inputs['ethnicity'] = demo.set_loan_ethn(self.inputs) #requires  ethnicity be parsed prior to running set_loan_ethn
 		self.inputs['minority status'] = demo.set_minority_status(self.inputs) #requires non white flags be set prior to running set_minority_status
 		self.inputs['gender'] = demo.set_gender(self.inputs)
+
+	def parse_tAx(self, row):
+		self.inputs['loan value'] = float(row['loanamount']) #loan value rounded to the nearest thousand
+		self.inputs['year'] = row['asofdate'] #year or application or origination
+		self.inputs['state code'] = row['statecode'] #two digit state code
+		self.inputs['state name'] = row['statename'] #two character state abbreviation
+		self.inputs['sequence'] = row['sequencenumber'] #the sequence number of the loan, used for checking errors
+		self.inputs['lien status'] = row['lienstatus']
+		self.inputs['action taken index'] = self.action_taken_index(int(row['actiontype']), row['preapproval']) #disposition of the loan application
+		self.inputs['purchaser'] = int(row['purchasertype'])
+		self.inputs['preapproval'] = row['preapproval']
+		#self.inputs['property type'] = row['propertytype']
+		self.inputs['loan purpose'] = self.purpose_index(row['loanpurpose']) #adjust loan purpose down one to match index in JSON structure
+		self.inputs['loan type'] = int(row['loantype']) -1 #adjust loan purpose down one to match index in JSON structure
+
+	def action_taken_index(self, action_taken, preapproval):
+		if action_taken < 6:
+			return action_taken
+		elif action_taken == 6:
+			return 7
+		else:
+			return 8
+
+	def purpose_index(self, loantype):
+		if loantype == '1':
+			return 0 #purchase loans
+		elif loantype == '2':
+			return 2 #home improvement loans
+		elif loantype == '3':
+			return 1 #refinance loans
+
+	def parse_tA4(self, row):
+		MSA_index = MSA_info() #contains functions for census tract characteristics
+		demo=demographics() #contains functions for borrower characteristics
+		a_race = [] #race lists will hold 5 integers with 0 replacing a blank entry
+		co_race = [] #race lists will hold 5 integers with 0 replacing a blank entry
+		#fill race lists from the demographics class
+		a_race = demo.a_race_list(row) #put applicant race codes in a list 0-5, 0 is blank field
+		co_race = demo.co_race_list(row) #put co-applicant race codes in a list 0-5, 0 is blank field
+		#add data elements to dictionary
+		self.inputs['a_race'] = a_race
+		self.inputs['co_race'] = co_race
+		self.inputs['a ethn'] = row['applicantethnicity'] #ethnicity of the applicant
+		self.inputs['co ethn'] = row['coapplicantethnicity'] #ethnicity of the co-applicant
+		self.inputs['income'] = row['applicantincome'] #relied upon income rounded to the nearest thousand
+		self.inputs['rate spread'] = row['ratespread'] # interest rate spread over APOR if spread is greater than 1.5%
+		self.inputs['loan value'] = float(row['loanamount']) #loan value rounded to the nearest thousand
+		self.inputs['year'] = row['asofdate'] #year or application or origination
+		self.inputs['state code'] = row['statecode'] #two digit state code
+		self.inputs['state name'] = row['statename'] #two character state abbreviation
+		self.inputs['app sex'] = row['applicantsex']
+		self.inputs['co app sex'] = row['coapplicantsex']
+		self.inputs['MSA median income'] = row['ffiec_median_family_income'] #median income for the tract/msa
+		self.inputs['minority percent'] = row['minoritypopulationpct'] #%of population that is minority
+		self.inputs['tract to MSA income'] = row['tract_to_msa_md_income'] #ratio of tract to msa/md income
+		self.inputs['sequence'] = row['sequencenumber'] #the sequence number of the loan, used for checking errors
+		self.inputs['preapproval'] = row['preapproval']
+		self.inputs['action taken'] = row['actiontype']
+		#self.inputs['lien status'] = row['lienstatus']
+		self.inputs['tract income index'] = MSA_index.tract_to_MSA_income(self.inputs) #sets the tract to MSA median income ratio to an index number for aggregation
+		self.inputs['income bracket'] = MSA_index.app_income_to_MSA(self.inputs) #sets the applicant income as an index by an applicant's income as a percent of MSA median
+		self.inputs['rate spread index'] = demo.rate_spread_index_11x(self.inputs['rate spread']) #index of the rate spread for use in the JSON structure
+		self.inputs['minority percent index'] = MSA_index.minority_percent(self.inputs) #sets the minority population percent to an index for aggregation
+		self.inputs['app non white flag'] = demo.set_non_white(a_race) #flags the applicant as non-white if true, used in setting minority status and race
+		self.inputs['co non white flag'] = demo.set_non_white(co_race) #flags the co applicant as non-white if true, used in setting minority status and race
+		self.inputs['minority count'] = demo.minority_count(a_race) #determines if the number of minority races claimed by the applicant is 2 or greater
+		self.inputs['joint status'] = demo.set_joint(self.inputs) #requires non white status flags be set prior to running set_joint
+		self.inputs['race'] = demo.set_race(self.inputs, a_race) #requires joint status be set prior to running set_race
+		self.inputs['ethnicity'] = demo.set_loan_ethn(self.inputs) #requires  ethnicity be parsed prior to running set_loan_ethn
+		self.inputs['minority status'] = demo.set_minority_status(self.inputs) #requires non white flags be set prior to running set_minority_status
+		self.inputs['gender'] = demo.set_gender(self.inputs)
+
+	def parse_tBx(self, row):
+		demo=demographics() #contains functions for borrower characteristics
+		self.inputs['year'] = row['asofdate'] #year or application or origination
+		#self.inputs['rate spread'] = row['ratespread'] # interest rate spread over APOR if spread is greater than 1.5%
+		self.inputs['rate spread'] = row['ratespread']
+		self.inputs['state code'] = row['statecode'] #two digit state code
+		self.inputs['state name'] = row['statename'] #two character state abbreviation
+		self.inputs['sequence'] = row['sequencenumber'] #the sequence number of the loan, used for checking errors
+		self.inputs['loan purpose'] = self.purpose_index(row['loanpurpose'])
+		self.inputs['lien status'] = int(row['lienstatus'])
+		self.inputs['hoepa flag'] = int(row['hoepastatus']) #if the loan is subject to Home Ownership Equity Protection Act
+		self.inputs['property type'] = int(row['propertytype'])
+		self.inputs['rate spread index'] = demo.rate_spread_index_11x(row['ratespread']) #index of the rate spread for use in the JSON structure
 
 class MSA_info(AD_report): #contains functions for setting aggregate information for the MSA
 
@@ -669,6 +755,7 @@ class build_JSON(AD_report):
 		self.income_bracket_names = ['Low Income', 'Moderate Income', 'Middle Income', 'Upper Income']
 		self.end_points = ['count', 'value']
 		self.denial_reasons = ['Debt-to-Income Ratio', 'Employment History', 'Credit History', 'Collateral', 'Insufficient Cash', 'Unverifiable Information', 'Credit App. Incomplete', 'Mortgage Insurance Denied', 'Other', 'Total']
+
 	def msas_in_state(self, cursor, selector, report_type):
 		#this function builds a list of MSA numbers and names in each state
 		#set sql query text to pull MSA names for each MSA number
@@ -841,6 +928,16 @@ class build_JSON(AD_report):
 			return 'Disposition of applications for conventional manufactured home-purchas loans, first lien, owner-occupied dwelling, by borrower or census tract characteristics'
 		elif table_num == '12-2':
 			return 'Pricing information for conventional manufactured home-purchase loans, first lien, owner-occupied dwelling, by borrower or census tract characteristics'
+		elif table_num == 'A1':
+			return 'Disposition of applications and loan sales by loan type, 1- to 4-family dwellings (Excludes manufactured homes)'
+		elif table_num == 'A2':
+			return 'Disposition of applications and loan sales by loan type, manufactured homes'
+		elif table_num == 'A3':
+			return 'Disposition of applications and loan sales by loan type, multifamily housing'
+		elif table_num == 'A4':
+			return 'Disposition of preapprovals for conventional home-purchase loans, first lien, 1- to 4-family dwellings (excludes manufactured homes), by borrower or census tract characteristics'
+		elif table_num == 'B':
+			return 'Loan pricing information for conventional loans by incidence and level'
 
 	def set_header(self, inputs, MSA, table_type, table_num): #sets the header information of the JSON object
 		now = foo.datetime.now()
@@ -1114,6 +1211,11 @@ class build_JSON(AD_report):
 		self.table_11_12_helper('pricinginformation', 'pricing', self.rate_spreads)
 		return self.container
 
+	def table_A4_builder(self):
+		preapproval_names = ['Preapprovals reasulting in originations', 'Preapprovals approved but not accepted', 'Preapprovals denied']
+		self.table_11_12_helper('preapprovalstatuses', 'preapprovalstatus', preapproval_names)
+		return self.container
+
 	def table_11_12_helper(self, key, key_singular, end_point_list):
 		borrower_list = ['Race', 'Ethnicity' , 'Minority Status', 'Income', 'Gender']
 		census_list = ['Racial/Ethnic Composition', 'Income Characteristics']
@@ -1131,6 +1233,48 @@ class build_JSON(AD_report):
 
 		for i in range(0, len(census_list)):
 			self.container['censuscharacteristics'][i] = self.table_11x_characteristics(census_list[i], census_plural_list[i], census_input_list[i], census_single_list[i], key, key_singular, end_point_list)
+
+		return self.container
+
+	def table_Ax_builder(self):
+		loan_types = ['Conventional', 'FHA', 'VA', 'FSA/RHS']
+		loan_purposes = ['Home Purchase', 'Refinance', 'Home Improvement']
+		lien_statuses = ['firstliencount', 'juniorliencount', 'noliencount']
+		disp_list = self.dispositions_list + ['Preapprovals Resulting in Originations', 'Loans Sold']
+		self.container['dispositions'] = self.set_list(self.end_points, disp_list, 'disposition', False)
+		for i in range(0, len(self.container['dispositions'])):
+			self.container['dispositions'][i]['loantypes'] = self.set_list(self.end_points, loan_types, 'loantype', False)
+			for j in range(0, len(self.container['dispositions'][i]['loantypes'])):
+				self.container['dispositions'][i]['loantypes'][j]['purposes'] = self.set_list(lien_statuses[:-1], loan_purposes, 'purpose', True)
+				self.container['dispositions'][i]['loantypes'][j]['purposes'][2]['noliencount'] = 0
+
+					#	self.container['dispositions'][i]['loantypes'][j]['purposes'] = self.set_list(lien_statuses[:-1], loan_purposes, 'purpose', True)
+		return self.container
+
+	def table_B_builder(self):
+		pricing_categories = ['No pricing reported', 'Pricing reported', 'Mean (points above average prime offer rate: only includes loans with APR above the threshold)', 'Median (points above the average prime offer rate: only includes loans with APR above the threshold)']
+		hoepa_statuses = ['HOEPA loan', 'Not a HOEPA loan']
+		loan_purposes = ['Home Purchase', 'Refinance', 'Home Improvement']
+		lien_statuses = ['firstliencount', 'juniorliencount', 'noliencount']
+
+		#self.container['singlefamily'] = self.set_list(self.end_points, ['pricinginformation', 'hoepastatuses'], 'pricinginformation', False)
+		self.container['singlefamily'] = [{'characteristic': 'Incidence of Pricing'}, {'characteristic':'HOEPA Status'}]
+		self.container['singlefamily'][0]['pricinginformation'] = self.set_list(self.end_points, pricing_categories, 'pricing', False)
+		for i in range(0, len(self.container['singlefamily'][0]['pricinginformation'])):
+			self.container['singlefamily'][0]['pricinginformation'][i]['purposes'] = self.set_list(lien_statuses, loan_purposes, 'purpose', True)
+
+		self.container['singlefamily'][1]['pricinginformation'] = self.set_list(self.end_points, hoepa_statuses, 'pricing', False)
+		for i in range(0, len(self.container['singlefamily'][1]['pricinginformation'])):
+			self.container['singlefamily'][1]['pricinginformation'][i]['purposes'] = self.set_list(lien_statuses, loan_purposes, 'purpose', True)
+
+		self.container['manufactured'] = [{'characteristic': 'Incidence of Pricing'}, {'characteristic':'HOEPA Status'}]
+		self.container['manufactured'][0]['pricinginformation'] = self.set_list(self.end_points, pricing_categories, 'pricing', False)
+		for i in range(0, len(self.container['manufactured'][0]['pricinginformation'])):
+			self.container['manufactured'][0]['pricinginformation'][i]['purposes'] = self.set_list(lien_statuses, loan_purposes, 'purpose', True)
+
+		self.container['manufactured'][1]['pricinginformation'] = self.set_list(self.end_points, hoepa_statuses, 'pricing', False)
+		for i in range(0, len(self.container['manufactured'][1]['pricinginformation'])):
+			self.container['manufactured'][1]['pricinginformation'][i]['purposes'] = self.set_list(lien_statuses, loan_purposes, 'purpose', True)
 
 		return self.container
 
@@ -1185,10 +1329,10 @@ class queries(AD_report):
 		self.SQL_Query = '''SELECT {columns} FROM hmdapub{year} WHERE msaofproperty = '{MSA}' '''
 
 	def table_A_3_1_conditions(self):
-		return ''' and purchasertype != '0'; '''
+		return ''' and purchasertype != '0' ;'''
 
 	def table_A_3_2_conditions(self):
-		return ''' and actiontype = '1' and purchasertype != '0';'''
+		return ''' and actiontype = '1' and purchasertype != '0' ;'''
 
 	def table_A_4_1_conditions(self):
 		return '''and (loantype = '2' or loantype = '3' or loantype = '4') and propertytype !='3' and loanpurpose = '1' ;'''
@@ -1197,34 +1341,34 @@ class queries(AD_report):
 		return '''and loantype = '1' and propertytype !='3' and loanpurpose = '1' ;'''
 
 	def table_A_4_3_conditions(self):
-		return '''and propertytype !='3' and loanpurpose = '3';'''
+		return '''and propertytype !='3' and loanpurpose = '3' ;'''
 
 	def table_A_4_4_conditions(self):
-		return '''and propertytype !='3' and loanpurpose = '2';'''
+		return '''and propertytype !='3' and loanpurpose = '2' ;'''
 
 	def table_A_4_5_conditions(self):
-		return '''and propertytype ='3';'''
+		return '''and propertytype ='3' ;'''
 
 	def table_A_4_6_conditions(self):
-		return '''and propertytype !='3' and occupancy = '2';'''
+		return '''and propertytype !='3' and occupancy = '2' ;'''
 
 	def table_A_4_7_conditions(self):
-		return '''and propertytype ='2';'''
+		return '''and propertytype ='2' ;'''
 
 	def table_A_5_1_conditions(self):
-		return '''and propertytype !='3' and loantype !='1' and loanpurpose = '1';'''
+		return '''and propertytype !='3' and loantype !='1' and loanpurpose = '1' ;'''
 
 	def table_A_5_2_conditions(self):
-		return '''and propertytype !='3' and loantype ='1' and loanpurpose = '1';'''
+		return '''and propertytype !='3' and loantype ='1' and loanpurpose = '1' ;'''
 
 	def table_A_5_3_conditions(self):
-		return '''and propertytype !='3' and loanpurpose = '3';'''
+		return '''and propertytype !='3' and loanpurpose = '3' ;'''
 
 	def table_A_5_4_conditions(self):
-		return '''and propertytype !='3' and loanpurpose = '2';'''
+		return '''and propertytype !='3' and loanpurpose = '2' ;'''
 
 	def table_A_5_5_conditions(self):
-		return '''and propertytype ='3';'''
+		return '''and propertytype ='3' ;'''
 
 	def table_A_5_6_conditions(self):
 		return '''and occupancy ='1' and propertytype !='3' ;'''
@@ -1233,53 +1377,52 @@ class queries(AD_report):
 		return '''and propertytype ='2' ;'''
 
 	def table_A_7_1_conditions(self):
-		return '''and loantype != '1' and propertytype !='3' and loanpurpose = '1';'''
-
+		return '''and loantype != '1' and propertytype !='3' and loanpurpose = '1' ;'''
 
 	def table_A_7_2_conditions(self):
-		return '''and loantype = '1' and propertytype !='3' and loanpurpose = '1';'''
+		return '''and loantype = '1' and propertytype !='3' and loanpurpose = '1' ;'''
 
 	def table_A_7_3_conditions(self):
-		return '''and propertytype !='3' and loanpurpose = '3';'''
+		return '''and propertytype !='3' and loanpurpose = '3' ;'''
 
 	def table_A_7_4_conditions(self):
-		return '''and propertytype !='3' and loanpurpose = '2';'''
+		return '''and propertytype !='3' and loanpurpose = '2' ;'''
 
 	def table_A_7_5_conditions(self):
-		return '''and propertytype ='3';'''
+		return '''and propertytype ='3' ;'''
 
 	def table_A_7_6_conditions(self):
-		return '''and propertytype !='3' and occupancy = '2';'''
+		return '''and propertytype !='3' and occupancy = '2' ;'''
 
 	def table_A_7_7_conditions(self):
-		return '''and propertytype ='3';'''
+		return '''and propertytype ='3' ;'''
 
 	def table_A_8_1_conditions(self):
-		return '''and loantype != '1' and propertytype != '3' and loanpurpose = '1';'''
+		return '''and loantype != '1' and propertytype != '3' and loanpurpose = '1' ;'''
 
 	def table_A_8_2_conditions(self):
-		return '''and loantype ='1' and propertytype !='3' and loanpurpose = '1';'''
+		return '''and loantype ='1' and propertytype !='3' and loanpurpose = '1' ;'''
 
 	def table_A_8_3_conditions(self):
-		return '''and propertytype != '3' and loanpurpose = '3';'''
+		return '''and propertytype != '3' and loanpurpose = '3' ;'''
 
 	def table_A_8_4_conditions(self):
-		return '''and propertytype !='3' and loanpurpose = '2';'''
+		return '''and propertytype !='3' and loanpurpose = '2' ;'''
 
 	def table_A_8_5_conditions(self):
-		return '''and propertytype = '3';'''
+		return '''and propertytype = '3' ;'''
 
 	def table_A_8_6_conditions(self):
-		return '''and occupancy = '2' and propertytype != '3';'''
+		return '''and occupancy = '2' and propertytype != '3' ;'''
 
 	def table_A_8_7_conditions(self):
-		return '''and propertytype = '2';'''
+		return '''and propertytype = '2' ;'''
 
 	def table_A_9_conditions(self):
-		return '''and actiontype != '6' and actiontype != '7' and actiontype != '8' and actiontype != '9';'''
+		return '''and actiontype != '6' and actiontype != '7' and actiontype != '8' and actiontype != '9' ;'''
 
 	def table_A_11_1_conditions(self):
-		return '''and loantype = '2' and loanpurpose = '1' and lienstatus = '1' and propertytype = '1' and occupancy = '1' and actiontype = '1';'''
+		return '''and loantype = '2' and loanpurpose = '1' and lienstatus = '1' and propertytype = '1' and occupancy = '1' and actiontype = '1' ;'''
 
 	def table_A_11_2_conditions(self):
 		return '''and loantype = '3' and loanpurpose = '1' and lienstatus = '1' and propertytype = '1' and occupancy = '1' ;'''
@@ -1309,10 +1452,25 @@ class queries(AD_report):
 		return '''and loantype = '1' and loanpurpose = '2' and lienstatus = '2' and propertytype = '1' and occupancy = '1' ;'''
 
 	def table_A_12_1_conditions(self):
-		return ''' and loantype = '1' and propertytype = '2' and loanpurpose = '1' and lienstatus = '1' and occupancy = '1';'''
+		return ''' and loantype = '1' and propertytype = '2' and loanpurpose = '1' and lienstatus = '1' and occupancy = '1' ;'''
 
 	def table_A_12_2_conditions(self):
-		return ''' and loantype = '1' and propertytype = '2' and loanpurpose = '1' and lienstatus = '1' and occupancy = '1' and actiontype = '1'; '''
+		return ''' and loantype = '1' and propertytype = '2' and loanpurpose = '1' and lienstatus = '1' and occupancy = '1' and actiontype = '1' ;'''
+
+	def table_A_A1_conditions(self):
+		return ''' and propertytype = '1' ;'''
+
+	def table_A_A2_conditions(self):
+		return ''' and propertytype = '2' ;'''
+
+	def table_A_A3_conditions(self):
+		return ''' and propertytype = '3' ;'''
+
+	def table_A_A4_conditions(self):
+		return ''' and loantype = '1' and loanpurpose = '1' and lienstatus = '1' and propertytype = '1' ;'''
+
+	def table_A_B_conditions(self):
+		return ''' and loantype = '1' and occupancy = '1' and actiontype = '1';'''
 
 	def table_3_1_columns(self):
 		return '''censustractnumber, applicantrace1, applicantrace2, applicantrace3, applicantrace4, applicantrace5,
@@ -1365,6 +1523,23 @@ class queries(AD_report):
 			minoritypopulationpct, ffiec_median_family_income, statename, statecode, loanamount,
 			sequencenumber, asofdate, ratespread, tract_to_msa_md_income, actiontype '''
 
+	def table_Ax_columns(self):
+		return '''loantype, lienstatus, loanpurpose, actiontype, loanamount, propertytype
+			msaofproperty, statename, statecode, asofdate, sequencenumber, preapproval, purchasertype
+			'''
+	def table_A4_columns(self):
+		return '''applicantrace1, applicantrace2, applicantrace3, applicantrace4, applicantrace5,
+			coapplicantrace1, coapplicantrace2, coapplicantrace3, coapplicantrace4, coapplicantrace5,
+			applicantethnicity, coapplicantethnicity, applicantincome, applicantsex, coapplicantsex,
+			minoritypopulationpct, ffiec_median_family_income, statename, statecode, loanamount,
+			sequencenumber, asofdate, ratespread, tract_to_msa_md_income, lienstatus, preapproval,
+			actiontype '''
+
+	def table_B_columns(self):
+		return '''loanpurpose, lienstatus, hoepastatus, ratespread, propertytype, msaofproperty
+			statecode, statename, asofdate, sequencenumber
+			'''
+
 class aggregate(AD_report): #aggregates LAR rows by appropriate characteristics to fill the JSON files
 
 	def __init__(self):
@@ -1373,15 +1548,16 @@ class aggregate(AD_report): #aggregates LAR rows by appropriate characteristics 
 		self.purchaser_first_lien_weight = ['Fannie Mae first weight', 'Ginnie Mae first weight', 'Freddie Mac first weight', 'Farmer Mac first weight', 'Private Securitization first weight', 'Commercial bank, savings bank or association first weight', 'Life insurance co., credit union, finance co. first weight', 'Affiliate institution first weight', 'Other first weight']
 		self.purchaser_junior_lien_weight = ['Fannie Mae junior weight', 'Ginnie Mae junior weight', 'Freddie Mac junior weight', 'Farmer Mac junior weight', 'Private Securitization junior weight', 'Commercial bank, savings bank or association junior weight', 'Life insurance co., credit union, finance co. junior weight', 'Affiliate institution junior weight', 'Other junior weight']
 		self.race_names = ['American Indian/Alaska Native', 'Asian', 'Black or African American', 'Native Hawaiian or Other Pacific Islander', 'White', '2 or more minority races', 'Joint (White/Minority Race)', 'Race Not Available']
-
+		self.rate_spreads = ['No Reported Pricing Data', 'Reported Pricing Data', '1.50 - 1.99', '2.00 - 2.49', '2.50 - 2.99', '3.00 - 3.99', '4.00 - 4.99', '5.00 - 5.99', '6 or more', 'Mean', 'Median']
 		self.race_rate_list = self.create_rate_lists(len(self.race_names))
+		#rate lists for tables 11 and 12
 		self.ethnicity_rate_list = self.create_rate_lists(4)
 		self.minority_rate_list = self.create_rate_lists(2)
 		self.income_rate_list = self.create_rate_lists(6)
 		self.gender_rate_list = self.create_rate_lists(4)
 		self.composition_rate_list = self.create_rate_lists(5)
 		self.tract_income_rate_list = self.create_rate_lists(4)
-
+		#weight lists for tables 11 and 12
 		self.race_weight_list = self.create_rate_lists(len(self.race_names))
 		self.ethnicity_weight_list = self.create_rate_lists(4)
 		self.minority_weight_list = self.create_rate_lists(2)
@@ -1389,12 +1565,59 @@ class aggregate(AD_report): #aggregates LAR rows by appropriate characteristics 
 		self.gender_weight_list = self.create_rate_lists(4)
 		self.composition_weight_list = self.create_rate_lists(5)
 		self.tract_income_weight_list = self.create_rate_lists(4)
+		#rate lists for table 3.2
+		#weight litsts for table 3.2
+		#rate lists for table B
+		self.table_B_rates = self.create_rate_lists(2) #lists by property type. 0 = single family, 1 = manufactured
+		for i in range(0, len(self.table_B_rates)):
+			self.table_B_rates[i] = self.create_rate_lists(3) #lien status lists 0=first lien, 1=junior lien, 2=no lien
+			for j in range(0, len(self.table_B_rates[i])):
+				self.table_B_rates[i][j] = self.create_rate_lists(3) #loan purpose lists. 0=home purchase, 1=refinance, 2=home improvement
+
+		#weight lists for table B
+		self.table_B_weights = self.create_rate_lists(2) #lists by property type. 0 = single family, 1 = manufactured
+		for i in range(0, len(self.table_B_weights)):
+			self.table_B_weights[i] = self.create_rate_lists(3) #lien status lists 0=first lien, 1=junior lien, 2=no lien
+			for j in range(0, len(self.table_B_weights[i])):
+				self.table_B_weights[i][j] = self.create_rate_lists(3) #loan purpose lists. 0=home purchase, 1=refinance, 2=home improvement
 
 	def create_rate_lists(self, length):
 		new_list = []
 		for x in range(0, length):
 			new_list.append([])
 		return new_list
+
+
+	def table_B_mean(self, container, inputs):
+		# list nesting order: [property type][lien status][loan purpose]
+
+			for i in range(0,3): #cycle loan purpose
+				if len(self.table_B_rates[0][0][i]) >0:
+					#single family
+					container['singlefamily'][0]['pricinginformation'][2]['purposes'][i]['firstliencount'] = round(numpy.mean(numpy.array(self.table_B_rates[0][0][i])),2) #mean for first liens
+					container['singlefamily'][0]['pricinginformation'][3]['purposes'][i]['firstliencount'] = round(numpy.median(numpy.array(self.table_B_rates[0][0][i])),2) #median for first liens
+
+				if len(self.table_B_rates[0][1][i]) >0:
+					container['singlefamily'][0]['pricinginformation'][2]['purposes'][i]['juniorliencount'] = round(numpy.mean(numpy.array(self.table_B_rates[0][1][i])),2) #mean for first liens
+					container['singlefamily'][0]['pricinginformation'][3]['purposes'][i]['juniorliencount'] = round(numpy.median(numpy.array(self.table_B_rates[0][1][i])),2) #median for first liens
+
+				if len(self.table_B_rates[1][0][i]) >0:
+					#manufactured
+					container['manufactured'][0]['pricinginformation'][2]['purposes'][i]['firstliencount'] = round(numpy.mean(numpy.array(self.table_B_rates[1][0][i])),2) #mean for junior liens
+					container['manufactured'][0]['pricinginformation'][3]['purposes'][i]['firstliencount'] = round(numpy.median(numpy.array(self.table_B_rates[1][0][i])),2) #median for junior liens
+				if len(self.table_B_rates[1][1][i]) >0:
+					container['manufactured'][0]['pricinginformation'][2]['purposes'][i]['juniorliencount'] = round(numpy.mean(numpy.array(self.table_B_rates[1][1][i])),2) #mean for junior liens
+					container['manufactured'][0]['pricinginformation'][3]['purposes'][i]['juniorliencount'] = round(numpy.median(numpy.array(self.table_B_rates[1][1][i])),2) #median for junior liens
+		#self.container['singlefamily'][0][2] #median
+		#round(numpy.median(numpy.array(inputs[self.purchaser_first_lien_rates[n]])),2) #for normal median
+
+	def fill_rates_B(self, inputs):
+		property_type = inputs['property type'] -1
+		lien_status = inputs['lien status'] -1
+
+		if inputs['rate spread'] != 'NA   ' and inputs['rate spread'] != '     ':
+			#first list 'property type', second list 'lien status', third list 'loan purpose'
+			self.table_B_rates[property_type][lien_status][inputs['loan purpose']].append(Decimal(inputs['rate spread']))
 
 	def fill_weighted_medians_11_12(self, container, inputs):
 		#strings need to be converted to floats for external data requests
@@ -1772,6 +1995,7 @@ class aggregate(AD_report): #aggregates LAR rows by appropriate characteristics 
 			self.ethnicity_rate_list[inputs['ethnicity']].append(Decimal(inputs['rate spread']))
 			if inputs['minority status'] < 2:
 				self.minority_rate_list[inputs['minority status']].append(Decimal(inputs['rate spread']))
+				print type(inputs['rate spread'])
 			if inputs['income bracket'] < 6:
 				self.income_rate_list[inputs['income bracket']].append(Decimal(inputs['rate spread']))
 			self.gender_rate_list[inputs['gender']].append(Decimal(inputs['rate spread']))
@@ -1847,3 +2071,92 @@ class aggregate(AD_report): #aggregates LAR rows by appropriate characteristics 
 		self.calc_median_11_12(table_X, build_X.gender_names2, 'borrowercharacteristics', 4, 'genders', self.gender_rate_list)
 		self.calc_median_11_12(table_X, build_X.tract_pct_minority, 'censuscharacteristics', 0, 'compositions', self.composition_rate_list)
 		self.calc_median_11_12(table_X, build_X.income_bracket_names, 'censuscharacteristics', 1, 'incomes', self.tract_income_rate_list)
+
+	def build_reportAx(self, container, inputs):
+		if inputs['action taken index'] < 8:
+			if inputs['lien status'] == '1':
+				#if inputs['action taken index'] == 5:
+					#print inputs['action taken index'], inputs['loan purpose'], inputs['loan type']
+				container['dispositions'][0]['loantypes'][inputs['loan type']]['purposes'][inputs['loan purpose']]['firstliencount'] +=1
+				container['dispositions'][inputs['action taken index']]['loantypes'][inputs['loan type']]['purposes'][inputs['loan purpose']]['firstliencount']+=1
+				if inputs['purchaser'] >0:
+					container['dispositions'][7]['loantypes'][inputs['loan type']]['purposes'][inputs['loan purpose']]['firstliencount'] +=1
+				if inputs['action taken index'] == 1 and inputs['preapproval'] == '1':
+					container['dispositions'][6]['loantypes'][inputs['loan type']]['purposes'][inputs['loan purpose']]['firstliencount'] +=1
+
+			elif inputs['lien status'] == '2':
+				container['dispositions'][0]['loantypes'][inputs['loan type']]['purposes'][inputs['loan purpose']]['juniorliencount'] +=1
+				container['dispositions'][inputs['action taken index']]['loantypes'][inputs['loan type']]['purposes'][inputs['loan purpose']]['juniorliencount']+=1
+				if inputs['purchaser'] >0:
+					container['dispositions'][7]['loantypes'][inputs['loan type']]['purposes'][inputs['loan purpose']]['juniorliencount'] +=1
+				if inputs['action taken index'] == 1 and inputs['preapproval'] == '1':
+					container['dispositions'][6]['loantypes'][inputs['loan type']]['purposes'][inputs['loan purpose']]['juniorliencount'] +=1
+			elif inputs['lien status'] == '3':
+				container['dispositions'][0]['loantypes'][inputs['loan type']]['purposes'][inputs['loan purpose']]['noliencount'] +=1
+				container['dispositions'][inputs['action taken index']]['loantypes'][inputs['loan type']]['purposes'][inputs['loan purpose']]['noliencount']+=1
+				if inputs['purchaser'] >0:
+					container['dispositions'][7]['loantypes'][inputs['loan type']]['purposes'][inputs['loan purpose']]['noliencount'] +=1
+				if inputs['action taken index'] == 1 and inputs['preapproval'] == '1':
+					container['dispositions'][6]['loantypes'][inputs['loan type']]['purposes'][inputs['loan purpose']]['noliencount'] +=1
+	def build_reportA4(self, container, inputs):
+
+		if inputs['preapproval'] == '1' and inputs['action taken'] == '1':
+			self.by_characteristics(container, inputs, 'borrowercharacteristics', 0, 'races', inputs['race'], 'preapprovalstatuses', 0)
+			self.by_characteristics(container, inputs, 'borrowercharacteristics', 1, 'ethnicities', inputs['ethnicity'], 'preapprovalstatuses', 0)
+			if inputs['minority status'] < 2:
+	 			self.by_characteristics(container, inputs, 'borrowercharacteristics', 2, 'minoritystatuses', inputs['minority status'], 'preapprovalstatuses', 0)
+			if inputs['income bracket'] < 6:
+				self.by_characteristics(container, inputs, 'borrowercharacteristics', 3, 'incomes', inputs['income bracket'], 'preapprovalstatuses',0)
+			self.by_characteristics(container, inputs, 'borrowercharacteristics', 4, 'genders', inputs['gender'], 'preapprovalstatuses', 0)
+			self.by_characteristics(container, inputs, 'censuscharacteristics', 0, 'compositions', inputs['minority percent index'], 'preapprovalstatuses', 0)
+			self.by_characteristics(container, inputs, 'censuscharacteristics', 1, 'incomes', inputs['tract income index'], 'preapprovalstatuses', 0)
+		#fill NAs for MSA level reports
+		for i in range(1, 3):
+			self.by_characteristics_NA(container, inputs, 'borrowercharacteristics', 0, 'races', inputs['race'], 'preapprovalstatuses', i)
+			self.by_characteristics_NA(container, inputs, 'borrowercharacteristics', 1, 'ethnicities', inputs['ethnicity'], 'preapprovalstatuses', i)
+			if inputs['minority status'] < 2:
+	 			self.by_characteristics_NA(container, inputs, 'borrowercharacteristics', 2, 'minoritystatuses', inputs['minority status'], 'preapprovalstatuses', i)
+			if inputs['income bracket'] < 6:
+				self.by_characteristics_NA(container, inputs, 'borrowercharacteristics', 3, 'incomes', inputs['income bracket'], 'preapprovalstatuses', i)
+			self.by_characteristics_NA(container, inputs, 'borrowercharacteristics', 4, 'genders', inputs['gender'], 'preapprovalstatuses', i)
+			self.by_characteristics_NA(container, inputs, 'censuscharacteristics', 0, 'compositions', inputs['minority percent index'], 'preapprovalstatuses', i)
+			if inputs['tract income index'] < 4:
+				self.by_characteristics_NA(container, inputs, 'censuscharacteristics', 1, 'incomes', inputs['tract income index'], 'preapprovalstatuses', i)
+
+	def by_characteristics_NA(self, container, inputs, section, section_index, key, key_index, section2, section2_index):
+		container[section][section_index][key][key_index][section2][section2_index]['count'] = 'NA'
+		container[section][section_index][key][key_index][section2][section2_index]['value'] = 'NA'
+
+	def build_reportB(self, container, inputs):
+		self.fill_rates_B(inputs)
+		table_b_pricing = self.rate_spreads[0:2] + self.rate_spreads[-2:]
+		if inputs['lien status'] == 1 and inputs['property type'] == 1:
+			if inputs['rate spread index'] == 0:
+				container['singlefamily'][0]['pricinginformation'][0]['purposes'][inputs['loan purpose']]['firstliencount'] += 1
+			if inputs['rate spread index'] > 0:
+				container['singlefamily'][0]['pricinginformation'][1]['purposes'][inputs['loan purpose']]['firstliencount'] += 1
+
+			container['singlefamily'][1]['pricinginformation'][inputs['hoepa flag']-1]['purposes'][inputs['loan purpose']]['firstliencount'] += 1
+
+		if inputs['lien status'] == 2 and inputs['property type'] == 1:
+			if inputs['rate spread index'] == 0:
+				container['singlefamily'][0]['pricinginformation'][0]['purposes'][inputs['loan purpose']]['juniorliencount'] += 1
+			if inputs['rate spread index'] > 0:
+				container['singlefamily'][0]['pricinginformation'][1]['purposes'][inputs['loan purpose']]['juniorliencount'] += 1
+			container['singlefamily'][1]['pricinginformation'][inputs['hoepa flag']-1]['purposes'][inputs['loan purpose']]['juniorliencount'] += 1
+		#aggregate manufactured loans
+		if inputs['lien status'] == 1 and inputs['property type'] == 2:
+			if inputs['rate spread index'] == 0:
+				container['manufactured'][0]['pricinginformation'][0]['purposes'][inputs['loan purpose']]['firstliencount'] += 1
+			if inputs['rate spread index'] > 0:
+				container['manufactured'][0]['pricinginformation'][1]['purposes'][inputs['loan purpose']]['firstliencount'] += 1
+			container['manufactured'][1]['pricinginformation'][inputs['hoepa flag']-1]['purposes'][inputs['loan purpose']]['firstliencount'] += 1
+
+		if inputs['lien status'] == 2 and inputs['property type'] == 2:
+			if inputs['rate spread index'] == 0:
+				container['manufactured'][0]['pricinginformation'][0]['purposes'][inputs['loan purpose']]['juniorliencount'] += 1
+			if inputs['rate spread index'] > 0:
+				container['manufactured'][0]['pricinginformation'][1]['purposes'][inputs['loan purpose']]['juniorliencount'] += 1
+
+			container['manufactured'][1]['pricinginformation'][inputs['hoepa flag']-1]['purposes'][inputs['loan purpose']]['juniorliencount'] += 1
+
