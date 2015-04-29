@@ -291,8 +291,8 @@ class parse_inputs(AD_report):
 		self.inputs['minority status'] = demo.set_minority_status(self.inputs) #requires non white flags be set prior to running set_minority_status
 		self.inputs['gender'] = demo.set_gender(self.inputs)
 		self.inputs['denial_list'] = self.denial_reasons_list(self.inputs['denial reason1'], self.inputs['denial reason2'], self.inputs['denial reason3'])
-		print row['denialreason1'], row['denialreason2'], row['denialreason3'], 'blurp'
-		print self.inputs['denial_list'], self.inputs['race'], self.inputs['ethnicity']
+		#print row['denialreason1'], row['denialreason2'], row['denialreason3'], 'blurp'
+		#print self.inputs['denial_list'], self.inputs['race'], self.inputs['ethnicity']
 
 	def adjust_denial_index(self, reason):
 		if reason != ' ':
@@ -1176,31 +1176,31 @@ class build_JSON(AD_report):
 
 	def set_gender_disps(self):
 		for i in range(0, len(self.race_names)):
-			for g in range(0, len(self.gender_list)):
+			for g in range(0, len(self.gender_names)):
 				self.container['races'][i]['genders'][g]['dispositions'] = self.set_list(self.end_points, self.dispositions_list, 'disposition', True)
 		for i in range(0, len(self.ethnicity_names)):
-			for g in range(0, len(self.gender_list)):
+			for g in range(0, len(self.gender_names)):
 				self.container['ethnicities'][i]['genders'][g]['dispositions'] = self.set_list(self.end_points, self.dispositions_list, 'disposition', True)
 		for i in range(0, len(self.minority_statuses)):
-			for g in range(0, len(self.gender_list)):
+			for g in range(0, len(self.gender_names)):
 				self.container['minoritystatuses'][i]['genders'][g]['dispositions'] = self.set_list(self.end_points, self.dispositions_list, 'disposition', True)
 	def set_4x_races(self):
 		self.container['races'] = self.set_list(self.end_points, self.race_names, 'race', False)
 		for i in range(0,len(self.container['races'])):
 			self.container['races'][i]['dispositions'] = self.set_list(self.end_points, self.dispositions_list, 'disposition', True)
-			self.container['races'][i]['genders'] = self.set_list(self.end_points, self.gender_list, 'gender', False)
+			self.container['races'][i]['genders'] = self.set_list(self.end_points, self.gender_names, 'gender', False)
 
 	def set_4x_ethnicity(self):
 		self.container['ethnicities'] = self.set_list(self.end_points, self.ethnicity_names, 'ethnicity', False)
 		for i in range(0, len(self.container['ethnicities'])):
 			self.container['ethnicities'][i]['dispositions'] = self.set_list(self.end_points, self.dispositions_list, 'disposition', True)
-			self.container['ethnicities'][i]['genders'] = self.set_list(self.end_points, self.gender_list, 'gender', False)
+			self.container['ethnicities'][i]['genders'] = self.set_list(self.end_points, self.gender_names, 'gender', False)
 
 	def set_4x_minority(self):
 		self.container['minoritystatuses'] = self.set_list(self.end_points, self.minority_statuses, 'minoritystatus', False)
 		for i in range(0, len(self.container['minoritystatuses'])):
 			self.container['minoritystatuses'][i]['dispositions'] = self.set_list(self.end_points, self.dispositions_list, 'disposition', True)
-			self.container['minoritystatuses'][i]['genders'] = self.set_list(self.end_points, self.gender_list, 'gender', False)
+			self.container['minoritystatuses'][i]['genders'] = self.set_list(self.end_points, self.gender_names, 'gender', False)
 
 	def set_4x_incomes(self):
 		self.container['incomes'] = self.set_list(self.end_points, self.applicant_income_bracket, 'income', False)
