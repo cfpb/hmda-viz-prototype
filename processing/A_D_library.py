@@ -316,8 +316,34 @@ class parse_inputs(AD_report):
 		self.inputs['action taken'] = int(row['actiontype']) #disposition of the loan application
 		self.inputs['property type'] = row['propertytype']
 		self.inputs['loan purpose'] = row['loanpurpose']
-		self.inputs['loan type'] = row['loantype']
-		#self.inputs['median age']
+		self.inputs['loan value'] = row['loanamount']
+		self.inputs['occupancy'] = row['occupancy']
+		self.inputs['tract number'] = row['censustractnumber']
+		#self.inputs['loan type'] = int(row['loantype'])
+		#print row['statecode'] + row['countycode']+ row['censustractnumber']
+		if self.inputs['census tract'] != 'NA     ':
+			self.inputs['median age'] = self.tract_median_ages[row['statecode']+row['countycode']+row['censustractnumber']] #passes state/county/tract to a dict to get age
+		self.inputs['loan type index'] = self.set_loan_index(int(row['loantype']), row['loanpurpose'], row['propertytype'])
+		self.inputs['median age index'] = self.median_age_index(self.inputs['median age'])
+
+	def set_loan_index(self, loan_type, loan_purpose, property_type):
+		if loan_purpose == '1' and property_type != '3':
+			if loan_type == 1:
+				return 1
+			elif loan_type == 2:
+				return 0
+			elif loan_type == 3:
+				return 0
+			elif loan_type == 4:
+				return 0
+		elif loan_purpose == '3' and property_type != '3':
+			return 2
+		elif loan_purpose == '2' and property_type != '3':
+			return 3
+		elif property_type == '3':
+			return 4
+
+
 	def median_tract_age(self, cur, MSA): #, state, county, tract
 		#calls the HMDA database and returns a distinct list of tracts for an MSA
 		#queries Census API to get median housing age for each tract
@@ -327,33 +353,51 @@ class parse_inputs(AD_report):
 		state_string = '''SELECT DISTINCT(statecode) FROM hmdapub2013 WHERE msaofproperty = '{MSA}' ;'''
 		tract_string = '''SELECT DISTINCT(censustractnumber) FROM hmdapub2013 WHERE countycode = '{county}' and msaofproperty = '{MSA}' ;'''
 		county_string = '''SELECT DISTINCT(countycode) FROM hmdapub2013 WHERE statecode = '{statecode}' and msaofproperty = '{MSA}' ;'''
-
 		state_SQL = state_string.format(MSA = MSA)
-		cur.execute(state_SQL,)
-		states = cur.fetchall()[0]
-		print states
-		for state in states:
-			county_SQL = county_string.format(MSA = MSA, statecode = state)
-			cur.execute(county_SQL, MSA)
-			counties = cur.fetchall()[0] #counties is a list
-			print counties
-			for county in counties:
-				tract_SQL = tract_string.format(county = county, MSA = MSA)
-				cur.execute(tract_SQL,)
 
-				tract_list= cur.fetchall()
-				#print len(tract_list)
-				for i in range(0, len(tract_list)):
-					#print tract_list[i][0][:-3] + tract_list[i][0][5:]
-					tract = tract_list[i][0].replace('.', '')
-					tract_age = self.age_API.get_age(state, county, tract)
-					#print int(tract_age.strip('"'))
-					self.tract_median_ages[state+county+tract_list[i][0]] = int(tract_age.strip('"'))
-		print self.tract_median_ages
+		cur.execute(state_SQL,)
+		#print MSA, #len(cur.fetchall())
+		test = cur.fetchall()
+		if len(test) > 0:
+		#try
+			state_list = test
+
+		#states = cur.fetchall()[0]
+			print state_list, "state list"
+			for j in range(0, len(state_list)):
+				state = state_list[j][0]
+				county_SQL = county_string.format(MSA = MSA, statecode = state)
+				cur.execute(county_SQL, MSA)
+
+				county_list= cur.fetchall() #counties is a list
+				print 'county list\n', county_list
+				for k in range(0, len(county_list)):
+					county = county_list[k][0]
+					tract_SQL = tract_string.format(county = county, MSA = MSA)
+					cur.execute(tract_SQL,)
+
+					tract_list= cur.fetchall()
+					print tract_list
+					for i in range(0, len(tract_list)):
+						#print tract_list[i][0][:-3] + tract_list[i][0][5:]
+						tract = tract_list[i][0].replace('.', '')
+						if tract == 'NA     ':
+							pass
+						else:
+							tract_age = self.age_API.get_age(state, county, tract)
+							#print int(tract_age.strip('"'))
+							print state+county+tract_list[i][0], tract_age
+							if tract_age != 'null':
+								self.tract_median_ages[state+county+tract_list[i][0]] = int(tract_age.strip('"'))
+							else:
+								self.tract_median_ages[state+county+tract_list[i][0]] = tract_age.strip('"')
+		else:
+			print "no states in '{MSA}' for selected HMDA year".format(MSA = MSA)
+		#except IndexError:
+		#	print cur.fetchall(), "index error problem with '{MSA}' ".format(MSA = MSA)
+		#print self.tract_median_ages
 					#print state + county+tract_list[i][0]
 
-		#SQL = (self.queries.SQL_Query + conditions).format(columns=columns, year=self.year, MSA=MSA)
-		#self.SQL_Count = '''SELECT COUNT(msaofproperty) FROM hmdapub{year} WHERE msaofproperty = '{MSA}' '''
 	def median_age_index(self, year):
 		#are new buckets added every 10 years?
 		#what will the unavailable index require?
@@ -368,7 +412,7 @@ class parse_inputs(AD_report):
 		elif year <= 2010:
 			return 0
 		else:
-			print "no match found"
+			print "no median age found for tract"
 			return 5
 
 	def parse_t11x(self, row):
@@ -1244,7 +1288,7 @@ class build_JSON(AD_report):
 				self.container['medianages'][i]['loancategories'] = self.set_list(self.end_points, loan_category, 'loancategory', False)
 			for i in range(0, len(self.container['medianages'])):
 				for j in range(0, len(self.container['medianages'][i]['loancategories'])):
-					self.container['medianages'][i]['loancategories'][j]['dispositions'] = self.set_list(self.end_points, self.dispositions_list[:6], 'disposition', True)
+					self.container['medianages'][i]['loancategories'][j]['dispositions'] = self.set_list(self.end_points, self.dispositions_list[1:6], 'disposition', True)
 			return self.container
 
 	def table_11x_characteristics(self, characteristic, list_header, item_list, item_name, layer_2_key, layer_2_name, layer_2_list):
@@ -1581,7 +1625,7 @@ class queries(AD_report):
 
 	def table_9_columns(self):
 		return '''loantype, loanpurpose, propertytype, actiontype, asofdate, censustractnumber, statecode, statename,
-			msaofproperty, countyname, countycode'''
+			msaofproperty, countyname, countycode, occupancy, loanamount'''
 
 	def table_11_x_columns(self):
 		return '''applicantrace1, applicantrace2, applicantrace3, applicantrace4, applicantrace5,
@@ -2234,5 +2278,17 @@ class aggregate(AD_report): #aggregates LAR rows by appropriate characteristics 
 
 			container['manufactured'][1]['pricinginformation'][inputs['hoepa flag']-1]['purposes'][inputs['loan purpose']]['juniorliencount'] += 1
 
+
 	def build_report9x(self, container, inputs):
-		pass
+		#if inputs['property type'] == '3':
+		#	print inputs['action taken'], inputs['loan type index'], inputs['loan value'], inputs['tract number'], inputs['median age index']
+
+		container['medianages'][inputs['median age index']]['loancategories'][inputs['loan type index']]['dispositions'][inputs['action taken']-1]['count'] += 1
+		container['medianages'][inputs['median age index']]['loancategories'][inputs['loan type index']]['dispositions'][inputs['action taken']-1]['value'] += int(inputs['loan value'])
+
+		if inputs['occupancy'] == '2' and inputs['property type'] != '3':
+			container['medianages'][inputs['median age index']]['loancategories'][5]['dispositions'][inputs['action taken']-1]['count'] += 1
+			container['medianages'][inputs['median age index']]['loancategories'][5]['dispositions'][inputs['action taken']-1]['value'] += int(inputs['loan value'])
+		if inputs['property type'] == '2':
+			container['medianages'][inputs['median age index']]['loancategories'][6]['dispositions'][inputs['action taken']-1]['count'] += 1
+			container['medianages'][inputs['median age index']]['loancategories'][6]['dispositions'][inputs['action taken']-1]['value'] += int(inputs['loan value'])
