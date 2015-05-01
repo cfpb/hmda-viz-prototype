@@ -31,8 +31,8 @@ class median_age_API(A_D_report):
 		#r = requests.get('http://api.census.gov/data/2013/acs5?get=NAME,'+field+'&for=tract:'+tract+'&in=state:'+state+'+county:'+county+'&key='+api_key)
 		#print(r.url)
 		median_list =  r.text
-		print tract, state, county
-		print median_list
+		#print tract, state, county
+		#print median_list
 		#print median_list
 		return_list = median_list.split(',')
 		#print return_list

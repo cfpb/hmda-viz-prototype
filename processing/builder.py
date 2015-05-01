@@ -1,17 +1,9 @@
-#this file holds the classes used to create the A&D reports using the HMDA LAR files combined with Census demographic information
-import datetime as foo
-import numpy
-import weighted
-import psycopg2
-import psycopg2.extras
 from collections import OrderedDict
 import json
 import os
-import csv
-class AD_report(object): #parent class for A&D report library
-	pass
+import datetime as foo
 
-class build_JSON(AD_report):
+class build_JSON(object):
 
 	def __init__(self):
 		self.container = OrderedDict({}) #master container for the JSON structure
@@ -53,7 +45,6 @@ class build_JSON(AD_report):
 		SQL2 = '''SELECT DISTINCT name, geoid_metdiv
 			FROM tract_to_cbsa_2010
 			WHERE geoid_metdiv != '          ' and state = %s;'''
-		#state_list = ['WA', 'WI', 'WV', 'FL', 'WY', 'NH', 'NJ', 'NM', 'NC', 'ND', 'NE', 'NY', 'RI', 'NV', 'CO', 'CA', 'GA', 'CT', 'OK', 'OH', 'KS', 'SC', 'KY', 'OR', 'SD', 'DE', 'HI', 'PR', 'TX', 'LA', 'TN', 'PA', 'VA', 'VI', 'AK', 'AL', 'AR', 'VT', 'IL', 'IN', 'IA', 'AZ', 'ID', 'ME', 'MD', 'MA', 'UT', 'MO', 'MN', 'MI', 'MT', 'MS']
 
 		for state, code in self.state_codes.iteritems():
 
@@ -84,8 +75,8 @@ class build_JSON(AD_report):
 			self.state_msa_list[state] = state_holding
 			state_msas['msa-mds'] = msas
 			name = 'msa-mds-all.json'
-			#this year path uses the year from the input file
 
+			#this year path uses the year from the input file
 			path = '../'+report_type+"/"+selector.report_list['year'][1]+"/"+self.state_names[state].replace(' ', '-').lower()
 			print path #change this to a log file write
 			if not os.path.exists(path): #check if path exists
@@ -223,7 +214,7 @@ class build_JSON(AD_report):
 			return 'Disposition of applications and loan sales by loan type, multifamily housing'
 		elif table_num == 'A4':
 			return 'Disposition of preapprovals for conventional home-purchase loans, first lien, 1- to 4-family dwellings (excludes manufactured homes), by borrower or census tract characteristics'
-		elif tabe_num == 'B':
+		elif table_num == 'B':
 			return 'Loan pricing information for conventional loans by incidence and level'
 
 	def set_header(self, inputs, MSA, table_type, table_num): #sets the header information of the JSON object
@@ -244,32 +235,6 @@ class build_JSON(AD_report):
 		self.container['msa'] = self.msa
 		return self.container
 
-	def table_8x_builder(self):
-		holding = OrderedDict({})
-		self.container['applicantcharacteristics'] = []
-		holding = self.table_8_helper('Races', 'race', self.race_names)
-		self.container['applicantcharacteristics'].append(holding)
-		holding = self.table_8_helper('Ethnicities', 'ethnicity', self.ethnicity_names)
-		self.container['applicantcharacteristics'].append(holding)
-		holding = self.table_8_helper('Minority Status', 'minoritystatus', self.minority_statuses)
-		self.container['applicantcharacteristics'].append(holding)
-		holding = self.table_8_helper('Genders', 'gender', self.gender_names2)
-		self.container['applicantcharacteristics'].append(holding)
-		holding = self.table_8_helper('Incomes', 'income', self.applicant_income_bracket)
-		self.container['applicantcharacteristics'].append(holding)
-		return self.container
-
-	def table_8_helper(self, key, key_singular, row_list):
-		temp = OrderedDict({})
-		temp['characteristic'] = key_singular
-		if key == 'Minority Status':
-			key = 'minoritystatuses'
-		temp[key.lower()] = self.set_list(self.end_points, row_list, key_singular, False)
-
-		for i in range(0, len(temp[key.lower()])):
-			temp[key.lower()][i]['denialreasons'] = self.set_list(self.end_points, self.denial_reasons, 'denialreason', True)
-		return temp
-
 	def table_helper(self, characteristic_key, characteristic, row_list, key, key_singular, end_key, end_key_singular, end_point_list, end_bool1, end_bool2):
 		temp = OrderedDict({})
 		temp[characteristic_key] = characteristic
@@ -278,51 +243,139 @@ class build_JSON(AD_report):
 			temp[key][i][end_key] = self.set_list(self.end_points, end_point_list, end_key_singular, end_bool2)
 		return temp
 
-	def table_7x_builder(self):
-		self.container['censuscharacteristics'] = []
+	def set_list(self, end_points, key_list, key_name, ends_bool):
+		holding_list = []
+		for item in key_list:
+			holding_dict = OrderedDict({})
+			holding_dict[key_name] = "{}".format(item)
+			if ends_bool == True:
+				for point in end_points:
+					holding_dict[point] = 0
+			holding_list.append(holding_dict)
+		return holding_list
 
+	def print_JSON(self): #prints a json object to the terminal
+		import json
+		print json.dumps(self.container, indent=4)
+
+	def write_JSON(self, name, data, path): #writes a json object to file
+		with open(os.path.join(path, name), 'w') as outfile: #writes the JSON structure to a file for the path named by report's header structure
+			json.dump(data, outfile, indent=4, ensure_ascii = False)
+
+	def set_purchasers_NA(self, holding_list):
+		purchasers = []
+		for item in self.purchaser_names:
+			purchasersholding = OrderedDict({})
+			purchasersholding['name'] = "{}".format(item)
+			for item in holding_list: #pass in the appropriate holding list for each set_purchasers call
+				if item == 'juniorliencount' or item == 'juniorlienvalue':
+					purchasersholding[item] = 'NA'
+				else:
+					purchasersholding[item] = 0
+			purchasers.append(purchasersholding)
+		return purchasers
+
+	def set_gender_disps(self):
+		for i in range(0, len(self.race_names)):
+			for g in range(0, len(self.gender_names)):
+				self.container['races'][i]['genders'][g]['dispositions'] = self.set_list(self.end_points, self.dispositions_list, 'disposition', True)
+		for i in range(0, len(self.ethnicity_names)):
+			for g in range(0, len(self.gender_names)):
+				self.container['ethnicities'][i]['genders'][g]['dispositions'] = self.set_list(self.end_points, self.dispositions_list, 'disposition', True)
+		for i in range(0, len(self.minority_statuses)):
+			for g in range(0, len(self.gender_names)):
+				self.container['minoritystatuses'][i]['genders'][g]['dispositions'] = self.set_list(self.end_points, self.dispositions_list, 'disposition', True)
+
+	def table_31_builder(self): #assembles all components of the 3-1 JSON object, appends totals section
+		borrowercharacteristics = []
+		censuscharacteristics = []
+		borrowercharacteristics.append(self.table_31_characteristics('Race', 'races', self.race_names))
+		borrowercharacteristics.append(self.table_31_characteristics('Ethnicity', 'ethnicities', self.ethnicity_names))
+		borrowercharacteristics.append(self.table_31_characteristics('Minority Status', 'minoritystatuses', self.minority_statuses))
+		borrowercharacteristics.append(self.table_31_characteristics('Applicant Income', 'applicantincomes', self.applicant_income_bracket))
+		censuscharacteristics.append(self.table_31_characteristics('Racial/Ethnic Composition', 'tractpctminorities', self.tract_pct_minority))
+		censuscharacteristics.append(self.table_31_characteristics('Income', 'incomelevels', self.tract_income))
+		self.container['borrowercharacteristics'] = borrowercharacteristics
+		self.container['censuscharacteristics'] = censuscharacteristics
+		totals = {} #totals sums all the loan counts and values for each purchaser
+		top = OrderedDict({})
 		holding = OrderedDict({})
-		'''
-		holding['characteristic'] = 'Racial/Ethnic Composition'
-		holding['compositions'] = self.set_list(self.end_points, self.tract_pct_minority, 'composition', False)
+		totals['purchasers'] = self.set_list(self.end_points, self.purchaser_names, 'name', True)
+		self.container['total'] = totals
+		return self.container
 
+	def table_31_characteristics(self, characteristic, container_name, item_list): #builds the borrower characteristics section of the report 3-1 JSON
+		container = {'ethnicities':'ethnicity', 'minoritystatuses':'minoritystatus', 'races':'race', 'applicantincomes':'applicantincome', 'incomelevels':'incomelevel', 'tractpctminorities':'tractpctminority'}
+		top = OrderedDict({})
+		top['characteristic'] = characteristic
+		top[container_name] = []
+		for item in item_list:
+			holding = OrderedDict({})
+			holding[container[container_name]] = "{}".format(item)
+			holding['purchasers'] = self.set_list(self.end_points, self.purchaser_names, 'name', True)
+			top[container_name].append(holding)
+		return top
 
-		for i in range(0, len(holding['compositions'])):
-			holding['compositions'][i]['dispositions'] = self.set_list(self.end_points, self.dispositions_list, 'disposition', True)
-		'''
-		holding = self.table_helper('characteristic', 'Racial/Ethnic Composition', self.tract_pct_minority, 'compositions','compositions', 'dispositions', 'disposition', self.dispositions_list, False, True)
-		self.container['censuscharacteristics'].append(holding)
-
+	def table_32_builder(self): #builds the JSON structure for report 3-2
+		pricinginformation = []
+		categories = ['No reported pricing data', 'reported pricing data']
+		for cat in categories:
+			holding = OrderedDict({})
+			holding['pricing']= "{}".format(cat)
+			holding['purchasers']  = self.set_list(['firstliencount', 'firstlienvalue', 'juniorliencount', 'juniorlienvalue'], self.purchaser_names, 'name', True)
+			pricinginformation.append(holding)
+		self.container['pricinginformation'] = pricinginformation
 		holding = OrderedDict({})
-		holding['characteristic'] = 'Income Characteristics'
-		holding['incomes'] = self.set_list(self.end_points, self.tract_income, 'income', False)
-		for i in range(0, len(holding['incomes'])):
-			holding['incomes'][i]['dispositions'] = self.set_list(self.end_points, self.dispositions_list, 'disposition', True)
+		points = self.build_rate_spreads()
+		self.container['points'] = points
+		hoepa = OrderedDict({})
+		hoepa['pricing'] = 'hoepa loans'
+		hoepa['purchasers'] = self.set_list(['firstliencount', 'firstlienvalue', 'juniorliencount', 'juniorlienvalue'], self.purchaser_names, 'name', True)
+		self.container['hoepa'] = hoepa
+		return self.container
 
-		self.container['censuscharacteristics'].append(holding)
+	def build_rate_spreads(self): #builds the rate spreads section of the report 3-2 JSON
+		spreads = []
+		for rate in self.table32_rates:
+			holding = OrderedDict({})
+			holding['point'] = "{}".format(rate)
+			if self.table32_rates.index(rate) < 4:
+				holding['purchasers'] = self.set_purchasers_NA(['firstliencount', 'firstlienvalue', 'juniorliencount', 'juniorlienvalue'])
+			else:
+				holding['purchasers'] = self.set_list(['firstliencount', 'firstlienvalue', 'juniorliencount', 'juniorlienvalue'], self.purchaser_names, 'name', True)
+			spreads.append(holding)
+		return spreads
 
-		extra_level = []
-		holding = OrderedDict({})
-		holding['characteristic'] = 'Income & Racial/Ethnic Composition'
-		holding['incomes'] = self.set_list(self.end_points, self.tract_income, 'income', False)
-		for i in range(0, len(holding['incomes'])):
-			holding['incomes'][i]['compositions'] = self.set_list(self.end_points, self.tract_pct_minority, 'composition', False)
-			for j in range(0, len(holding['incomes'][i]['compositions'])):
-				holding['incomes'][i]['compositions'][j]['dispositions'] = self.set_list(self.end_points, self.dispositions_list, 'disposition', True)
-		extra_level.append(holding)
-		self.container['incomeRaces'] = extra_level
+	def set_4x_races(self):
+		self.container['races'] = self.set_list(self.end_points, self.race_names, 'race', False)
+		for i in range(0,len(self.container['races'])):
+			self.container['races'][i]['dispositions'] = self.set_list(self.end_points, self.dispositions_list, 'disposition', True)
+			self.container['races'][i]['genders'] = self.set_list(self.end_points, self.gender_names, 'gender', False)
 
-		holding = OrderedDict({})
-		holding['type'] = 'Small County'
-		holding['dispositions'] = self.set_list(self.end_points, self.dispositions_list, 'disposition', True)
-		self.container['types'] = []
-		self.container['types'].append(holding)
+	def set_4x_ethnicity(self):
+		self.container['ethnicities'] = self.set_list(self.end_points, self.ethnicity_names, 'ethnicity', False)
+		for i in range(0, len(self.container['ethnicities'])):
+			self.container['ethnicities'][i]['dispositions'] = self.set_list(self.end_points, self.dispositions_list, 'disposition', True)
+			self.container['ethnicities'][i]['genders'] = self.set_list(self.end_points, self.gender_names, 'gender', False)
 
-		holding = OrderedDict({})
-		holding['type'] = 'All Other Tracts'
-		holding['dispositions'] = self.set_list(self.end_points, self.dispositions_list, 'disposition', True)
-		self.container['types'].append(holding)
+	def set_4x_minority(self):
+		self.container['minoritystatuses'] = self.set_list(self.end_points, self.minority_statuses, 'minoritystatus', False)
+		for i in range(0, len(self.container['minoritystatuses'])):
+			self.container['minoritystatuses'][i]['dispositions'] = self.set_list(self.end_points, self.dispositions_list, 'disposition', True)
+			self.container['minoritystatuses'][i]['genders'] = self.set_list(self.end_points, self.gender_names, 'gender', False)
+
+	def set_4x_incomes(self):
+		self.container['incomes'] = self.set_list(self.end_points, self.applicant_income_bracket, 'income', False)
+		for i in range(0, len(self.container['incomes'])):
+			self.container['incomes'][i]['dispositions'] = self.set_list(self.end_points, self.dispositions_list, 'disposition', True)
 		self.container['total'] = self.set_list(self.end_points, self.dispositions_list, 'disposition', True)
+
+	def table_4x_builder(self): #builds the table 4-1 JSON object: disposition of application by race and gender
+		self.set_4x_races()
+		self.set_4x_ethnicity()
+		self.set_4x_minority()
+		self.set_4x_incomes()
+		self.set_gender_disps()
 		return self.container
 
 	def table_5x_builder(self):
@@ -357,108 +410,84 @@ class build_JSON(AD_report):
 		self.container['total'] = self.set_list(self.end_points, self.dispositions_list, 'disposition', True)
 		return self.container
 
-	def set_gender_disps(self):
-		for i in range(0, len(self.race_names)):
-			for g in range(0, len(self.gender_list)):
-				self.container['races'][i]['genders'][g]['dispositions'] = self.set_list(self.end_points, self.dispositions_list, 'disposition', True)
-		for i in range(0, len(self.ethnicity_names)):
-			for g in range(0, len(self.gender_list)):
-				self.container['ethnicities'][i]['genders'][g]['dispositions'] = self.set_list(self.end_points, self.dispositions_list, 'disposition', True)
-		for i in range(0, len(self.minority_statuses)):
-			for g in range(0, len(self.gender_list)):
-				self.container['minoritystatuses'][i]['genders'][g]['dispositions'] = self.set_list(self.end_points, self.dispositions_list, 'disposition', True)
-	def set_4x_races(self):
-		self.container['races'] = self.set_list(self.end_points, self.race_names, 'race', False)
-		for i in range(0,len(self.container['races'])):
-			self.container['races'][i]['dispositions'] = self.set_list(self.end_points, self.dispositions_list, 'disposition', True)
-			self.container['races'][i]['genders'] = self.set_list(self.end_points, self.gender_list, 'gender', False)
+	def table_7x_builder(self):
+		self.container['censuscharacteristics'] = []
+		holding = OrderedDict({})
+		holding['characteristic'] = 'Racial/Ethnic Composition'
+		holding['compositions'] = self.set_list(self.end_points, self.tract_pct_minority, 'composition', False)
+		for i in range(0, len(holding['compositions'])):
+			holding['compositions'][i]['dispositions'] = self.set_list(self.end_points, self.dispositions_list, 'disposition', True)
+		self.container['censuscharacteristics'].append(holding)
 
-	def set_4x_ethnicity(self):
-		self.container['ethnicities'] = self.set_list(self.end_points, self.ethnicity_names, 'ethnicity', False)
-		for i in range(0, len(self.container['ethnicities'])):
-			self.container['ethnicities'][i]['dispositions'] = self.set_list(self.end_points, self.dispositions_list, 'disposition', True)
-			self.container['ethnicities'][i]['genders'] = self.set_list(self.end_points, self.gender_list, 'gender', False)
+		holding = OrderedDict({})
+		holding['characteristic'] = 'Income Characteristics'
+		holding['incomes'] = self.set_list(self.end_points, self.tract_income, 'income', False)
+		for i in range(0, len(holding['incomes'])):
+			holding['incomes'][i]['dispositions'] = self.set_list(self.end_points, self.dispositions_list, 'disposition', True)
+		self.container['censuscharacteristics'].append(holding)
 
-	def set_4x_minority(self):
-		self.container['minoritystatuses'] = self.set_list(self.end_points, self.minority_statuses, 'minoritystatus', False)
-		for i in range(0, len(self.container['minoritystatuses'])):
-			self.container['minoritystatuses'][i]['dispositions'] = self.set_list(self.end_points, self.dispositions_list, 'disposition', True)
-			self.container['minoritystatuses'][i]['genders'] = self.set_list(self.end_points, self.gender_list, 'gender', False)
+		extra_level = []
+		holding = OrderedDict({})
+		holding['characteristic'] = 'Income & Racial/Ethnic Composition'
+		holding['incomes'] = self.set_list(self.end_points, self.tract_income, 'income', False)
+		for i in range(0, len(holding['incomes'])):
+			holding['incomes'][i]['compositions'] = self.set_list(self.end_points, self.tract_pct_minority, 'composition', False)
+			for j in range(0, len(holding['incomes'][i]['compositions'])):
+				holding['incomes'][i]['compositions'][j]['dispositions'] = self.set_list(self.end_points, self.dispositions_list, 'disposition', True)
+		extra_level.append(holding)
+		self.container['incomeRaces'] = extra_level
 
-	def set_4x_incomes(self):
-		self.container['incomes'] = self.set_list(self.end_points, self.applicant_income_bracket, 'income', False)
-		for i in range(0, len(self.container['incomes'])):
-			self.container['incomes'][i]['dispositions'] = self.set_list(self.end_points, self.dispositions_list, 'disposition', True)
+		holding = OrderedDict({})
+		holding['type'] = 'Small County'
+		holding['dispositions'] = self.set_list(self.end_points, self.dispositions_list, 'disposition', True)
+		self.container['types'] = []
+		self.container['types'].append(holding)
+
+		holding = OrderedDict({})
+		holding['type'] = 'All Other Tracts'
+		holding['dispositions'] = self.set_list(self.end_points, self.dispositions_list, 'disposition', True)
+		self.container['types'].append(holding)
 		self.container['total'] = self.set_list(self.end_points, self.dispositions_list, 'disposition', True)
-
-	def table_4x_builder(self): #builds the table 4-1 JSON object: disposition of application by race and gender
-		self.set_4x_races()
-		self.set_4x_ethnicity()
-		self.set_4x_minority()
-		self.set_4x_incomes()
-		self.set_gender_disps()
 		return self.container
 
-	def set_purchasers_NA(self, holding_list):
-		purchasers = []
-		for item in self.purchaser_names:
-			purchasersholding = OrderedDict({})
-			purchasersholding['name'] = "{}".format(item)
-			for item in holding_list: #pass in the appropriate holding list for each set_purchasers call
-				if item == 'juniorliencount' or item == 'juniorlienvalue':
-					purchasersholding[item] = 'NA'
-				else:
-					purchasersholding[item] = 0
-			purchasers.append(purchasersholding)
-		return purchasers
-
-	def build_rate_spreads(self): #builds the rate spreads section of the report 3-2 JSON
-		spreads = []
-		for rate in self.table32_rates:
-			holding = OrderedDict({})
-			holding['point'] = "{}".format(rate)
-			if self.table32_rates.index(rate) < 4:
-				holding['purchasers'] = self.set_purchasers_NA(['firstliencount', 'firstlienvalue', 'juniorliencount', 'juniorlienvalue'])
-			else:
-				holding['purchasers'] = self.set_list(['firstliencount', 'firstlienvalue', 'juniorliencount', 'juniorlienvalue'], self.purchaser_names, 'name', True)
-			spreads.append(holding)
-		return spreads
-
-	def table_32_builder(self): #builds the JSON structure for report 3-2
-		pricinginformation = []
-		categories = ['No reported pricing data', 'reported pricing data']
-		for cat in categories:
-			holding = OrderedDict({})
-			holding['pricing']= "{}".format(cat)
-			holding['purchasers']  = self.set_list(['firstliencount', 'firstlienvalue', 'juniorliencount', 'juniorlienvalue'], self.purchaser_names, 'name', True)
-			pricinginformation.append(holding)
-		self.container['pricinginformation'] = pricinginformation
+	def table_8x_builder(self):
 		holding = OrderedDict({})
-		points = self.build_rate_spreads()
-		self.container['points'] = points
-		hoepa = OrderedDict({})
-		hoepa['pricing'] = 'hoepa loans'
-		hoepa['purchasers'] = self.set_list(['firstliencount', 'firstlienvalue', 'juniorliencount', 'juniorlienvalue'], self.purchaser_names, 'name', True)
-		self.container['hoepa'] = hoepa
+		self.container['applicantcharacteristics'] = []
+		holding = self.table_8_helper('Races', 'race', self.race_names)
+		self.container['applicantcharacteristics'].append(holding)
+		holding = self.table_8_helper('Ethnicities', 'ethnicity', self.ethnicity_names)
+		self.container['applicantcharacteristics'].append(holding)
+		holding = self.table_8_helper('Minority Status', 'minoritystatus', self.minority_statuses)
+		self.container['applicantcharacteristics'].append(holding)
+		holding = self.table_8_helper('Genders', 'gender', self.gender_names2)
+		self.container['applicantcharacteristics'].append(holding)
+		holding = self.table_8_helper('Incomes', 'income', self.applicant_income_bracket)
+		self.container['applicantcharacteristics'].append(holding)
 		return self.container
 
-	def table_31_builder(self): #assembles all components of the 3-1 JSON object, appends totals section
-		borrowercharacteristics = []
-		censuscharacteristics = []
-		borrowercharacteristics.append(self.table_31_characteristics('Race', 'races', self.race_names))
-		borrowercharacteristics.append(self.table_31_characteristics('Ethnicity', 'ethnicities', self.ethnicity_names))
-		borrowercharacteristics.append(self.table_31_characteristics('Minority Status', 'minoritystatuses', self.minority_statuses))
-		borrowercharacteristics.append(self.table_31_characteristics('Applicant Income', 'applicantincomes', self.applicant_income_bracket))
-		censuscharacteristics.append(self.table_31_characteristics('Racial/Ethnic Composition', 'tractpctminorities', self.tract_pct_minority))
-		censuscharacteristics.append(self.table_31_characteristics('Income', 'incomelevels', self.tract_income))
-		self.container['borrowercharacteristics'] = borrowercharacteristics
-		self.container['censuscharacteristics'] = censuscharacteristics
-		totals = {} #totals sums all the loan counts and values for each purchaser
-		top = OrderedDict({})
-		holding = OrderedDict({})
-		totals['purchasers'] = self.set_list(self.end_points, self.purchaser_names, 'name', True)
-		self.container['total'] = totals
-		return self.container
+	def table_8_helper(self, key, key_singular, row_list):
+		temp = OrderedDict({})
+		temp['characteristic'] = key_singular
+		if key == 'Minority Status':
+			key = 'minoritystatuses'
+		temp[key.lower()] = self.set_list(self.end_points, row_list, key_singular, False)
+		for i in range(0, len(temp[key.lower()])):
+			temp[key.lower()][i]['denialreasons'] = self.set_list(self.end_points, self.denial_reasons, 'denialreason', True)
+		return temp
+
+	def table_9x_builder(self):
+			age_list = ['2000 - 2010', '1990 - 1999', '1980 - 1989', '1970 - 1979', '1969 or Earlier', 'Age Unknown']
+			loan_category = ['FHA, FSA/RHS & VA', 'Conventional', 'Refinancings', 'Home Improvement Loans', 'Loans on Dwellings For 5 or More Families', 'Nonoccupant Loans from Columns A, B, C & D', 'Loans on Manufactured Home Dwellings From Columns A, B, C & D']
+			#holding = OrderedDict({})
+			self.container['characteristic'] = 'Census Tracts by Median Age of Homes'
+			self.container['medianages'] = self.set_list(self.end_points, age_list, 'medianage', False)
+
+			for i in range(0, len(self.container['medianages'])):
+				self.container['medianages'][i]['loancategories'] = self.set_list(self.end_points, loan_category, 'loancategory', False)
+			for i in range(0, len(self.container['medianages'])):
+				for j in range(0, len(self.container['medianages'][i]['loancategories'])):
+					self.container['medianages'][i]['loancategories'][j]['dispositions'] = self.set_list(self.end_points, self.dispositions_list[1:6], 'disposition', True)
+			return self.container
 
 	def table_11x_characteristics(self, characteristic, list_header, item_list, item_name, layer_2_key, layer_2_name, layer_2_list):
 		characteristic_list = []
@@ -473,18 +502,6 @@ class build_JSON(AD_report):
 		characteristic_list.append(temp)
 		return_dict = characteristic_list[0]
 		return return_dict
-
-	def table_31_characteristics(self, characteristic, container_name, item_list): #builds the borrower characteristics section of the report 3-1 JSON
-		container = {'ethnicities':'ethnicity', 'minoritystatuses':'minoritystatus', 'races':'race', 'applicantincomes':'applicantincome', 'incomelevels':'incomelevel', 'tractpctminorities':'tractpctminority'}
-		top = OrderedDict({})
-		top['characteristic'] = characteristic
-		top[container_name] = []
-		for item in item_list:
-			holding = OrderedDict({})
-			holding[container[container_name]] = "{}".format(item)
-			holding['purchasers'] = self.set_list(self.end_points, self.purchaser_names, 'name', True)
-			top[container_name].append(holding)
-		return top
 
 	def table_11x_builder(self):
 		self.table_11_12_helper('pricinginformation', 'pricing', self.rate_spreads)
@@ -526,23 +543,21 @@ class build_JSON(AD_report):
 	def table_Ax_builder(self):
 		loan_types = ['Conventional', 'FHA', 'VA', 'FSA/RHS']
 		loan_purposes = ['Home Purchase', 'Refinance', 'Home Improvement']
-		lien_statuses = ['firstliencount', 'juniorlien', 'noliencount']
-
-		self.container['dispositions'] = self.set_list(self.end_points, self.dispositions_list, 'disposition', False)
+		lien_statuses = ['firstliencount', 'juniorliencount', 'noliencount']
+		disp_list = self.dispositions_list + ['Preapprovals Resulting in Originations', 'Loans Sold']
+		self.container['dispositions'] = self.set_list(self.end_points, disp_list, 'disposition', False)
 		for i in range(0, len(self.container['dispositions'])):
 			self.container['dispositions'][i]['loantypes'] = self.set_list(self.end_points, loan_types, 'loantype', False)
 			for j in range(0, len(self.container['dispositions'][i]['loantypes'])):
-				if j+1 == len(self.container['dispositions'][i]['loantypes']):
-					self.container['dispositions'][i]['loantypes'][j]['purposes'] = self.set_list(lien_statuses, loan_purposes, 'purpose', True)
-				else:
-					self.container['dispositions'][i]['loantypes'][j]['purposes'] = self.set_list(lien_statuses[:-1], loan_purposes, 'purpose', True)
+				self.container['dispositions'][i]['loantypes'][j]['purposes'] = self.set_list(lien_statuses[:-1], loan_purposes, 'purpose', True)
+				self.container['dispositions'][i]['loantypes'][j]['purposes'][2]['noliencount'] = 0
 		return self.container
 
 	def table_B_builder(self):
 		pricing_categories = ['No pricing reported', 'Pricing reported', 'Mean (points above average prime offer rate: only includes loans with APR above the threshold)', 'Median (points above the average prime offer rate: only includes loans with APR above the threshold)']
 		hoepa_statuses = ['HOEPA loan', 'Not a HOEPA loan']
 		loan_purposes = ['Home Purchase', 'Refinance', 'Home Improvement']
-		lien_statuses = ['firstliencount', 'juniorlien', 'noliencount']
+		lien_statuses = ['firstliencount', 'juniorliencount', 'noliencount']
 
 		#self.container['singlefamily'] = self.set_list(self.end_points, ['pricinginformation', 'hoepastatuses'], 'pricinginformation', False)
 		self.container['singlefamily'] = [{'characteristic': 'Incidence of Pricing'}, {'characteristic':'HOEPA Status'}]
@@ -554,66 +569,13 @@ class build_JSON(AD_report):
 		for i in range(0, len(self.container['singlefamily'][1]['pricinginformation'])):
 			self.container['singlefamily'][1]['pricinginformation'][i]['purposes'] = self.set_list(lien_statuses, loan_purposes, 'purpose', True)
 
+		self.container['manufactured'] = [{'characteristic': 'Incidence of Pricing'}, {'characteristic':'HOEPA Status'}]
+		self.container['manufactured'][0]['pricinginformation'] = self.set_list(self.end_points, pricing_categories, 'pricing', False)
+		for i in range(0, len(self.container['manufactured'][0]['pricinginformation'])):
+			self.container['manufactured'][0]['pricinginformation'][i]['purposes'] = self.set_list(lien_statuses, loan_purposes, 'purpose', True)
+
+		self.container['manufactured'][1]['pricinginformation'] = self.set_list(self.end_points, hoepa_statuses, 'pricing', False)
+		for i in range(0, len(self.container['manufactured'][1]['pricinginformation'])):
+			self.container['manufactured'][1]['pricinginformation'][i]['purposes'] = self.set_list(lien_statuses, loan_purposes, 'purpose', True)
+
 		return self.container
-
-	def set_list(self, end_points, key_list, key_name, ends_bool):
-		holding_list = []
-		for item in key_list:
-			holding_dict = OrderedDict({})
-			holding_dict[key_name] = "{}".format(item)
-			if ends_bool == True:
-				for point in end_points:
-					holding_dict[point] = 0
-			holding_list.append(holding_dict)
-		return holding_list
-
-	def table_9x_builder(self):
-			age_list = ['2000 - 2010', '1990 - 1999', '1980 - 1989', '1970 - 1979', '1969 or Earlier', 'Age Unknown']
-			loan_category = ['FHA, FSA/RHS & VA', 'Conventional', 'Refinancings', 'Home Improvement Loans', 'Loans on Dwellings For 5 or More Families', 'Nonoccupant Loans from Columns A, B, C & D', 'Loans on Manufactured Home Dwellings From Columns A, B, C & D']
-			#holding = OrderedDict({})
-			self.container['characteristic'] = 'Census Tracts by Median Age of Homes'
-			self.container['medianages'] = self.set_list(self.end_points, age_list, 'medianage', False)
-
-			for i in range(0, len(self.container['medianages'])):
-				self.container['medianages'][i]['loancategories'] = self.set_list(self.end_points, loan_category, 'loancategory', False)
-			for i in range(0, len(self.container['medianages'])):
-				for j in range(0, len(self.container['medianages'][i]['loancategories'])):
-					self.container['medianages'][i]['loancategories'][j]['dispositions'] = self.set_list(self.end_points, self.dispositions_list[:6], 'disposition', True)
-			return self.container
-
-	def print_JSON(self): #prints a json object to the terminal
-		import json
-		print json.dumps(self.container, indent=4)
-
-	def write_JSON(self, name, data): #writes a json object to file
-		with open(name, 'w') as outfile: #writes the JSON structure to a file for the path named by report's header structure
-			json.dump(data, outfile, indent=4, ensure_ascii = False)
-
-build = build_JSON()
-#table_31 = build.table_31_builder()
-#build.print_JSON()
-#table_32 = build.table_32_builder()
-#build.print_JSON()
-#table_4x = build.table_4x_builder()
-#build.print_JSON()
-#table_5x = build.table_5x_builder()
-#build.print_JSON()
-#table_7x = build.table_7x_builder()
-#build.print_JSON()
-#table_8x = build.table_8x_builder()
-#build.print_JSON()
-#build.write_JSON('report8.json', table_8x)
-table_9x = build.table_9x_builder()
-build.print_JSON()
-#table_5x['applicantincomes'][0]['borrowercharacteristics'][0]['races'][2]['dispositions'][1]['count'] +=100
-#table_12x = build.table_12x_builder()
-#build.write_JSON('report12.json', table_12x)
-#table_Ax = build.table_Ax_builder()
-#build.print_JSON()
-#build.write_JSON('reportA1.json', table_Ax)
-#table_A4 = build.table_A4_builder()
-#build.print_JSON()
-#build.write_JSON('reportA4.json', table_A4)
-#table_B = build.table_B_builder()
-#build.write_JSON('reportAB.json', table_B)
-#build.print_JSON()

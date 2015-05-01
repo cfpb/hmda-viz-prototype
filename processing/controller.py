@@ -1,17 +1,10 @@
-import json
-import os
-import csv
+#import json
 import time
 import psycopg2
 import psycopg2.extras
-from collections import OrderedDict
-#import the parse_inputs class to store the 'inputs' dictionary
-from A_D_library import parse_inputs as parse
-from A_D_library import connect_DB as connect
-from A_D_library import build_JSON as build
-from A_D_library import aggregate as agg
-from A_D_library import queries
-from A_D_library import report_selector as selector
+from connector import connect_DB as connect
+from builder import build_JSON as build
+from selector import report_selector as selector
 from constructor import report_4x
 from file_check import check_file
 from report_list import report_list_maker
@@ -24,9 +17,11 @@ build_msa = build() #instantiate the build object for file path, jekyll files
 build_msa.msas_in_state(cur, selector, 'aggregate') #creates a list of all MSAs in each state and places the file in the state's aggregate folder
 #build_msa.msas_in_state(cur, selector, 'disclosure')#creates a list of all MSAs in each state and places the file in the state's disclosure folder
 
+#List of Alabama MSAs for test state case
 AL_MSAs = ['45180', '45980', '11500', '10760', '42460', '13820', '19460', '23460', '46740', '17980', '12220', '20020', '18980', '33860', '46260', '33660', '19300', '22840',
 '21460','10700','21640','42820','26620','22520','46220']
-#testing code
+
+#setting MSAs for reports for testing
 selector.report_list['A 3-1'] = AL_MSAs
 #selector.report_list['A 3-1'] = ['11500']
 selector.report_list['A 3-2'] = AL_MSAs
@@ -79,8 +74,10 @@ selector.report_list['A A3'] = AL_MSAs
 selector.report_list['A A4'] = AL_MSAs
 selector.report_list['A B'] = AL_MSAs
 
-#selector.report_list['A 9'] = ['13820']
+#selector.report_list['A 3-1'] = ['13820']
 #selector.report_list['A 9'] = ['33660']
+
+#report lists for testing
 #report_list = ['A 9']
 #report_list = ['A 3-2']
 #report_list = ['A 4-1', 'A 4-2', 'A 4-3', 'A 4-4', 'A 4-6', 'A 4-7']
@@ -90,23 +87,27 @@ selector.report_list['A B'] = AL_MSAs
 #report_list = ['A 11-1', 'A 11-2', 'A 11-3', 'A 11-4', 'A 11-5', 'A 11-6', 'A 11-7', 'A 11-8', 'A 11-9', 'A 11-10']
 #report_list = ['A 12-1', 'A 12-2']
 #report_list = ['A A1', 'A A2', 'A A3', 'A A4']
-#report_list = ['B']
-report_list = ['A 3-1', 'A 3-2', 'A 4-1', 'A 4-2', 'A 4-3', 'A 4-4', 'A 4-5', 'A 4-6', 'A 4-7', 'A 5-1', 'A 5-2', 'A 5-3', 'A 5-4', 'A 5-5', 'A 5-7', 'A 7-1', 'A 7-2', 'A 7-3', 'A 7-4', 'A 7-5', 'A 7-6', 'A 7-7', 'A 8-1', 'A 8-2', 'A 8-3', 'A 8-4', 'A 8-5', 'A 8-6', 'A 8-7', 'A 9', 'A 11-1', 'A 11-2', 'A 11-3', 'A 11-4', 'A 11-5', 'A 11-6', 'A 11-7', 'A 11-8', 'A 11-9', 'A 11-10', 'A 12-1', 'A 12-2', 'A A1', 'A A2', 'A A3', 'A A4', 'A B'] #this needs to be changed to read from the input file
-total_time_start = time.clock()
+report_list = ['B']
+
+#complete report list
+#report_list = ['A 3-1', 'A 3-2', 'A 4-1', 'A 4-2', 'A 4-3', 'A 4-4', 'A 4-5', 'A 4-6', 'A 4-7', 'A 5-1', 'A 5-2', 'A 5-3', 'A 5-4', 'A 5-5', 'A 5-7', 'A 7-1', 'A 7-2', 'A 7-3', 'A 7-4', 'A 7-5', 'A 7-6', 'A 7-7', 'A 8-1', 'A 8-2', 'A 8-3', 'A 8-4', 'A 8-5', 'A 8-6', 'A 8-7', 'A 9', 'A 11-1', 'A 11-2', 'A 11-3', 'A 11-4', 'A 11-5', 'A 11-6', 'A 11-7', 'A 11-8', 'A 11-9', 'A 11-10', 'A 12-1', 'A 12-2', 'A A1', 'A A2', 'A A3', 'A A4', 'A B'] #this needs to be changed to read from the input file
+
+#control loop
+total_time_start = time.clock() #set start time for total report batch
 for report in report_list: #loop over a list of report names
 
-	start = time.clock()
+	start = time.clock() #set start for one report
 	for MSA in selector.report_list[report]: #loop through MSAs flagged for report generation
 		report_x = report_4x(report, selector) #instantiate class and set function strings
 		report_x.report_x(MSA, cur) #variabalize funciton inputs!!!!
-	end = time.clock()
+	end = time.clock() #set end for one report
 	print end-start, 'time to run report {report}'.format(report=report)
-total_time_end = time.clock()
+total_time_end = time.clock() #set end time for total batch
 print total_time_end-total_time_start, 'time to run entire report selection'
 #check_file must be run after reports are generated
 report_list = ['A 3-1', 'A 3-2', 'A 4-1', 'A 4-2', 'A 4-3', 'A 4-4', 'A 4-5', 'A 4-6', 'A 4-7', 'A 5-1', 'A 5-2', 'A 5-3', 'A 5-4', 'A 5-5', 'A 5-7', 'A 7-1', 'A 7-2', 'A 7-3', 'A 7-4', 'A 7-5', 'A 7-6', 'A 7-7', 'A 8-1', 'A 8-2', 'A 8-3', 'A 8-4', 'A 8-5', 'A 8-6', 'A 8-7', 'A 11-1', 'A 11-2', 'A 11-3', 'A 11-4', 'A 11-5', 'A 11-6', 'A 11-7', 'A 11-8', 'A 11-9', 'A 11-10', 'A 12-1', 'A 12-2'] #this needs to be changed to read from the input file
 check_file = check_file(build_msa) #needs a report list, state list, and msa list
-check_file.is_file('aggregate', selector.report_list['year'][0], report_list)
-report_lists = report_list_maker(build_msa)
-report_lists.report_lists('aggregate', selector.report_list['year'][0], report_list)
+check_file.is_file('aggregate', selector.report_list['year'][0], report_list) #creates msa-mds.json files showing which MSAs have reports in the sub folders
+report_lists = report_list_maker(build_msa) #takes a build object
+report_lists.report_lists('aggregate', selector.report_list['year'][0], report_list) #produces a list of all reports available for an MSA
 

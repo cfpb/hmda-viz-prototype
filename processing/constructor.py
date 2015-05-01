@@ -4,18 +4,14 @@ import csv
 import psycopg2
 import psycopg2.extras
 from collections import OrderedDict
-#import the parse_inputs class to store the 'inputs' dictionary
-from A_D_library import parse_inputs as parse
-from A_D_library import connect_DB as connect
-from A_D_library import build_JSON as build
-from A_D_library import aggregate as agg
-from A_D_library import queries
-from A_D_library import report_selector as selector
+from parsing import parse_inputs as parse
+from connector import connect_DB as connect
+from builder import build_JSON as build
+from aggregation import aggregate as agg
+from queries import queries
+from selector import report_selector as selector
 
-class constructor(object):
-	pass
-
-class report_4x(constructor):
+class report_4x(object):
 	def __init__(self, report, selector):
 		self.year = selector.report_list['year'][1]
 		self.parsed = parse() #for parsing inputs from rows
@@ -39,30 +35,27 @@ class report_4x(constructor):
 			report_type = 'National'
 		else:
 			print 'report type not set'
-		#for MSA in selector.report_list[report_number]: #take this loop out
+
 		build_X = build()
 		build_X.set_msa_names(cur) #builds a list of msa names as a dictionary
 		if self.report_number[2] == '9':
-			self.parsed.median_tract_age(cur, MSA)
+			self.parsed.median_tract_age(cur, MSA) #call the Census API to get median housing stock age for each tract in the MSA
 		location = (MSA,) #pass the MSA nubmers as a tuple to Psycopg2 (doesn't take singletons)
 
-		self.parsed.inputs['small county flag'] = self.agg.get_small_county_flag(cur, location)
-
+		self.parsed.inputs['small county flag'] = self.agg.get_small_county_flag(cur, location) #checks for small county flag for report ??
 		conditions = getattr(self.queries, ('table_' + self.report_number.replace(' ','_').replace('-','_') +'_conditions'))() #A 4-1 vs A A1
-		#print conditions
 
 		SQL = (self.queries.SQL_Count + conditions).format(year=self.year, MSA=MSA)
-		#print SQL
 		cur.execute(SQL, location)
 		count = int(cur.fetchone()[0])
 
 		if count > 0:
-			print count, 'LAR rows in MSA %s, for report %s, in %s' %(MSA, self.report_number, self.year)
+			print count, 'LAR rows in MSA "{MSA}", for report "{report}", in {year}'.format(MSA=MSA, report=self.report_number, year=self.year)
 			#manipulate report name to call query and aggregation functions
 
 			if self.report_number[2] == '4' or self.report_number[2] == '5' or self.report_number[2] == '7' or self.report_number[2] == '8' or self.report_number[2:4] == '11' or self.report_number[2:4] == '12':
 				self.report_number = self.report_number[:self.report_number.index('-')+1] + 'x' # removes the 1 and adds an x to reports that share a json template for the series
-			elif self.report_number[2] == 'A' and self.report_number[3] != '4':
+			elif self.report_number[2] == 'A' and self.report_number[3] != '4': #reports A1, A2, A3 have the same structure, A4 is different
 				self.report_number = self.report_number[:-1] + 'x'
 			columns = getattr(self.queries, ('table_' + self.report_number[2:].replace(' ','_').replace('-','_')+'_columns'))()
 
@@ -70,38 +63,37 @@ class report_4x(constructor):
 
 			cur.execute(SQL, location)
 			for num in range(0, count):
-				row = cur.fetchone()
-
+				row = cur.fetchone() #get a single LAR row
 				getattr(self.parsed, self.parse_function)(row) #returns the parse_function string from parse_return and calls it on self.parsed
 
 				if num == 0:
-					build_X.set_header(self.parsed.inputs, MSA, report_type, table_number)
+					build_X.set_header(self.parsed.inputs, MSA, report_type, table_number) #sets header information for the JSON object
 					table_X = getattr(build_X, self.json_builder)() #returns a string from the JSON_constructor_return function and uses it to call the json building function from A_D_Library
 
 				getattr(self.agg, self.aggregation)(table_X, self.parsed.inputs)
 
-			if self.report_number[2:] == '3-2': #report 3-2 requires out of loop aggregation functions
+			if self.report_number[2:] == '3-2': #report 3-2 requires out of loop aggregation functions for means and medians
 				self.agg.by_median(table_X, self.parsed.inputs)
 				self.agg.by_weighted_mean(table_X, self.parsed.inputs)
 				self.agg.by_weighted_median(table_X, self.parsed.inputs)
 				self.agg.by_mean(table_X, self.parsed.inputs)
 
-			if self.report_number[2] == '8': #reports 8-x requires out of loop calculation of denial reason percents
-
+			if self.report_number[2] == '8': #8 series of reports has calculation of denial reason by percent, these are done out of the main aggregation loop
 				percent_list = ['races', 'ethnicities', 'minoritystatuses', 'genders', 'incomes']
 				index_num = 0
 				for item in percent_list:
 					self.agg.by_denial_percent(table_X, self.parsed.inputs, index_num, item)
 					index_num +=1
 
-			if self.report_number[2:4] == '11' or self.report_number[2:6] == '12-2':
+			if self.report_number[2:4] == '11' or self.report_number[2:6] == '12-2': #means and medians for 11 and 12 series are done out of main aggregation loop
 				self.agg.fill_means_11_12(table_X, build_X)
 				self.agg.fill_medians_11_12(table_X, build_X)
 				self.agg.fill_weighted_medians_11_12(table_X, self.parsed.inputs)
 
-			if self.report_number[2:] == 'B':
+			if self.report_number[2:] == 'B': #table B means are done outside the aggregation loop
 				self.agg.table_B_mean(table_X, self.parsed.inputs)
 
+			#path matches URL structure for front end
 			path = "../" +table_X['type']+"/"+table_X['year']+"/"+build_X.get_state_name(table_X['msa']['state']).replace(' ', '-').lower()+"/"+build_X.msa_names[MSA].replace(' ', '-').lower()+"/"+table_X['table']
 			if not os.path.exists(path): #check if path exists
 				os.makedirs(path) #if path not present, create it
