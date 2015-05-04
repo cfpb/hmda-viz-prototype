@@ -20,9 +20,7 @@ class report_4x(object):
 		self.agg = agg() #aggregation functions for all tables
 		self.json_builder = self.JSON_constructor_return(report)
 		self.parse_function = self.parse_return(report)
-		#self.query_string = self.query_return(self.year, report)
 		self.aggregation = self.aggregation_return(self.year, report)
-		#self.count_string = self.count_return(self.year, report)
 		self.report_number = report
 
 	def report_x(self, MSA, cur):
@@ -41,8 +39,8 @@ class report_4x(object):
 		if self.report_number[2] == '9':
 			self.parsed.median_tract_age(cur, MSA) #call the Census API to get median housing stock age for each tract in the MSA
 		location = (MSA,) #pass the MSA nubmers as a tuple to Psycopg2 (doesn't take singletons)
-
-		self.parsed.inputs['small county flag'] = self.agg.get_small_county_flag(cur, location) #checks for small county flag for report ??
+		if self.report_number[2 == '7':
+			self.parsed.inputs['small county flag'] = self.agg.get_small_county_flag(cur, location) #checks for small county flag for report 7
 		conditions = getattr(self.queries, ('table_' + self.report_number.replace(' ','_').replace('-','_') +'_conditions'))() #A 4-1 vs A A1
 
 		SQL = (self.queries.SQL_Count + conditions).format(year=self.year, MSA=MSA)
@@ -98,12 +96,11 @@ class report_4x(object):
 			if not os.path.exists(path): #check if path exists
 				os.makedirs(path) #if path not present, create it
 			build_X.write_JSON(table_X['table']+'.json', table_X, path)
-			#use an if exists check for jekyll files
 			build_X.jekyll_for_report(path) #create and write jekyll file to report path
+
 			#year in the path is determined by the asofdate in the LAR entry
 			path2 = "../"+table_X['type']+"/"+table_X['year']+"/"+build_X.get_state_name(table_X['msa']['state']).replace(' ', '-').lower()+"/"+build_X.msa_names[MSA].replace(' ', '-').lower() #set path for writing the jekyll file to the msa directory
 			build_X.jekyll_for_msa(path2) #create and write jekyll file to the msa path
-
 
 	'''find a way to rename the functions in the A_D libary so that string manipulation chan be used to call them insead of having the functions below'''
 	def aggregation_return(self, year, report_number):

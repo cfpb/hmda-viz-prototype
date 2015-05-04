@@ -1,0 +1,65 @@
+# HMDA Viz Prototype Processing
+
+This is the **prototype** processing code for the HMDA aggregate and disclosure reports. It is based on the current [FFIEC On-Line Reports](http://www.ffiec.gov/hmda/online_rpts.htm).
+
+Working prototype processing code can be found running in [gh-pages](http://cfpb.github.io/hmda-viz-prototype/processing).
+
+## Processing Dependancies
+- Python
+    - Psycopg2
+    - Numpy
+    - Requests
+    - json
+- PostgresSQL
+- CSV writing tool
+- internet access
+
+## Data Dependancies
+- Census ACS 2010 API
+    - available at: [http://www.census.gov/data/developers/data-sets/acs-survey-5-year-data.html]. The processing code uses the B25035_001E source field to get median housing stock age by tract. The API requires state, county, and tract inputs.
+- Tract to CBSA 2010 crosswalk
+    - post in github?
+- Public HMDA LAR data
+    - Available at Consumerfinance.gov/HMDA and www.FFIEC.gov/HMDA. Note: the load script runs on pipe delimited files and requires certain fields appended from Census data.
+
+
+## File Dependancies
+The controller.py file requires an input CSV titled 'MSAinputs2013.csv' to run, an example file can be found here [https://github.com/cfpb/hmda-viz-prototype/blob/gh-pages/processing/MSAinputs2013.csv]. The first row of the file is all the CSV is a header row. Column 1 is a list of all Metropolitan Statistical Areas (MSA) and Metropolitan Divisions (MD). MDs are listed as the last 5 numbers of the complete MD number. Column 2 is the year for which the report(s) will be generated. Columns 3+ are binary flags, if a 1 is entered in a cell, then the report at that row will be generated when the controller.py file is run. The headers for columns 3+ are report numbers. The first letter shows which type of report 'A' is aggregate, 'D' is disclosure and 'N' is national.
+
+## Loading SQL Data
+To load HMDA data to a Postgres database use this script [https://github.com/cfpb/hmda-viz-prototype/blob/gh-pages/processing/HMDApub%20data%20load%20to%20SQL.txt]. This script creates tables for HMDA data from 2009 to 2013. To use the file, change the copy bath at the bottom to match the location of the HMDA data. This script is set to read pipe (|) delimited text files into varchar tables. The dataset used for processing requires several Census fields.
+
+## Back-end Installation
+To launch the processing script, enter:
+```shell
+$ python controller.py
+```
+## Usage
+Currently the code produces only aggregate reports. The most thorough testing and validation has been done with Alabama 2013. Testing has not been done for previous years, and schema changes to the HMDA LAR will affect the processing code.
+
+## Known issues
+
+We are still in the prototyping phase so there is a lot of work happening on both the front-end and processing sides.
+- Only certain paths currently work for the forms.
+- Only 2013 data has been tested for code compatability
+- Disclosure and national reports are not yet produced
+
+## Getting help
+
+If you have questions, concerns, bug reports, etc, please file an issue in this repository's [Issue Tracker](https://github.com/cfpb/hmda-viz-prototype/issues).
+
+## Getting involved
+
+TBD
+
+----
+## Open source licensing info
+1. [TERMS](TERMS.md)
+2. [LICENSE](LICENSE)
+3. [CFPB Source Code Policy](https://github.com/cfpb/source-code-policy/)
+----
+## Credits and references
+
+1. [FFIEC](http://www.ffiec.gov/HmdaAdWebReport/AggWelcome.aspx)
+2. [Federal Register] (http://www.gpo.gov/fdsys/pkg/FR-2004-12-20/pdf/04-27425.pdf)
+3. <http://cfpb.github.io/hmda-viz-prototype/aggregate/2013>

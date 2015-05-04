@@ -1,5 +1,4 @@
 
-
 class queries(object):
     #can I decompose these query parts into lists and concatenate them prior to passing to the cursor?
     #need to standardize field names in order to use the same query across eyars

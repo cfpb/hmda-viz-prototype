@@ -1,6 +1,7 @@
 from msa_indexing import MSA_info
 from median_age_api import median_age_API as age_API
 from demographics_indexing import demographics
+
 class parse_inputs(object):
     inputs = {}
     def __init__(self):
