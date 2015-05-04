@@ -1,12 +1,9 @@
 from collections import OrderedDict
 import os.path
 import json
-from A_D_library import build_JSON as build
+from builder import build_JSON as build
 
-class report_list(object):
-	pass
-
-class report_list_maker(report_list):
+class report_list_maker(object):
 	#generates a list of reports that were created for an MSA or MD. This list is stored in report-list.json in the MSA or MD folder.
 	def __init__(self, build_object):
 		self.state_names = build_object.state_names #this is a dictionary in format {"DE":"Delaware"}

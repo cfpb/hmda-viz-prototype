@@ -1,0 +1,60 @@
+--------
+-- SUBJECT:  MANTIS DATA LOAD
+-- DESCRIPTION:  SQL SCRIPT TO CREATE DATA TABLES AND LOAD (1) 2010 TRACT TO CBSA DATA
+-- DATE:  3/31/2015
+-- BY:  PAUL SALASZNYK (ADAPTED BY DAVID ROELL)
+--------
+
+--------
+-- PRE-REQUISITES:  Transfer the following files to your local machine
+--------
+
+-- (1) Data -> Valid Value MSA/MD/Census Tract Files -> tract_to_cbsa_2010.csv
+
+--------
+-- STEP 1:  Search for “/users/paulsalasznyk/desktop/HMDA/data/“ in this code and replace with path where you saved the data files listed above
+
+--------
+-- STEP 2:  Run the code below in PGAdmin
+--------
+
+--------
+-- CREATE TRACT TO CBSA DATA TABLES
+--------
+
+CREATE TABLE tract_to_cbsa_2010
+(
+  name character varying(100),
+  namelsad character varying(100),
+  lsad character varying(2),
+  memi character varying(1),
+  mtfcc10 character varying(5),
+  tract text,
+  state character varying(2),
+  county character varying(5),
+  tracts character varying(6),
+  geoid_msa character varying(5),
+  geoid_metdiv character varying(10),
+  metdivfp character varying(5),
+  metname character varying(100),
+  small_county integer
+); commit;
+
+--------
+-- LOAD DATA INTO TABLES CREATED ABOVE
+--------
+
+-- Tract to CBSA --
+copy tract_to_cbsa_2010 from '/users/paulsalasznyk/desktop/HMDA/data/tract_to_cbsa_2010.csv' csv delimiter '|' encoding 'latin1' header; commit;
+
+
+-- Indexes --
+create index on tract_to_cbsa_2010 (tracts); commit;
+create index on tract_to_cbsa_2010 (state); commit;
+create index on tract_to_cbsa_2010 (county); commit;
+
+
+
+
+
+
