@@ -2,7 +2,7 @@ import csv
 class report_selector(object):
 	def __init__(self):
 		self.report_list = {} #fill this dictionary with the headers in the CSV as dict keys
-
+		self.reports_to_run = []
 	def initalize_lists(self, infile):
 		with open(infile, 'rU') as csvfile:
 			msareader = csv.DictReader(csvfile, delimiter = ',', quotechar='"')
@@ -24,4 +24,9 @@ class report_selector(object):
 					if key == 'year': #create a year variable for each row, filepath and query should key off this year
 						self.report_list[key].append(row['year'])
 
+		#print len(self.report_list['A 3-1'])
+		for key in self.report_list:
+			if len(self.report_list[key]) > 0 and key != 'year' and key != 'MSA number':
+				self.reports_to_run.append(key)
+		#print self.reports_to_run
 		#need to find a work around to add lists for disclosure reports that will return lists of FIs and not flags

@@ -36,6 +36,7 @@ class report_4x(object):
 
 		build_X = build()
 		build_X.set_msa_names(cur) #builds a list of msa names as a dictionary
+		print self.report_number
 		if self.report_number[2] == '9':
 			self.parsed.median_tract_age(cur, MSA) #call the Census API to get median housing stock age for each tract in the MSA
 		location = (MSA,) #pass the MSA nubmers as a tuple to Psycopg2 (doesn't take singletons)

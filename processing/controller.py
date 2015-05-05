@@ -18,7 +18,7 @@ build_msa.msas_in_state(cur, selector, 'aggregate') #creates a list of all MSAs 
 #build_msa.msas_in_state(cur, selector, 'disclosure')#creates a list of all MSAs in each state and places the file in the state's disclosure folder
 
 #List of Alabama MSAs for test state case
-
+'''
 AL_MSAs =[
 '29260', '47900', '31980', '11820', '20700', '36740', '36860', '43740', '49380', '42780', '39940', '46860', '11780', '18220', '37700', '40380', '43940', '12900',
 '42140', '46700', '36420', '33340', '39380', '38380', '39740', '42340', '39060', '26260', '10620', '32580', '39220', '42900', '41580', '36780', '20140', '15500',
@@ -75,8 +75,8 @@ AL_MSAs =[
 '21820', '31580', '28060', '30020', '16820', '30220', '32700', '24980', '23180', '10180', '15900', '40460', '37660', '19100', '27380', '40900', '19500', '22300',
 '41180', '40484', '41884', '31084', '15764', '47644', '19804', '35084', '19124', '15804', '35644', '16974', '22744', '20764', '48864', '13644', '33124', '45104',
 '14484', '23844', '42644', '37964', '23104', '36084', '35004', '47894', '42044', '29404', '37764', '48424']
-
-
+'''
+'''
 #AL_MSAs = ['45180', '45980', '11500', '10760', '42460', '13820', '19460', '23460', '46740', '17980', '12220', '20020', '18980', '33860', '46260', '33660', '19300', '22840', '21460','10700','21640','42820','26620','22520','46220']
 #setting MSAs for reports for testing
 selector.report_list['A 3-1'] = AL_MSAs
@@ -130,29 +130,31 @@ selector.report_list['A A2'] = AL_MSAs
 selector.report_list['A A3'] = AL_MSAs
 selector.report_list['A A4'] = AL_MSAs
 selector.report_list['A B'] = AL_MSAs
-
-selector.report_list['A 7-1'] = ['33660']
+'''
+#selector.report_list['A 7-1'] = ['33660']
 #selector.report_list['A 9'] = ['33660']
 
 #report lists for testing
-report_list = ['A 7-1']
-#report_list = ['A 3-1', 'A 7-2']
-#report_list = ['A 4-1', 'A 4-2', 'A 4-3', 'A 4-4', 'A 4-6', 'A 4-7']
-#report_list = ['A 5-1', 'A 5-2', 'A 5-3', 'A 5-4', 'A 5-5', 'A 5-7']
-#report_list = ['A 7-1', 'A 7-2', 'A 7-3', 'A 7-4', 'A 7-5', 'A 7-6', 'A 7-7']
-#report_list = ['A 8-1', 'A 8-2', 'A 8-3', 'A 8-4', 'A 8-5', 'A 8-6', 'A 8-7']
-#report_list = ['A 11-1', 'A 11-2', 'A 11-3', 'A 11-4', 'A 11-5', 'A 11-6', 'A 11-7', 'A 11-8', 'A 11-9', 'A 11-10']
-#report_list = ['A 12-1', 'A 12-2']
-#report_list = ['A A1', 'A A2', 'A A3', 'A A4']
-#report_list = ['B']
+#selector.reports_to_run = ['A 9']
+#selector.reports_to_run = ['A 3-1', 'A 7-2']
+#selector.reports_to_run = ['A 4-1', 'A 4-2', 'A 4-3', 'A 4-4', 'A 4-6', 'A 4-7']
+#selector.reports_to_run = ['A 5-1', 'A 5-2', 'A 5-3', 'A 5-4', 'A 5-5', 'A 5-7']
+#selector.reports_to_run = ['A 7-1', 'A 7-2', 'A 7-3', 'A 7-4', 'A 7-5', 'A 7-6', 'A 7-7']
+#selector.reports_to_run = ['A 8-1', 'A 8-2', 'A 8-3', 'A 8-4', 'A 8-5', 'A 8-6', 'A 8-7']
+#selector.reports_to_run = ['A 11-1', 'A 11-2', 'A 11-3', 'A 11-4', 'A 11-5', 'A 11-6', 'A 11-7', 'A 11-8', 'A 11-9', 'A 11-10']
+#selector.reports_to_run = ['A 12-1', 'A 12-2']
+#selector.reports_to_run = ['A A1', 'A A2', 'A A3', 'A A4']
+#selector.reports_to_run = ['B']
 
 #complete report list
-#report_list = ['A 3-1', 'A 3-2', 'A 4-1', 'A 4-2', 'A 4-3', 'A 4-4', 'A 4-5', 'A 4-6', 'A 4-7', 'A 5-1', 'A 5-2', 'A 5-3', 'A 5-4', 'A 5-5', 'A 5-7', 'A 7-1', 'A 7-2', 'A 7-3', 'A 7-4', 'A 7-5', 'A 7-6', 'A 7-7', 'A 8-1', 'A 8-2', 'A 8-3', 'A 8-4', 'A 8-5', 'A 8-6', 'A 8-7', 'A 9', 'A 11-1', 'A 11-2', 'A 11-3', 'A 11-4', 'A 11-5', 'A 11-6', 'A 11-7', 'A 11-8', 'A 11-9', 'A 11-10', 'A 12-1', 'A 12-2', 'A A1', 'A A2', 'A A3', 'A A4', 'A B'] #this needs to be changed to read from the input file
+#selector.reports_to_run = ['A 3-1', 'A 3-2', 'A 4-1', 'A 4-2', 'A 4-3', 'A 4-4', 'A 4-5', 'A 4-6', 'A 4-7', 'A 5-1', 'A 5-2', 'A 5-3', 'A 5-4', 'A 5-5', 'A 5-7', 'A 7-1', 'A 7-2', 'A 7-3', 'A 7-4', 'A 7-5', 'A 7-6', 'A 7-7', 'A 8-1', 'A 8-2', 'A 8-3', 'A 8-4', 'A 8-5', 'A 8-6', 'A 8-7', 'A 9', 'A 11-1', 'A 11-2', 'A 11-3', 'A 11-4', 'A 11-5', 'A 11-6', 'A 11-7', 'A 11-8', 'A 11-9', 'A 11-10', 'A 12-1', 'A 12-2', 'A A1', 'A A2', 'A A3', 'A A4', 'A B'] #this needs to be changed to read from the input file
 
 #control loop
 total_time_start2 = time.time()
 total_time_start = time.clock() #set start time for total report batch
-for report in report_list: #loop over a list of report names
+logfile = open('processing_log.txt', 'w')
+for report in selector.reports_to_run: #loop over a list of report names
+	#if len(selector.report_list[report]) >0:
 	start = time.clock() #set start for one report
 	start2 = time.time()
 	for MSA in selector.report_list[report]: #loop through MSAs flagged for report generation
@@ -161,12 +163,22 @@ for report in report_list: #loop over a list of report names
 	end = time.clock() #set end for one report
 	end2 = time.time()
 
-	print end-start, 'CPU time to run report {report} on'.format(report=report), time.asctime()
-	print end2-start2, 'human time to run {report} on'.format(report=report), time.asctime()
+	cpu_report_time = end-start
+	clock_report_time = end2-start2
+	logfile.write('{time} CPU time to run report {report} on {date}\n'.format(report=report, time=cpu_report_time, date=time.asctime()))
+	logfile.write('{time} human time to run {report} on {date}\n'.format(report=report, time=clock_report_time, date=time.asctime()))
+	print '{time} CPU time to run report {report} on {date}'.format(report=report, time=clock_report_time, date=time.asctime())
+	print '{time} human time to run {report} on {date}'.format(report=report, time=clock_report_time, date=time.asctime())
+
 total_time_end = time.clock() #set end time for total batch
 total_time_end2 = time.time()
-print total_time_end-total_time_start, 'time to run entire report selection on', time.asctime()
-print total_time_end2 - total_time_start2, 'human time to run entire report selection'
+cpu_selection_time = total_time_end - total_time_start
+clock_selection_time = total_time_end2 - total_time_start2
+logfile.write('{time} time to run entire report selection on {date}\n'.format(time=cpu_selection_time, date=time.asctime()))
+logfile.write('{time} human time to run entire report selection on {date}\n'.format(time=clock_selection_time, date=time.asctime()))
+logfile.close()
+print total_time_end-total_time_start, 'time to run entire report selection on\n', time.asctime()
+print total_time_end2 - total_time_start2, 'human time to run entire report selection\n', time.asctime()
 #check_file must be run after reports are generated
 #report_list = ['A 3-1', 'A 3-2', 'A 4-1', 'A 4-2', 'A 4-3', 'A 4-4', 'A 4-5', 'A 4-6', 'A 4-7', 'A 5-1', 'A 5-2', 'A 5-3', 'A 5-4', 'A 5-5', 'A 5-7', 'A 7-1', 'A 7-2', 'A 7-3', 'A 7-4', 'A 7-5', 'A 7-6', 'A 7-7', 'A 8-1', 'A 8-2', 'A 8-3', 'A 8-4', 'A 8-5', 'A 8-6', 'A 8-7', 'A 11-1', 'A 11-2', 'A 11-3', 'A 11-4', 'A 11-5', 'A 11-6', 'A 11-7', 'A 11-8', 'A 11-9', 'A 11-10', 'A 12-1', 'A 12-2'] #this needs to be changed to read from the input file
 #check_file = check_file(build_msa) #needs a report list, state list, and msa list
