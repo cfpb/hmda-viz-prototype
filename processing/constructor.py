@@ -39,7 +39,7 @@ class report_4x(object):
 		if self.report_number[2] == '9':
 			self.parsed.median_tract_age(cur, MSA) #call the Census API to get median housing stock age for each tract in the MSA
 		location = (MSA,) #pass the MSA nubmers as a tuple to Psycopg2 (doesn't take singletons)
-		if self.report_number[2 == '7':
+		if self.report_number[2] == '7':
 			self.parsed.inputs['small county flag'] = self.agg.get_small_county_flag(cur, location) #checks for small county flag for report 7
 		conditions = getattr(self.queries, ('table_' + self.report_number.replace(' ','_').replace('-','_') +'_conditions'))() #A 4-1 vs A A1
 

@@ -4,6 +4,7 @@ class demographics(object):
 	#this class is called when the parse_txx function is called by the controller
 	def __init__(self):
 		pass
+
 	def set_gender(self, inputs):
 		male_flag = False
 		female_flag = False
@@ -78,7 +79,6 @@ class demographics(object):
 
 	def set_non_white(self, race_list): #pass in a list of length 5, return a boolean
 		for i in range(1, 5):
-			#print race_list, i in race_list
 			if i in race_list:
 				return True
 		if 5 in race_list:
