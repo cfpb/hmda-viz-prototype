@@ -59,18 +59,19 @@ class demographics(object):
 		#index 1 is reserved for 'reported pricing data' and will be handled during aggregation
 		elif float(rate) >= 1.5 and float(rate) <= 1.99:
 			return 2
-		elif float(rate) >= 2.00 and float(rate) <= 2.49:
+		elif float(rate) >= 1.5 and float(rate) <= 2.49:
 			return 3
-		elif float(rate) >= 2.50 and float(rate) <= 2.99:
+		elif float(rate) >= 1.5 and float(rate) <= 2.99:
 			return 4
-		elif float(rate) >= 3.00 and float(rate) <= 3.99:
+		elif float(rate) >= 1.5 and float(rate) <= 3.99:
 			return 5
-		elif float(rate) >= 4.00 and float(rate) <= 4.99:
+		elif float(rate) >= 1.5 and float(rate) <= 4.99:
 			return 6
-		elif float(rate) >= 5.00 and float(rate) <= 5.99:
+		elif float(rate) >= 1.5 and float(rate) <= 5.99:
 			return 7
-		elif float(rate) >=5.99:
+		elif float(rate) > 5.99:
 			return 8
+
 	def minority_count(self, a_race):
 		#the minority count is the count of minority races listed for the primary applicant
 		#if minority count is > 2, then the race is set to 2 minority
@@ -151,24 +152,14 @@ class demographics(object):
 			return 3
 			print "error setting ethnicity"
 
-	def a_race_list(self, row):
-		a_race = [row['applicantrace1'], row['applicantrace2'], row['applicantrace3'],row['applicantrace4'],row['applicantrace5']]
+	def a_race_list(self, a_race):
+		#a_race = [row['applicantrace1'], row['applicantrace2'], row['applicantrace3'],row['applicantrace4'],row['applicantrace5']]
 		for i in range(0, 5): #convert ' ' entries to 0 for easier comparisons and loan aggregation
 			if a_race[i] == ' ':
 				a_race[i] = 0
 			else:
 				a_race[i] = int(a_race[i])
 		return [int(race) for race in a_race] #convert string entries to int for easier comparison and loan aggregation
-
-	def co_race_list(self, row):
-		co_race = [row['coapplicantrace1'], row['coapplicantrace2'], row['coapplicantrace3'],row['coapplicantrace4'],row['coapplicantrace5']]
-		for i in range(0,5):
-			if co_race[i] == ' ':
-				co_race[i] = 0
-			else:
-				co_race[i] = int(co_race[i])
-
-		return [int(race) for race in co_race] #convert string entries to int for easier comparison and loan aggregation
 
 	def set_race(self, inputs, race_list): #sets the race to an integer index for loan aggregation
 		#if one white and one minority race are listed, use the minority race

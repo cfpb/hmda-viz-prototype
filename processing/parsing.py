@@ -60,11 +60,11 @@ class parse_inputs(object):
         MSA_index = MSA_info() #contains functions for census tract characteristics
         demo=demographics() #contains functions for borrower characteristics
 
-        a_race = [] #race lists will hold 5 integers with 0 replacing a blank entry
-        co_race = [] #race lists will hold 5 integers with 0 replacing a blank entry
-        #fill race lists from the demographics class
-        a_race = demo.a_race_list(row) #put applicant race codes in a list 0-5, 0 is blank field
-        co_race = demo.co_race_list(row) #put co-applicant race codes in a list 0-5, 0 is blank field
+        app_races = [row['applicantrace1'], row['applicantrace2'], row['applicantrace3'],row['applicantrace4'],row['applicantrace5']]
+        co_app_race = [row['coapplicantrace1'], row['coapplicantrace2'], row['coapplicantrace3'],row['coapplicantrace4'],row['coapplicantrace5']]
+
+        a_race = demo.a_race_list(app_races) #put applicant race codes in a list 0-5, 0 is blank field
+        co_race = demo.a_race_list(co_app_race) #put co-applicant race codes in a list 0-5, 0 is blank field
         #add data elements to dictionary
         self.inputs['a_race'] = a_race
         self.inputs['co_race'] = co_race
