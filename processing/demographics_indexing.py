@@ -3,7 +3,7 @@ class demographics(object):
 	#holds all the functions for setting race, minority status, and ethnicity for FFIEC A&D reports
 	#this class is called when the parse_txx function is called by the controller
 	def __init__(self):
-		pass
+		self.result = 0
 
 	def set_gender(self, inputs):
 		male_flag = False
@@ -35,20 +35,23 @@ class demographics(object):
 			return 8
 		elif float(rate) >= 1.5 and float(rate) <= 1.99:
 			return 0
-		elif float(rate) >= 2.00 and float(rate) <= 2.49:
+		elif float(rate) >= 1.5 and float(rate) <= 2.49:
 			return 1
-		elif float(rate) >= 2.50 and float(rate) <= 2.99:
+		elif float(rate) >= 1.5 and  float(rate) <= 2.99:
 			return 2
-		elif float(rate) >= 3.00 and float(rate) <= 3.49:
+		elif float(rate) >= 1.5 and float(rate) <= 3.49:
 			return 3
-		elif float(rate) >= 3.50 and float(rate) <= 4.49:
+		elif float(rate) >= 1.5 and  float(rate) <= 4.49:
 			return 4
-		elif float(rate) >= 4.50 and float(rate) <= 5.49:
+		elif float(rate) >= 1.5 and  float(rate) <= 5.49:
 			return 5
-		elif float(rate) >= 5.50  and float(rate) <= 6.49:
+		elif float(rate) >= 1.5 and  float(rate) <= 6.49:
 			return 6
-		elif float(rate) >= 6.50:
+		elif float(rate) >= 1.5 and  float(rate) >= 6.50:
 			return 7
+		else:
+			print 'rate spread outside range: rate spread index not set'
+
 	def rate_spread_index_11x(self, rate):
 		#indexes the rate spreads for use in table 11.x
 		if rate == 'NA   ' or rate == '     ':
@@ -83,16 +86,13 @@ class demographics(object):
 				return True
 		if 5 in race_list:
 			return False
+		else:
+			return False
 
 	def set_joint(self, inputs): #takes a dictionary 'inputs' which is held in the controller(?) object and used to process each loan row
 		#set default return to true or false and then only run 1 check
 		#joint status exists if one borrower is white and one is non-white
 		#check to see if joint status exists
-		#inputs['joint status'] = False
-		#if inputs['app non white flag'] == False and inputs['co non white flag'] == False:
-		#   return False #flag false if both applicant and co-applicant are white
-		#elif inputs['app non white flag'] == True and inputs['co non white flag'] == True:
-		#   return False #flag false if both applicant and co-applicant are minority
 		if inputs['app non white flag'] == True and inputs['co non white flag'] ==  False:
 			return True #flag true if one applicant is minority and one is white
 		elif inputs['app non white flag'] == False and inputs['co non white flag'] == True:
