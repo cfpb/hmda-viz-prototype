@@ -50,7 +50,7 @@ class demographics(object):
 		elif float(rate) >= 1.5 and  float(rate) >= 6.50:
 			return 7
 		else:
-			print 'rate spread outside range: rate spread index not set'
+			return None
 
 	def rate_spread_index_11x(self, rate):
 		#indexes the rate spreads for use in table 11.x
