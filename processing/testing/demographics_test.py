@@ -77,7 +77,7 @@ def test_rate_spread_index_11x(rate, expected_result):
 	({'app sex':'4', 'co app sex': '4'}, 3),
 	({'app sex':'4', 'co app sex': '5'}, 3)
 	])
-def test_gender_index(input_dict, expected_result): #testing set_gender
+def test_gender(input_dict, expected_result): #testing set_gender
 	# Arrange
 	demo = demographics()
 
@@ -167,12 +167,29 @@ def test_set_loan_ethn(input_dict, expected_result):
 	# Assert
 	assert_equals(actual_result, expected_result)
 
-def test_a_race_list(race1, race2, race3, race4, race5, expected_result):
+@parameterized([
+	(['1','2',' ',' ',' ',], [1,2,0,0,0]),
+	([' ','5','3','2',' '], [0,5,3,2,0])
+	])
+def test_a_race_list(race_list, expected_result):
 	# Arrange
 	demo = demographics()
 
 	# Action
-	actual_result = demo.a_race_list(race1, race)
+ 	actual_result = demo.a_race_list(race_list)
+
+	# Assert
+	assert_equals(actual_result, expected_result)
+
+@parameterized([
+	({'joint status': True}, [5,2,1,0,0], 6)
+	]) #expand test parameters with actual LAR data from edge cases
+def test_set_race(input_dict, race_list, expected_result):
+	# Arrange
+	demo = demographics()
+
+	# Action
+ 	actual_result = demo.set_race(input_dict, race_list)
 
 	# Assert
 	assert_equals(actual_result, expected_result)
