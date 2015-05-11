@@ -72,16 +72,16 @@ class report_4x(object):
 				getattr(self.agg, self.aggregation)(table_X, self.parsed.inputs)
 
 			if self.report_number[2:] == '3-2': #report 3-2 requires out of loop aggregation functions for means and medians
-				self.agg.by_median(table_X, self.parsed.inputs)
-				self.agg.by_weighted_mean(table_X, self.parsed.inputs)
-				self.agg.by_weighted_median(table_X, self.parsed.inputs)
-				self.agg.by_mean(table_X, self.parsed.inputs)
+				self.agg.fill_by_median_32(table_X, self.parsed.inputs)
+				self.agg.fill_by_weighted_mean_32(table_X, self.parsed.inputs)
+				self.agg.fill_by_weighted_median_32(table_X, self.parsed.inputs)
+				self.agg.fill_by_mean_32(table_X, self.parsed.inputs)
 
 			if self.report_number[2] == '8': #8 series of reports has calculation of denial reason by percent, these are done out of the main aggregation loop
 				percent_list = ['races', 'ethnicities', 'minoritystatuses', 'genders', 'incomes']
 				index_num = 0
 				for item in percent_list:
-					self.agg.by_denial_percent(table_X, self.parsed.inputs, index_num, item)
+					self.agg.fill_by_denial_percent(table_X, self.parsed.inputs, index_num, item)
 					index_num +=1
 
 			if self.report_number[2:4] == '11' or self.report_number[2:6] == '12-2': #means and medians for 11 and 12 series are done out of main aggregation loop
@@ -90,7 +90,7 @@ class report_4x(object):
 				self.agg.fill_weighted_medians_11_12(table_X, self.parsed.inputs)
 
 			if self.report_number[2:] == 'B': #table B means are done outside the aggregation loop
-				self.agg.table_B_mean(table_X, self.parsed.inputs)
+				self.agg.fill_table_B_mean(table_X, self.parsed.inputs)
 
 			#path matches URL structure for front end
 			path = "../" +table_X['type']+"/"+table_X['year']+"/"+build_X.get_state_name(table_X['msa']['state']).replace(' ', '-').lower()+"/"+build_X.msa_names[MSA].replace(' ', '-').lower()+"/"+table_X['table']
@@ -106,35 +106,35 @@ class report_4x(object):
 	'''find a way to rename the functions in the A_D libary so that string manipulation chan be used to call them insead of having the functions below'''
 	def aggregation_return(self, year, report_number):
 		if report_number == 'A 3-1':
-			return 'build_report_31'
+			return 'aggregate_report_31'
 		elif report_number == 'A 3-2':
-			return 'build_report_32'
+			return 'aggregate_report_32'
 		elif report_number[:3] == 'A 4':
-			return 'build_report4x'
+			return 'aggregate_report4x'
 		elif report_number[:3] == 'A 5':
-			return 'build_report5x'
+			return 'aggregate_report5x'
 		elif report_number[:3] == 'A 7':
-			return 'build_report7x'
+			return 'aggregate_report7x'
 		elif report_number[:3] == 'A 8':
-			return 'build_report8x'
+			return 'aggregate_report8x'
 		elif report_number[:3] == 'A 9':
-			return 'build_report9x'
+			return 'aggregate_report9x'
 		elif report_number[:4] == 'A 11':
-			return 'build_report11x'
+			return 'aggregate_report11x'
 		elif report_number == 'A 12-1':
-			return 'build_report12_1'
+			return 'aggregate_report12_1'
 		elif report_number == 'A 12-2':
-			return 'build_report12_2'
+			return 'aggregate_report12_2'
 		elif report_number == 'A A1':
-			return 'build_reportAx'
+			return 'aggregate_reportAx'
 		elif report_number == 'A A2':
-			return 'build_reportAx'
+			return 'aggregate_reportAx'
 		elif report_number == 'A A3':
-			return 'build_reportAx'
+			return 'aggregate_reportAx'
 		elif report_number == 'A A4':
-			return 'build_reportA4'
+			return 'aggregate_reportA4'
 		elif report_number == 'A B':
-			return 'build_reportB'
+			return 'aggregate_reportB'
 
 	def JSON_constructor_return(self, report_number):
 		if report_number == 'A 3-1':
