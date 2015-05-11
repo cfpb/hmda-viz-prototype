@@ -63,6 +63,7 @@ class aggregate(object): #aggregates LAR rows by appropriate characteristics to 
 		for i in range(0, len(self.tract_income_rate_list)):
 			container['censuscharacteristics'][1]['incomes'][i]['pricinginformation'][10]['value'] = str(self.calc_weighted_median(self.tract_income_rate_list[i], self.tract_income_weight_list[i]))
 
+	#rename this function
 	def totals(self, container, inputs): #aggregate total of purchased loans
 		container['total']['purchasers'][inputs['purchaser']]['count'] +=1
 		container['total']['purchasers'][inputs['purchaser']]['value'] += int(inputs['loan value'])
@@ -138,7 +139,7 @@ class aggregate(object): #aggregates LAR rows by appropriate characteristics to 
 				nd_junior_weights = numpy.array(inputs[self.purchaser_junior_lien_rates[n]])
 				container['points'][8]['purchasers'][n]['juniorlienvalue'] = round(numpy.average(nd_junior_rates, weights=nd_junior_weights),2)#round(inputs[self.purchaser_junior_lien_weight[n]]/float(container['pricinginformation'][1]['purchasers'][n]['juniorlienvalue']),2)
 
-	def fill_weight_lists(self, inputs): #add all loan values to a list to find means and medians
+	def fill_weight_lists(self, inputs): #add all loan values to a list to find means and medians for table 3-2
 		if inputs['rate spread'] != 'NA   ' and inputs['rate spread'] != '     ':
 
 			if inputs['lien status'] =='1':
@@ -146,7 +147,7 @@ class aggregate(object): #aggregates LAR rows by appropriate characteristics to 
 			elif inputs['lien status'] == '2':
 				inputs[self.purchaser_junior_lien_weight[inputs['purchaser']]].append(int(inputs['loan value']))
 
-	def fill_rate_lists(self, inputs): #add all rate spreads to a list to find the mean and median rate spreads
+	def fill_rate_lists(self, inputs): #add all rate spreads to a list to find the mean and median rate spreads for table 3-2
 		if inputs['rate spread'] == 'NA   ' or inputs['rate spread'] == '     ':
 			pass
 		elif inputs['lien status'] == '1': #add to first lien rate spread list
@@ -156,65 +157,23 @@ class aggregate(object): #aggregates LAR rows by appropriate characteristics to 
 
 	def by_median(self, container, inputs): #puts the median rate spread in the JSON object
 		for n in range(0,9):
-			#first lien median block
+			#first lien median column
 			if len(inputs[self.purchaser_first_lien_rates[n]]) > 0: #check to see if the array is populated
 				container['points'][9]['purchasers'][n]['firstliencount'] = round(numpy.median(numpy.array(inputs[self.purchaser_first_lien_rates[n]])),2) #for normal median
-
-			#junior lien median block
+			#junior lien median column
 			if len(inputs[self.purchaser_junior_lien_rates[n]]) > 0: #check to see if the array is populated
 				container['points'][9]['purchasers'][n]['juniorliencount'] = round(numpy.median(numpy.array(inputs[self.purchaser_junior_lien_rates[n]])),2) #for normal median
 
 	def by_weighted_median(self, container, inputs): #weighted median function for table 3-2
-		'''
 		for n in range(0,9):
-			#first lien weighted median block
-			#print inputs[self.purchaser_first_lien_rates[n]], inputs[self.purchaser_first_lien_weight[n]]
-			if len(inputs[self.purchaser_first_lien_rates[n]]) >0 and len(inputs[self.purchaser_first_lien_weight[n]]) >0: #check to see if the array is populated
-				nd_first_rates = inputs[self.purchaser_first_lien_rates[n]]
-				nd_first_values = inputs[self.purchaser_first_lien_weight[n]]
-				nd_first_rates, nd_first_values = zip(*sorted(zip(nd_first_rates, nd_first_values)))
-
-				step_size = round(float(sum(nd_first_values)) / len(nd_first_values),3)
-				steps_needed = (len(nd_first_values) / float(2))
-				nd_steps = [round(x/step_size,3) for x in nd_first_values] #compute step size by weights (values) of loans
-
-				count = 0
-				for i in range(0, len(nd_first_values)):
-					step_taken = nd_first_values[i] / float(step_size)
-					steps_needed -=step_taken
-					count +=1
-
-					if steps_needed <= 0:
-
-						#print nd_first_rates, "*"*10,nd_first_rates[count-1], count-1
-
-						container['points'][9]['purchasers'][n]['firstlienvalue'] = sorted(nd_first_rates)[count-1] #for weighted median
-						break
-		'''
-		for n in range(0,9):
+			#first lien weighted median column
 			container['points'][9]['purchasers'][n]['firstlienvalue'] = self.calc_weighted_median(inputs[self.purchaser_first_lien_rates[n]], inputs[self.purchaser_first_lien_weight[n]])
-			#junior lien weighted median block
+			#junior lien weighted median column
 			container['points'][9]['purchasers'][n]['juniorlienvalue'] = self.calc_weighted_median(inputs[self.purchaser_junior_lien_rates[n]], inputs[self.purchaser_junior_lien_weight[n]])
-			'''
-			if len(inputs[self.purchaser_junior_lien_rates[n]]) > 0 and len(inputs[self.purchaser_junior_lien_weight[n]]) >0: #check to see if the array is populated
-				nd_junior_rates = inputs[self.purchaser_junior_lien_rates[n]]
-				nd_junior_values = inputs[self.purchaser_junior_lien_weight[n]]
-				nd_junior_rates, nd_junior_values = zip(*sorted(zip(nd_junior_rates, nd_junior_values)))
 
-				step_size = round(float(sum(nd_junior_values)) / len(nd_junior_values),3)
-				steps_needed = (len(nd_junior_values) / float(2))
-				nd_steps = [round(x/step_size,3) for x in nd_junior_values]
-
-				count = 0
-				for i in range(0, len(nd_junior_values)):
-					step_taken = nd_junior_values[i] / float(step_size)
-					steps_needed -=step_taken
-					count +=1
-					if steps_needed <= 0:
-						container['points'][9]['purchasers'][n]['juniorlienvalue'] = sorted(nd_junior_rates)[count-1] #for weighted median
-						break
-			'''
 	def calc_weighted_median(self, rate_list, weight_list):
+		#to find the weighted median, step throught the rates using a step size that is the average loan amount
+		#when number of loans divided by 2 steps have been taken, return the associated rate spread
 		if len(rate_list) > 0 and len(weight_list) > 0:#check for divide by 0 errors
 			rate_list, weight_list = zip(*sorted(zip(rate_list, weight_list))) #sort both lists by rate- this converts the lists to tuples
 			step_size = round(Decimal(sum(weight_list)) / len(weight_list),2) #get a managable decimal length
@@ -264,19 +223,19 @@ class aggregate(object): #aggregates LAR rows by appropriate characteristics to 
 			pass
 
 		elif inputs['income bracket'] <6 and inputs['action taken'] < 6:
+			#aggregate loans by total applications
 			container['incomes'][inputs['income bracket']]['dispositions'][0]['count'] += 1 #add to 'applications received'
 			container['incomes'][inputs['income bracket']]['dispositions'][0]['value'] += int(inputs['loan value']) #add to 'applications received'
-
+			#aggregate loans by application disposition
 			container['incomes'][inputs['income bracket']]['dispositions'][inputs['action taken']]['count'] += 1 #loans by action taken code
 			container['incomes'][inputs['income bracket']]['dispositions'][inputs['action taken']]['value'] += int(inputs['loan value'])
 		else:
 			print "error aggregating income for report 4-1"
 
 	def by_4x_demographics(self, container, inputs, key, key_index):
-
 		if inputs['action taken'] < 6:
 			if key == 'minoritystatuses' and key_index > 1:
-				pass
+				pass #minoritystatuses has 2 indexes 0,1
 			else:
 				self.aggregate_4x(container, inputs, key, key_index, 0, False)
 				self.aggregate_4x(container, inputs, key, key_index, inputs['action taken'], False)
@@ -287,16 +246,20 @@ class aggregate(object): #aggregates LAR rows by appropriate characteristics to 
 
 	def aggregate_4x(self, container, inputs, key, key_index, action_index, gender_bool):
 		if gender_bool == False:
+			#aggregate by application disposition
 			container[key][key_index]['dispositions'][action_index]['count'] +=1
 			container[key][key_index]['dispositions'][action_index]['value'] +=int(inputs['loan value'])
 		elif gender_bool == True:
+			#aggregate by gender and application disposition
 			container[key][key_index]['genders'][inputs['gender']]['dispositions'][action_index]['count'] +=1
 			container[key][key_index]['genders'][inputs['gender']]['dispositions'][action_index]['value'] +=int(inputs['loan value'])
 
 	def totals_4x(self, container, inputs):
 		if inputs['action taken'] < 6 and inputs['action taken'] != ' ':
+			#aggregates loans for toal application column
 			container['total'][0]['count'] += 1
 			container['total'][0]['value'] += int(inputs['loan value'])
+			#aggregates loans for application dispositions (action taken)
 			container['total'][inputs['action taken']]['count'] +=1
 			container['total'][inputs['action taken']]['value'] += int(inputs['loan value'])
 
@@ -304,9 +267,10 @@ class aggregate(object): #aggregates LAR rows by appropriate characteristics to 
 		if inputs['action taken'] > 5:
 			pass
 		else:
+			#aggregates total applications column
 			container['total'][0]['count'] +=1
 			container['total'][0]['value'] += int(inputs['loan value'])
-
+			#aggregates loans by application disposition (action taken)
 			container['total'][inputs['action taken']]['count'] +=1
 			container['total'][inputs['action taken']]['value'] += int(inputs['loan value'])
 
