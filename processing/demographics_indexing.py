@@ -25,10 +25,9 @@ class demographics(object):
 		elif male_flag == False and female_flag == True:
 			return 1 #female loan
 		else:
-			print "gender not set", inputs['app sex'], inputs['co app sex']
-			print male_flag, female_flag
+			return None
 
-	def rate_spread_index(self, rate):
+	def rate_spread_index_32(self, rate):
 		#sets the rate spread variable to an index number for aggregation in the JSON object
 		#indexes match the position on the report
 		if rate == 'NA   ' or rate == '     ':
@@ -88,7 +87,7 @@ class demographics(object):
 		if 5 in race_list:
 			return False
 		else:
-			return False
+			return None
 
 	def set_joint(self, inputs): #takes a dictionary 'inputs' which is held in the controller(?) object and used to process each loan row
 		#set default return to true or false and then only run 1 check
@@ -120,8 +119,7 @@ class demographics(object):
 		#elif inputs['race'] == 6 or inputs['race'] == 5: #joint status race
 		#   return 1
 		else:
-			print inputs['race'], inputs['ethnicity']
-			print 'minority status not set'
+			return None
 
 	def set_loan_ethn(self, inputs):
 		#this function outputs a number code for ethnicity: 0 - hispanic or latino, 1 - not hispanic/latino
@@ -174,6 +172,7 @@ class demographics(object):
 			return  5
 
 		elif race_list[0] != 0 and race_list[1] == 0 and race_list[2] == 0 and race_list[3] == 0 and race_list[4] == 0: #if only the first race field is used, use the first field unless it is blank
+
 			return  race_list[0]-1 #if only one race is reported, and joint status and minority status are false, set race to first race
 		elif race_list[0] == 0 and race_list[1] == 0 and race_list[2] == 0 and race_list[3] == 0 and race_list[4] == 0:
 			return  7 #if all race fields are blank, set to 7 'not available'
