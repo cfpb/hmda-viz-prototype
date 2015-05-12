@@ -1,9 +1,11 @@
 import numpy
 from decimal import Decimal
+import decimal
 
 class aggregate(object): #aggregates LAR rows by appropriate characteristics to fill the JSON files
 
 	def __init__(self):
+		self.small_tract_flags = {} #to hold 11 digit tract number as key and small county flag as value
 		self.purchaser_first_lien_rates = ['Fannie Mae first rates', 'Ginnie Mae first rates', 'Freddie Mac first rates', 'Farmer Mac first rates', 'Private Securitization first rates', 'Commercial bank, savings bank or association first rates', 'Life insurance co., credit union, finance co. first rates', 'Affiliate institution first rates', 'Other first rates']
 		self.purchaser_junior_lien_rates = ['Fannie Mae junior rates', 'Ginnie Mae junior rates', 'Freddie Mac junior rates', 'Farmer Mac junior rates', 'Private Securitization junior rates', 'Commercial bank, savings bank or association junior rates', 'Life insurance co., credit union, finance co. junior rates', 'Affiliate institution junior rates', 'Other junior rates']
 		self.purchaser_first_lien_weight = ['Fannie Mae first weight', 'Ginnie Mae first weight', 'Freddie Mac first weight', 'Farmer Mac first weight', 'Private Securitization first weight', 'Commercial bank, savings bank or association first weight', 'Life insurance co., credit union, finance co. first weight', 'Affiliate institution first weight', 'Other first weight']
@@ -50,31 +52,75 @@ class aggregate(object): #aggregates LAR rows by appropriate characteristics to 
 		container[section][section_index][key][key_index][section2][section2_index]['count'] += 1
 		container[section][section_index][key][key_index][section2][section2_index]['value'] += int(inputs['loan value'])
 
-	def fill_weighted_medians_11_12(self, container, inputs):
-		#strings need to be converted to floats for external data requests
-		for i in range(0, len(self.race_rate_list)):
-			container['borrowercharacteristics'][0]['races'][i]['pricinginformation'][10]['value'] = str(self.calc_weighted_median(self.race_rate_list[i], self.race_weight_list[i]))
-		for i in range(0, len(self.ethnicity_rate_list)):
-			container['borrowercharacteristics'][1]['ethnicities'][i]['pricinginformation'][10]['value'] = str(self.calc_weighted_median(self.ethnicity_rate_list[i], self.ethnicity_weight_list[i]))
-		for i in range(0, len(self.minority_rate_list)):
-			container['borrowercharacteristics'][2]['minoritystatuses'][i]['pricinginformation'][10]['value'] = str(self.calc_weighted_median(self.minority_rate_list[i], self.minority_weight_list[i]))
-		for i in range(0, len(self.income_rate_list)):
-			container['borrowercharacteristics'][3]['incomes'][i]['pricinginformation'][10]['value'] = str(self.calc_weighted_median(self.income_rate_list[i], self.income_weight_list[i]))
-		for i in range(0, len(self.gender_rate_list)):
-			container['borrowercharacteristics'][4]['genders'][i]['pricinginformation'][10]['value'] = str(self.calc_weighted_median(self.gender_rate_list[i], self.gender_weight_list[i]))
-		for i in range(0, len(self.composition_rate_list)):
-			container['censuscharacteristics'][0]['compositions'][i]['pricinginformation'][10]['value'] = str(self.calc_weighted_median(self.composition_rate_list[i], self.composition_weight_list[i]))
-		for i in range(0, len(self.tract_income_rate_list)):
-			container['censuscharacteristics'][1]['incomes'][i]['pricinginformation'][10]['value'] = str(self.calc_weighted_median(self.tract_income_rate_list[i], self.tract_income_weight_list[i]))
-
-	#rename this function
-	def fill_totals_31(self, container, inputs): #aggregate total of purchased loans for table 3-1
-		container['total']['purchasers'][inputs['purchaser']]['count'] +=1
-		container['total']['purchasers'][inputs['purchaser']]['value'] += int(inputs['loan value'])
-
 	def fill_by_characteristics_NA(self, container, inputs, section, section_index, key, key_index, section2, section2_index):
 		container[section][section_index][key][key_index][section2][section2_index]['count'] = 'NA'
 		container[section][section_index][key][key_index][section2][section2_index]['value'] = 'NA'
+
+	def calc_weighted_median(self, rate_list, weight_list):
+		#to find the weighted median, step throught the rates using a step size that is the average loan amount
+		#when number of loans divided by 2 steps have been taken, return the associated rate spread
+		if len(rate_list) > 0 and len(weight_list) > 0:#check for divide by 0 errors
+			rate_list, weight_list = zip(*sorted(zip(rate_list, weight_list))) #sort both lists by rate- this converts the lists to tuples
+			step_size = round(Decimal(sum(weight_list)) / len(weight_list),2) #get a managable decimal length
+			steps_needed = Decimal(round(len(weight_list) / Decimal(2),1))
+			count = 0 #count is used to choose find the index of the rate for the median weight, can this be simplified?
+			for i in range(0, len(weight_list)):
+				step_taken = Decimal(weight_list[i] / Decimal(step_size))
+				steps_needed -= step_taken
+				if round(steps_needed,2) <= 0:
+					return rate_list[count]
+				count +=1
+
+	def fill_weighted_medians_11_12(self, container, inputs):
+		#strings need to be converted to floats for external data requests
+		for i in range(0, len(self.race_rate_list)):
+			container['borrowercharacteristics'][0]['races'][i]['pricinginformation'][9]['value'] = str(self.calc_weighted_median(self.race_rate_list[i], self.race_weight_list[i]))
+		for i in range(0, len(self.ethnicity_rate_list)):
+			container['borrowercharacteristics'][1]['ethnicities'][i]['pricinginformation'][9]['value'] = str(self.calc_weighted_median(self.ethnicity_rate_list[i], self.ethnicity_weight_list[i]))
+		for i in range(0, len(self.minority_rate_list)):
+			container['borrowercharacteristics'][2]['minoritystatuses'][i]['pricinginformation'][9]['value'] = str(self.calc_weighted_median(self.minority_rate_list[i], self.minority_weight_list[i]))
+		for i in range(0, len(self.income_rate_list)):
+			container['borrowercharacteristics'][3]['incomes'][i]['pricinginformation'][9]['value'] = str(self.calc_weighted_median(self.income_rate_list[i], self.income_weight_list[i]))
+		for i in range(0, len(self.gender_rate_list)):
+			container['borrowercharacteristics'][4]['genders'][i]['pricinginformation'][9]['value'] = str(self.calc_weighted_median(self.gender_rate_list[i], self.gender_weight_list[i]))
+		for i in range(0, len(self.composition_rate_list)):
+			container['censuscharacteristics'][0]['compositions'][i]['pricinginformation'][9]['value'] = str(self.calc_weighted_median(self.composition_rate_list[i], self.composition_weight_list[i]))
+		for i in range(0, len(self.tract_income_rate_list)):
+			container['censuscharacteristics'][1]['incomes'][i]['pricinginformation'][9]['value'] = str(self.calc_weighted_median(self.tract_income_rate_list[i], self.tract_income_weight_list[i]))
+
+	def calc_weighted_mean_11_12(self, rate_list, weight_list):
+		#rate_list = [1.34, 1.22, 6, 4]
+		#weight_list = [200, 100, 300, 400]
+		#return (numpy.average(numpy.array(rate_list), weights=weight_list))
+		#round(numpy.array(ratespread_list[x]).sum() / len(ratespread_list[x]),2)
+		weighted_rates = []
+		percent_weights = [x / sum(weight_list) for x in weight_list]
+		if len(rate_list) > 0 and len(weight_list) > 0:
+			for i in range(0, len(rate_list)):
+				weighted_rates.append(rate_list[i] * percent_weights[i])
+			print sum(weighted_rates)# / sum(percent_weights[i])
+			return round(sum(weighted_rates),2)# / sum(percent_weights[i]),2)
+		else:
+			return None
+	def fill_weighted_means_11_12(self, container, inputs):
+		for i in range(0, len(self.race_rate_list)):
+			container['borrowercharacteristics'][0]['races'][i]['pricinginformation'][8]['value'] = str(self.calc_weighted_mean_11_12(self.race_rate_list[i], self.race_weight_list[i]))#self.calc_weighted_mean_11_12(self.race_rate_list[i], self.race_weight_list[i]) #numpy.average(numpy.array(self.race_weight_list[i],dtype=numpy.dtype(decimal.Decimal)), weights=numpy.array(self.race_weight_list[i],dtype=numpy.dtype(decimal.Decimal)))
+		for i in range(0, len(self.ethnicity_rate_list)):
+			container['borrowercharacteristics'][1]['ethnicities'][i]['pricinginformation'][8]['value'] = str(self.calc_weighted_mean_11_12(self.ethnicity_rate_list[i], self.ethnicity_weight_list[i]))
+		for i in range(0, len(self.minority_rate_list)):
+			container['borrowercharacteristics'][2]['minoritystatuses'][i]['pricinginformation'][8]['value'] = str(self.calc_weighted_mean_11_12(self.minority_rate_list[i], self.minority_weight_list[i]))
+		for i in range(0, len(self.income_rate_list)):
+			container['borrowercharacteristics'][3]['incomes'][i]['pricinginformation'][8]['value'] = str(self.calc_weighted_mean_11_12(self.income_rate_list[i], self.income_weight_list[i]))
+		for i in range(0, len(self.gender_rate_list)):
+			container['borrowercharacteristics'][4]['genders'][i]['pricinginformation'][8]['value'] = str(self.calc_weighted_mean_11_12(self.gender_rate_list[i], self.gender_weight_list[i]))
+		for i in range(0, len(self.composition_rate_list)):
+			container['censuscharacteristics'][0]['compositions'][i]['pricinginformation'][8]['value'] = str(self.calc_weighted_mean_11_12(self.composition_rate_list[i], self.composition_weight_list[i]))
+		for i in range(0, len(self.tract_income_rate_list)):
+			container['censuscharacteristics'][1]['incomes'][i]['pricinginformation'][8]['value'] = str(self.calc_weighted_mean_11_12(self.tract_income_rate_list[i], self.tract_income_weight_list[i]))
+
+	def fill_totals_31(self, container, inputs): #aggregate total of purchased loans for table 3-1
+		container['total']['purchasers'][inputs['purchaser']]['count'] +=1
+		container['total']['purchasers'][inputs['purchaser']]['value'] += int(inputs['loan value'])
 
 	def aggregate_report_31(self, table31, inputs):  #calls aggregation functions to fill JSON object for table 3-1
 		self.fill_by_characteristics(table31, inputs, 'borrowercharacteristics', 0, 'races', inputs['race'], 'purchasers', inputs['purchaser'])#aggregate loan by race
@@ -194,21 +240,6 @@ class aggregate(object): #aggregates LAR rows by appropriate characteristics to 
 			#junior lien weighted median column
 			container['points'][9]['purchasers'][n]['juniorlienvalue'] = self.calc_weighted_median(inputs[self.purchaser_junior_lien_rates[n]], inputs[self.purchaser_junior_lien_weight[n]])
 
-	def calc_weighted_median(self, rate_list, weight_list):
-		#to find the weighted median, step throught the rates using a step size that is the average loan amount
-		#when number of loans divided by 2 steps have been taken, return the associated rate spread
-		if len(rate_list) > 0 and len(weight_list) > 0:#check for divide by 0 errors
-			rate_list, weight_list = zip(*sorted(zip(rate_list, weight_list))) #sort both lists by rate- this converts the lists to tuples
-			step_size = round(Decimal(sum(weight_list)) / len(weight_list),2) #get a managable decimal length
-			steps_needed = Decimal(round(len(weight_list) / Decimal(2),1))
-			count = 0 #count is used to choose find the index of the rate for the median weight, can this be simplified?
-			for i in range(0, len(weight_list)):
-				step_taken = Decimal(weight_list[i] / Decimal(step_size))
-				steps_needed -= step_taken
-				if round(steps_needed,2) <= 0:
-					return rate_list[count]
-				count +=1
-
 	def aggregate_report_32(self, table32, inputs): #calls aggregation functions to fill JSON object for table 3-2
 		self.fill_by_pricing_status_32(table32, inputs) #aggregate count by lien status
 		self.fill_by_rate_spread_32(table32, inputs) #aggregate loans by percentage points above APOR as ##.##%
@@ -217,7 +248,6 @@ class aggregate(object): #aggregates LAR rows by appropriate characteristics to 
 		self.fill_weight_lists_32(inputs) #fills the median rate spread for each purchaser
 		#mean and median functions are not called here
 		#mean and median function must be called outside the control loop
-		return table32
 
 	def aggregate_report4x(self, table4x, inputs): #call functions to fill JSON object for table 4-1 (FHA, FSA, RHS, and VA home purchase loans)
 		self.fill_by_4x_demographics(table4x, inputs, 'races', inputs['race'])
@@ -245,14 +275,14 @@ class aggregate(object): #aggregates LAR rows by appropriate characteristics to 
 			if key == 'minoritystatuses' and key_index > 1:
 				pass #minoritystatuses has 2 indexes 0,1
 			else:
-				self.aggregate_4x(container, inputs, key, key_index, 0, False)
-				self.aggregate_4x(container, inputs, key, key_index, inputs['action taken'], False)
+				self.fill_4x(container, inputs, key, key_index, 0, False)
+				self.fill_4x(container, inputs, key, key_index, inputs['action taken'], False)
 
 				if inputs['gender'] < 3:
-					self.aggregate_4x(container, inputs, key, key_index, 0, True)
-					self.aggregate_4x(container, inputs, key, key_index, inputs['action taken'], True)
+					self.fill_4x(container, inputs, key, key_index, 0, True)
+					self.fill_4x(container, inputs, key, key_index, inputs['action taken'], True)
 
-	def aggregate_4x(self, container, inputs, key, key_index, action_index, gender_bool):
+	def fill_4x(self, container, inputs, key, key_index, action_index, gender_bool):
 		if gender_bool == False:
 			#aggregate by application disposition
 			container[key][key_index]['dispositions'][action_index]['count'] +=1
@@ -318,9 +348,15 @@ class aggregate(object): #aggregates LAR rows by appropriate characteristics to 
 	def get_small_county_flag(self, cur, MSA): #marks tracts with small county flag for report 7
 		#does this need to have a tract passed instead of an MSA?
 		#msa can be either an MSA or the last 5 of a geoid?
-		SQL = '''SELECT small_county FROM tract_to_cbsa_2010 WHERE geoid_msa = %s;'''
-		cur.execute(SQL, MSA)
-		small_county_flag = cur.fetchall()[0]
+		SQL = '''SELECT small_county, tract FROM tract_to_cbsa_2010
+			WHERE geoid_msa = '{msa}';'''.format(msa=MSA)
+		cur.execute(SQL,)
+		#print cur.fetchall()
+		#small_county_flag = cur.fetchall()[0]
+		flags = cur.fetchall()
+		for i in range(0, len(flags)):
+			self.small_tract_flags[flags[i][1]] = str(flags[i][0])
+		#print self.small_tract_flags
 
 	def fill_by_geo_type(self, container, inputs, index_num, action_index):
 		container['types'][index_num]['dispositions'][action_index]['count'] +=1
@@ -335,6 +371,18 @@ class aggregate(object): #aggregates LAR rows by appropriate characteristics to 
 			container['total'][inputs['action taken']]['count'] += 1
 			container['total'][inputs['action taken']]['value'] += int(inputs['loan value'])
 
+	def aggregate_report7x(self, table7x, inputs):
+		self.fill_by_tract_characteristics(table7x, inputs, 0, 'compositions', inputs['minority percent index'], inputs['action taken'])
+		self.fill_by_tract_characteristics(table7x, inputs, 1, 'incomes', inputs['tract income index'], inputs['action taken'])
+		self.fill_by_income_ethnic_combo(table7x, inputs)
+		if inputs['small county flag'] == '1':
+			self.fill_by_geo_type(table7x, inputs, 0, 0)
+			self.fill_by_geo_type(table7x, inputs, 0, inputs['action taken'])
+		if inputs['tract to MSA income'] == 4 and inputs['action taken'] < 6:
+			self.fill_by_geo_type(table7x, inputs, 1, 0)
+			self.fill_by_geo_type(table7x, inputs, 1, inputs['action taken'])
+		self.fill_totals_7x(table7x, inputs)
+
 	def fill_by_denial_percent(self, container, inputs, index_num, key):
 		for j in range(0, len(container['applicantcharacteristics'][index_num][key])):
 			for i in range(0, len(container['applicantcharacteristics'][index_num][key][j]['denialreasons'])):
@@ -348,18 +396,6 @@ class aggregate(object): #aggregates LAR rows by appropriate characteristics to 
 			else:
 				container['applicantcharacteristics'][index_num][key][inputs[key_singular]]['denialreasons'][9]['count'] +=1 #add to totals
 				container['applicantcharacteristics'][index_num][key][inputs[key_singular]]['denialreasons'][reason]['count'] +=1 #adds to race/reason cell
-
-	def aggregate_report7x(self, table7x, inputs):
-		self.fill_by_tract_characteristics(table7x, inputs, 0, 'compositions', inputs['minority percent index'], inputs['action taken'])
-		self.fill_by_tract_characteristics(table7x, inputs, 1, 'incomes', inputs['tract income index'], inputs['action taken'])
-		self.fill_by_income_ethnic_combo(table7x, inputs)
-		if inputs['small county flag'] == '1':
-			self.fill_by_geo_type(table7x, inputs, 0, 0)
-			self.fill_by_geo_type(table7x, inputs, 0, inputs['action taken'])
-		if inputs['tract to MSA income'] == 4 and inputs['action taken'] < 6:
-			self.fill_by_geo_type(table7x, inputs, 1, 0)
-			self.fill_by_geo_type(table7x, inputs, 1, inputs['action taken'])
-		self.fill_totals_7x(table7x, inputs)
 
 	def aggregate_report8x(self, table8x, inputs):
 		self.fill_by_denial_reason(table8x, inputs, 0, 'races', 'race')
@@ -412,16 +448,16 @@ class aggregate(object): #aggregates LAR rows by appropriate characteristics to 
 	def calc_mean_11_12(self, container, list_name, section, section_index, key_plural, ratespread_list):
 		for x in range(0, len(list_name)):
 			if len(ratespread_list[x]) > 0: #check for divide by 0 errors
-				mean = round(numpy.array(ratespread_list[x]).sum() / len(ratespread_list[x]),2)
-				container[section][section_index][key_plural][x]['pricinginformation'][9]['count'] = round(numpy.array(ratespread_list[x]).sum() / len(ratespread_list[x]),2)
+				container[section][section_index][key_plural][x]['pricinginformation'][8]['count'] = round(numpy.array(ratespread_list[x]).sum() / len(ratespread_list[x]),2)
 				#this access path needs to abstract to match the by_characteristics function
 
 	def calc_median_11_12(self, container, list_name, section, section_index, key_plural, ratespread_list):
 		for x in range(0, len(list_name)):
 			if len(ratespread_list[x]) > 0:
-				container[section][section_index][key_plural][x]['pricinginformation'][10]['count'] = round(numpy.median(numpy.array(ratespread_list[x])),2)
+				container[section][section_index][key_plural][x]['pricinginformation'][9]['count'] = round(numpy.median(numpy.array(ratespread_list[x])),2)
 
 	def fill_report_11_12(self, table, inputs, key, key_index):
+
 		self.fill_by_characteristics(table, inputs, 'borrowercharacteristics', 0, 'races', inputs['race'], key, key_index)
 		self.fill_by_characteristics(table, inputs, 'borrowercharacteristics', 1, 'ethnicities', inputs['ethnicity'], key, key_index)
 		if inputs['minority status'] < 2:
