@@ -150,7 +150,7 @@ class demographics(object):
 			return 3
 			print "error setting ethnicity"
 
-	def a_race_list(self, a_race):
+	def make_race_list(self, a_race):
 		#a_race = [row['applicantrace1'], row['applicantrace2'], row['applicantrace3'],row['applicantrace4'],row['applicantrace5']]
 		for i in range(0, 5): #convert ' ' entries to 0 for easier comparisons and loan aggregation
 			if a_race[i] == ' ':

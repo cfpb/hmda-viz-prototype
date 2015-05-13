@@ -1,6 +1,7 @@
-from msa_indexing import MSA_info
+Cfrom msa_indexing import MSA_info
 from median_age_api import median_age_API as age_API
 from demographics_indexing import demographics
+from connector import connect_DB as connect
 
 class parse_inputs(object):
 	inputs = {}
@@ -63,8 +64,8 @@ class parse_inputs(object):
 		app_races = [row['applicantrace1'], row['applicantrace2'], row['applicantrace3'],row['applicantrace4'],row['applicantrace5']]
 		co_app_races = [row['coapplicantrace1'], row['coapplicantrace2'], row['coapplicantrace3'],row['coapplicantrace4'],row['coapplicantrace5']]
 
-		a_race = demo.a_race_list(app_races) #put applicant race codes in a list 0-5, 0 is blank field
-		co_race = demo.a_race_list(co_app_races) #put co-applicant race codes in a list 0-5, 0 is blank field
+		a_race = demo.make_race_list(app_races) #put applicant race codes in a list 0-5, 0 is blank field
+		co_race = demo.make_race_list(co_app_races) #put co-applicant race codes in a list 0-5, 0 is blank field
 		#add data elements to dictionary
 		self.inputs['a_race'] = a_race
 		self.inputs['co_race'] = co_race
@@ -114,7 +115,7 @@ class parse_inputs(object):
 		self.inputs['census tract'] = row['censustractnumber'] # this is currently the 7 digit tract used by the FFIEC, it includes a decimal prior to the last two digits
 		self.inputs['county code'] = row['countycode'] #3 digit county code
 		self.inputs['county name'] = row['countyname'] #full county name
-		self.inputs['rate spread index'] = demo.rate_spread_index(self.inputs['rate spread']) #index of the rate spread for use in the JSON structure
+		self.inputs['rate spread index'] = demo.rate_spread_index_32(self.inputs['rate spread']) #index of the rate spread for use in the JSON structure
 
 	def parse_t4x(self, row):
 		#parsing inputs for report 4-x
@@ -126,8 +127,8 @@ class parse_inputs(object):
 		#fill race lists from the demographics class
 		app_races = [row['applicantrace1'], row['applicantrace2'], row['applicantrace3'],row['applicantrace4'],row['applicantrace5']]
 		co_app_races = [row['coapplicantrace1'], row['coapplicantrace2'], row['coapplicantrace3'],row['coapplicantrace4'],row['coapplicantrace5']]
-		a_race = demo.a_race_list(app_races) #put applicant race codes in a list 0-5, 0 is blank field
-		co_race = demo.a_race_list(co_app_races) #put co-applicant race codes in a list 0-5, 0 is blank field
+		a_race = demo.make_race_list(app_races) #put applicant race codes in a list 0-5, 0 is blank field
+		co_race = demo.make_race_list(co_app_races) #put co-applicant race codes in a list 0-5, 0 is blank field
 
 		self.inputs['a ethn'] = row['applicantethnicity'] #ethnicity of the applicant
 		self.inputs['co ethn'] = row['coapplicantethnicity'] #ethnicity of the co-applicant
@@ -165,8 +166,8 @@ class parse_inputs(object):
 
 		app_races = [row['applicantrace1'], row['applicantrace2'], row['applicantrace3'],row['applicantrace4'],row['applicantrace5']]
 		co_app_races = [row['coapplicantrace1'], row['coapplicantrace2'], row['coapplicantrace3'],row['coapplicantrace4'],row['coapplicantrace5']]
-		a_race = demo.a_race_list(app_races) #put applicant race codes in a list 0-5, 0 is blank field
-		co_race = demo.a_race_list(co_app_races) #put co-applicant race codes in a list 0-5, 0 is blank field
+		a_race = demo.make_race_list(app_races) #put applicant race codes in a list 0-5, 0 is blank field
+		co_race = demo.make_race_list(co_app_races) #put co-applicant race codes in a list 0-5, 0 is blank field
 		#add data elements to dictionary
 		self.inputs['a_race'] = a_race
 		self.inputs['co_race'] = co_race
@@ -191,11 +192,16 @@ class parse_inputs(object):
 
 	def parse_t7x(self, row):
 		MSA_index = MSA_info() #contains functions for census tract characteristics
+		#connection = connect() #connects to the DB
+		#cur = connection.connect() #creates cursor object connected to HMDAPub2012 sql database, locally hosted postgres
 
 		self.inputs['year'] = row['asofdate'] #year or application or origination
 		self.inputs['state code'] = row['statecode'] #two digit state code
 		self.inputs['MSA median income'] = row['ffiec_median_family_income'] #median income for the tract/msa
 		self.inputs['state code'] = row['statecode'] #two digit state code
+		self.inputs['county code'] = row['countycode']
+		self.inputs['census tract number'] = row['censustractnumber']
+		self.inputs['MSA'] = row['msaofproperty']
 		self.inputs['state name'] = row['statename'] #two character state abbreviation
 		self.inputs['loan value'] = float(row['loanamount']) #loan value rounded to the nearest thousand
 		self.inputs['action taken'] = int(row['actiontype']) #disposition of the loan application
@@ -203,6 +209,7 @@ class parse_inputs(object):
 		self.inputs['minority percent index'] = MSA_index.minority_percent(self.inputs) #sets the minority population percent to an index for aggregation
 		self.inputs['tract to MSA income'] = row['tract_to_msa_md_income'] #ratio of tract to msa/md income
 		self.inputs['tract income index'] = MSA_index.tract_to_MSA_income(self.inputs) #sets the tract to msa income ratio to an index for aggregation (low, middle, moderate,  high
+		#self.inputs['small county flag'] = MSA_index.get_small_county_flag(cur, self.inputs['MSA'], self.inputs['state code'], self.inputs['county code'], self.inputs['census tract number'].replace('.',''))
 
 	def parse_t8x(self, row):
 		#note: sequence number did not exist prior to 2012 and HUD median income became FFIEC median income in 2012
@@ -215,8 +222,8 @@ class parse_inputs(object):
 		#fill race lists from the demographics class
 		app_races = [row['applicantrace1'], row['applicantrace2'], row['applicantrace3'],row['applicantrace4'],row['applicantrace5']]
 		co_app_races = [row['coapplicantrace1'], row['coapplicantrace2'], row['coapplicantrace3'],row['coapplicantrace4'],row['coapplicantrace5']]
-		a_race = demo.a_race_list(app_races) #put applicant race codes in a list 0-5, 0 is blank field
-		co_race = demo.a_race_list(co_app_races) #put co-applicant race codes in a list 0-5, 0 is blank field
+		a_race = demo.make_race_list(app_races) #put applicant race codes in a list 0-5, 0 is blank field
+		co_race = demo.make_race_list(co_app_races) #put co-applicant race codes in a list 0-5, 0 is blank field
 
 		self.inputs['a_race'] = a_race
 		self.inputs['co_race'] = co_race
@@ -370,8 +377,8 @@ class parse_inputs(object):
 		#fill race lists from the demographics class
 		app_races = [row['applicantrace1'], row['applicantrace2'], row['applicantrace3'],row['applicantrace4'],row['applicantrace5']]
 		co_app_races = [row['coapplicantrace1'], row['coapplicantrace2'], row['coapplicantrace3'],row['coapplicantrace4'],row['coapplicantrace5']]
-		a_race = demo.a_race_list(app_races) #put applicant race codes in a list 0-5, 0 is blank field
-		co_race = demo.a_race_list(co_app_races) #put co-applicant race codes in a list 0-5, 0 is blank field
+		a_race = demo.make_race_list(app_races) #put applicant race codes in a list 0-5, 0 is blank field
+		co_race = demo.make_race_list(co_app_races) #put co-applicant race codes in a list 0-5, 0 is blank field
 		#add data elements to dictionary
 		self.inputs['a_race'] = a_race
 		self.inputs['co_race'] = co_race
@@ -379,7 +386,7 @@ class parse_inputs(object):
 		self.inputs['co ethn'] = row['coapplicantethnicity'] #ethnicity of the co-applicant
 		self.inputs['income'] = row['applicantincome'] #relied upon income rounded to the nearest thousand
 		self.inputs['rate spread'] = row['ratespread'] # interest rate spread over APOR if spread is greater than 1.5%
-		self.inputs['loan value'] = float(row['loanamount']) #loan value rounded to the nearest thousand
+		self.inputs['loan value'] = (row['loanamount']) #loan value rounded to the nearest thousand
 		self.inputs['year'] = row['asofdate'] #year or application or origination
 		self.inputs['state code'] = row['statecode'] #two digit state code
 		self.inputs['state name'] = row['statename'] #two character state abbreviation
@@ -411,8 +418,8 @@ class parse_inputs(object):
 		#fill race lists from the demographics class
 		app_races = [row['applicantrace1'], row['applicantrace2'], row['applicantrace3'],row['applicantrace4'],row['applicantrace5']]
 		co_app_races = [row['coapplicantrace1'], row['coapplicantrace2'], row['coapplicantrace3'],row['coapplicantrace4'],row['coapplicantrace5']]
-		a_race = demo.a_race_list(app_races) #put applicant race codes in a list 0-5, 0 is blank field
-		co_race = demo.a_race_list(co_app_races) #put co-applicant race codes in a list 0-5, 0 is blank field
+		a_race = demo.make_race_list(app_races) #put applicant race codes in a list 0-5, 0 is blank field
+		co_race = demo.make_race_list(co_app_races) #put co-applicant race codes in a list 0-5, 0 is blank field
 		#add data elements to dictionary
 		self.inputs['a_race'] = a_race
 		self.inputs['co_race'] = co_race
@@ -482,8 +489,8 @@ class parse_inputs(object):
 		#fill race lists from the demographics class
 		app_races = [row['applicantrace1'], row['applicantrace2'], row['applicantrace3'],row['applicantrace4'],row['applicantrace5']]
 		co_app_races = [row['coapplicantrace1'], row['coapplicantrace2'], row['coapplicantrace3'],row['coapplicantrace4'],row['coapplicantrace5']]
-		a_race = demo.a_race_list(app_races) #put applicant race codes in a list 0-5, 0 is blank field
-		co_race = demo.a_race_list(co_app_races) #put co-applicant race codes in a list 0-5, 0 is blank field
+		a_race = demo.make_race_list(app_races) #put applicant race codes in a list 0-5, 0 is blank field
+		co_race = demo.make_race_list(co_app_races) #put co-applicant race codes in a list 0-5, 0 is blank field
 		#add data elements to dictionary
 		self.inputs['a_race'] = a_race
 		self.inputs['co_race'] = co_race
