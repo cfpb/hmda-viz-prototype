@@ -30,9 +30,13 @@ The controller.py file requires an input CSV titled 'MSAinputs2013.csv' to run, 
 
 
 ## Loading SQL Data
-- To load HMDA LAR data to a Postgres database use [this script](https://github.com/cfpb/hmda-viz-prototype/blob/gh-pages/processing/HMDApub%20data%20load%20to%20SQL.txt). This script creates tables for HMDA data from 2009 to 2013. To use the file, change the copy path at the bottom to match the location of the HMDA data. This script is set to read pipe (|) delimited text files into varchar tables. The dataset used for processing requires several Census fields. In addition to the standard HMDA fields, the following fields have been appended from Census data: areapopulation, minoritypopulationpct, ffiec_median_family_income, tract_to_msa_md_income, num_of_owner_occupied_units, num_of_1_to_4_family_units, application_date_indicator, fipscode, latitude, longitude. Of these fields only minority populationpct, ffiec_median_family_income, and tract_to_msa_md_income are used in the processing code.
+- To load HMDA LAR data to a Postgres database use [this script](https://github.com/cfpb/hmda-viz-prototype/blob/gh-pages/processing/HMDApub%20data%20load%20to%20SQL.txt). This script creates tables for HMDA data from 2009 to 2013 and then fills the tables from files referenced in the paths of the copy statements at the end of the script. To use the file, change the copy path at the bottom to match the location of the HMDA data. This script is set to read pipe (|) delimited text files into varchar tables.
 
-- To load tract to CBSA data use [this script](https://github.com/cfpb/hmda-viz-prototype/blob/gh-pages/processing/tract%20to%20CBSA%20Load%20Script%20PostgreSQL-2.txt). This will create the tract to CBSA data table which contains the crosswalks between MSAs/MDs and census tracts.
+- If you do not have the data files for any year from 2009 to 2013 then the relevant copy command(s) need to be removed.
+
+-The dataset used for processing requires several Census fields. In addition to the standard HMDA fields, the following fields have been appended from Census data: areapopulation, minoritypopulationpct, ffiec_median_family_income, tract_to_msa_md_income, num_of_owner_occupied_units, num_of_1_to_4_family_units, application_date_indicator, fipscode, latitude, longitude. Of these fields only minority populationpct, ffiec_median_family_income, and tract_to_msa_md_income are used in the processing code.
+
+- To load tract to CBSA data use [this script](https://github.com/cfpb/hmda-viz-prototype/blob/gh-pages/processing/tract%20to%20CBSA%20Load%20Script%20PostgreSQL-2.txt). This will create the tract to CBSA data table which contains the crosswalks between MSAs/MDs and census tracts and then copy the data into the tables from the path specified at the bottom of the script.
 
 ## Back-end Installation
 To launch the processing script, enter:
