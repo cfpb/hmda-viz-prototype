@@ -41,7 +41,8 @@ class report_4x(object):
 			self.parsed.median_tract_age(cur, MSA) #call the Census API to get median housing stock age for each tract in the MSA
 		location = (MSA,) #pass the MSA nubmers as a tuple to Psycopg2 (doesn't take singletons)
 		if self.report_number[2] == '7':
-			self.parsed.inputs['small county flag'] = self.agg.get_small_county_flag(cur, location) #checks for small county flag for report 7
+			self.parsed.inputs['small county flag'] = self.agg.get_small_county_flag(cur, MSA) #checks for small county flag for report 7
+			#print self.parsed.inputs['small county flag']
 		conditions = getattr(self.queries, ('table_' + self.report_number.replace(' ','_').replace('-','_') +'_conditions'))() #A 4-1 vs A A1
 
 		SQL = (self.queries.SQL_Count + conditions).format(year=self.year, MSA=MSA)
@@ -72,10 +73,10 @@ class report_4x(object):
 				getattr(self.agg, self.aggregation)(table_X, self.parsed.inputs)
 
 			if self.report_number[2:] == '3-2': #report 3-2 requires out of loop aggregation functions for means and medians
-				self.agg.fill_by_median_32(table_X, self.parsed.inputs)
-				self.agg.fill_by_weighted_mean_32(table_X, self.parsed.inputs)
-				self.agg.fill_by_weighted_median_32(table_X, self.parsed.inputs)
-				self.agg.fill_by_mean_32(table_X, self.parsed.inputs)
+				self.agg.fill_by_median_3_2(table_X, self.parsed.inputs)
+				self.agg.fill_by_weighted_mean_3_2(table_X, self.parsed.inputs)
+				self.agg.fill_by_weighted_median_3_2(table_X, self.parsed.inputs)
+				self.agg.fill_by_mean_3_2(table_X, self.parsed.inputs)
 
 			if self.report_number[2] == '8': #8 series of reports has calculation of denial reason by percent, these are done out of the main aggregation loop
 				percent_list = ['races', 'ethnicities', 'minoritystatuses', 'genders', 'incomes']
@@ -88,6 +89,7 @@ class report_4x(object):
 				self.agg.fill_means_11_12(table_X, build_X)
 				self.agg.fill_medians_11_12(table_X, build_X)
 				self.agg.fill_weighted_medians_11_12(table_X, self.parsed.inputs)
+				self.agg.fill_weighted_means_11_12(table_X, self.parsed.inputs)
 
 			if self.report_number[2:] == 'B': #table B means are done outside the aggregation loop
 				self.agg.fill_table_B_mean(table_X, self.parsed.inputs)
@@ -106,35 +108,35 @@ class report_4x(object):
 	'''find a way to rename the functions in the A_D libary so that string manipulation chan be used to call them insead of having the functions below'''
 	def aggregation_return(self, year, report_number):
 		if report_number == 'A 3-1':
-			return 'aggregate_report_31'
+			return 'aggregate_report_3_1'
 		elif report_number == 'A 3-2':
-			return 'aggregate_report_32'
+			return 'aggregate_report_3_2'
 		elif report_number[:3] == 'A 4':
-			return 'aggregate_report4x'
+			return 'aggregate_report_4_x'
 		elif report_number[:3] == 'A 5':
-			return 'aggregate_report5x'
+			return 'aggregate_report_5_x'
 		elif report_number[:3] == 'A 7':
-			return 'aggregate_report7x'
+			return 'aggregate_report_7_x'
 		elif report_number[:3] == 'A 8':
-			return 'aggregate_report8x'
+			return 'aggregate_report_8_x'
 		elif report_number[:3] == 'A 9':
-			return 'aggregate_report9x'
+			return 'aggregate_report_9_x'
 		elif report_number[:4] == 'A 11':
-			return 'aggregate_report11x'
+			return 'aggregate_report_11_x'
 		elif report_number == 'A 12-1':
-			return 'aggregate_report12_1'
+			return 'aggregate_report_12_1'
 		elif report_number == 'A 12-2':
-			return 'aggregate_report12_2'
+			return 'aggregate_report_12_2'
 		elif report_number == 'A A1':
-			return 'aggregate_reportAx'
+			return 'aggregate_report_A_x'
 		elif report_number == 'A A2':
-			return 'aggregate_reportAx'
+			return 'aggregate_report_A_x'
 		elif report_number == 'A A3':
-			return 'aggregate_reportAx'
+			return 'aggregate_report_A_x'
 		elif report_number == 'A A4':
-			return 'aggregate_reportA4'
+			return 'aggregate_report_A_4'
 		elif report_number == 'A B':
-			return 'aggregate_reportB'
+			return 'aggregate_report_B'
 
 	def JSON_constructor_return(self, report_number):
 		if report_number == 'A 3-1':

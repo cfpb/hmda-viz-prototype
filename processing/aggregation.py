@@ -89,19 +89,15 @@ class aggregate(object): #aggregates LAR rows by appropriate characteristics to 
 			container['censuscharacteristics'][1]['incomes'][i]['pricinginformation'][9]['value'] = str(self.calc_weighted_median(self.tract_income_rate_list[i], self.tract_income_weight_list[i]))
 
 	def calc_weighted_mean_11_12(self, rate_list, weight_list):
-		#rate_list = [1.34, 1.22, 6, 4]
-		#weight_list = [200, 100, 300, 400]
-		#return (numpy.average(numpy.array(rate_list), weights=weight_list))
-		#round(numpy.array(ratespread_list[x]).sum() / len(ratespread_list[x]),2)
 		weighted_rates = []
 		percent_weights = [x / sum(weight_list) for x in weight_list]
 		if len(rate_list) > 0 and len(weight_list) > 0:
 			for i in range(0, len(rate_list)):
 				weighted_rates.append(rate_list[i] * percent_weights[i])
-			print sum(weighted_rates)# / sum(percent_weights[i])
 			return round(sum(weighted_rates),2)# / sum(percent_weights[i]),2)
 		else:
 			return None
+
 	def fill_weighted_means_11_12(self, container, inputs):
 		for i in range(0, len(self.race_rate_list)):
 			container['borrowercharacteristics'][0]['races'][i]['pricinginformation'][8]['value'] = str(self.calc_weighted_mean_11_12(self.race_rate_list[i], self.race_weight_list[i]))#self.calc_weighted_mean_11_12(self.race_rate_list[i], self.race_weight_list[i]) #numpy.average(numpy.array(self.race_weight_list[i],dtype=numpy.dtype(decimal.Decimal)), weights=numpy.array(self.race_weight_list[i],dtype=numpy.dtype(decimal.Decimal)))
@@ -118,11 +114,11 @@ class aggregate(object): #aggregates LAR rows by appropriate characteristics to 
 		for i in range(0, len(self.tract_income_rate_list)):
 			container['censuscharacteristics'][1]['incomes'][i]['pricinginformation'][8]['value'] = str(self.calc_weighted_mean_11_12(self.tract_income_rate_list[i], self.tract_income_weight_list[i]))
 
-	def fill_totals_31(self, container, inputs): #aggregate total of purchased loans for table 3-1
+	def fill_totals_3_1(self, container, inputs): #aggregate total of purchased loans for table 3-1
 		container['total']['purchasers'][inputs['purchaser']]['count'] +=1
 		container['total']['purchasers'][inputs['purchaser']]['value'] += int(inputs['loan value'])
 
-	def aggregate_report_31(self, table31, inputs):  #calls aggregation functions to fill JSON object for table 3-1
+	def aggregate_report_3_1(self, table31, inputs):  #calls aggregation functions to fill JSON object for table 3-1
 		self.fill_by_characteristics(table31, inputs, 'borrowercharacteristics', 0, 'races', inputs['race'], 'purchasers', inputs['purchaser'])#aggregate loan by race
 		self.fill_by_characteristics(table31, inputs, 'borrowercharacteristics', 1, 'ethnicities', inputs['ethnicity'], 'purchasers', inputs['purchaser'])#aggregate loan by ethnicity
 		if inputs['minority status'] < 2:
@@ -133,10 +129,10 @@ class aggregate(object): #aggregates LAR rows by appropriate characteristics to 
 			self.fill_by_characteristics(table31, inputs, 'censuscharacteristics', 0, 'tractpctminorities', inputs['minority percent index'], 'purchasers', inputs['purchaser'])#aggregates loans by percent of minority residents (census)
 		if inputs['tract income index'] < 4: #income ratio not available or outside report 3-1 bounds
 			self.fill_by_characteristics(table31, inputs, 'censuscharacteristics', 1, 'incomelevels', inputs['tract income index'], 'purchasers', inputs['purchaser']) #aggregates loans by census tract income rating - low/moderate/middle/upper
-		self.fill_totals_31(table31, inputs) #aggregate totals for each purchaser
+		self.fill_totals_3_1(table31, inputs) #aggregate totals for each purchaser
 		return table31
 
-	def fill_by_pricing_status_32(self, container, inputs): #aggregate loans by lien status
+	def fill_by_pricing_status_3_2(self, container, inputs): #aggregate loans by lien status
 		#index 8 is for loans with no reported pricing information
 		if inputs['rate spread index'] == 8 and inputs['lien status'] == '1':
 			container['pricinginformation'][0]['purchasers'][inputs['purchaser']]['firstliencount'] +=1
@@ -152,7 +148,7 @@ class aggregate(object): #aggregates LAR rows by appropriate characteristics to 
 				container['pricinginformation'][1]['purchasers'][inputs['purchaser']]['juniorliencount'] += 1
 				container['pricinginformation'][1]['purchasers'][inputs['purchaser']]['juniorlienvalue'] += int(inputs['loan value'])
 
-	def fill_by_rate_spread_32(self, container, inputs): #aggregate loans by rate spread index
+	def fill_by_rate_spread_3_2(self, container, inputs): #aggregate loans by rate spread index
 		if inputs['lien status'] == '1' and inputs['rate spread index'] < 8: #aggregate first lien status loans
 			if container['points'][inputs['rate spread index']]['purchasers'][inputs['purchaser']]['firstliencount'] == 'NA':
 				container['points'][inputs['rate spread index']]['purchasers'][inputs['purchaser']]['firstliencount'] =0
@@ -167,7 +163,7 @@ class aggregate(object): #aggregates LAR rows by appropriate characteristics to 
 			container['points'][inputs['rate spread index']]['purchasers'][inputs['purchaser']]['juniorliencount'] +=1
 			container['points'][inputs['rate spread index']]['purchasers'][inputs['purchaser']]['juniorlienvalue'] += int(inputs['loan value'])
 
-	def fill_by_hoepa_status_32(self, container, inputs): #aggregate loans subject to HOEPA
+	def fill_by_hoepa_status_3_2(self, container, inputs): #aggregate loans subject to HOEPA
 		if inputs['hoepa flag'] == 1:
 			if inputs['lien status'] == '1': #first lien HOEPA
 				container['hoepa']['purchasers'][inputs['purchaser']]['firstliencount'] +=1
@@ -187,7 +183,7 @@ class aggregate(object): #aggregates LAR rows by appropriate characteristics to 
 		else:
 			print "HOEPA flag not present or outside parameters" #error message to be displayed if a loan falls outside logic parameters
 
-	def fill_by_mean_32(self, container, inputs): #aggregate loans by mean of rate spread
+	def fill_by_mean_3_2(self, container, inputs): #aggregate loans by mean of rate spread
 		for n in range(0,9):
 			if float(container['pricinginformation'][1]['purchasers'][n]['firstliencount']) > 0 and inputs[self.purchaser_first_lien_rates[n]] > 0: #bug fix for divide by 0 errors
 				container['points'][8]['purchasers'][n]['firstliencount'] = round(numpy.mean(numpy.array(inputs[self.purchaser_first_lien_rates[n]])),2)
@@ -195,7 +191,7 @@ class aggregate(object): #aggregates LAR rows by appropriate characteristics to 
 			if float(container['pricinginformation'][1]['purchasers'][n]['juniorliencount']) > 0 and inputs[self.purchaser_junior_lien_rates[n]] > 0: #bug fix for divide by 0 errors
 				container['points'][8]['purchasers'][n]['juniorliencount'] = round(numpy.mean(numpy.array(inputs[self.purchaser_junior_lien_rates[n]]), dtype=numpy.float64),2)
 
-	def fill_by_weighted_mean_32(self, container, inputs): #aggregate loans by weighted mean of rate spread
+	def fill_by_weighted_mean_3_2(self, container, inputs): #aggregate loans by weighted mean of rate spread
 
 		for n in range(0,9):
 			if float(container['pricinginformation'][1]['purchasers'][n]['firstliencount']) > 0 and inputs[self.purchaser_first_lien_weight[n]] > 0: #bug fix for divide by 0 errors
@@ -208,7 +204,7 @@ class aggregate(object): #aggregates LAR rows by appropriate characteristics to 
 				nd_junior_weights = numpy.array(inputs[self.purchaser_junior_lien_rates[n]])
 				container['points'][8]['purchasers'][n]['juniorlienvalue'] = round(numpy.average(nd_junior_rates, weights=nd_junior_weights),2)#round(inputs[self.purchaser_junior_lien_weight[n]]/float(container['pricinginformation'][1]['purchasers'][n]['juniorlienvalue']),2)
 
-	def fill_weight_lists_32(self, inputs): #add all loan values to a list to find means and medians for table 3-2
+	def fill_weight_lists_3_2(self, inputs): #add all loan values to a list to find means and medians for table 3-2
 		if inputs['rate spread'] != 'NA   ' and inputs['rate spread'] != '     ':
 
 			if inputs['lien status'] =='1':
@@ -216,7 +212,7 @@ class aggregate(object): #aggregates LAR rows by appropriate characteristics to 
 			elif inputs['lien status'] == '2':
 				inputs[self.purchaser_junior_lien_weight[inputs['purchaser']]].append(int(inputs['loan value']))
 
-	def fill_rate_lists_32(self, inputs): #add all rate spreads to a list to find the mean and median rate spreads for table 3-2
+	def fill_rate_lists_3_2(self, inputs): #add all rate spreads to a list to find the mean and median rate spreads for table 3-2
 		if inputs['rate spread'] == 'NA   ' or inputs['rate spread'] == '     ':
 			pass
 		elif inputs['lien status'] == '1': #add to first lien rate spread list
@@ -224,7 +220,7 @@ class aggregate(object): #aggregates LAR rows by appropriate characteristics to 
 		elif inputs['lien status'] == '2': #add to junior lien rate spread list
 			inputs[self.purchaser_junior_lien_rates[inputs['purchaser']]].append(float(inputs['rate spread']))
 
-	def fill_by_median_32(self, container, inputs): #puts the median rate spread in the JSON object
+	def fill_by_median_3_2(self, container, inputs): #puts the median rate spread in the JSON object
 		for n in range(0,9):
 			#first lien median column
 			if len(inputs[self.purchaser_first_lien_rates[n]]) > 0: #check to see if the array is populated
@@ -233,30 +229,30 @@ class aggregate(object): #aggregates LAR rows by appropriate characteristics to 
 			if len(inputs[self.purchaser_junior_lien_rates[n]]) > 0: #check to see if the array is populated
 				container['points'][9]['purchasers'][n]['juniorliencount'] = round(numpy.median(numpy.array(inputs[self.purchaser_junior_lien_rates[n]])),2) #for normal median
 
-	def fill_by_weighted_median_32(self, container, inputs): #weighted median function for table 3-2
+	def fill_by_weighted_median_3_2(self, container, inputs): #weighted median function for table 3-2
 		for n in range(0,9):
 			#first lien weighted median column
 			container['points'][9]['purchasers'][n]['firstlienvalue'] = self.calc_weighted_median(inputs[self.purchaser_first_lien_rates[n]], inputs[self.purchaser_first_lien_weight[n]])
 			#junior lien weighted median column
 			container['points'][9]['purchasers'][n]['juniorlienvalue'] = self.calc_weighted_median(inputs[self.purchaser_junior_lien_rates[n]], inputs[self.purchaser_junior_lien_weight[n]])
 
-	def aggregate_report_32(self, table32, inputs): #calls aggregation functions to fill JSON object for table 3-2
-		self.fill_by_pricing_status_32(table32, inputs) #aggregate count by lien status
-		self.fill_by_rate_spread_32(table32, inputs) #aggregate loans by percentage points above APOR as ##.##%
-		self.fill_by_hoepa_status_32(table32, inputs) #aggregates loans by presence of HOEPA flag
-		self.fill_rate_lists_32(inputs)
-		self.fill_weight_lists_32(inputs) #fills the median rate spread for each purchaser
+	def aggregate_report_3_2(self, table32, inputs): #calls aggregation functions to fill JSON object for table 3-2
+		self.fill_by_pricing_status_3_2(table32, inputs) #aggregate count by lien status
+		self.fill_by_rate_spread_3_2(table32, inputs) #aggregate loans by percentage points above APOR as ##.##%
+		self.fill_by_hoepa_status_3_2(table32, inputs) #aggregates loans by presence of HOEPA flag
+		self.fill_rate_lists_3_2(inputs)
+		self.fill_weight_lists_3_2(inputs) #fills the median rate spread for each purchaser
 		#mean and median functions are not called here
 		#mean and median function must be called outside the control loop
 
-	def aggregate_report4x(self, table4x, inputs): #call functions to fill JSON object for table 4-1 (FHA, FSA, RHS, and VA home purchase loans)
-		self.fill_by_4x_demographics(table4x, inputs, 'races', inputs['race'])
-		self.fill_by_4x_demographics(table4x, inputs, 'ethnicities', inputs['ethnicity'])
-		self.fill_by_4x_demographics(table4x, inputs, 'minoritystatuses', inputs['minority status'])
-		self.fill_by_applicant_income_4x(table4x, inputs) #aggregate loans by applicant income to MSA income ratio
-		self.fill_totals_4x(table4x, inputs) #totals of applications by application disposition
+	def aggregate_report_4_x(self, table4x, inputs): #call functions to fill JSON object for table 4-1 (FHA, FSA, RHS, and VA home purchase loans)
+		self.fill_by_4_x_demographics(table4x, inputs, 'races', inputs['race'])
+		self.fill_by_4_x_demographics(table4x, inputs, 'ethnicities', inputs['ethnicity'])
+		self.fill_by_4_x_demographics(table4x, inputs, 'minoritystatuses', inputs['minority status'])
+		self.fill_by_applicant_income_4_x(table4x, inputs) #aggregate loans by applicant income to MSA income ratio
+		self.fill_totals_4_x(table4x, inputs) #totals of applications by application disposition
 
-	def fill_by_applicant_income_4x(self, container, inputs): #aggregate loans by applicant income index
+	def fill_by_applicant_income_4_x(self, container, inputs): #aggregate loans by applicant income index
 		if inputs['income bracket'] > 5 or inputs['action taken'] == ' ' or inputs['action taken'] > 5: #filter out of bounds indexes before calling aggregations
 			pass
 
@@ -270,19 +266,19 @@ class aggregate(object): #aggregates LAR rows by appropriate characteristics to 
 		else:
 			print "error aggregating income for report 4-1"
 
-	def fill_by_4x_demographics(self, container, inputs, key, key_index):
+	def fill_by_4_x_demographics(self, container, inputs, key, key_index):
 		if inputs['action taken'] < 6:
 			if key == 'minoritystatuses' and key_index > 1:
 				pass #minoritystatuses has 2 indexes 0,1
 			else:
-				self.fill_4x(container, inputs, key, key_index, 0, False)
-				self.fill_4x(container, inputs, key, key_index, inputs['action taken'], False)
+				self.fill_4_x(container, inputs, key, key_index, 0, False)
+				self.fill_4_x(container, inputs, key, key_index, inputs['action taken'], False)
 
 				if inputs['gender'] < 3:
-					self.fill_4x(container, inputs, key, key_index, 0, True)
-					self.fill_4x(container, inputs, key, key_index, inputs['action taken'], True)
+					self.fill_4_x(container, inputs, key, key_index, 0, True)
+					self.fill_4_x(container, inputs, key, key_index, inputs['action taken'], True)
 
-	def fill_4x(self, container, inputs, key, key_index, action_index, gender_bool):
+	def fill_4_x(self, container, inputs, key, key_index, action_index, gender_bool):
 		if gender_bool == False:
 			#aggregate by application disposition
 			container[key][key_index]['dispositions'][action_index]['count'] +=1
@@ -292,7 +288,7 @@ class aggregate(object): #aggregates LAR rows by appropriate characteristics to 
 			container[key][key_index]['genders'][inputs['gender']]['dispositions'][action_index]['count'] +=1
 			container[key][key_index]['genders'][inputs['gender']]['dispositions'][action_index]['value'] +=int(inputs['loan value'])
 
-	def fill_totals_4x(self, container, inputs):
+	def fill_totals_4_x(self, container, inputs):
 		if inputs['action taken'] < 6 and inputs['action taken'] != ' ':
 			#aggregates loans for toal application column
 			container['total'][0]['count'] += 1
@@ -301,7 +297,7 @@ class aggregate(object): #aggregates LAR rows by appropriate characteristics to 
 			container['total'][inputs['action taken']]['count'] +=1
 			container['total'][inputs['action taken']]['value'] += int(inputs['loan value'])
 
-	def fill_by_5x_totals(self, container, inputs):
+	def fill_by_5_x_totals(self, container, inputs):
 		if inputs['action taken'] > 5:
 			pass
 		else:
@@ -312,7 +308,7 @@ class aggregate(object): #aggregates LAR rows by appropriate characteristics to 
 			container['total'][inputs['action taken']]['count'] +=1
 			container['total'][inputs['action taken']]['value'] += int(inputs['loan value'])
 
-	def fill_by_5x_demographics(self, container, inputs, index_num, index_name, index_code):
+	def fill_by_5_x_demographics(self, container, inputs, index_num, index_name, index_code):
 		#index_num: the index of the primary list in the dictionary
 		#index_name: the key corresponding to the index number
 		#index_code: the code from the inputs dictionary for the row being aggregated
@@ -322,12 +318,12 @@ class aggregate(object): #aggregates LAR rows by appropriate characteristics to 
 			container['applicantincomes'][inputs['income bracket']]['borrowercharacteristics'][index_num][index_name][index_code]['dispositions'][inputs['action taken']]['count'] += 1 #increment count by action taken and minority status
 			container['applicantincomes'][inputs['income bracket']]['borrowercharacteristics'][index_num][index_name][index_code]['dispositions'][inputs['action taken']]['value'] += int(inputs['loan value'])
 
-	def aggregate_report5x(self, table5x, inputs):
-		self.fill_by_5x_demographics(table5x, inputs, 0, 'races', inputs['race'])
-		self.fill_by_5x_demographics(table5x, inputs, 1, 'ethnicities', inputs['ethnicity'])
+	def aggregate_report_5_x(self, table5x, inputs):
+		self.fill_by_5_x_demographics(table5x, inputs, 0, 'races', inputs['race'])
+		self.fill_by_5_x_demographics(table5x, inputs, 1, 'ethnicities', inputs['ethnicity'])
 		if inputs['minority status'] < 2:
-			self.fill_by_5x_demographics(table5x, inputs, 2, 'minoritystatus', inputs['minority status'])
-		self.fill_by_5x_totals(table5x, inputs)
+			self.fill_by_5_x_demographics(table5x, inputs, 2, 'minoritystatus', inputs['minority status'])
+		self.fill_by_5_x_totals(table5x, inputs)
 
 	def fill_by_tract_characteristics(self, container, inputs, json_index, key, key_index, action_index):
 		if action_index < 6 and key_index <4:
@@ -362,7 +358,7 @@ class aggregate(object): #aggregates LAR rows by appropriate characteristics to 
 		container['types'][index_num]['dispositions'][action_index]['count'] +=1
 		container['types'][index_num]['dispositions'][action_index]['value'] +=int(inputs['loan value'])
 
-	def fill_totals_7x(self, container, inputs):
+	def fill_totals_7_x(self, container, inputs):
 		if inputs['action taken'] > 5:
 			pass
 		else:
@@ -371,7 +367,7 @@ class aggregate(object): #aggregates LAR rows by appropriate characteristics to 
 			container['total'][inputs['action taken']]['count'] += 1
 			container['total'][inputs['action taken']]['value'] += int(inputs['loan value'])
 
-	def aggregate_report7x(self, table7x, inputs):
+	def aggregate_report_7_x(self, table7x, inputs):
 		self.fill_by_tract_characteristics(table7x, inputs, 0, 'compositions', inputs['minority percent index'], inputs['action taken'])
 		self.fill_by_tract_characteristics(table7x, inputs, 1, 'incomes', inputs['tract income index'], inputs['action taken'])
 		self.fill_by_income_ethnic_combo(table7x, inputs)
@@ -381,7 +377,7 @@ class aggregate(object): #aggregates LAR rows by appropriate characteristics to 
 		if inputs['tract to MSA income'] == 4 and inputs['action taken'] < 6:
 			self.fill_by_geo_type(table7x, inputs, 1, 0)
 			self.fill_by_geo_type(table7x, inputs, 1, inputs['action taken'])
-		self.fill_totals_7x(table7x, inputs)
+		self.fill_totals_7_x(table7x, inputs)
 
 	def fill_by_denial_percent(self, container, inputs, index_num, key):
 		for j in range(0, len(container['applicantcharacteristics'][index_num][key])):
@@ -397,7 +393,7 @@ class aggregate(object): #aggregates LAR rows by appropriate characteristics to 
 				container['applicantcharacteristics'][index_num][key][inputs[key_singular]]['denialreasons'][9]['count'] +=1 #add to totals
 				container['applicantcharacteristics'][index_num][key][inputs[key_singular]]['denialreasons'][reason]['count'] +=1 #adds to race/reason cell
 
-	def aggregate_report8x(self, table8x, inputs):
+	def aggregate_report_8_x(self, table8x, inputs):
 		self.fill_by_denial_reason(table8x, inputs, 0, 'races', 'race')
 		self.fill_by_denial_reason(table8x, inputs, 1, 'ethnicities', 'ethnicity')
 		if inputs['minority status'] <2: #pass on loans with no minority status information
@@ -406,7 +402,7 @@ class aggregate(object): #aggregates LAR rows by appropriate characteristics to 
 		if inputs['income bracket'] <6:
 			self.fill_by_denial_reason(table8x, inputs, 4, 'incomes', 'income bracket')
 
-	def aggregate_report9x(self, container, inputs):
+	def aggregate_report_9_x(self, container, inputs):
 		container['medianages'][inputs['median age index']]['loancategories'][inputs['loan type index']]['dispositions'][inputs['action taken']-1]['count'] += 1
 		container['medianages'][inputs['median age index']]['loancategories'][inputs['loan type index']]['dispositions'][inputs['action taken']-1]['value'] += int(inputs['loan value'])
 
@@ -450,14 +446,30 @@ class aggregate(object): #aggregates LAR rows by appropriate characteristics to 
 			if len(ratespread_list[x]) > 0: #check for divide by 0 errors
 				container[section][section_index][key_plural][x]['pricinginformation'][8]['count'] = round(numpy.array(ratespread_list[x]).sum() / len(ratespread_list[x]),2)
 				#this access path needs to abstract to match the by_characteristics function
+	def fill_means_11_12(self, table_X, build_X):
+		self.calc_mean_11_12(table_X, build_X.race_names, 'borrowercharacteristics', 0, 'races', self.race_rate_list)
+		self.calc_mean_11_12(table_X, build_X.ethnicity_names, 'borrowercharacteristics', 1, 'ethnicities', self.ethnicity_rate_list)
+		self.calc_mean_11_12(table_X, build_X.minority_statuses, 'borrowercharacteristics', 2, 'minoritystatuses', self.minority_rate_list)
+		self.calc_mean_11_12(table_X, build_X.applicant_income_bracket, 'borrowercharacteristics', 3, 'incomes', self.income_rate_list)
+		self.calc_mean_11_12(table_X, build_X.gender_names2, 'borrowercharacteristics', 4, 'genders', self.gender_rate_list)
+		self.calc_mean_11_12(table_X, build_X.tract_pct_minority, 'censuscharacteristics', 0, 'compositions', self.composition_rate_list)
+		self.calc_mean_11_12(table_X, build_X.income_bracket_names, 'censuscharacteristics', 1, 'incomes', self.tract_income_rate_list)
 
 	def calc_median_11_12(self, container, list_name, section, section_index, key_plural, ratespread_list):
 		for x in range(0, len(list_name)):
 			if len(ratespread_list[x]) > 0:
 				container[section][section_index][key_plural][x]['pricinginformation'][9]['count'] = round(numpy.median(numpy.array(ratespread_list[x])),2)
 
-	def fill_report_11_12(self, table, inputs, key, key_index):
+	def fill_medians_11_12(self, table_X, build_X):
+		self.calc_median_11_12(table_X, build_X.race_names, 'borrowercharacteristics', 0, 'races', self.race_rate_list)
+		self.calc_median_11_12(table_X, build_X.ethnicity_names, 'borrowercharacteristics', 1, 'ethnicities', self.ethnicity_rate_list)
+		self.calc_median_11_12(table_X, build_X.minority_statuses, 'borrowercharacteristics', 2, 'minoritystatuses', self.minority_rate_list)
+		self.calc_median_11_12(table_X, build_X.applicant_income_bracket, 'borrowercharacteristics', 3, 'incomes', self.income_rate_list)
+		self.calc_median_11_12(table_X, build_X.gender_names2, 'borrowercharacteristics', 4, 'genders', self.gender_rate_list)
+		self.calc_median_11_12(table_X, build_X.tract_pct_minority, 'censuscharacteristics', 0, 'compositions', self.composition_rate_list)
+		self.calc_median_11_12(table_X, build_X.income_bracket_names, 'censuscharacteristics', 1, 'incomes', self.tract_income_rate_list)
 
+	def fill_report_11_12(self, table, inputs, key, key_index):
 		self.fill_by_characteristics(table, inputs, 'borrowercharacteristics', 0, 'races', inputs['race'], key, key_index)
 		self.fill_by_characteristics(table, inputs, 'borrowercharacteristics', 1, 'ethnicities', inputs['ethnicity'], key, key_index)
 		if inputs['minority status'] < 2:
@@ -470,44 +482,26 @@ class aggregate(object): #aggregates LAR rows by appropriate characteristics to 
 		if inputs['tract income index'] < 4:
 			self.fill_by_characteristics(table, inputs, 'censuscharacteristics', 1, 'incomes', inputs['tract income index'], key, key_index)
 
-	def aggregate_report11x(self, table11x, inputs):
+	def aggregate_report_11_x(self, table11x, inputs):
 		self.fill_11_12_rates(inputs)
 		self.fill_11_12_weights(inputs)
 		self.fill_report_11_12(table11x, inputs, 'pricinginformation', inputs['rate spread index']) #fill all columns except 'prciing infomraiton reported'
 		if inputs['rate spread index'] > 0:
 			self.fill_report_11_12(table11x, inputs, 'pricinginformation', 1) #fill the 'pricing information reported column'
 
-	def aggregate_report12_1(self, table12x, inputs):
+	def aggregate_report_12_1(self, table12x, inputs):
 		self.fill_report_11_12(table12x, inputs, 'dispositions', inputs['action taken'])
 		if inputs['action taken'] < 6:
 			self.fill_report_11_12(table12x, inputs, 'dispositions', 0)
 
-	def aggregate_report12_2(self, table12x, inputs):
+	def aggregate_report_12_2(self, table12x, inputs):
 		self.fill_11_12_rates(inputs)
 		self.fill_11_12_weights(inputs)
 		self.fill_report_11_12(table12x, inputs, 'pricinginformation', inputs['rate spread index'])
 		if inputs['rate spread index'] > 0:
 			self.fill_report_11_12(table12x, inputs, 'pricinginformation', 1)
 
-	def fill_means_11_12(self, table_X, build_X):
-		self.calc_mean_11_12(table_X, build_X.race_names, 'borrowercharacteristics', 0, 'races', self.race_rate_list)
-		self.calc_mean_11_12(table_X, build_X.ethnicity_names, 'borrowercharacteristics', 1, 'ethnicities', self.ethnicity_rate_list)
-		self.calc_mean_11_12(table_X, build_X.minority_statuses, 'borrowercharacteristics', 2, 'minoritystatuses', self.minority_rate_list)
-		self.calc_mean_11_12(table_X, build_X.applicant_income_bracket, 'borrowercharacteristics', 3, 'incomes', self.income_rate_list)
-		self.calc_mean_11_12(table_X, build_X.gender_names2, 'borrowercharacteristics', 4, 'genders', self.gender_rate_list)
-		self.calc_mean_11_12(table_X, build_X.tract_pct_minority, 'censuscharacteristics', 0, 'compositions', self.composition_rate_list)
-		self.calc_mean_11_12(table_X, build_X.income_bracket_names, 'censuscharacteristics', 1, 'incomes', self.tract_income_rate_list)
-
-	def fill_medians_11_12(self, table_X, build_X):
-		self.calc_median_11_12(table_X, build_X.race_names, 'borrowercharacteristics', 0, 'races', self.race_rate_list)
-		self.calc_median_11_12(table_X, build_X.ethnicity_names, 'borrowercharacteristics', 1, 'ethnicities', self.ethnicity_rate_list)
-		self.calc_median_11_12(table_X, build_X.minority_statuses, 'borrowercharacteristics', 2, 'minoritystatuses', self.minority_rate_list)
-		self.calc_median_11_12(table_X, build_X.applicant_income_bracket, 'borrowercharacteristics', 3, 'incomes', self.income_rate_list)
-		self.calc_median_11_12(table_X, build_X.gender_names2, 'borrowercharacteristics', 4, 'genders', self.gender_rate_list)
-		self.calc_median_11_12(table_X, build_X.tract_pct_minority, 'censuscharacteristics', 0, 'compositions', self.composition_rate_list)
-		self.calc_median_11_12(table_X, build_X.income_bracket_names, 'censuscharacteristics', 1, 'incomes', self.tract_income_rate_list)
-
-	def aggregate_reportAx(self, container, inputs):
+	def aggregate_report_A_x(self, container, inputs):
 		if inputs['action taken index'] < 8:
 			if inputs['lien status'] == '1':
 				container['dispositions'][0]['loantypes'][inputs['loan type']]['purposes'][inputs['loan purpose']]['firstliencount'] +=1
@@ -524,6 +518,7 @@ class aggregate(object): #aggregates LAR rows by appropriate characteristics to 
 					container['dispositions'][7]['loantypes'][inputs['loan type']]['purposes'][inputs['loan purpose']]['juniorliencount'] +=1
 				if inputs['action taken index'] == 1 and inputs['preapproval'] == '1':
 					container['dispositions'][6]['loantypes'][inputs['loan type']]['purposes'][inputs['loan purpose']]['juniorliencount'] +=1
+
 			elif inputs['lien status'] == '3':
 				container['dispositions'][0]['loantypes'][inputs['loan type']]['purposes'][inputs['loan purpose']]['noliencount'] +=1
 				container['dispositions'][inputs['action taken index']]['loantypes'][inputs['loan type']]['purposes'][inputs['loan purpose']]['noliencount']+=1
@@ -532,7 +527,7 @@ class aggregate(object): #aggregates LAR rows by appropriate characteristics to 
 				if inputs['action taken index'] == 1 and inputs['preapproval'] == '1':
 					container['dispositions'][6]['loantypes'][inputs['loan type']]['purposes'][inputs['loan purpose']]['noliencount'] +=1
 
-	def aggregate_reportA4(self, container, inputs):
+	def aggregate_report_A_4(self, container, inputs):
 		if inputs['preapproval'] == '1' and inputs['action taken'] == '1':
 			self.fill_by_characteristics(container, inputs, 'borrowercharacteristics', 0, 'races', inputs['race'], 'preapprovalstatuses', 0)
 			self.fill_by_characteristics(container, inputs, 'borrowercharacteristics', 1, 'ethnicities', inputs['ethnicity'], 'preapprovalstatuses', 0)
@@ -557,7 +552,7 @@ class aggregate(object): #aggregates LAR rows by appropriate characteristics to 
 			if inputs['tract income index'] < 4:
 				self.fill_by_characteristics_NA(container, inputs, 'censuscharacteristics', 1, 'incomes', inputs['tract income index'], 'preapprovalstatuses', i)
 
-	def aggregate_reportB(self, container, inputs):
+	def aggregate_report_B(self, container, inputs):
 		self.fill_rates_B(inputs)
 		table_b_pricing = self.rate_spreads[0:2] + self.rate_spreads[-2:]
 		#aggregate 1-4 family loans
