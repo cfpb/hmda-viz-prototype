@@ -1,4 +1,6 @@
 class MSA_info(object): #contains functions for setting aggregate information for the MSA
+	def __init__(self):
+		self.small_tract_flags = {} #to hold 11 digit tract number as key and small county flag as value
 
 	def app_income_to_MSA(self, inputs): #set income bracket index
 		if inputs['income'] == 'NA  ' or inputs['income'] == '    ':

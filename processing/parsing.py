@@ -115,7 +115,7 @@ class parse_inputs(object):
 		self.inputs['census tract'] = row['censustractnumber'] # this is currently the 7 digit tract used by the FFIEC, it includes a decimal prior to the last two digits
 		self.inputs['county code'] = row['countycode'] #3 digit county code
 		self.inputs['county name'] = row['countyname'] #full county name
-		self.inputs['rate spread index'] = demo.rate_spread_index_32(self.inputs['rate spread']) #index of the rate spread for use in the JSON structure
+		self.inputs['rate spread index'] = demo.rate_spread_index_3_2(self.inputs['rate spread']) #index of the rate spread for use in the JSON structure
 
 	def parse_4_x(self, row):
 		#parsing inputs for report 4-x
@@ -310,14 +310,9 @@ class parse_inputs(object):
 		state_SQL = state_string.format(MSA = MSA)
 
 		cur.execute(state_SQL,)
-		#print MSA, #len(cur.fetchall())
-		test = cur.fetchall()
-		if len(test) > 0:
+		state_list = cur.fetchall()
+		if len(state_list) > 0:
 		#try
-			state_list = test
-
-		#states = cur.fetchall()[0]
-			#print state_list, "state list"
 			for j in range(0, len(state_list)):
 				state = state_list[j][0]
 				county_SQL = county_string.format(MSA = MSA, statecode = state)
@@ -367,7 +362,7 @@ class parse_inputs(object):
 			return 0
 		else:
 			print "no median age found for tract"
-			return 5
+			return 5 #this is actually a report section, not an ignored index
 
 	def parse_11_x(self, row):
 		MSA_index = MSA_info() #contains functions for census tract characteristics
@@ -399,7 +394,7 @@ class parse_inputs(object):
 		self.inputs['lien status'] = row['lienstatus']
 		self.inputs['tract income index'] = MSA_index.tract_to_MSA_income(self.inputs) #sets the tract to MSA median income ratio to an index number for aggregation
 		self.inputs['income bracket'] = MSA_index.app_income_to_MSA(self.inputs) #sets the applicant income as an index by an applicant's income as a percent of MSA median
-		self.inputs['rate spread index'] = demo.rate_spread_index_11x(self.inputs['rate spread']) #index of the rate spread for use in the JSON structure
+		self.inputs['rate spread index'] = demo.rate_spread_index_11_x(self.inputs['rate spread']) #index of the rate spread for use in the JSON structure
 		self.inputs['minority percent index'] = MSA_index.minority_percent(self.inputs) #sets the minority population percent to an index for aggregation
 		self.inputs['app non white flag'] = demo.set_non_white(a_race) #flags the applicant as non-white if true, used in setting minority status and race
 		self.inputs['co non white flag'] = demo.set_non_white(co_race) #flags the co applicant as non-white if true, used in setting minority status and race
@@ -440,7 +435,7 @@ class parse_inputs(object):
 		self.inputs['tract income index'] = MSA_index.tract_to_MSA_income(self.inputs) #sets the tract to MSA median income ratio to an index number for aggregation
 		self.inputs['income bracket'] = MSA_index.app_income_to_MSA(self.inputs) #sets the applicant income as an index by an applicant's income as a percent of MSA median
 		self.inputs['action taken'] = int(row['actiontype'])
-		self.inputs['rate spread index'] = demo.rate_spread_index_11x(self.inputs['rate spread']) #index of the rate spread for use in the JSON structure
+		self.inputs['rate spread index'] = demo.rate_spread_index_11_x(self.inputs['rate spread']) #index of the rate spread for use in the JSON structure
 		self.inputs['minority percent index'] = MSA_index.minority_percent(self.inputs) #sets the minority population percent to an index for aggregation
 		self.inputs['app non white flag'] = demo.set_non_white(a_race) #flags the applicant as non-white if true, used in setting minority status and race
 		self.inputs['co non white flag'] = demo.set_non_white(co_race) #flags the co applicant as non-white if true, used in setting minority status and race
@@ -461,7 +456,6 @@ class parse_inputs(object):
 		self.inputs['action taken index'] = self.action_taken_index(int(row['actiontype']), row['preapproval']) #disposition of the loan application
 		self.inputs['purchaser'] = int(row['purchasertype'])
 		self.inputs['preapproval'] = row['preapproval']
-		#self.inputs['property type'] = row['propertytype']
 		self.inputs['loan purpose'] = self.purpose_index(row['loanpurpose']) #adjust loan purpose down one to match index in JSON structure
 		self.inputs['loan type'] = int(row['loantype']) -1 #adjust loan purpose down one to match index in JSON structure
 
@@ -513,7 +507,7 @@ class parse_inputs(object):
 		#self.inputs['lien status'] = row['lienstatus']
 		self.inputs['tract income index'] = MSA_index.tract_to_MSA_income(self.inputs) #sets the tract to MSA median income ratio to an index number for aggregation
 		self.inputs['income bracket'] = MSA_index.app_income_to_MSA(self.inputs) #sets the applicant income as an index by an applicant's income as a percent of MSA median
-		self.inputs['rate spread index'] = demo.rate_spread_index_11x(self.inputs['rate spread']) #index of the rate spread for use in the JSON structure
+		self.inputs['rate spread index'] = demo.rate_spread_index_11_x(self.inputs['rate spread']) #index of the rate spread for use in the JSON structure
 		self.inputs['minority percent index'] = MSA_index.minority_percent(self.inputs) #sets the minority population percent to an index for aggregation
 		self.inputs['app non white flag'] = demo.set_non_white(a_race) #flags the applicant as non-white if true, used in setting minority status and race
 		self.inputs['co non white flag'] = demo.set_non_white(co_race) #flags the co applicant as non-white if true, used in setting minority status and race
@@ -536,4 +530,4 @@ class parse_inputs(object):
 		self.inputs['lien status'] = int(row['lienstatus'])
 		self.inputs['hoepa flag'] = int(row['hoepastatus']) #if the loan is subject to Home Ownership Equity Protection Act
 		self.inputs['property type'] = int(row['propertytype'])
-		self.inputs['rate spread index'] = demo.rate_spread_index_11x(row['ratespread']) #index of the rate spread for use in the JSON structure
+		self.inputs['rate spread index'] = demo.rate_spread_index_11_x(row['ratespread']) #index of the rate spread for use in the JSON structure
