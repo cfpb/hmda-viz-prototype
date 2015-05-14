@@ -1,4 +1,4 @@
-Cfrom msa_indexing import MSA_info
+from msa_indexing import MSA_info
 from median_age_api import median_age_API as age_API
 from demographics_indexing import demographics
 from connector import connect_DB as connect
@@ -53,7 +53,7 @@ class parse_inputs(object):
 		#median age of housing by tract
 		self.tract_median_ages = {}
 
-	def parse_t31(self, row): #takes a row of tuples from a table 3-1 query and parses it to the inputs dictionary
+	def parse_3_1(self, row): #takes a row of tuples from a table 3-1 query and parses it to the inputs dictionary
 		#parsing inputs for report 3.1
 		#self.inputs will be used in the aggregation functions
 		#note: sequence number did not exist prior to 2012 and HUD median income became FFIEC median income in 2012
@@ -97,7 +97,7 @@ class parse_inputs(object):
 		self.inputs['minority status'] = demo.set_minority_status(self.inputs) #requires non white flags be set prior to running set_minority_status
 
 
-	def parse_t32(self, row): #takes a row of tuples from a table 3-1 query and parses it to the inputs dictionary
+	def parse_3_2(self, row): #takes a row of tuples from a table 3-1 query and parses it to the inputs dictionary
 		#parsing inputs for report 3-1
 		#self.inputs will be returned to for use in the aggregation function
 
@@ -117,7 +117,7 @@ class parse_inputs(object):
 		self.inputs['county name'] = row['countyname'] #full county name
 		self.inputs['rate spread index'] = demo.rate_spread_index_32(self.inputs['rate spread']) #index of the rate spread for use in the JSON structure
 
-	def parse_t4x(self, row):
+	def parse_4_x(self, row):
 		#parsing inputs for report 4-x
 		MSA_index = MSA_info() #contains functions for census tract characteristics
 		demo=demographics() #contains functions for borrower characteristics
@@ -156,7 +156,7 @@ class parse_inputs(object):
 		self.inputs['minority status'] = demo.set_minority_status(self.inputs) #requires non white flags be set prior to running set_minority_status
 		self.inputs['gender'] = demo.set_gender(self.inputs)
 
-	def parse_t5x(self, row):
+	def parse_5_x(self, row):
 
 		#self.inputs will be used in the aggregation functions
 		#note: sequence number did not exist prior to 2012 and HUD median income became FFIEC median income in 2012
@@ -190,7 +190,7 @@ class parse_inputs(object):
 		self.inputs['ethnicity'] = demo.set_loan_ethn(self.inputs) #requires  ethnicity be parsed prior to running set_loan_ethn
 		self.inputs['minority status'] = demo.set_minority_status(self.inputs) #requires non white flags be set prior to running set_minority_status
 
-	def parse_t7x(self, row):
+	def parse_7_x(self, row):
 		MSA_index = MSA_info() #contains functions for census tract characteristics
 		#connection = connect() #connects to the DB
 		#cur = connection.connect() #creates cursor object connected to HMDAPub2012 sql database, locally hosted postgres
@@ -211,7 +211,7 @@ class parse_inputs(object):
 		self.inputs['tract income index'] = MSA_index.tract_to_MSA_income(self.inputs) #sets the tract to msa income ratio to an index for aggregation (low, middle, moderate,  high
 		#self.inputs['small county flag'] = MSA_index.get_small_county_flag(cur, self.inputs['MSA'], self.inputs['state code'], self.inputs['county code'], self.inputs['census tract number'].replace('.',''))
 
-	def parse_t8x(self, row):
+	def parse_8_x(self, row):
 		#note: sequence number did not exist prior to 2012 and HUD median income became FFIEC median income in 2012
 
 		MSA_index = MSA_info() #contains functions for census tract characteristics
@@ -264,7 +264,7 @@ class parse_inputs(object):
 		denial_list.append(reason3)
 		return denial_list
 
-	def parse_t9x(self, row):
+	def parse_9_x(self, row):
 		self.inputs['year'] = row['asofdate'] #year or application or origination
 		self.inputs['state code'] = row['statecode'] #two digit state code
 		self.inputs['state name'] = row['statename'] #two character state abbreviation
@@ -369,7 +369,7 @@ class parse_inputs(object):
 			print "no median age found for tract"
 			return 5
 
-	def parse_t11x(self, row):
+	def parse_11_x(self, row):
 		MSA_index = MSA_info() #contains functions for census tract characteristics
 		demo=demographics() #contains functions for borrower characteristics
 		a_race = [] #race lists will hold 5 integers with 0 replacing a blank entry
@@ -410,7 +410,7 @@ class parse_inputs(object):
 		self.inputs['minority status'] = demo.set_minority_status(self.inputs) #requires non white flags be set prior to running set_minority_status
 		self.inputs['gender'] = demo.set_gender(self.inputs)
 
-	def parse_t12x(self, row):
+	def parse_12_x(self, row):
 		MSA_index = MSA_info() #contains functions for census tract characteristics
 		demo=demographics() #contains functions for borrower characteristics
 		a_race = [] #race lists will hold 5 integers with 0 replacing a blank entry
@@ -451,7 +451,7 @@ class parse_inputs(object):
 		self.inputs['minority status'] = demo.set_minority_status(self.inputs) #requires non white flags be set prior to running set_minority_status
 		self.inputs['gender'] = demo.set_gender(self.inputs)
 
-	def parse_tAx(self, row):
+	def parse_A_x(self, row):
 		self.inputs['loan value'] = float(row['loanamount']) #loan value rounded to the nearest thousand
 		self.inputs['year'] = row['asofdate'] #year or application or origination
 		self.inputs['state code'] = row['statecode'] #two digit state code
@@ -481,7 +481,7 @@ class parse_inputs(object):
 		elif loantype == '3':
 			return 1 #refinance loans
 
-	def parse_tA4(self, row):
+	def parse_A_4(self, row):
 		MSA_index = MSA_info() #contains functions for census tract characteristics
 		demo=demographics() #contains functions for borrower characteristics
 		a_race = [] #race lists will hold 5 integers with 0 replacing a blank entry
@@ -524,7 +524,7 @@ class parse_inputs(object):
 		self.inputs['minority status'] = demo.set_minority_status(self.inputs) #requires non white flags be set prior to running set_minority_status
 		self.inputs['gender'] = demo.set_gender(self.inputs)
 
-	def parse_tBx(self, row):
+	def parse_B_x(self, row):
 		demo=demographics() #contains functions for borrower characteristics
 		self.inputs['year'] = row['asofdate'] #year or application or origination
 		#self.inputs['rate spread'] = row['ratespread'] # interest rate spread over APOR if spread is greater than 1.5%

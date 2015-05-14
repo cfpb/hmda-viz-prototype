@@ -168,32 +168,32 @@ class report_4x(object):
 
 	def parse_return(self, report_number):
 		if report_number == 'A 3-1':
-			return 'parse_t31'
+			return 'parse_3_1'
 		elif report_number == 'A 3-2':
-			return 'parse_t32'
+			return 'parse_3_2'
 		elif report_number[:3] == 'A 4':
-			return 'parse_t4x'
+			return 'parse_4_x'
 		elif report_number[:3] == 'A 5':
-			return 'parse_t5x'
+			return 'parse_5_x'
 		elif report_number[:3] == 'A 7':
-			return 'parse_t7x'
+			return 'parse_7_x'
 		elif report_number[:3] == 'A 8':
-			return 'parse_t8x'
+			return 'parse_8_x'
 		elif report_number[:3] == 'A 9':
-			return 'parse_t9x'
+			return 'parse_9_x'
 		elif report_number[:4] == 'A 11':
-			return 'parse_t11x'
+			return 'parse_11_x'
 		elif report_number[:4] == 'A 12':
-			return 'parse_t12x'
+			return 'parse_12_x'
 		elif report_number == 'A A1':
-			return 'parse_tAx'
+			return 'parse_A_x'
 		elif report_number == 'A A2':
-			return 'parse_tAx'
+			return 'parse_A_x'
 		elif report_number == 'A A3':
-			return 'parse_tAx'
+			return 'parse_A_x'
 		elif report_number == 'A A4':
-			return 'parse_tA4'
+			return 'parse_A_4'
 		elif report_number == 'A B':
-			return 'parse_tBx'
+			return 'parse_B_x'
 		else:
 			print 'parse return fail'
