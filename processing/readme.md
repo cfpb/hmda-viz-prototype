@@ -11,7 +11,6 @@ Working prototype processing code can be found running in [gh-pages](http://cfpb
     - Requests
     - json
 - [PostgresSQL](http://www.postgresql.org/download/)
-- CSV writing tool
 - [Internet access](http://www.broadbandmap.gov)
 
 
