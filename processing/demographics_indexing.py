@@ -27,7 +27,7 @@ class demographics(object):
 		else:
 			return None
 
-	def rate_spread_index_32(self, rate):
+	def rate_spread_index_3_2(self, rate):
 		#sets the rate spread variable to an index number for aggregation in the JSON object
 		#indexes match the position on the report
 		if rate == 'NA   ' or rate == '     ':
@@ -51,7 +51,7 @@ class demographics(object):
 		else:
 			return None
 
-	def rate_spread_index_11x(self, rate):
+	def rate_spread_index_11_x(self, rate):
 		#indexes the rate spreads for use in table 11.x
 		if rate == 'NA   ' or rate == '     ':
 			return 0
