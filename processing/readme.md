@@ -12,6 +12,8 @@ Working prototype processing code can be found running in [gh-pages](http://cfpb
     - json
 - [PostgresSQL](http://www.postgresql.org/download/)
 - [Internet access](http://www.broadbandmap.gov)
+- A full list of packages used can be found in [requirements.txt](https://github.com/cfpb/hmda-viz-prototype/blob/gh-pages/processing/requirements.txt)
+    - `pip install -r requirements.txt` to install the requirements
 
 
 ## Data Dependancies
