@@ -108,35 +108,35 @@ class report_4x(object):
 	'''find a way to rename the functions in the A_D libary so that string manipulation chan be used to call them insead of having the functions below'''
 	def aggregation_return(self, year, report_number):
 		if report_number == 'A 3-1':
-			return 'aggregate_report_3_1'
+			return 'compile_report_3_1'
 		elif report_number == 'A 3-2':
-			return 'aggregate_report_3_2'
+			return 'compile_report_3_2'
 		elif report_number[:3] == 'A 4':
-			return 'aggregate_report_4_x'
+			return 'compile_report_4_x'
 		elif report_number[:3] == 'A 5':
-			return 'aggregate_report_5_x'
+			return 'compile_report_5_x'
 		elif report_number[:3] == 'A 7':
-			return 'aggregate_report_7_x'
+			return 'compile_report_7_x'
 		elif report_number[:3] == 'A 8':
-			return 'aggregate_report_8_x'
+			return 'compile_report_8_x'
 		elif report_number[:3] == 'A 9':
-			return 'aggregate_report_9_x'
+			return 'compile_report_9_x'
 		elif report_number[:4] == 'A 11':
-			return 'aggregate_report_11_x'
+			return 'compile_report_11_x'
 		elif report_number == 'A 12-1':
-			return 'aggregate_report_12_1'
+			return 'compile_report_12_1'
 		elif report_number == 'A 12-2':
-			return 'aggregate_report_12_2'
+			return 'compile_report_12_2'
 		elif report_number == 'A A1':
-			return 'aggregate_report_A_x'
+			return 'compile_report_A_x'
 		elif report_number == 'A A2':
-			return 'aggregate_report_A_x'
+			return 'compile_report_A_x'
 		elif report_number == 'A A3':
-			return 'aggregate_report_A_x'
+			return 'compile_report_A_x'
 		elif report_number == 'A A4':
-			return 'aggregate_report_A_4'
+			return 'compile_report_A_4'
 		elif report_number == 'A B':
-			return 'aggregate_report_B'
+			return 'compile_report_B'
 
 	def JSON_constructor_return(self, report_number):
 		if report_number == 'A 3-1':
