@@ -23,15 +23,115 @@ For information on dependancies and running the code see [readme.md](https://git
 - demographics_indexing.py
 - file_check.py
 - median_age_api.py
-
 - queries.py
 - report_list.py
 - selector.py
 
+
 #Explanation of Classes and Methods
 
 
+## MSA_info
+- app_income_to_MSA
+- minority_percent
+- tract_to_MSA_income
+
+
+## median_age_API
+-get_age
+
+
+## demographics
+- set_gender
+- rate_spread_index_3_2
+- rate_spread_index_11_x
+- minority_count
+- set_non_white
+- set_joint
+- set_minority_status
+- set_loan_ethn
+- make_race_list
+- set_race
+
+## controller
+
+
+## constructor
+- __init__
+- report_x
+- aggregation_return
+- JSON_constructor_return
+- parse_return
+
 ## parse_inputs
+
+
+## queries
+- __init__
+- table_A_3_1_conditions
+- table_A_3_2_conditions
+- table_A_4_1_conditions
+- table_A_4_2_conditions
+- table_A_4_3_conditions
+- table_A_4_4_conditions
+- table_A_4_5_conditions
+- table_A_4_6_conditions
+- table_A_4_7_conditions
+- table_A_5_1_conditions
+- table_A_5_2_conditions
+- table_A_5_3_conditions
+- table_A_5_4_conditions
+- table_A_5_5_conditions
+- table_A_5_6_conditions
+- table_A_5_7_conditions
+- table_A_7_1_conditions
+- table_A_7_2_conditions
+- table_A_7_3_conditions
+- table_A_7_4_conditions
+- table_A_7_5_conditions
+- table_A_7_6_conditions
+- table_A_7_7_conditions
+- table_A_8_1_conditions
+- table_A_8_2_conditions
+- table_A_8_3_conditions
+- table_A_8_4_conditions
+- table_A_8_5_conditions
+- table_A_8_6_conditions
+- table_A_8_7_conditions
+- table_A_9_conditions
+- table_A_11_1_conditions
+- table_A_11_2_conditions
+- table_A_11_3_conditions
+- table_A_11_4_conditions
+- table_A_11_5_conditions
+- table_A_11_6_conditions
+- table_A_11_7_conditions
+- table_A_11_8_conditions
+- table_A_11_9_conditions
+- table_A_11_10_conditions
+- table_A_12_1_conditions
+- table_A_12_2_conditions
+- table_A_A_1_conditions
+- table_A_A_2_conditions
+- table_A_A_3_conditions
+- table_A_A_4_conditions
+- table_A_B_conditions
+- table_3_2_columns
+- table_3_1_columns
+- table_4_x_columns
+- table_5_x_columns
+- table_7_x_columns
+- table_8_x_columns
+- table_9_columns
+- table_11_x_columns
+- table_12_x_columns
+- table_A_x_columns
+- table_B_columns
+
+
+
+
+
 - __init__
 	- Initializes lists to hold weights and rates that are used to calculate means, medians, weighted means, and weighted medians
 	- Initializes a dictionary for tract median age which stores the median age of housing stock as a value and an 11 digit census tract as a key

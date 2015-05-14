@@ -11,7 +11,7 @@ from aggregation import aggregate as agg
 from queries import queries
 from selector import report_selector as selector
 
-class report_4x(object):
+class report_construction(object):
 	def __init__(self, report, selector):
 		self.year = selector.report_list['year'][1]
 		self.parsed = parse() #for parsing inputs from rows
@@ -53,10 +53,11 @@ class report_4x(object):
 			print count, 'LAR rows in MSA "{MSA}", for report "{report}", in {year}'.format(MSA=MSA, report=self.report_number, year=self.year)
 			#manipulate report name to call query and aggregation functions
 
-			if self.report_number[2] == '4' or self.report_number[2] == '5' or self.report_number[2] == '7' or self.report_number[2] == '8' or self.report_number[2:4] == '11' or self.report_number[2:4] == '12':
+			if self.report_number[2] == '4' or self.report_number[2] == '5' or self.report_number[2] == '7' or self.report_number[2] == '8' or self.report_number[2:4] == '11' \
+			or self.report_number[2:4] == '12' or (self.report_number[2] == 'A' and self.report_number[4] != '4'):
 				self.report_number = self.report_number[:self.report_number.index('-')+1] + 'x' # removes the 1 and adds an x to reports that share a json template for the series
-			elif self.report_number[2] == 'A' and self.report_number[3] != '4': #reports A1, A2, A3 have the same structure, A4 is different
-				self.report_number = self.report_number[:-1] + 'x'
+			#elif self.report_number[2] == 'A' and self.report_number[3] != '4': #reports A1, A2, A3 have the same structure, A4 is different
+			#	self.report_number = self.report_number[:-1] + 'x'
 			columns = getattr(self.queries, ('table_' + self.report_number[2:].replace(' ','_').replace('-','_')+'_columns'))()
 
 			SQL = (self.queries.SQL_Query + conditions).format(columns=columns, year=self.year, MSA=MSA)
@@ -127,13 +128,13 @@ class report_4x(object):
 			return 'compile_report_12_1'
 		elif report_number == 'A 12-2':
 			return 'compile_report_12_2'
-		elif report_number == 'A A1':
+		elif report_number == 'A A-1':
 			return 'compile_report_A_x'
-		elif report_number == 'A A2':
+		elif report_number == 'A A-2':
 			return 'compile_report_A_x'
-		elif report_number == 'A A3':
+		elif report_number == 'A A-3':
 			return 'compile_report_A_x'
-		elif report_number == 'A A4':
+		elif report_number == 'A A-4':
 			return 'compile_report_A_4'
 		elif report_number == 'A B':
 			return 'compile_report_B'
@@ -159,9 +160,9 @@ class report_4x(object):
 			return 'table_12_1_builder'
 		elif report_number == 'A 12-2':
 			return 'table_12_2_builder'
-		elif report_number == 'A A1' or report_number == 'A A2' or report_number == 'A A3':
+		elif report_number == 'A A-1' or report_number == 'A A-2' or report_number == 'A A-3':
 			return 'table_Ax_builder'
-		elif report_number == 'A A4':
+		elif report_number == 'A A-4':
 			return 'table_A4_builder'
 		elif report_number == 'A B':
 			return 'table_B_builder'
@@ -185,15 +186,16 @@ class report_4x(object):
 			return 'parse_11_x'
 		elif report_number[:4] == 'A 12':
 			return 'parse_12_x'
-		elif report_number == 'A A1':
+		elif report_number == 'A A-1':
 			return 'parse_A_x'
-		elif report_number == 'A A2':
+		elif report_number == 'A A-2':
 			return 'parse_A_x'
-		elif report_number == 'A A3':
+		elif report_number == 'A A-3':
 			return 'parse_A_x'
-		elif report_number == 'A A4':
+		elif report_number == 'A A-4':
 			return 'parse_A_4'
 		elif report_number == 'A B':
 			return 'parse_B_x'
 		else:
 			print 'parse return fail'
+			return None
