@@ -5,13 +5,13 @@ import psycopg2.extras
 from connector import connect_DB as connect
 from builder import build_JSON as build
 from selector import report_selector as selector
-from constructor import report_4x
+from constructor import report_construction
 from file_check import check_file
 from report_list import report_list_maker
 
 connection = connect() #connects to the DB
 selector = selector() #holds lists of reports to be generated for each MSA
-cur = connection.connect() #creates cursor object connected to HMDAPub2012 sql database, locally hosted postgres
+cur = connection.connect() #creates cursor object connected to HMDAPub2013 sql database, locally hosted postgres
 selector.get_report_lists('MSAinputs2013.csv') #fills the dictionary of lists of reports to be generated
 build_msa = build() #instantiate the build object for file path, jekyll files
 build_msa.msas_in_state(cur, selector, 'aggregate') #creates a list of all MSAs in each state and places the file in the state's aggregate folder
@@ -76,9 +76,10 @@ AL_MSAs =[
 '41180', '40484', '41884', '31084', '15764', '47644', '19804', '35084', '19124', '15804', '35644', '16974', '22744', '20764', '48864', '13644', '33124', '45104',
 '14484', '23844', '42644', '37964', '23104', '36084', '35004', '47894', '42044', '29404', '37764', '48424']
 '''
-'''
+
 #AL_MSAs = ['45180', '45980', '11500', '10760', '42460', '13820', '19460', '23460', '46740', '17980', '12220', '20020', '18980', '33860', '46260', '33660', '19300', '22840', '21460','10700','21640','42820','26620','22520','46220']
 #setting MSAs for reports for testing
+AL_MSAs = ['33660']
 selector.report_list['A 3-1'] = AL_MSAs
 #selector.report_list['A 3-1'] = ['11500']
 selector.report_list['A 3-2'] = AL_MSAs
@@ -125,29 +126,29 @@ selector.report_list['A 11-9'] = AL_MSAs
 selector.report_list['A 11-10'] = AL_MSAs
 selector.report_list['A 12-1'] = AL_MSAs
 selector.report_list['A 12-2'] = AL_MSAs
-selector.report_list['A A1'] = AL_MSAs
-selector.report_list['A A2'] = AL_MSAs
-selector.report_list['A A3'] = AL_MSAs
-selector.report_list['A A4'] = AL_MSAs
+selector.report_list['A A-1'] = AL_MSAs
+selector.report_list['A A-2'] = AL_MSAs
+selector.report_list['A A-3'] = AL_MSAs
+selector.report_list['A A-4'] = AL_MSAs
 selector.report_list['A B'] = AL_MSAs
-'''
+
 #selector.report_list['A 7-1'] = ['33660']
-#selector.report_list['A 9'] = ['33660']
+#selector.report_list['A 3-1'] = ['33660']
 
 #report lists for testing
 #selector.reports_to_run = ['A 9']
-#selector.reports_to_run = ['A 3-1', 'A 7-2']
+#selector.reports_to_run = ['A 11-1']
 #selector.reports_to_run = ['A 4-1', 'A 4-2', 'A 4-3', 'A 4-4', 'A 4-6', 'A 4-7']
 #selector.reports_to_run = ['A 5-1', 'A 5-2', 'A 5-3', 'A 5-4', 'A 5-5', 'A 5-7']
 #selector.reports_to_run = ['A 7-1', 'A 7-2', 'A 7-3', 'A 7-4', 'A 7-5', 'A 7-6', 'A 7-7']
 #selector.reports_to_run = ['A 8-1', 'A 8-2', 'A 8-3', 'A 8-4', 'A 8-5', 'A 8-6', 'A 8-7']
 #selector.reports_to_run = ['A 11-1', 'A 11-2', 'A 11-3', 'A 11-4', 'A 11-5', 'A 11-6', 'A 11-7', 'A 11-8', 'A 11-9', 'A 11-10']
 #selector.reports_to_run = ['A 12-1', 'A 12-2']
-#selector.reports_to_run = ['A A1', 'A A2', 'A A3', 'A A4']
+selector.reports_to_run = ['A A-1', 'A A-2', 'A A-3', 'A A-4']
 #selector.reports_to_run = ['B']
 
 #complete report list
-#selector.reports_to_run = ['A 3-1', 'A 3-2', 'A 4-1', 'A 4-2', 'A 4-3', 'A 4-4', 'A 4-5', 'A 4-6', 'A 4-7', 'A 5-1', 'A 5-2', 'A 5-3', 'A 5-4', 'A 5-5', 'A 5-7', 'A 7-1', 'A 7-2', 'A 7-3', 'A 7-4', 'A 7-5', 'A 7-6', 'A 7-7', 'A 8-1', 'A 8-2', 'A 8-3', 'A 8-4', 'A 8-5', 'A 8-6', 'A 8-7', 'A 9', 'A 11-1', 'A 11-2', 'A 11-3', 'A 11-4', 'A 11-5', 'A 11-6', 'A 11-7', 'A 11-8', 'A 11-9', 'A 11-10', 'A 12-1', 'A 12-2', 'A A1', 'A A2', 'A A3', 'A A4', 'A B'] #this needs to be changed to read from the input file
+#selector.reports_to_run = ['A 3-1', 'A 3-2', 'A 4-1', 'A 4-2', 'A 4-3', 'A 4-4', 'A 4-5', 'A 4-6', 'A 4-7', 'A 5-1', 'A 5-2', 'A 5-3', 'A 5-4', 'A 5-5', 'A 5-7', 'A 7-1', 'A 7-2', 'A 7-3', 'A 7-4', 'A 7-5', 'A 7-6', 'A 7-7', 'A 8-1', 'A 8-2', 'A 8-3', 'A 8-4', 'A 8-5', 'A 8-6', 'A 8-7', 'A 9', 'A 11-1', 'A 11-2', 'A 11-3', 'A 11-4', 'A 11-5', 'A 11-6', 'A 11-7', 'A 11-8', 'A 11-9', 'A 11-10', 'A 12-1', 'A 12-2', 'A A-1', 'A A-2', 'A A-3', 'A A-4', 'A-B'] #this needs to be changed to read from the input file
 
 #control loop
 total_time_start2 = time.time()
@@ -158,7 +159,7 @@ for report in selector.reports_to_run: #loop over a list of report names
 	start = time.clock() #set start for one report
 	start2 = time.time()
 	for MSA in selector.report_list[report]: #loop through MSAs flagged for report generation
-		report_x = report_4x(report, selector) #instantiate class and set function strings
+		report_x = report_construction(report, selector) #instantiate class and set function strings
 		report_x.report_x(MSA, cur) #variabalize funciton inputs!!!!
 	end = time.clock() #set end for one report
 	end2 = time.time()
