@@ -9,149 +9,149 @@ class queries(object):
 		self.SQL_Count = '''SELECT COUNT(msaofproperty) FROM hmdapub{year} WHERE msaofproperty = '{MSA}' '''
 		self.SQL_Query = '''SELECT {columns} FROM hmdapub{year} WHERE msaofproperty = '{MSA}' '''
 
-	def table_A_3_1_conditions(self):
+	def table_3_1_conditions(self):
 		return ''' and purchasertype != '0' ;'''
 
-	def table_A_3_2_conditions(self):
+	def table_3_2_conditions(self):
 		return ''' and actiontype = '1' and purchasertype != '0' ;'''
 
-	def table_A_4_1_conditions(self):
+	def table_4_1_conditions(self):
 		return '''and (loantype = '2' or loantype = '3' or loantype = '4') and propertytype !='3' and loanpurpose = '1' ;'''
 
-	def table_A_4_2_conditions(self):
+	def table_4_2_conditions(self):
 		return '''and loantype = '1' and propertytype !='3' and loanpurpose = '1' ;'''
 
-	def table_A_4_3_conditions(self):
+	def table_4_3_conditions(self):
 		return '''and propertytype !='3' and loanpurpose = '3' ;'''
 
-	def table_A_4_4_conditions(self):
+	def table_4_4_conditions(self):
 		return '''and propertytype !='3' and loanpurpose = '2' ;'''
 
-	def table_A_4_5_conditions(self):
+	def table_4_5_conditions(self):
 		return '''and propertytype ='3' ;'''
 
-	def table_A_4_6_conditions(self):
+	def table_4_6_conditions(self):
 		return '''and propertytype !='3' and occupancy = '2' ;'''
 
-	def table_A_4_7_conditions(self):
+	def table_4_7_conditions(self):
 		return '''and propertytype ='2' ;'''
 
-	def table_A_5_1_conditions(self):
+	def table_5_1_conditions(self):
 		return '''and propertytype !='3' and loantype !='1' and loanpurpose = '1' ;'''
 
-	def table_A_5_2_conditions(self):
+	def table_5_2_conditions(self):
 		return '''and propertytype !='3' and loantype ='1' and loanpurpose = '1' ;'''
 
-	def table_A_5_3_conditions(self):
+	def table_5_3_conditions(self):
 		return '''and propertytype !='3' and loanpurpose = '3' ;'''
 
-	def table_A_5_4_conditions(self):
+	def table_5_4_conditions(self):
 		return '''and propertytype !='3' and loanpurpose = '2' ;'''
 
-	def table_A_5_5_conditions(self):
+	def table_5_5_conditions(self):
 		return '''and propertytype ='3' ;'''
 
-	def table_A_5_6_conditions(self):
+	def table_5_6_conditions(self):
 		return '''and occupancy ='1' and propertytype !='3' ;'''
 
-	def table_A_5_7_conditions(self):
+	def table_5_7_conditions(self):
 		return '''and propertytype ='2' ;'''
 
-	def table_A_7_1_conditions(self):
+	def table_7_1_conditions(self):
 		return '''and loantype != '1' and propertytype !='3' and loanpurpose = '1' ;'''
 
-	def table_A_7_2_conditions(self):
+	def table_7_2_conditions(self):
 		return '''and loantype = '1' and propertytype !='3' and loanpurpose = '1' ;'''
 
-	def table_A_7_3_conditions(self):
+	def table_7_3_conditions(self):
 		return '''and propertytype !='3' and loanpurpose = '3' ;'''
 
-	def table_A_7_4_conditions(self):
+	def table_7_4_conditions(self):
 		return '''and propertytype !='3' and loanpurpose = '2' ;'''
 
-	def table_A_7_5_conditions(self):
+	def table_7_5_conditions(self):
 		return '''and propertytype ='3' ;'''
 
-	def table_A_7_6_conditions(self):
+	def table_7_6_conditions(self):
 		return '''and propertytype !='3' and occupancy = '2' ;'''
 
-	def table_A_7_7_conditions(self):
+	def table_7_7_conditions(self):
 		return '''and propertytype ='3' ;'''
 
-	def table_A_8_1_conditions(self):
+	def table_8_1_conditions(self):
 		return '''and loantype != '1' and propertytype != '3' and loanpurpose = '1' ;'''
 
-	def table_A_8_2_conditions(self):
+	def table_8_2_conditions(self):
 		return '''and loantype ='1' and propertytype !='3' and loanpurpose = '1' ;'''
 
-	def table_A_8_3_conditions(self):
+	def table_8_3_conditions(self):
 		return '''and propertytype != '3' and loanpurpose = '3' ;'''
 
-	def table_A_8_4_conditions(self):
+	def table_8_4_conditions(self):
 		return '''and propertytype !='3' and loanpurpose = '2' ;'''
 
-	def table_A_8_5_conditions(self):
+	def table_8_5_conditions(self):
 		return '''and propertytype = '3' ;'''
 
-	def table_A_8_6_conditions(self):
+	def table_8_6_conditions(self):
 		return '''and occupancy = '2' and propertytype != '3' ;'''
 
-	def table_A_8_7_conditions(self):
+	def table_8_7_conditions(self):
 		return '''and propertytype = '2' ;'''
 
-	def table_A_9_conditions(self):
+	def table_9_conditions(self):
 		return '''and actiontype != '6' and actiontype != '7' and actiontype != '8' and actiontype != '9' ;'''
 
-	def table_A_11_1_conditions(self):
+	def table_11_1_conditions(self):
 		return '''and loantype = '2' and loanpurpose = '1' and lienstatus = '1' and propertytype = '1' and occupancy = '1' and actiontype = '1' ;'''
 
-	def table_A_11_2_conditions(self):
+	def table_11_2_conditions(self):
 		return '''and loantype = '3' and loanpurpose = '1' and lienstatus = '1' and propertytype = '1' and occupancy = '1' ;'''
 
-	def table_A_11_3_conditions(self):
+	def table_11_3_conditions(self):
 		return '''and loantype = '3' and loanpurpose = '1' and lienstatus = '1' and propertytype = '1' and occupancy = '1' ;'''
 
-	def table_A_11_4_conditions(self):
+	def table_11_4_conditions(self):
 		return '''and loantype = '1' and loanpurpose = '1' and lienstatus = '2' and propertytype = '1' and occupancy = '1' ;'''
 
-	def table_A_11_5_conditions(self):
+	def table_11_5_conditions(self):
 		return '''and loantype = '2' and loanpurpose = '3' and lienstatus = '1' and propertytype = '1' and occupancy = '1' ;'''
 
-	def table_A_11_6_conditions(self):
+	def table_11_6_conditions(self):
 		return '''and loantype = '3' and loanpurpose = '3' and lienstatus = '1' and propertytype = '1' and occupancy = '1' ;'''
 
-	def table_A_11_7_conditions(self):
+	def table_11_7_conditions(self):
 		return '''and loantype = '1' and loanpurpose = '3' and lienstatus = '1' and propertytype = '1' and occupancy = '1' ;'''
 
-	def table_A_11_8_conditions(self):
+	def table_11_8_conditions(self):
 		return '''and loantype = '1' and loanpurpose = '3' and lienstatus = '2' and propertytype = '1' and occupancy = '1' ;'''
 
-	def table_A_11_9_conditions(self):
+	def table_11_9_conditions(self):
 		return '''and loantype = '1' and loanpurpose = '2' and lienstatus = '1' and propertytype = '1' and occupancy = '1' ;'''
 
-	def table_A_11_10_conditions(self):
+	def table_11_10_conditions(self):
 		return '''and loantype = '1' and loanpurpose = '2' and lienstatus = '2' and propertytype = '1' and occupancy = '1' ;'''
 
-	def table_A_12_1_conditions(self):
+	def table_12_1_conditions(self):
 		return ''' and loantype = '1' and propertytype = '2' and loanpurpose = '1' and lienstatus = '1' and occupancy = '1' ;'''
 
-	def table_A_12_2_conditions(self):
+	def table_12_2_conditions(self):
 		return ''' and loantype = '1' and propertytype = '2' and loanpurpose = '1' and lienstatus = '1' and occupancy = '1' and actiontype = '1' ;'''
 
-	def table_A_A_1_conditions(self):
+	def table_A_1_conditions(self):
 		return ''' and propertytype = '1' ;'''
 
-	def table_A_A_2_conditions(self):
+	def table_A_2_conditions(self):
 		return ''' and propertytype = '2' ;'''
 
-	def table_A_A_3_conditions(self):
+	def table_A_3_conditions(self):
 		return ''' and propertytype = '3' ;'''
 
-	def table_A_A_4_conditions(self):
+	def table_A_4_conditions(self):
 		return ''' and loantype = '1' and loanpurpose = '1' and lienstatus = '1' and propertytype = '1' ;'''
 
-	def table_A_B_conditions(self):
-		return ''' and loantype = '1' and occupancy = '1' and actiontype = '1';'''
+	def table_B_conditions(self):
+		return ''' and loantype = '1' and occupancy = '1' and actiontype = '1' ;'''
 
 	def table_3_1_columns(self):
 		return '''censustractnumber, applicantrace1, applicantrace2, applicantrace3, applicantrace4, applicantrace5,

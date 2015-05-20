@@ -44,13 +44,13 @@ For information on dependancies and running the code see [readme.md](https://git
 
 
 - builder.py
-	- Called by report_x in constructor.py
+	- Called by aggregate_report in constructor.py
 	- Creates emtpy JSON objects used to hold the aggregated LAR rows
 	- Imports json, os, OrderedDict, and datetime
 
 
 - parsing.py
-	- Called by report_constructor and report_x in constructor.py
+	- Called by report_constructor and aggregate_report in constructor.py
 	- Parses LAR rows by report series and stores rate lists for use in calculating means and medians
 	- Imports msa_indexing, median_age_api, demographics_indexing, and connector
 
@@ -127,7 +127,7 @@ For information on dependancies and running the code see [readme.md](https://git
 	- Calls parse_return, JSON_constructor_return, and aggregation_return from report_construction in constructor.py
 
 
-- report_x
+- aggregate_report
 	- Called by controller.py
 	- Takes an MSA as a string and a cursor object as arguments
 	- Determines report type (aggregate, disclosure, or national)
@@ -141,17 +141,17 @@ For information on dependancies and running the code see [readme.md](https://git
 
 
 - aggregation_return
-	- Called by report_x in report_constructor
+	- Called by aggregate_report in report_constructor
 	- Takes a year and report_number as strings and returns a function name used to call an aggregation function from aggregation.py
 
 
 - JSON_constructor_return
-	- Called by report_x in report_constructor
+	- Called by aggregate_report in report_constructor
 	- Takes a report_number as a string and returns a function name used to call a JSON object building function from builder.py
 
 
 - parse_return
-	- Called by report_x in report_constructor
+	- Called by aggregate_report in report_constructor
 	- Takes a report_number as a string and returns a function name used to call a parsing function from parsing.py
 
 
@@ -162,12 +162,12 @@ For information on dependancies and running the code see [readme.md](https://git
 
 
 - Condition functions
-	- Called by report_x in report_construction in constructor.py
+	- Called by aggregate_report in report_construction in constructor.py
 	- Returns the conditions for the report with function name format as table_type_series_number_conditions (IE table_A_3_1_conditions)
 
 
 - Column select functions
-	- Called by report_x in report_construction in constructor.py
+	- Called by aggregate_report in report_construction in constructor.py
 	- Returns the columns required to aggregate LAR rows for the report with function name format as table_series_number_columns(IE table_3_1_columns)
 
 
@@ -202,7 +202,7 @@ For information on dependancies and running the code see [readme.md](https://git
 
 
 - set_msa_names
-	- Called by report_x in constructor.py
+	- Called by aggregate_report in constructor.py
 	- Builds a dictionary containing MSA/MD numbers and the associated names
 	- Takes a cursor argument and queries the tract_to_cbsa_2010 data table to return the names and numbers of all MSAs and MDs
 
@@ -213,12 +213,12 @@ For information on dependancies and running the code see [readme.md](https://git
 
 
 - table_headers
-	- Called by report_x in constructor.py
+	- Called by aggregate_report in constructor.py
 	- Takes a table number argument as a string and returns the descriptive text for the table
 
 
 - set_header
-	- Called by report_x in constructor.py
+	- Called by aggregate_report in constructor.py
 	- Takes a dictionary as inputs, MSA as a string, table_type as a string and table_num as a string
 	- Populates the header information for tables
 
@@ -236,7 +236,7 @@ For information on dependancies and running the code see [readme.md](https://git
 
 
 - write_JSON
-	- Called by report_x in constructor.py
+	- Called by aggregate_report in constructor.py
 	- Writes the dictionary container to a .json file at the specified path
 	- Takes name as a string, data as a json compatibile object, and path as a string
 
@@ -254,7 +254,7 @@ For information on dependancies and running the code see [readme.md](https://git
 
 
 - table_3_1_builder
-	- Called by report_x in constructor.py
+	- Called by aggregate_report in constructor.py
 	- Calls table_3_1_characteristics in builder.py
 	- Builds the JSON structure for report 3-1
 
@@ -267,7 +267,7 @@ For information on dependancies and running the code see [readme.md](https://git
 
 
 -table_3_2_builder
-	- Called by report_x in constructor.py
+	- Called by aggregate_report in constructor.py
 	- Calls set_list  and build_rate_spreads from builder.py
 	- Builds the JSON structure for report 3-2
 
@@ -304,25 +304,25 @@ For information on dependancies and running the code see [readme.md](https://git
 
 
 - table_4_x_builder
-	- Called by report_x in constructor.py
+	- Called by aggregate_report in constructor.py
 	- Calls set_4_x_races, set_4_x_ethnicity, set_4_x_minority, set_4_x_incomes, and set_gender_disps from builder.py
 	- Builds the JSON object for the 4 series of reports
 
 
 - table_5_x_builder
-	- Called by report_x in constructor.py
+	- Called by aggregate_report in constructor.py
 	- Calls set_list from builder.py
 	- Builds the JSON object for the 5 series of reports
 
 
 - table_7_x_builder
-	- Called by report_x in constructor.py
+	- Called by aggregate_report in constructor.py
 	- Calls set_list from builder.py
 	- Builds the JSON object for the 7 series of reports
 
 
 - table_8_x_builder
-	- Called by report_x in constructor.py
+	- Called by aggregate_report in constructor.py
 	- Calls table_8_helper from builder.py
 	- Builds the JSON object for the 8 series of reports
 
@@ -334,7 +334,7 @@ For information on dependancies and running the code see [readme.md](https://git
 
 
 - table_9_x_builder
-	- Called by report_x in constructor.py
+	- Called by aggregate_report in constructor.py
 	- Calls set_list from builder.py
 	- Builds the JSON object for report 9
 
@@ -346,25 +346,25 @@ For information on dependancies and running the code see [readme.md](https://git
 
 
 - table_11_x_builder
-	- Called by report_x in constructor.py
+	- Called by aggregate_report in constructor.py
 	- Calls table_11_12_helper from builder.py
 	- Builds the JSON object for the 11 series of reports
 
 
 - table_12_1_builder
-	- Called by report_x in constructor.py
+	- Called by aggregate_report in constructor.py
 	- Calls table_11_12_helper from builder.py
 	- Builds the JSON object for the 12-1 report
 
 
 - table_12_2_builder
-	- Called by report_x in constructor.py
+	- Called by aggregate_report in constructor.py
 	- Calls table_11_12_helper from builder.py
 	- Builds the JSON object for the 12-2 report
 
 
 - table_A_4_builder
-	- Called by report_x in constructor.py
+	- Called by aggregate_report in constructor.py
 	- Calls table_11_12_helper
 	- Builds the JSON object for the A-4 report
 
@@ -377,13 +377,13 @@ For information on dependancies and running the code see [readme.md](https://git
 
 
 - table_A_x_builder
-	- Called by report_x in constructor.py
+	- Called by aggregate_report in constructor.py
 	- Calls set_list from builder.py
 	- Builds the JSON object for the A-1, A-2, and A-3 reports
 
 
 - table_B_builder
-	- Called by report_x in constructor.py
+	- Called by aggregate_report in constructor.py
 	- Calls set_list from builder.py
 	- Builds the JSON object for report B
 
@@ -397,7 +397,7 @@ For information on dependancies and running the code see [readme.md](https://git
 
 - parse_3_1
 	- Instantiates MSA_info from msa_indexing.py and demographics from demographics_indexing.py
-	- Called by function report_x in class_report construction in file constructor.py
+	- Called by function aggregate_report in class_report construction in file constructor.py
 	- Parses a LAR row into the components required for report 3-1 and stores them in the inputs dictionary
 	- Calls make_race_list from the demographics class in demographics_indexing.py to convert applicant and coapplicant race strings to integer lists
 	- Calls tract_to_MSA_income from MSA_info to convert the tract to FFIEC median MSA income ratio to an index for use in loan aggregation
@@ -414,7 +414,7 @@ For information on dependancies and running the code see [readme.md](https://git
 
 - parse_3_2
 	- Instantiates the demographics class from demographics.py
-	- Called by function report_x in class_report construction in file constructor.py
+	- Called by function aggregate_report in class_report construction in file constructor.py
 	- Parses LAR rows and stores the components in a dictionary to bused as needed for processing report 3-2
 	- Calls rate_spread_index_3_2 to assign an index to each rate spread
 
@@ -423,7 +423,7 @@ For information on dependancies and running the code see [readme.md](https://git
 - parse_4_x
 	- Instantiates MSA_info from msa_indexing.py and demographics from demographics_indexing.py
 	- Parses a LAR row into components required for the 4 series of reports and stores them in the inputs dictionary
-	- Called by function report_x in class_report construction in file constructor.py
+	- Called by function aggregate_report in class_report construction in file constructor.py
 	- Calls make_race_list from the parse_inputs class in parsing.py to store applicant and co applicant races in two lists of length 5
 	- Calls app_income_to_MSA from MSA_info to assign an index to the applicant's income relative to the median MSA income
 	- Calls set_non_white from demographics to set a boolean to True if the list of races contains minority races
@@ -439,7 +439,7 @@ For information on dependancies and running the code see [readme.md](https://git
 - parse_5_x
 	- Instantiates MSA_info from msa_indexing.py and demographics from demographics_indexing.py
 	- Parses a LAR row into components required for the 5 series of reports and stores them in the inputs dictionary
-	- Called by function report_x in class_report construction in file constructor.py
+	- Called by function aggregate_report in class_report construction in file constructor.py
 	- Calls set_minority_status from demographics to assign a single index integer for the minority status of the loan
 	- Calls make_race_list from the parse_inputs class in parsing.py to store applicant and co applicant races in two lists of length 5
 	- Calls app_income_to_MSA from MSA_info to assign an index to the applicant's income relative to the median MSA income
@@ -454,7 +454,7 @@ For information on dependancies and running the code see [readme.md](https://git
 - parse_7_x
 	- Instantiates MSA_info from msa_indexing.py
 	- Parses a LAR row into components required for the 7 series of reports and stores them in the inputs dictionary
-	- Called by function report_x in class_report construction in file constructor.py
+	- Called by function aggregate_report in class_report construction in file constructor.py
 	- Calls minority_percent from MSA_info to assign an integer index according to the minority population percent
 	- Calls tract_to_MSA_income to assign an integer index to the tract to MSA income ratio
 
@@ -462,7 +462,7 @@ For information on dependancies and running the code see [readme.md](https://git
 - parse_8_x
 	- Instantiates MSA_info from msa_indexing.py and demographics from demographics_indexing.py
 	- Parses a LAR row into components required for the 8 series of reports and stores them in the inputs dictionary
-	- Called by function report_x in class_report construction in file constructor.py
+	- Called by function aggregate_report in class_report construction in file constructor.py
 	- Calls adjust_denial_index from parse_inputs in parsing.py to change the denial reason code to an integer index that matches the JSON structure for data ouput
 	- Calls make_race_list from the parse_inputs class in parsing.py to store applicant and co applicant races in two lists of length 5
 	- Calls app_income_to_MSA from MSA_info to assign an index to the applicant's income relative to the median MSA income
@@ -491,7 +491,7 @@ For information on dependancies and running the code see [readme.md](https://git
 
 - parse_9_x
 	- Parses a LAR row into components required for the 9 series of reports and stores them in the inputs dictionary
-	- Called by function report_x in class_report construction in file constructor.py
+	- Called by function aggregate_report in class_report construction in file constructor.py
 	- Calls set_loan_index to change the loan type to match the index used in the JSON structure for report 9
 	- Calls median_age_index to assign an integer index an integer index based on the median age of housing stock in the loan's census tract
 	- Sets the median age for the loan by passing the 11 digit census tract number to  the tract_median_ages dictionary in parse_inputs in parsing.py
@@ -504,7 +504,7 @@ For information on dependancies and running the code see [readme.md](https://git
 
 - median_tract_age
 	- Instantiates median_age_API from median_age_api.py
-	- Called by the report_x function in the report_construction class in file constructor.py
+	- Called by the aggregate_report function in the report_construction class in file constructor.py
 	- Fills the tract_median_ages dictionary in parse_inputs with the median housing stock ages for each tract in an MSA by making queries agains the database holding LAR data
 	- Queries the Census ACS 5 year API to get the median housing stock age for a tract using the B25035_001E end-point
 
@@ -516,7 +516,7 @@ For information on dependancies and running the code see [readme.md](https://git
 - parse_11_x
 	- Instantiates MSA_info from msa_indexing.py and demographics from demographics_indexing.py
 	- Parses a LAR row into components required for the 11 series of reports and stores them in the inputs dictionary
-	- Called by the report_x function in the report_construction class in file constructor.py
+	- Called by the aggregate_report function in the report_construction class in file constructor.py
 	- Calls make_race_list from the parse_inputs class in parsing.py to store applicant and co applicant races in two lists of length 5
 	- Calls tract_to_MSA_income to return a single integer index for the loan's tract to MSA income ratio
 	- Calls app_income_to_MSA from MSA_info to assign an index to the applicant's income relative to the median MSA income
@@ -533,7 +533,7 @@ For information on dependancies and running the code see [readme.md](https://git
 - parse_12_x
 	- Instantiates MSA_info from msa_indexing.py and demographics from demographics_indexing.py
 	- Parses a LAR row into components required for the 12 series of reports and stores them in the inputs dictionary
-	- Called by the report_x function in the report_construction class in constructor.py
+	- Called by the aggregate_report function in the report_construction class in constructor.py
 	- Calls make_race_list from the parse_inputs class in parsing.py to store applicant and co applicant races in two lists of length 5
 	- Calls tract_to_MSA_income to return a single integer index for the loan's tract to MSA income ratio
 	- Calls app_income_to_MSA from MSA_info to assign an index to the applicant's income relative to the median MSA income
@@ -549,7 +549,7 @@ For information on dependancies and running the code see [readme.md](https://git
 
 
 - parse_A_x
-	- Called by the report_x function the report_construction class in constructor.py
+	- Called by the aggregate_report function the report_construction class in constructor.py
 	- Parses a LAR row into components required for the A series of reports (excluding A 4) and stores them in the inputs dictionary
 
 
@@ -566,7 +566,7 @@ For information on dependancies and running the code see [readme.md](https://git
 - parse_A_4
 	- Instantiates MSA_info from msa_indexing.py and demographics from demographics_indexing.py
 	- Parses a LAR row into components required for the A 4 reports and stores them in the inputs dictionary
-	- Called by the report_x function in the report_construction class in constructor.py
+	- Called by the aggregate_report function in the report_construction class in constructor.py
 	- Calls make_race_list from the parse_inputs class in parsing.py to store applicant and co applicant races in two lists of length 5
 	- Calls tract_to_MSA_income to return a single integer index for the loan's tract to MSA income ratio
 	- Calls app_income_to_MSA from MSA_info to assign an index to the applicant's income relative to the median MSA income
@@ -692,7 +692,7 @@ For information on dependancies and running the code see [readme.md](https://git
 
 
 - fill_weighted_medians_11_12
-	- Called by report_x in constructor.py to fill the weighted median column in reports 11 and 12
+	- Called by aggregate_report in constructor.py to fill the weighted median column in reports 11 and 12
 	- Calls calc_weighted_median from aggregation.py to calculate the weighted medians
 	- Takes a dictionary object as container and the a parsed LAR row as inputs
 
@@ -703,7 +703,7 @@ For information on dependancies and running the code see [readme.md](https://git
 
 
 - compile_report_3_1
-	- Called by report_x in constructor.py to fill the dictionary object
+	- Called by aggregate_report in constructor.py to fill the dictionary object
 	- Aggregates LAR rows for report 3-1 and returns the filled dictionary object
 	- Takes a dictionary object as table31 and a parsed LAR row
 
@@ -733,7 +733,7 @@ For information on dependancies and running the code see [readme.md](https://git
 
 
 - fill_by_weighted_mean_3_2
-	- Called by report_x in constructor.py
+	- Called by aggregate_report in constructor.py
 	- Aggregates LAR rows for report 3-2 by weighted mean of rate spreads
 	- Takes a dictionary object as container and a parsed LAR row as inputs
 
@@ -752,25 +752,25 @@ For information on dependancies and running the code see [readme.md](https://git
 
 
 - fill_by_median_3_2
-	- Called by report_x in constructor.py
+	- Called by aggregate_report in constructor.py
 	- Aggregates loans by median for report 3-2
 	- Takes a dictionary object as container and a parsed LAR row as inputs
 
 
 - fill_by_weighted_median_3_2
-	- Called by report_x in constructor.py
+	- Called by aggregate_report in constructor.py
 	- Aggregates loans by weighted median for report 3-2
 	- Takes a dictionary object as container and a parsed LAR row as inputs
 
 
 - compile_report_3_2
-	- Called by report_x in constructor.py
+	- Called by aggregate_report in constructor.py
 	- Aggregates LAR rows for table 3-2 using by_pricing_status, by_rate_spread, by_hoepa_status, fil_rate_lists, and fill_weight_lists
 	- Takes a dictionary object as table32 and a parsed LAR row as inputs
 
 
 - compile_report_4_x
-	- Called by report_x in constructor.py
+	- Called by aggregate_report in constructor.py
 	- Calls fill_by_4_x_demographics, by_aplicant_income, and totals_4x in aggregation.py to aggregate LAR rows for tables in the 4 series
 	- Takes a dictionary object as table4x and a parsed LAR row as inputs
 
@@ -814,7 +814,7 @@ For information on dependancies and running the code see [readme.md](https://git
 
 
 - compile_report_5_x
-	- Called by report_x in constructor.py
+	- Called by aggregate_report in constructor.py
 	- Calls fill_by_5x_demographics, fill_by_5x_totals to aggregate parsed LAR rows by applicant income, and action taken (application disposition)
 	- Takes a dictionary object as table5x and a parsed LAR row as inputs
 
@@ -833,7 +833,7 @@ For information on dependancies and running the code see [readme.md](https://git
 
 
 - get_small_county_flag
-	- Called by report_x in constructor.py
+	- Called by aggregate_report in constructor.py
 	- Queries the tract_to_cbsa_201 data table to return all tracts in an MSA; these tracts are used to fill the dictionary small_tract_flags in aggregation.py with tract numbers and the binary flag for small county status
 	- Takes a Psycopg2 dictionary cursor as cur and an 5 digit MSA number as MSA
 
@@ -850,13 +850,13 @@ For information on dependancies and running the code see [readme.md](https://git
 
 
 - compile_report_7_x
-	- Called by report_x in aggregation.py
+	- Called by aggregate_report in aggregation.py
 	- Calls fill_by_tract_characteristics, fill_by_income_ethnic_combo, and fill_by_geo_type to fill the 7 series of reports
 	- Takes a dictionary objet as table7x and a parsed LAR row as inputs
 
 
 - fill_by_denial_percent
-	- Called by report_x in constructor.py
+	- Called by aggregate_report in constructor.py
 	- Fills the percent (%) column for each denial reason by dividing the a cell's count by the total for the row
 	- Takes a dictionary object as container, a parsed LAR row as inputs, index_num which determines the row on the report, and key which is a string used to access the sub-section of the container dictionary
 
@@ -868,13 +868,13 @@ For information on dependancies and running the code see [readme.md](https://git
 
 
 - compile_report_8_x
-	- Called by report_x in constructor.py
+	- Called by aggregate_report in constructor.py
 	- Calls fill_by_denial_reason from aggregation.py to fill the 8 series of reports with parsed LAR rows
 	- Takes a dictionary object as table8x and a parsed LAR row as inputs
 
 
 - compile_report_9_x
-	- Called by report_x in construtor.py
+	- Called by aggregate_report in construtor.py
 	- Aggregates parsed LAR rows by the median age of housing stock for the property location's census tract, occupancy type, property type, loan type, and action taken (application disposition)
 	- Takes a dictionary object as container and a parsed LAR row as inputs
 
@@ -927,57 +927,57 @@ For information on dependancies and running the code see [readme.md](https://git
 
 
 - compile_report_12_1
-	- Called by report_x in constructor.py
+	- Called by aggregate_report in constructor.py
 	- Calls fill_report_11_12 to aggregate parsed LAR rows by action taken (application disposition)
 	- Takes a dictionary object as table12x and a parsed LAR row as inputs
 
 
 - compile_report_12_2
-	- Called by report_x in constructor.py
+	- Called by aggregate_report in constructor.py
 	- Calls fill_11_12_rates and fill_11_12_weights from aggregation.py to fill the rate lists used to calculate means and medians
 	- Calls fill_report_11_12 from aggregation.py to aggregated parsed LAR rows by their rate spread index
 	- Takes a dictionary object as table12x and a parsed LAR row as inputs
 
 
 - compile_report_11_x
-	- Called by report_x in constructor.py
+	- Called by aggregate_report in constructor.py
 	- Calls fill_11_12_rates and fill_11_12_weights from aggregation.py to fill the rate lists used to calculate means and medians
 	- Calls fill_report_11_12 from aggregation.py to aggregated parsed LAR rows by their rate spread index
 	- Takes a dictionary object as table11x and a parsed LAR row as inputs
 
 
 - fill_means_11_12
-	- Called by report_x in constructor.py
+	- Called by aggregate_report in constructor.py
 	- Calls calc_mean_11_12 to calculate a list of means and place them in the appropriate section of the dictionary
 	- Takes a dictionary object as table_X to store aggregated loan data and a builder.py object as build_X to reference list names
 
 
 - fill_medians_11_12
-	- Called by report_x in constructor.py
+	- Called by aggregate_report in constructor.py
 	- Calls calc_median_11_12 to calculate a list of means and place them in the appropriate section of the dictionary
 	- Takes a dictionary object as table_X to store aggregated loan data and a builder.py object as build_X to reference list names
 
 
 - compile_report_A_x
-	- Called by report_x in constructor.py
+	- Called by aggregate_report in constructor.py
 	- Aggregates parsed LAR rows by action taken (application disposition), lien status, loan type, loan purpose, and preapproval status
 	- Takes a dictionary object as container and a parsed LAR row as inputs
 
 
 - compile_report_A_4
-	- Called by report_x in constructor.py
+	- Called by aggregate_report in constructor.py
 	- Calls fill_by_characteristics to aggregate parsed LAR rows by race, ethnicity, minority status, income, gender, minority population percent, tract to MSA income category, and preapproval status
 	- Takes a dictionary object as container and a parsed LAR row as inputs
 
 
 - compile_report_B
-	- Called by report_x in constructor.py
+	- Called by aggregate_report in constructor.py
 	- Calls fill_rates_B from aggregation.py to store rate spreads for calculating means and medians for report B
 	- Aggregates parsed LAR rows by property type, lien status, loan purpose, hoepa status, reporting of pricing information, and means and medians of rate spreads
 	- Takes a dictionary object as container and a parsed LAR row as inputs
 
 - fill_table_B_mean
-	- Called by report_x in constructor.py
+	- Called by aggregate_report in constructor.py
 	- Uses numpy to calculate means from table_B_rates and then inserts them into the appropriate section of the dictionary
 	- Takes a dictionary object as container and a parsed LAR row as inputs
 

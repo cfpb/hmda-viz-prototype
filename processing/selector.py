@@ -4,7 +4,7 @@ class report_selector(object):
 		self.report_list = {} #fill this dictionary with the headers in the CSV as dict keys
 		self.reports_to_run = []
 	def initalize_lists(self, infile):
-		with open(infile, 'rU') as csvfile:
+		with open(infile, 'rU') as csvfile: #open the MSAinputs file to create a dictionary with report names as keys and lists of MSA numbers as values
 			msareader = csv.DictReader(csvfile, delimiter = ',', quotechar='"')
 			for row in msareader:
 				for key in row:
@@ -27,6 +27,6 @@ class report_selector(object):
 		#print len(self.report_list['A 3-1'])
 		for key in self.report_list:
 			if len(self.report_list[key]) > 0 and key != 'year' and key != 'MSA number':
-				self.reports_to_run.append(key)
+				self.reports_to_run.append(key) #fills the list with all reports to be run
 		#print self.reports_to_run
 		#need to find a work around to add lists for disclosure reports that will return lists of FIs and not flags

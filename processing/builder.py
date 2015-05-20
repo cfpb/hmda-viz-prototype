@@ -8,9 +8,9 @@ class build_JSON(object):
 	def __init__(self):
 		self.container = OrderedDict({}) #master container for the JSON structure
 		self.msa = OrderedDict({}) #stores header information for the MSA
-		self.table32_categories = ['pricinginformation', 'points', 'hoepa']
-		self.rate_spreads = ['No Reported Pricing Data', 'Reported Pricing Data', '1.50 - 1.99', '2.00 - 2.49', '2.50 - 2.99', '3.00 - 3.99', '4.00 - 4.99', '5.00 - 5.99', '6 or more', 'Mean', 'Median']
-		self.table32_rates = ['1.50 - 1.99', '2.00 - 2.49', '2.50 - 2.99', '3.00 - 3.49', '3.50 - 4.49', '4.50 - 5.49', '5.50 - 6.49', '6.5 or more', 'Mean', 'Median']
+		self.table_3_2_categories = ['pricinginformation', 'points', 'hoepa']
+		self.rate_spreads = ['No Reported Pricing Data', 'Reported Pricing Data', '1.50 - 1.99', '2.00 - 2.49', '2.50 - 2.99', '3.00 - 3.99', '4.00 - 4.99', '5 or more', 'Mean', 'Median']
+		self.table_3_2_rates = ['1.50 - 1.99', '2.00 - 2.49', '2.50 - 2.99', '3.00 - 3.49', '3.50 - 4.49', '4.50 - 5.49', '5.50 - 6.49', '6.5 or more', 'Mean', 'Median']
 		self.purchaser_names = ['Fannie Mae', 'Ginnie Mae', 'Freddie Mac', 'Farmer Mac', 'Private Securitization', 'Commercial bank, savings bank or association', 'Life insurance co., credit union, finance co.', 'Affiliate institution', 'Other']
 		self.race_names = ['American Indian/Alaska Native', 'Asian', 'Black or African American', 'Native Hawaiian or Other Pacific Islander', 'White', '2 or more minority races', 'Joint (White/Minority Race)', 'Race Not Available']
 		self.ethnicity_names = ['Hispanic or Latino', 'Not Hispanic or Latino', 'Joint (Hispanic or Latino/Not Hispanic or Latino)', 'Ethnicity Not Available']
@@ -76,7 +76,6 @@ class build_JSON(object):
 			state_msas['msa-mds'] = msas
 			name = 'msa-mds-all.json'
 
-			#this year path uses the year from the input file
 			path = '../'+report_type+"/"+selector.report_list['year'][1]+"/"+self.state_names[state].replace(' ', '-').lower()
 			print path #change this to a log file write
 			if not os.path.exists(path): #check if path exists
@@ -217,12 +216,15 @@ class build_JSON(object):
 		elif table_num == 'B':
 			return 'Loan pricing information for conventional loans by incidence and level'
 
-	def set_header(self, inputs, MSA, table_type, table_num): #sets the header information of the JSON object
+	def set_header(self, inputs, MSA, table_type, table_num, respondent_id, institution_name): #sets the header information of the JSON object
 		now = foo.datetime.now()
 		d = now.day
 		m = now.month
 		y = now.year
 		msa = OrderedDict({})
+		if table_type == 'Disclosure':
+			self.container['respondent_id'] = respondent_id
+			self.container['institution_name'] = institution_name
 		self.container['table'] = table_num
 		self.container['type'] = table_type
 		self.container['desc'] = self.table_headers(table_num)
@@ -233,6 +235,7 @@ class build_JSON(object):
 		self.msa['state'] = inputs['state name'] #this is the two digit abbreviation
 		self.msa['state_name'] = self.state_names[self.msa['state']]
 		self.container['msa'] = self.msa
+
 		return self.container
 
 	def table_helper(self, characteristic_key, characteristic, row_list, key, key_singular, end_key, end_key_singular, end_point_list, end_bool1, end_bool2):
@@ -286,15 +289,15 @@ class build_JSON(object):
 			for g in range(0, len(self.gender_names)):
 				self.container['minoritystatuses'][i]['genders'][g]['dispositions'] = self.set_list(self.end_points, self.dispositions_list, 'disposition', True)
 
-	def table_31_builder(self): #assembles all components of the 3-1 JSON object, appends totals section
+	def table_3_1_builder(self): #assembles all components of the 3-1 JSON object, appends totals section
 		borrowercharacteristics = []
 		censuscharacteristics = []
-		borrowercharacteristics.append(self.table_31_characteristics('Race', 'races', self.race_names))
-		borrowercharacteristics.append(self.table_31_characteristics('Ethnicity', 'ethnicities', self.ethnicity_names))
-		borrowercharacteristics.append(self.table_31_characteristics('Minority Status', 'minoritystatuses', self.minority_statuses))
-		borrowercharacteristics.append(self.table_31_characteristics('Applicant Income', 'applicantincomes', self.applicant_income_bracket))
-		censuscharacteristics.append(self.table_31_characteristics('Racial/Ethnic Composition', 'tractpctminorities', self.tract_pct_minority))
-		censuscharacteristics.append(self.table_31_characteristics('Income', 'incomelevels', self.tract_income))
+		borrowercharacteristics.append(self.table_3_1_characteristics('Race', 'races', self.race_names))
+		borrowercharacteristics.append(self.table_3_1_characteristics('Ethnicity', 'ethnicities', self.ethnicity_names))
+		borrowercharacteristics.append(self.table_3_1_characteristics('Minority Status', 'minoritystatuses', self.minority_statuses))
+		borrowercharacteristics.append(self.table_3_1_characteristics('Applicant Income', 'applicantincomes', self.applicant_income_bracket))
+		censuscharacteristics.append(self.table_3_1_characteristics('Racial/Ethnic Composition', 'tractpctminorities', self.tract_pct_minority))
+		censuscharacteristics.append(self.table_3_1_characteristics('Income', 'incomelevels', self.tract_income))
 		self.container['borrowercharacteristics'] = borrowercharacteristics
 		self.container['censuscharacteristics'] = censuscharacteristics
 		totals = {} #totals sums all the loan counts and values for each purchaser
@@ -304,7 +307,7 @@ class build_JSON(object):
 		self.container['total'] = totals
 		return self.container
 
-	def table_31_characteristics(self, characteristic, container_name, item_list): #builds the borrower characteristics section of the report 3-1 JSON
+	def table_3_1_characteristics(self, characteristic, container_name, item_list): #builds the borrower characteristics section of the report 3-1 JSON
 		container = {'ethnicities':'ethnicity', 'minoritystatuses':'minoritystatus', 'races':'race', 'applicantincomes':'applicantincome', 'incomelevels':'incomelevel', 'tractpctminorities':'tractpctminority'}
 		top = OrderedDict({})
 		top['characteristic'] = characteristic
@@ -316,7 +319,7 @@ class build_JSON(object):
 			top[container_name].append(holding)
 		return top
 
-	def table_32_builder(self): #builds the JSON structure for report 3-2
+	def table_3_2_builder(self): #builds the JSON structure for report 3-2
 		pricinginformation = []
 		categories = ['No reported pricing data', 'reported pricing data']
 		for cat in categories:
@@ -326,8 +329,8 @@ class build_JSON(object):
 			pricinginformation.append(holding)
 		self.container['pricinginformation'] = pricinginformation
 		holding = OrderedDict({})
-		points = self.build_rate_spreads()
-		self.container['points'] = points
+		#points = self.build_rate_spreads()
+		self.container['points'] = self.build_rate_spreads()
 		hoepa = OrderedDict({})
 		hoepa['pricing'] = 'hoepa loans'
 		hoepa['purchasers'] = self.set_list(['firstliencount', 'firstlienvalue', 'juniorliencount', 'juniorlienvalue'], self.purchaser_names, 'name', True)
@@ -336,49 +339,49 @@ class build_JSON(object):
 
 	def build_rate_spreads(self): #builds the rate spreads section of the report 3-2 JSON
 		spreads = []
-		for rate in self.table32_rates:
+		for rate in self.table_3_2_rates:
 			holding = OrderedDict({})
 			holding['point'] = "{}".format(rate)
-			if self.table32_rates.index(rate) < 4:
+			if self.table_3_2_rates.index(rate) < 4:
 				holding['purchasers'] = self.set_purchasers_NA(['firstliencount', 'firstlienvalue', 'juniorliencount', 'juniorlienvalue'])
 			else:
 				holding['purchasers'] = self.set_list(['firstliencount', 'firstlienvalue', 'juniorliencount', 'juniorlienvalue'], self.purchaser_names, 'name', True)
 			spreads.append(holding)
 		return spreads
 
-	def set_4x_races(self):
+	def set_4_x_races(self):
 		self.container['races'] = self.set_list(self.end_points, self.race_names, 'race', False)
 		for i in range(0,len(self.container['races'])):
 			self.container['races'][i]['dispositions'] = self.set_list(self.end_points, self.dispositions_list, 'disposition', True)
 			self.container['races'][i]['genders'] = self.set_list(self.end_points, self.gender_names, 'gender', False)
 
-	def set_4x_ethnicity(self):
+	def set_4_x_ethnicity(self):
 		self.container['ethnicities'] = self.set_list(self.end_points, self.ethnicity_names, 'ethnicity', False)
 		for i in range(0, len(self.container['ethnicities'])):
 			self.container['ethnicities'][i]['dispositions'] = self.set_list(self.end_points, self.dispositions_list, 'disposition', True)
 			self.container['ethnicities'][i]['genders'] = self.set_list(self.end_points, self.gender_names, 'gender', False)
 
-	def set_4x_minority(self):
+	def set_4_x_minority(self):
 		self.container['minoritystatuses'] = self.set_list(self.end_points, self.minority_statuses, 'minoritystatus', False)
 		for i in range(0, len(self.container['minoritystatuses'])):
 			self.container['minoritystatuses'][i]['dispositions'] = self.set_list(self.end_points, self.dispositions_list, 'disposition', True)
 			self.container['minoritystatuses'][i]['genders'] = self.set_list(self.end_points, self.gender_names, 'gender', False)
 
-	def set_4x_incomes(self):
+	def set_4_x_incomes(self):
 		self.container['incomes'] = self.set_list(self.end_points, self.applicant_income_bracket, 'income', False)
 		for i in range(0, len(self.container['incomes'])):
 			self.container['incomes'][i]['dispositions'] = self.set_list(self.end_points, self.dispositions_list, 'disposition', True)
 		self.container['total'] = self.set_list(self.end_points, self.dispositions_list, 'disposition', True)
 
-	def table_4x_builder(self): #builds the table 4-1 JSON object: disposition of application by race and gender
-		self.set_4x_races()
-		self.set_4x_ethnicity()
-		self.set_4x_minority()
-		self.set_4x_incomes()
+	def table_4_x_builder(self): #builds the table 4-1 JSON object: disposition of application by race and gender
+		self.set_4_x_races()
+		self.set_4_x_ethnicity()
+		self.set_4_x_minority()
+		self.set_4_x_incomes()
 		self.set_gender_disps()
 		return self.container
 
-	def table_5x_builder(self):
+	def table_5_x_builder(self):
 		#note to self: you have to re-instantiate all the ordered dicts or else they will be linked to each other during aggregation
 		self.container['applicantincomes'] = self.set_list(self.end_points, self.applicant_income_bracket[:-1], 'applicantincome', False)
 
@@ -410,7 +413,7 @@ class build_JSON(object):
 		self.container['total'] = self.set_list(self.end_points, self.dispositions_list, 'disposition', True)
 		return self.container
 
-	def table_7x_builder(self):
+	def table_7_x_builder(self):
 		self.container['censuscharacteristics'] = []
 		holding = OrderedDict({})
 		holding['characteristic'] = 'Racial/Ethnic Composition'
@@ -450,7 +453,7 @@ class build_JSON(object):
 		self.container['total'] = self.set_list(self.end_points, self.dispositions_list, 'disposition', True)
 		return self.container
 
-	def table_8x_builder(self):
+	def table_8_x_builder(self):
 		holding = OrderedDict({})
 		self.container['applicantcharacteristics'] = []
 		holding = self.table_8_helper('Races', 'race', self.race_names)
@@ -475,7 +478,7 @@ class build_JSON(object):
 			temp[key.lower()][i]['denialreasons'] = self.set_list(self.end_points, self.denial_reasons, 'denialreason', True)
 		return temp
 
-	def table_9x_builder(self):
+	def table_9_x_builder(self):
 			age_list = ['2000 - 2010', '1990 - 1999', '1980 - 1989', '1970 - 1979', '1969 or Earlier', 'Age Unknown']
 			loan_category = ['FHA, FSA/RHS & VA', 'Conventional', 'Refinancings', 'Home Improvement Loans', 'Loans on Dwellings For 5 or More Families', 'Nonoccupant Loans from Columns A, B, C & D', 'Loans on Manufactured Home Dwellings From Columns A, B, C & D']
 			#holding = OrderedDict({})
@@ -489,21 +492,21 @@ class build_JSON(object):
 					self.container['medianages'][i]['loancategories'][j]['dispositions'] = self.set_list(self.end_points, self.dispositions_list[1:6], 'disposition', True)
 			return self.container
 
-	def table_11x_characteristics(self, characteristic, list_header, item_list, item_name, layer_2_key, layer_2_name, layer_2_list):
+	def table_11_x_characteristics(self, characteristic, list_header, item_list, item_name, layer_2_key, layer_2_name, layer_2_list):
 		characteristic_list = []
 		temp = OrderedDict({})
 		return_dict = OrderedDict({})
 		temp['characteristic'] = characteristic
 		temp[list_header] = self.set_list(self.end_points, item_list, item_name, False)
 
-		for i in range(0, len(temp[list_header])): #make this loop a separate function
+		for i in range(0, len(temp[list_header])):
 			temp_dict = OrderedDict({})
 			temp[list_header][i][layer_2_key] = self.set_list(self.end_points, layer_2_list, layer_2_name, True)
 		characteristic_list.append(temp)
 		return_dict = characteristic_list[0]
 		return return_dict
 
-	def table_11x_builder(self):
+	def table_11_x_builder(self):
 		self.table_11_12_helper('pricinginformation', 'pricing', self.rate_spreads)
 		return self.container
 
@@ -515,7 +518,7 @@ class build_JSON(object):
 		self.table_11_12_helper('pricinginformation', 'pricing', self.rate_spreads)
 		return self.container
 
-	def table_A4_builder(self):
+	def table_A_4_builder(self):
 		preapproval_names = ['Preapprovals reasulting in originations', 'Preapprovals approved but not accepted', 'Preapprovals denied']
 		self.table_11_12_helper('preapprovalstatuses', 'preapprovalstatus', preapproval_names)
 		return self.container
@@ -533,14 +536,14 @@ class build_JSON(object):
 		self.container['censuscharacteristics'] = [''] * len(census_list)
 
 		for i in range(0, len(borrower_list)):
-			self.container['borrowercharacteristics'][i] = self.table_11x_characteristics(borrower_list[i], plural_list[i], borrower_input_list[i], single_list[i], key, key_singular, end_point_list)
+			self.container['borrowercharacteristics'][i] = self.table_11_x_characteristics(borrower_list[i], plural_list[i], borrower_input_list[i], single_list[i], key, key_singular, end_point_list)
 
 		for i in range(0, len(census_list)):
-			self.container['censuscharacteristics'][i] = self.table_11x_characteristics(census_list[i], census_plural_list[i], census_input_list[i], census_single_list[i], key, key_singular, end_point_list)
+			self.container['censuscharacteristics'][i] = self.table_11_x_characteristics(census_list[i], census_plural_list[i], census_input_list[i], census_single_list[i], key, key_singular, end_point_list)
 
 		return self.container
 
-	def table_Ax_builder(self):
+	def table_A_x_builder(self):
 		loan_types = ['Conventional', 'FHA', 'VA', 'FSA/RHS']
 		loan_purposes = ['Home Purchase', 'Refinance', 'Home Improvement']
 		lien_statuses = ['firstliencount', 'juniorliencount', 'noliencount']
