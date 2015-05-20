@@ -93,7 +93,7 @@ class parse_inputs(object):
 		self.inputs['minority count'] = demo.minority_count(a_race) #determines if the number of minority races claimed by the applicant is 2 or greater
 		self.inputs['joint status'] = demo.set_joint(self.inputs) #requires non white status flags be set prior to running set_joint
 		self.inputs['race'] = demo.set_race(self.inputs, a_race) #requires joint status be set prior to running set_race
-		self.inputs['ethnicity'] = demo.set_loan_ethn(self.inputs) #requires  ethnicity be parsed prior to running set_loan_ethn
+		self.inputs['ethnicity'] = demo.set_ethnicity(self.inputs) #requires  ethnicity be parsed prior to running set_ethnicity
 		self.inputs['minority status'] = demo.set_minority_status(self.inputs) #requires non white flags be set prior to running set_minority_status
 
 
@@ -152,7 +152,7 @@ class parse_inputs(object):
 		self.inputs['minority count'] = demo.minority_count(a_race) #determines if the number of minority races claimed by the applicant is 2 or greater
 		self.inputs['joint status'] = demo.set_joint(self.inputs) #requires non white status flags be set prior to running set_joint
 		self.inputs['race'] = demo.set_race(self.inputs, a_race) #requires joint status be set prior to running set_race
-		self.inputs['ethnicity'] = demo.set_loan_ethn(self.inputs) #requires  ethnicity be parsed prior to running set_loan_ethn
+		self.inputs['ethnicity'] = demo.set_ethnicity(self.inputs) #requires  ethnicity be parsed prior to running set_ethnicity
 		self.inputs['minority status'] = demo.set_minority_status(self.inputs) #requires non white flags be set prior to running set_minority_status
 		self.inputs['gender'] = demo.set_gender(self.inputs)
 
@@ -187,7 +187,7 @@ class parse_inputs(object):
 		self.inputs['minority count'] = demo.minority_count(a_race) #determines if the number of minority races claimed by the applicant is 2 or greater
 		self.inputs['joint status'] = demo.set_joint(self.inputs) #requires non white status flags be set prior to running set_joint
 		self.inputs['race'] = demo.set_race(self.inputs, a_race) #requires joint status be set prior to running set_race
-		self.inputs['ethnicity'] = demo.set_loan_ethn(self.inputs) #requires  ethnicity be parsed prior to running set_loan_ethn
+		self.inputs['ethnicity'] = demo.set_ethnicity(self.inputs) #requires  ethnicity be parsed prior to running set_ethnicity
 		self.inputs['minority status'] = demo.set_minority_status(self.inputs) #requires non white flags be set prior to running set_minority_status
 
 	def parse_7_x(self, row):
@@ -248,7 +248,7 @@ class parse_inputs(object):
 		self.inputs['minority count'] = demo.minority_count(a_race) #determines if the number of minority races claimed by the applicant is 2 or greater
 		self.inputs['joint status'] = demo.set_joint(self.inputs) #requires non white status flags be set prior to running set_joint
 		self.inputs['race'] = demo.set_race(self.inputs, a_race) #requires joint status be set prior to running set_race
-		self.inputs['ethnicity'] = demo.set_loan_ethn(self.inputs) #requires  ethnicity be parsed prior to running set_loan_ethn
+		self.inputs['ethnicity'] = demo.set_ethnicity(self.inputs) #requires  ethnicity be parsed prior to running set_ethnicity
 		self.inputs['minority status'] = demo.set_minority_status(self.inputs) #requires non white flags be set prior to running set_minority_status
 		self.inputs['gender'] = demo.set_gender(self.inputs)
 		self.inputs['denial_list'] = self.denial_reasons_list(self.inputs['denial reason1'], self.inputs['denial reason2'], self.inputs['denial reason3'])
@@ -401,7 +401,7 @@ class parse_inputs(object):
 		self.inputs['minority count'] = demo.minority_count(a_race) #determines if the number of minority races claimed by the applicant is 2 or greater
 		self.inputs['joint status'] = demo.set_joint(self.inputs) #requires non white status flags be set prior to running set_joint
 		self.inputs['race'] = demo.set_race(self.inputs, a_race) #requires joint status be set prior to running set_race
-		self.inputs['ethnicity'] = demo.set_loan_ethn(self.inputs) #requires  ethnicity be parsed prior to running set_loan_ethn
+		self.inputs['ethnicity'] = demo.set_ethnicity(self.inputs) #requires  ethnicity be parsed prior to running set_ethnicity
 		self.inputs['minority status'] = demo.set_minority_status(self.inputs) #requires non white flags be set prior to running set_minority_status
 		self.inputs['gender'] = demo.set_gender(self.inputs)
 
@@ -442,7 +442,7 @@ class parse_inputs(object):
 		self.inputs['minority count'] = demo.minority_count(a_race) #determines if the number of minority races claimed by the applicant is 2 or greater
 		self.inputs['joint status'] = demo.set_joint(self.inputs) #requires non white status flags be set prior to running set_joint
 		self.inputs['race'] = demo.set_race(self.inputs, a_race) #requires joint status be set prior to running set_race
-		self.inputs['ethnicity'] = demo.set_loan_ethn(self.inputs) #requires  ethnicity be parsed prior to running set_loan_ethn
+		self.inputs['ethnicity'] = demo.set_ethnicity(self.inputs) #requires  ethnicity be parsed prior to running set_ethnicity
 		self.inputs['minority status'] = demo.set_minority_status(self.inputs) #requires non white flags be set prior to running set_minority_status
 		self.inputs['gender'] = demo.set_gender(self.inputs)
 
@@ -514,7 +514,7 @@ class parse_inputs(object):
 		self.inputs['minority count'] = demo.minority_count(a_race) #determines if the number of minority races claimed by the applicant is 2 or greater
 		self.inputs['joint status'] = demo.set_joint(self.inputs) #requires non white status flags be set prior to running set_joint
 		self.inputs['race'] = demo.set_race(self.inputs, a_race) #requires joint status be set prior to running set_race
-		self.inputs['ethnicity'] = demo.set_loan_ethn(self.inputs) #requires  ethnicity be parsed prior to running set_loan_ethn
+		self.inputs['ethnicity'] = demo.set_ethnicity(self.inputs) #requires  ethnicity be parsed prior to running set_ethnicity
 		self.inputs['minority status'] = demo.set_minority_status(self.inputs) #requires non white flags be set prior to running set_minority_status
 		self.inputs['gender'] = demo.set_gender(self.inputs)
 
