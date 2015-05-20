@@ -4,134 +4,391 @@ For information on dependancies and running the code see [readme.md](https://git
 
 
 #Files
+- controller.py
+	- Calls check_file
+	- Calls report_lists
+	- Runs a set of nested for loops to pass report names and MSAs to the constructor.py file
+	- Establishes a database connection, parses the MSAinputs CSV file to determine which reports will be created
+	- Builds the directory structure for report type, report year, and states
+	- Times report processing for both CPU and clock time
+	- Writes log files on processing speeds
+	- During testing controller has extra lists of MSAs and report names to control output quickly
+	- Imports time, psycopg2, psycopg2.extras, connector, builder, selector, constructor, file_check, and report_list
+
+
+- selector.py
+	- Called by controller.py and constructor.py
+	- Creates a dictionary that controls which reports will be run for which MSAs
+
+
+- connector.py
+	- Called by controller.py and median_age_api.py
+	- Connects to the database hosting the hmda public files and tract to cbsa data
+	- imports psycopg2 and psycopg2.extras
+	- Uses a dictionary cursor to read inputs
+
+
+- constructor.py
+	- Called by controller.py
+	- Selects LAR rows based on report specific columns and conditions and aggregates the LAR rows into JSON objects
+	- Calls report specific functions to get small county flags and median housing stock age
+	- Calculates means and medians and stores them in the JSON object
+	- Writes JSON objects to files using report type, year, and geogrpahy as a path
+
+
+- queries.py
+	- Called by constructor.py
+	- Returns text for conditions and column selection for SQL queries
+	- Currently only formatted for psycopg2 for use with postgreSQL
+	- Planned development for pyodbc for use with microsoft server clients
+
+
+- builder.py
+	- Called by report_x in constructor.py
+	- Creates emtpy JSON objects used to hold the aggregated LAR rows
+	- Imports json, os, OrderedDict, and datetime
+
+
 - parsing.py
-	- Called by report_4x and report_x in constructor.py
+	- Called by report_constructor and report_x in constructor.py
 	- Parses LAR rows by report series and stores rate lists for use in calculating means and medians
 	- Imports msa_indexing, median_age_api, demographics_indexing, and connector
+
+
+- demographics_indexing.py
+	- Called by parse_inputs in parsing.py
+	- Takes parsed loan attributes and returns indexes and sets flags used in loan aggregation into the JSON structures for reports
+
+
+- msa_indexing.py
+	- Called by parse_inputs in parsing.py
+	- Takes inputs regarding census tracts or combinations of applicant and census tract information and returns an integer index used in aggregating data into JSON structures
+
 
 - aggregation.py
 	- Called by constructor.py to fill dictionary objects prior to conversion to JSON objects
 	- Calculates means, medians, weighted means, and weighted medians
 	- Imports numpy and decimal
 
-- builder.py
 
-
-- connector.py
-- controller.py
-- constructor.py
-- demographics_indexing.py
-- file_check.py
 - median_age_api.py
-- queries.py
-- report_list.py
-- selector.py
+	- Called by the median_tract_age function in the parse_inputs class in the parsing.py file
+	- Returns an integer for the median housing stock age for the selected census tract
+
+
+- file_check.py
+	- Called by controller.py
+	- Searches the report directory structure for MSAs that have reports and writes an 'msa-mds.json' to indicate to  Jekyll that reports exist in subfolders for that MSA
+	- Imports os.path and json
+
+ - report_list.py
+	- Called by controller.py
+	- Scans the directory of potential reports and creates a JSON object listing all the reports run for each MSA and writes the JSON to a file and stores it in the appropriate folder
+	- Imports OrderedDict from collections, os.path, json, and builder.py
+
 
 
 #Explanation of Classes and Methods
 
-
-## MSA_info
-- app_income_to_MSA
-- minority_percent
-- tract_to_MSA_income
-
-
-## median_age_API
--get_age
-
-
-## demographics
-- set_gender
-- rate_spread_index_3_2
-- rate_spread_index_11_x
-- minority_count
-- set_non_white
-- set_joint
-- set_minority_status
-- set_loan_ethn
-- make_race_list
-- set_race
-
 ## controller
+- Has no classes or methods
+- Calls connect from connection to establish a cursor connection with the database
+- Calls msas_in_state from builder to create a list of MSAs in each state for each report type directory
+- Calls get_reports_list from selector to create a list of which reports for which MSAs are to be run based on the MSAinputs CSV
+- Calls time.time and time.clock to log CPU and human clock time required to generate reports
+- Writes processing times for each report and total times to a log file (processing_log.txt)
+- Calls check_file from file_check.py to create msa-mds.json files showing which MSAs have reports in which sub-directories
+- Calls report_lists from report_list.py to produce a list of all reports run for an MSA
+
+
+## report_selector
+	- initialize_lists
+		- Creates a master list of all possible report types to be run using the heads of the infile
+		- Takes a CSV file as infile
+
+
+	- get_report_lists
+		- Called by controller.py
+		- Reads the CSV file and adds any MSA/report intersection cell marked with a 1 to the list of reports to be run
+		- Takes a CSV file as infile
+
+
+## connect_DB
+	- connect
+		- Reads a credentials file from the path /Users/roellk/Desktop/python/credentials.txt and parses the file to access the specified database
+		- Prints on successful or unsuccessful connection to notify the user of potential errors
 
 
 ## constructor
 - __init__
-- report_x
-- aggregation_return
-- JSON_constructor_return
-- parse_return
+	- Instantiates parse_inputs from parsing.py, connection from connect.py, queries from queries.py, and aggregate from aggregation.py
+	- Puts the report year and report number in the global class variables
+	- Puts the parse_return, JSON_constructor_return, and aggregation_return in the global class variables
+	- Calls parse_return, JSON_constructor_return, and aggregation_return from report_construction in constructor.py
 
-## parse_inputs
+
+- report_x
+	- Called by controller.py
+	- Takes an MSA as a string and a cursor object as arguments
+	- Determines report type (aggregate, disclosure, or national)
+	- Runs  a loop which pulls one LAR row from the cursor at a time, parses it, and aggregates it into a JSON structure
+	- Calls median_tract_age from parsing to pull median housing stock age from the Census ACS5 API for each tract in the MSA of the current report
+	- Calls get_small_county_flag from aggregation.py to determine if a loan is in a small county
+	- Calls a the report specific conditions and columns query strings from queries.py
+	- Calls aggregation_return, JSON_constructor_return, and parse_return from constructor.py to get the function names used with aggregation.py, builder.py and parsing.py
+	- Calls functions to calculate means and medians from aggregation.py if needed for the report
+	- Writes the report's JSON object to a file path that includes, report type, data year, state, MSA, and report number
+
+
+- aggregation_return
+	- Called by report_x in report_constructor
+	- Takes a year and report_number as strings and returns a function name used to call an aggregation function from aggregation.py
+
+
+- JSON_constructor_return
+	- Called by report_x in report_constructor
+	- Takes a report_number as a string and returns a function name used to call a JSON object building function from builder.py
+
+
+- parse_return
+	- Called by report_x in report_constructor
+	- Takes a report_number as a string and returns a function name used to call a parsing function from parsing.py
 
 
 ## queries
 - __init__
-- table_A_3_1_conditions
-- table_A_3_2_conditions
-- table_A_4_1_conditions
-- table_A_4_2_conditions
-- table_A_4_3_conditions
-- table_A_4_4_conditions
-- table_A_4_5_conditions
-- table_A_4_6_conditions
-- table_A_4_7_conditions
-- table_A_5_1_conditions
-- table_A_5_2_conditions
-- table_A_5_3_conditions
-- table_A_5_4_conditions
-- table_A_5_5_conditions
-- table_A_5_6_conditions
-- table_A_5_7_conditions
-- table_A_7_1_conditions
-- table_A_7_2_conditions
-- table_A_7_3_conditions
-- table_A_7_4_conditions
-- table_A_7_5_conditions
-- table_A_7_6_conditions
-- table_A_7_7_conditions
-- table_A_8_1_conditions
-- table_A_8_2_conditions
-- table_A_8_3_conditions
-- table_A_8_4_conditions
-- table_A_8_5_conditions
-- table_A_8_6_conditions
-- table_A_8_7_conditions
-- table_A_9_conditions
-- table_A_11_1_conditions
-- table_A_11_2_conditions
-- table_A_11_3_conditions
-- table_A_11_4_conditions
-- table_A_11_5_conditions
-- table_A_11_6_conditions
-- table_A_11_7_conditions
-- table_A_11_8_conditions
-- table_A_11_9_conditions
-- table_A_11_10_conditions
-- table_A_12_1_conditions
-- table_A_12_2_conditions
-- table_A_A_1_conditions
-- table_A_A_2_conditions
-- table_A_A_3_conditions
-- table_A_A_4_conditions
-- table_A_B_conditions
-- table_3_2_columns
-- table_3_1_columns
-- table_4_x_columns
-- table_5_x_columns
-- table_7_x_columns
-- table_8_x_columns
-- table_9_columns
-- table_11_x_columns
-- table_12_x_columns
-- table_A_x_columns
-- table_B_columns
+	- Holds the base SQL string for getting counts of selected LAR rows with formatting sections to variabalize MSA and year
+	- Holds the base SQL string for selecting columns of HMDA data with formatting sectsion to variabalize which columns, year, and MSA
 
 
+- Condition functions
+	- Called by report_x in report_construction in constructor.py
+	- Returns the conditions for the report with function name format as table_type_series_number_conditions (IE table_A_3_1_conditions)
 
 
+- Column select functions
+	- Called by report_x in report_construction in constructor.py
+	- Returns the columns required to aggregate LAR rows for the report with function name format as table_series_number_columns(IE table_3_1_columns)
 
+
+## build_JSON
+- __init__
+	- Instantiates lists and dictionaries used in subsequent functions
+
+
+- msas_in_state
+	- Called by controller.py
+	- Queries the tract_to_cbsa_2010 data table for a distinct list of MSAs and MDs
+	- Creates a dictionary of all MSAs and MDs in a state
+	- Calls jekyll_for_state from builder.py
+
+
+- jekyll_for_msa
+	- Called by constructor.py
+	- Takes a path as an argument that includes report type, year, msa, and state
+	- Writes a jekyll file to the passed path
+
+
+- jekyll_for_state
+	- Called by msas_in_state in builder.py
+	- Takes a path as an argument that includes report type, year, and state
+	- Writes a jekyll file to the passed path
+
+
+- jekyll_for_report
+	- Called by constructor.py
+	- Takes a path as an argument that includes report type, year, state, MSA, and report number
+	- Writes a jekyll file to the passed path
+
+
+- set_msa_names
+	- Called by report_x in constructor.py
+	- Builds a dictionary containing MSA/MD numbers and the associated names
+	- Takes a cursor argument and queries the tract_to_cbsa_2010 data table to return the names and numbers of all MSAs and MDs
+
+
+- get_state_name
+	- Called by constructor.py
+	- Takes a state abbreviation and returns the full state name
+
+
+- table_headers
+	- Called by report_x in constructor.py
+	- Takes a table number argument as a string and returns the descriptive text for the table
+
+
+- set_header
+	- Called by report_x in constructor.py
+	- Takes a dictionary as inputs, MSA as a string, table_type as a string and table_num as a string
+	- Populates the header information for tables
+
+
+- set_list
+	- Called by set_gender_disps, table_3_1_builder, table_3_1_characteristics, table_3_2_builder, build_rate_spreads, set_4_x_race, set_4_x_ethnicity, set_4_x_minority, set_4_x_incomes, table_5_x_builder, table_7_x_builder, table_8_helper, table_9_x_builder, table_11_x_characteristics, table_A_x_builder, table_B_builder in builder.py
+	- Takes end_points as a list, key_list as a list, key_name as a string, and ends_bool as a boolean
+	- Creates a list of dictionary objects and returns it
+	- If ends_bool is false each element of the end_points list is added to each dictionary object as a key with a value of 0
+
+
+- print_JSON
+	- Called during testing to check outputs
+	- Prints the JSON structure to the terminal
+
+
+- write_JSON
+	- Called by report_x in constructor.py
+	- Writes the dictionary container to a .json file at the specified path
+	- Takes name as a string, data as a json compatibile object, and path as a string
+
+
+- set_purchasers_NA
+	- Called by build_rate_spreads in builder.py
+	- Takes holding_list as a list and returns a list of dictionaries containing a purchaser name each item in the holding_list
+	- If the holding list item is juniorliencount or juniorlienvalue then 'NA' is stored as the value, else the value is '0'
+
+
+- set_gender_disps
+	- Called by table_4_x_builder
+	- Calls set_list from builder.py
+	- Specifies a path to which set_list appends a list of dictionaries
+
+
+- table_3_1_builder
+	- Called by report_x in constructor.py
+	- Calls table_3_1_characteristics in builder.py
+	- Builds the JSON structure for report 3-1
+
+
+- table_3_1_characteristics
+	- Called by table_3_1_builder in builder.py
+	- Calls set_list in builder.py
+	- Takes characteristic as a string, container_name as a string, and item_list as a list
+	- Returns a dictionary strucure for a row section of report 3-1
+
+
+-table_3_2_builder
+	- Called by report_x in constructor.py
+	- Calls set_list  and build_rate_spreads from builder.py
+	- Builds the JSON structure for report 3-2
+
+
+- build_rate_spreads
+	- Called by table_3_2_builder in builder.py
+	- Returns a list of dictionaries for each item in table_3_2_rates
+	- Sets values of firstliencount and firstlien value to 0
+	- Sets juniorliencount and juniorlienvalue to 0 if the rate's index is greater than or equal to 4 and to 'NA' if the index is below 4
+
+
+- set_4_x_races
+	- Called by table_4_x_builder in builder.py
+	- Calls set_list from builder.py
+	- Builds the race section for the 4 series of JSON objects
+
+
+- set_4_x_ethnicity
+	- Called by table_4_x_builder in builder.py
+	- Calls set_list from builder.py
+	- Builds the ethnicity section for the 4 series JSON objects
+
+
+- set_4_x_minority
+	- Called by table_4_x_builder in builder.py
+	- Calls set_list from builder.py
+	- Builds the minority section for the 4 series JSON objects
+
+
+- set_4_x_incomes
+	- Called by table_4_x_builder in builder.py
+	- Calls set_list from builder.py
+	- Builds the income section for the 4 series JSON objects
+
+
+- table_4_x_builder
+	- Called by report_x in constructor.py
+	- Calls set_4_x_races, set_4_x_ethnicity, set_4_x_minority, set_4_x_incomes, and set_gender_disps from builder.py
+	- Builds the JSON object for the 4 series of reports
+
+
+- table_5_x_builder
+	- Called by report_x in constructor.py
+	- Calls set_list from builder.py
+	- Builds the JSON object for the 5 series of reports
+
+
+- table_7_x_builder
+	- Called by report_x in constructor.py
+	- Calls set_list from builder.py
+	- Builds the JSON object for the 7 series of reports
+
+
+- table_8_x_builder
+	- Called by report_x in constructor.py
+	- Calls table_8_helper from builder.py
+	- Builds the JSON object for the 8 series of reports
+
+
+- table_8_helper
+	- Called by table_8_x_builder in builder.py
+	- Calls set list from builder.py
+	- Builds a section of the JSON object for the 8 series of reports
+
+
+- table_9_x_builder
+	- Called by report_x in constructor.py
+	- Calls set_list from builder.py
+	- Builds the JSON object for report 9
+
+
+- table_11_x_characteristics
+	- Called by table_11_x_builder and table_11_12_helper from builder.py
+	- Calls set_list from builder.py
+	- Builds a JSON structure section for 11 or 12 series reports
+
+
+- table_11_x_builder
+	- Called by report_x in constructor.py
+	- Calls table_11_12_helper from builder.py
+	- Builds the JSON object for the 11 series of reports
+
+
+- table_12_1_builder
+	- Called by report_x in constructor.py
+	- Calls table_11_12_helper from builder.py
+	- Builds the JSON object for the 12-1 report
+
+
+- table_12_2_builder
+	- Called by report_x in constructor.py
+	- Calls table_11_12_helper from builder.py
+	- Builds the JSON object for the 12-2 report
+
+
+- table_A_4_builder
+	- Called by report_x in constructor.py
+	- Calls table_11_12_helper
+	- Builds the JSON object for the A-4 report
+
+
+- table_11_12_helper
+	- Called by table_11_x_builder, table_12_1_builder, table_12_2_builder, and table_A_4_builder from builder.py
+	- Calls table_11_x_characteristics from builder.py
+	- Takes key as a string, key_singular as a string, and end_point_list as a list of strings
+	- Builds sections of 11 series, 12 series and the A-4 report
+
+
+- table_A_x_builder
+	- Called by report_x in constructor.py
+	- Calls set_list from builder.py
+	- Builds the JSON object for the A-1, A-2, and A-3 reports
+
+
+- table_B_builder
+	- Called by report_x in constructor.py
+	- Calls set_list from builder.py
+	- Builds the JSON object for report B
+
+
+## parse_inputs
 - __init__
 	- Initializes lists to hold weights and rates that are used to calculate means, medians, weighted means, and weighted medians
 	- Initializes a dictionary for tract median age which stores the median age of housing stock as a value and an 11 digit census tract as a key
@@ -328,6 +585,80 @@ For information on dependancies and running the code see [readme.md](https://git
 	- Instantiates the demographics class from demographics_indexing.py
 	- Parses a LAr row into components required for the B series of reports and stores them in the inputs dictionary
 	- Calls rate_spread_index_11_X to assign a single integer index to the loan based on the loan's reported rate spread
+
+
+## demographics
+
+- set_gender
+	- Called by parse_4_x, parse_8_x, parse_11_x, parse_12_x, and parse_A_4
+	- Takes a parsed LAR row as inputs and returns an index value for aggregating loans
+	- Returns None if conditions for available indices are not met
+
+
+- rate_spread_index_3_2
+	- Called by parse_3_2
+	- Takes a rate spread value as a string, converts to floats for bucket comparison and returns an integer index based on the buckets for report 3-2
+	- Returns none if the input does not map to an available bucket
+
+
+- rate_spread_index_11_x
+	- Called by parse_11_x, parse_12_x, and parse_A_4
+	- Takes a rate spread value as a string, converts to floats for bucket comparison and returns an integer index based on the buckets for the 11 series of reports
+	- Returns None if the input does not map to an available bucket
+
+- minority_count
+	- Called by parse_3_1, parse_4_x, parse_5_x, parse_8_x, parse_11_x, parse_12_x, and parse_A_4
+	- Takes the applicant's list of races from a parsed LAR row and returns the integer count of minority races selected
+
+
+- set_non_white
+	- Called by parse_3_1, parse_4_x, parse_5_x, parse_8_x, parse_11_x, parse_12_x, and parse_A_4
+	- Takes a list of races and returns a boolean that is True if 2 or more minority races were selected, False if no minority races were selected, or None if none of those conditions were met
+
+
+- set_joint
+	- Called by parse_3_1, parse_4_x, parse_5_x, parse_8_x, parse_11_x, parse_12_x, and parse_A_4
+	- Takes a parsed LAR row dictionary as inputs and returns True if one applicant is listed as non-white and the other as white
+	- Uses app non white flag and co non white flag from inputs
+
+
+- set_minority_status
+	- Called by parse_3_1, parse_4_x, parse_5_x, parse_8_x, parse_11_x, parse_12_x, and parse_A_4
+	- Takes a dictionary as inputs and returns an index for the minority status of the loan
+	- Uses race and ethnicity of the loan to determine minority status
+
+
+- set_ethnicity
+	- Called by parse_3_1, parse_4_x, parse_5_x, parse_8_x, parse_11_x, parse_12_x, and parse_A_4
+	- Takes a dictionary as inputs to return an index for the ethnicity of a loan
+	- Uses a ethn and co ethn from inputs
+
+
+- make_race_list
+	- Called by parse_3_1, parse_4_x, parse_5_x, parse_8_x, parse_11_x, parse_12_x, and parse_A_4
+	- Takes a list of strings length 5 that holds the race information for an applicant or co applicant and returns an integer list with blanks converted to 0s (zeros)
+
+
+- set_race
+	- Called by parse_3_1, parse_4_x, parse_5_x, parse_8_x, parse_11_x, parse_12_x, and parse_A_4
+	- Takes race_list, a list of integers length 5, and inputs, a dictionary as arguments
+	- Returns a single integer index for the race of a a loan, this index is used to aggregate loans for all reports using race
+
+
+## MSA_info
+- app_income_to_MSA
+	- Called by, parse_3_1, parse_4_x, parse_5_x, parse_8_x, parse_11_x, parse_12_x, and parse_A_4 in parse_inputs in parsing.py
+	- Takes a dictionary as inputs and returns a single integer index based on the ratio of applicant income to MSA median income which is used to aggregate loans into a JSON object
+
+
+- minority_percent
+	- Called by parse_3_1, parse_7_x, parse_11_x, parse_12_x, and parse_A_4
+	- Takes a dictionary as inputs and returns a single integer index based on the minority population percent in a tract which is used to aggregate loans into a JSON object
+
+
+- tract_to_MSA_income
+	- Called by parse_3_1, parse_7_x, parse_11_x, parse_12_x, and parse_A_4
+	- Takes a dictionary as inputs and returns a single integer based on the ratio of tract to MSA median income which is used to aggregate loans into a JSON object
 
 
 ##aggregate
@@ -656,3 +987,56 @@ For information on dependancies and running the code see [readme.md](https://git
 	- Appends to aggregation.table_B_rates rate spreads, as a decimal, for loans with reported pricing information
 	- Table_B_rates is nested as follows: property_type, lien_status, loan purpose
 	- Takes a parsed LAR row as inputs
+
+
+## median_age_API
+-get_age
+	- Called by median_tract_age in parse_inputs in parsing.py
+	- Uses the requests library to query the Census ACS5 API using the B25035_001E endpoint by supplying state, tract, and county information to return the median housing stock age of a census tract
+	- For bulk use, an API key is required, this is parsed in from a file using the directory path /Users/roellk/Documents/api_key.txt
+	- API keys are free from Census.gov
+
+
+## check_file
+	- __init__
+		- Imports a dictionary of state names and abbreviations
+		- Imports a dictionary of MSA names and numbers
+		- Takes a builder.py object as build_object
+
+
+	- write_JSON
+		- Called by the is_file function in the check_file class in file_check.py
+		- Takes report_type as a string, report_year as a string, and report_list as a list of strings
+		- Writes the msa-mds.json file to a path using report_type, report_year and report_list[key]
+
+
+	- is_file
+		- Called by controller.py
+		- Takes report_type as a string, report_year as a string, and report_list as a list of strings
+		- Loops over all states and MSAs to determine which MSAs have reports in sub-folders, if reports exist an msa-mds.json file is written into the state folder
+		- The msa-mds.json file lists MSA names and numbers
+
+
+## report_list_maker
+	- __init__
+		- Initializes  a build_JSON object from builder.py
+		- Uses a build_object (a build_object) passed from controller.py to create a dictionary with state names and abbreviations and a dictionary with MSA numbers and names
+
+
+	- write_JSON
+		- Called by report_lists in class report_list_maker in report_list.py
+		- Takes a file name, data, and file path and writes a JSON object with the given file name to the given path
+
+
+	- report_lists
+		- Called by controller.py
+		- Searches the directory structure containing the JSON report objects and creates a json file listing all reports created for each MSA
+		- Takes a report_type as a string to use in search and write paths
+		- Takes a report_year as a string to use in search and write paths
+		- Takes a report_list as a list of strings from which the function pulls elements to use in search and write paths
+
+
+
+
+
+
