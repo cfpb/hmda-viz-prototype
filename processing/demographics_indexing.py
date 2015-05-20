@@ -70,6 +70,8 @@ class demographics(object):
 			return 7
 		elif float(rate) > 5.99:
 			return 8
+		else:
+			return None
 
 	def minority_count(self, a_race):
 		#the minority count is the count of minority races listed for the primary applicant
@@ -121,7 +123,7 @@ class demographics(object):
 		else:
 			return None
 
-	def set_loan_ethn(self, inputs):
+	def set_ethnicity(self, inputs):
 		#this function outputs a number code for ethnicity: 0 - hispanic or latino, 1 - not hispanic/latino
 		#2 - joint (1 applicant hispanic/latino 1 not), 3 - ethnicity not available
 		#if both ethnicity fields are blank report not available(3)
