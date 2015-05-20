@@ -31,6 +31,7 @@ htmlcov/
 .cache
 nosetests.xml
 coverage.xml
+processing/testing/*
 
 # Front-End #
 #############
@@ -57,15 +58,10 @@ aggregate/*
 !aggregate/2013
 aggregate/2013/*
 !aggregate/2013/alabama
-
-# for now remove all non-Alabama 2013 from MSA directories
-processing/json/*
-!processing/json/aggregate
-processing/json/aggregate/*
-!processing/json/aggregate/2013
-processing/json/aggregate/2013/*
-!processing/json/aggregate/2013/alabama
-
+disclosure/*
+!disclosure/2013
+disclosure/2013/*
+!disclosure/2013/alabama
 
 
 
