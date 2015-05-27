@@ -102,15 +102,15 @@ For information on dependancies and running the code see [readme.md](https://git
 
 
 ## report_selector
-	- initialize_lists
-		- Creates a master list of all possible report types to be run using the heads of the infile
-		- Takes a CSV file as infile
+- initialize_lists
+	- Creates a master list of all possible report types to be run using the heads of the infile
+	- Takes a CSV file as infile
 
 
-	- get_report_lists
-		- Called by controller.py
-		- Reads the CSV file and adds any MSA/report intersection cell marked with a 1 to the list of reports to be run
-		- Takes a CSV file as infile
+- get_report_lists
+	- Called by controller.py
+	- Reads the CSV file and adds any MSA/report intersection cell marked with a 1 to the list of reports to be run
+	- Takes a CSV file as infile
 
 
 ## connect_DB
@@ -998,42 +998,42 @@ For information on dependancies and running the code see [readme.md](https://git
 
 
 ## check_file
-	- __init__
-		- Imports a dictionary of state names and abbreviations
-		- Imports a dictionary of MSA names and numbers
-		- Takes a builder.py object as build_object
+- __init__
+	- Imports a dictionary of state names and abbreviations
+	- Imports a dictionary of MSA names and numbers
+	- Takes a builder.py object as build_object
 
 
-	- write_JSON
-		- Called by the is_file function in the check_file class in file_check.py
-		- Takes report_type as a string, report_year as a string, and report_list as a list of strings
-		- Writes the msa-mds.json file to a path using report_type, report_year and report_list[key]
+- write_JSON
+	- Called by the is_file function in the check_file class in file_check.py
+	- Takes report_type as a string, report_year as a string, and report_list as a list of strings
+	- Writes the msa-mds.json file to a path using report_type, report_year and report_list[key]
 
 
-	- is_file
-		- Called by controller.py
-		- Takes report_type as a string, report_year as a string, and report_list as a list of strings
-		- Loops over all states and MSAs to determine which MSAs have reports in sub-folders, if reports exist an msa-mds.json file is written into the state folder
-		- The msa-mds.json file lists MSA names and numbers
+- is_file
+	- Called by controller.py
+	- Takes report_type as a string, report_year as a string, and report_list as a list of strings
+	- Loops over all states and MSAs to determine which MSAs have reports in sub-folders, if reports exist an msa-mds.json file is written into the state folder
+	- The msa-mds.json file lists MSA names and numbers
 
 
 ## report_list_maker
-	- __init__
-		- Initializes  a build_JSON object from builder.py
-		- Uses a build_object (a build_object) passed from controller.py to create a dictionary with state names and abbreviations and a dictionary with MSA numbers and names
+- __init__
+	- Initializes  a build_JSON object from builder.py
+	- Uses a build_object (a build_object) passed from controller.py to create a dictionary with state names and abbreviations and a dictionary with MSA numbers and names
 
 
-	- write_JSON
-		- Called by report_lists in class report_list_maker in report_list.py
-		- Takes a file name, data, and file path and writes a JSON object with the given file name to the given path
+- write_JSON
+	- Called by report_lists in class report_list_maker in report_list.py
+	- Takes a file name, data, and file path and writes a JSON object with the given file name to the given path
 
 
-	- report_lists
-		- Called by controller.py
-		- Searches the directory structure containing the JSON report objects and creates a json file listing all reports created for each MSA
-		- Takes a report_type as a string to use in search and write paths
-		- Takes a report_year as a string to use in search and write paths
-		- Takes a report_list as a list of strings from which the function pulls elements to use in search and write paths
+- report_lists
+	- Called by controller.py
+	- Searches the directory structure containing the JSON report objects and creates a json file listing all reports created for each MSA
+	- Takes a report_type as a string to use in search and write paths
+	- Takes a report_year as a string to use in search and write paths
+	- Takes a report_list as a list of strings from which the function pulls elements to use in search and write paths
 
 
 
