@@ -1,4 +1,4 @@
-#Developer Documentation for Aggregate and Disclsoure Processing
+#Developer Documentation for Aggregate and Disclosure Processing
 
 For information on dependancies and running the code see [readme.md](https://github.com/cfpb/hmda-viz-prototype/blob/gh-pages/processing/readme.md)
 
@@ -19,6 +19,7 @@ For information on dependancies and running the code see [readme.md](https://git
 - selector.py
 	- Called by controller.py and constructor.py
 	- Creates a dictionary that controls which reports will be run for which MSAs
+	- imports csv
 
 
 - connector.py
@@ -33,8 +34,8 @@ For information on dependancies and running the code see [readme.md](https://git
 	- Selects LAR rows based on report specific columns and conditions and aggregates the LAR rows into JSON objects
 	- Calls report specific functions to get small county flags and median housing stock age
 	- Calculates means and medians and stores them in the JSON object
-	- Writes JSON objects to files using report type, year, and geogrpahy as a path
-
+	- Writes JSON objects to files using report type, year, and geography as a path
+	- Imports json, os, csv, psycopg2, psycopg2.extras, OrderedDict, parsing, connector, builder, aggregation, queries, selector, respondent_id_compiler
 
 - queries.py
 	- Called by constructor.py
@@ -134,7 +135,7 @@ For information on dependancies and running the code see [readme.md](https://git
 	- Runs  a loop which pulls one LAR row from the cursor at a time, parses it, and aggregates it into a JSON structure
 	- Calls median_tract_age from parsing to pull median housing stock age from the Census ACS5 API for each tract in the MSA of the current report
 	- Calls get_small_county_flag from aggregation.py to determine if a loan is in a small county
-	- Calls a the report specific conditions and columns query strings from queries.py
+	- Calls the report specific conditions and columns query strings from queries.py
 	- Calls aggregation_return, JSON_constructor_return, and parse_return from constructor.py to get the function names used with aggregation.py, builder.py and parsing.py
 	- Calls functions to calculate means and medians from aggregation.py if needed for the report
 	- Writes the report's JSON object to a file path that includes, report type, data year, state, MSA, and report number
@@ -158,7 +159,7 @@ For information on dependancies and running the code see [readme.md](https://git
 ## queries
 - __init__
 	- Holds the base SQL string for getting counts of selected LAR rows with formatting sections to variabalize MSA and year
-	- Holds the base SQL string for selecting columns of HMDA data with formatting sectsion to variabalize which columns, year, and MSA
+	- Holds the base SQL string for selecting columns of HMDA data with formatting sections in which columns, year, and MSA are variabalized
 
 
 - Condition functions
@@ -243,7 +244,7 @@ For information on dependancies and running the code see [readme.md](https://git
 
 - set_purchasers_NA
 	- Called by build_rate_spreads in builder.py
-	- Takes holding_list as a list and returns a list of dictionaries containing a purchaser name each item in the holding_list
+	- Takes holding_list as a list and returns a list of dictionaries containing a purchaser name for each item in the holding_list
 	- If the holding list item is juniorliencount or juniorlienvalue then 'NA' is stored as the value, else the value is '0'
 
 
@@ -266,7 +267,7 @@ For information on dependancies and running the code see [readme.md](https://git
 	- Returns a dictionary strucure for a row section of report 3-1
 
 
--table_3_2_builder
+- table_3_2_builder
 	- Called by aggregate_report in constructor.py
 	- Calls set_list  and build_rate_spreads from builder.py
 	- Builds the JSON structure for report 3-2
@@ -415,7 +416,7 @@ For information on dependancies and running the code see [readme.md](https://git
 - parse_3_2
 	- Instantiates the demographics class from demographics.py
 	- Called by function aggregate_report in class_report construction in file constructor.py
-	- Parses LAR rows and stores the components in a dictionary to bused as needed for processing report 3-2
+	- Parses LAR rows and stores the components in a dictionary to be  used as needed for processing report 3-2
 	- Calls rate_spread_index_3_2 to assign an index to each rate spread
 
 
@@ -429,10 +430,10 @@ For information on dependancies and running the code see [readme.md](https://git
 	- Calls set_non_white from demographics to set a boolean to True if the list of races contains minority races
 	- Calls minority_count from demographics to count the total number of minority races in the race list
 	- Calls set_joint from demographics to determine if the loan meets the requirements for joint status
-	- Calls set_race from demographics to assign a single index integer for the race of the loan
-	- Calls set_loan_ethn from demographics to assing a single index integer for the ethnicity of the loan
-	- Calls set_minority_status from demographics to assign a single index integer for the minority status of the loan
-	- Calls set_gender from demographics to set a single index integer for the gender of the loan
+	- Calls set_race from demographics to assign a single index integer for the race of the loan or application
+	- Calls set_loan_ethn from demographics to assing a single index integer for the ethnicity of the loan or application
+	- Calls set_minority_status from demographics to assign a single index integer for the minority status of the loan or application
+	- Calls set_gender from demographics to set a single index integer for the gender of the loan or application
 
 
 
@@ -464,16 +465,16 @@ For information on dependancies and running the code see [readme.md](https://git
 	- Parses a LAR row into components required for the 8 series of reports and stores them in the inputs dictionary
 	- Called by function aggregate_report in class_report construction in file constructor.py
 	- Calls adjust_denial_index from parse_inputs in parsing.py to change the denial reason code to an integer index that matches the JSON structure for data ouput
-	- Calls make_race_list from the parse_inputs class in parsing.py to store applicant and co applicant races in two lists of length 5
+	- Calls make_race_list from the parse_inputs class in parsing.py to store applicant and co applicant races in lists with a length of 5
 	- Calls app_income_to_MSA from MSA_info to assign an index to the applicant's income relative to the median MSA income
 	- Calls set_non_white from demographics to set a boolean to True if the list of races contains minority races
 	- Calls minority_count from demographics to count the total number of minority races in the race list
 	- Calls set_joint from demographics to determine if the loan meets the requirements for joint status
-	- Calls set_race from demographics to assign a single index integer for the race of the loan
-	- Calls set_loan_ethn from demographics to assing a single index integer for the ethnicity of the loan
-	- Calls set_minority_status from demographics to assign a single index integer for the minority status of the loan
-	- Calls set_gender from demographics to set a single index integer for the gender of the loan
-	- Calls denial_reasons_list from parse_inputs in parsing.py to create a list of denial reasons and store it in puts
+	- Calls set_race from demographics to assign a single index integer for the race of the loan or application
+	- Calls set_loan_ethn from demographics to assing a single index integer for the ethnicity of the loan or application
+	- Calls set_minority_status from demographics to assign a single index integer for the minority status of the loan or application
+	- Calls set_gender from demographics to set a single index integer for the gender of the loan or application
+	- Calls denial_reasons_list from parse_inputs in parsing.py to create a list of denial reasons and store it in the inputs dictionary
 
 
 - adjst_denial_index
@@ -493,7 +494,7 @@ For information on dependancies and running the code see [readme.md](https://git
 	- Parses a LAR row into components required for the 9 series of reports and stores them in the inputs dictionary
 	- Called by function aggregate_report in class_report construction in file constructor.py
 	- Calls set_loan_index to change the loan type to match the index used in the JSON structure for report 9
-	- Calls median_age_index to assign an integer index an integer index based on the median age of housing stock in the loan's census tract
+	- Calls median_age_index to assign an integer index based on the median age of housing stock in the loan's census tract
 	- Sets the median age for the loan by passing the 11 digit census tract number to  the tract_median_ages dictionary in parse_inputs in parsing.py
 
 - set_loan_index
@@ -525,9 +526,9 @@ For information on dependancies and running the code see [readme.md](https://git
 	- Calls minority_count from demographics to count the total number of minority races in the race list
 	- Calls set_joint from demographics to determine if the loan meets the requirements for joint status
 	- Calls set_race from demographics to assign a single index integer for the race of the loan
-	- Calls set_loan_ethn from demographics to assing a single index integer for the ethnicity of the loan
+	- Calls set_loan_ethn from demographics to assing a single index integer for the ethnicity of the loan or application
 	- Calls set_minority_status from demographics to assign a single index integer for the minority status of the loan
-	- Calls set_gender from demographics to set a single index integer for the gender of the loan
+	- Calls set_gender from demographics to set a single index integer for the gender of the loan or application
 
 
 - parse_12_x
@@ -535,17 +536,17 @@ For information on dependancies and running the code see [readme.md](https://git
 	- Parses a LAR row into components required for the 12 series of reports and stores them in the inputs dictionary
 	- Called by the aggregate_report function in the report_construction class in constructor.py
 	- Calls make_race_list from the parse_inputs class in parsing.py to store applicant and co applicant races in two lists of length 5
-	- Calls tract_to_MSA_income to return a single integer index for the loan's tract to MSA income ratio
+	- Calls tract_to_MSA_income to return a single integer index that represents the bucket of the loan's tract to MSA income ratio (buckets determined by FFIEC A&D report format)
 	- Calls app_income_to_MSA from MSA_info to assign an index to the applicant's income relative to the median MSA income
 	- Calls minority_percent from MSA_info to assign a single integer index to the loan based on the minority population percent in the loan's census tract
 	- Calls rate_spread_index_11_x from demographics to return a single integer index for the loan's rate spread variable
 	- Calls set_non_white from demographics to set a boolean to True if the list of races contains minority races
 	- Calls minority_count from demographics to count the total number of minority races in the race list
 	- Calls set_joint from demographics to determine if the loan meets the requirements for joint status
-	- Calls set_race from demographics to assign a single index integer for the race of the loan
-	- Calls set_loan_ethn from demographics to assing a single index integer for the ethnicity of the loan
-	- Calls set_minority_status from demographics to assign a single index integer for the minority status of the loan
-	- Calls set_gender from demographics to set a single index integer for the gender of the loan
+	- Calls set_race from demographics to assign a single index integer for the race of the loan or application
+	- Calls set_loan_ethn from demographics to assing a single index integer for the ethnicity of the loan or application
+	- Calls set_minority_status from demographics to assign a single index integer for the minority status of the loan or application
+	- Calls set_gender from demographics to set a single index integer for the gender of the loan or application
 
 
 - parse_A_x
@@ -555,12 +556,12 @@ For information on dependancies and running the code see [readme.md](https://git
 
 - action_taken_index
 	- Called by parse_A_x in parse_inputs in parsing.py
-	- Adjust the action taken code to match the JSON structure of the report
+	- Adjusts the action taken code to match the JSON structure of the report
 
 
 - purpose_index
 	- Called by parse_A_x in parse_inputs in parsing.py
-	- Adjust the loan purpose code to match the JSON structure of the report
+	- Adjusts the loan purpose code to match the JSON structure of the report
 
 
 - parse_A_4
@@ -568,17 +569,17 @@ For information on dependancies and running the code see [readme.md](https://git
 	- Parses a LAR row into components required for the A 4 reports and stores them in the inputs dictionary
 	- Called by the aggregate_report function in the report_construction class in constructor.py
 	- Calls make_race_list from the parse_inputs class in parsing.py to store applicant and co applicant races in two lists of length 5
-	- Calls tract_to_MSA_income to return a single integer index for the loan's tract to MSA income ratio
+	- Calls tract_to_MSA_income to return a single integer index that represents the bucket of the loan's tract to MSA income ratio (buckets determined by the FFIEC A&D report format)
 	- Calls app_income_to_MSA from MSA_info to assign an index to the applicant's income relative to the median MSA income
 	- Calls minority_percent from MSA_info to assign a single integer index to the loan based on the minority population percent in the loan's census tract
 	- Calls rate_spread_index_11_x from demographics to return a single integer index for the loan's rate spread variable
 	- Calls set_non_white from demographics to set a boolean to True if the list of races contains minority races
 	- Calls minority_count from demographics to count the total number of minority races in the race list
 	- Calls set_joint from demographics to determine if the loan meets the requirements for joint status
-	- Calls set_race from demographics to assign a single index integer for the race of the loan
-	- Calls set_loan_ethn from demographics to assing a single index integer for the ethnicity of the loan
-	- Calls set_minority_status from demographics to assign a single index integer for the minority status of the loan
-	- Calls set_gender from demographics to set a single index integer for the gender of the loan
+	- Calls set_race from demographics to assign a single index integer for the race of the loan or application
+	- Calls set_loan_ethn from demographics to assing a single index integer for the ethnicity of the loan or application
+	- Calls set_minority_status from demographics to assign a single index integer for the minority status of the loan or application
+	- Calls set_gender from demographics to set a single index integer for the gender of the loan or application
 
 
 - parse_B_x
@@ -592,19 +593,19 @@ For information on dependancies and running the code see [readme.md](https://git
 - set_gender
 	- Called by parse_4_x, parse_8_x, parse_11_x, parse_12_x, and parse_A_4
 	- Takes a parsed LAR row as inputs and returns an index value for aggregating loans
-	- Returns None if conditions for available indices are not met
+	- Returns \"None\" if conditions for available indices are not met
 
 
 - rate_spread_index_3_2
 	- Called by parse_3_2
 	- Takes a rate spread value as a string, converts to floats for bucket comparison and returns an integer index based on the buckets for report 3-2
-	- Returns none if the input does not map to an available bucket
+	- Returns \"None\" if the input does not map to an available bucket
 
 
 - rate_spread_index_11_x
 	- Called by parse_11_x, parse_12_x, and parse_A_4
 	- Takes a rate spread value as a string, converts to floats for bucket comparison and returns an integer index based on the buckets for the 11 series of reports
-	- Returns None if the input does not map to an available bucket
+	- Returns \"None\" if the input does not map to an available bucket
 
 - minority_count
 	- Called by parse_3_1, parse_4_x, parse_5_x, parse_8_x, parse_11_x, parse_12_x, and parse_A_4
@@ -624,13 +625,13 @@ For information on dependancies and running the code see [readme.md](https://git
 
 - set_minority_status
 	- Called by parse_3_1, parse_4_x, parse_5_x, parse_8_x, parse_11_x, parse_12_x, and parse_A_4
-	- Takes a dictionary as inputs and returns an index for the minority status of the loan
+	- Takes a dictionary as inputs and returns an index for the minority status of the loan or application
 	- Uses race and ethnicity of the loan to determine minority status
 
 
 - set_ethnicity
 	- Called by parse_3_1, parse_4_x, parse_5_x, parse_8_x, parse_11_x, parse_12_x, and parse_A_4
-	- Takes a dictionary as inputs to return an index for the ethnicity of a loan
+	- Takes a dictionary as inputs to return an index for the ethnicity of a loan or application
 	- Uses a ethn and co ethn from inputs
 
 
@@ -641,7 +642,7 @@ For information on dependancies and running the code see [readme.md](https://git
 
 - set_race
 	- Called by parse_3_1, parse_4_x, parse_5_x, parse_8_x, parse_11_x, parse_12_x, and parse_A_4
-	- Takes race_list, a list of integers length 5, and inputs, a dictionary as arguments
+	- Takes race_list, a list of integers length 5, and inputs, a dictionary, as arguments
 	- Returns a single integer index for the race of a a loan, this index is used to aggregate loans for all reports using race
 
 
@@ -668,7 +669,7 @@ For information on dependancies and running the code see [readme.md](https://git
 
 
 - create_rate_list
-	- called by __init__ to establish lists of length n
+	- Called by __init__ to establish lists of length n
 	- Takes an integer input that determines list length
 
 
@@ -686,7 +687,7 @@ For information on dependancies and running the code see [readme.md](https://git
 
 
 - calc_weighted_median
-	- Called by fill_weidhted_medians_11_12 and fill_by_weighted_median_3_2 in aggregation.py
+	- Called by fill_weighted_medians_11_12 and fill_by_weighted_median_3_2 in aggregation.py
 	- Calculates the weighted median value using a list of rate spreads and a list of loan values
 	- The weighted median is found by taking n/2 steps through the sorted rate list where n is the length of the list and a step is the average loan value from the weight list.
 
@@ -694,7 +695,7 @@ For information on dependancies and running the code see [readme.md](https://git
 - fill_weighted_medians_11_12
 	- Called by aggregate_report in constructor.py to fill the weighted median column in reports 11 and 12
 	- Calls calc_weighted_median from aggregation.py to calculate the weighted medians
-	- Takes a dictionary object as container and the a parsed LAR row as inputs
+	- Takes a dictionary object as container and a parsed LAR row as inputs
 
 
 - fill_totals_3_1
@@ -864,7 +865,7 @@ For information on dependancies and running the code see [readme.md](https://git
 - fill_by_denial_reason
 	- Called by compile_report_8_x in aggregation.py
 	- Aggregates parsed LAR rows by denial reason for rows determined by passed parameters, reason is used to select the column for aggregation
-	- Takes a dictionary object as container, a parsed LAR row as inputs, index_num to determine the row for aggregation, a key and key_singular to access the appropriate sub-sec tion of the dictionary
+	- Takes a dictionary object as container, a parsed LAR row as inputs, index_num to determine the row for aggregation, a key and key_singular to access the appropriate sub-section of the dictionary
 
 
 - compile_report_8_x
@@ -990,7 +991,7 @@ For information on dependancies and running the code see [readme.md](https://git
 
 
 ## median_age_API
--get_age
+- get_age
 	- Called by median_tract_age in parse_inputs in parsing.py
 	- Uses the requests library to query the Census ACS5 API using the B25035_001E endpoint by supplying state, tract, and county information to return the median housing stock age of a census tract
 	- For bulk use, an API key is required, this is parsed in from a file using the directory path /Users/roellk/Documents/api_key.txt
