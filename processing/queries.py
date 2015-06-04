@@ -103,13 +103,13 @@ class queries(object):
 		return '''and actiontype != '6' and actiontype != '7' and actiontype != '8' and actiontype != '9' ;'''
 
 	def table_11_1_conditions(self):
-		return '''and loantype = '2' and loanpurpose = '1' and lienstatus = '1' and propertytype = '1' and occupancy = '1' and actiontype = '1' ;'''
+		return '''and loantype = '2' and loanpurpose = '1' and lienstatus = '1' and propertytype = '1' and occupancy = '1' ;'''
 
 	def table_11_2_conditions(self):
 		return '''and loantype = '3' and loanpurpose = '1' and lienstatus = '1' and propertytype = '1' and occupancy = '1' ;'''
 
 	def table_11_3_conditions(self):
-		return '''and loantype = '3' and loanpurpose = '1' and lienstatus = '1' and propertytype = '1' and occupancy = '1' ;'''
+		return '''and loantype = '1' and loanpurpose = '1' and lienstatus = '1' and propertytype = '1' and occupancy = '1' ;'''
 
 	def table_11_4_conditions(self):
 		return '''and loantype = '1' and loanpurpose = '1' and lienstatus = '2' and propertytype = '1' and occupancy = '1' ;'''
