@@ -75,3 +75,14 @@ TBD
 1. [FFIEC](http://www.ffiec.gov/HmdaAdWebReport/AggWelcome.aspx)
 2. [Federal Register] (http://www.gpo.gov/fdsys/pkg/FR-2004-12-20/pdf/04-27425.pdf)
 3. <http://cfpb.github.io/hmda-viz-prototype/aggregate/2013>
+
+
+## Status
+**Time to Market**  
+1. Processing time  
+2. Time needed to test format, accuracy, footnotes, etc: 30 hours  
+3. Remaining testing items can be found at (https://drive.google.com/open?id=1g6kkDiD4sxoUd10kmYNsmhTsWRL7iWHbf9GjY9B-FMY&authuser=0)
+
+
+**Files**  
+Requirements and analysis are saved at (https://drive.google.com/open?id=0B667BGHwjTznb3F0ZmZabUFoc3M&authuser=0)
