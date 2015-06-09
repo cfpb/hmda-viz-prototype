@@ -537,7 +537,8 @@ class aggregate(object): #aggregates LAR rows by appropriate characteristics to 
 				self.fill_by_characteristics(container, inputs, 'borrowercharacteristics', 3, 'incomes', inputs['income bracket'], 'preapprovalstatuses',0)
 			self.fill_by_characteristics(container, inputs, 'borrowercharacteristics', 4, 'genders', inputs['gender'], 'preapprovalstatuses', 0)
 			self.fill_by_characteristics(container, inputs, 'censuscharacteristics', 0, 'compositions', inputs['minority percent index'], 'preapprovalstatuses', 0)
-			self.fill_by_characteristics(container, inputs, 'censuscharacteristics', 1, 'incomes', inputs['tract income index'], 'preapprovalstatuses', 0)
+			if inputs['tract income index'] < 4:
+				self.fill_by_characteristics(container, inputs, 'censuscharacteristics', 1, 'incomes', inputs['tract income index'], 'preapprovalstatuses', 0)
 
 		#fill NAs for MSA level reports
 		for i in range(1, 3):

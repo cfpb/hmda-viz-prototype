@@ -3,7 +3,7 @@ import sys
 #print sys.path
 sys.path.append('/users/roellk/desktop/HMDA/hmda-viz-prototype/processing')
 from demographics_indexing import demographics
-from test_index import testing
+
 from nose.tools import assert_equals
 from nose_parameterized import parameterized
 
