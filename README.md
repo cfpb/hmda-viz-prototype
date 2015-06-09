@@ -83,12 +83,12 @@ TBD
     * Aggregate: 2-3 days processing time
     * Disclosure: TBD
 * Time needed to test format, accuracy, footnotes, etc: 30 hours
-* Remaining testing items can be found at (https://drive.google.com/open?id=1g6kkDiD4sxoUd10kmYNsmhTsWRL7iWHbf9GjY9B-FMY&authuser=0)
-* Time to write code for National reports: 1 week
-* Time to adapt code for running server-side using Pyodbc: 1 week
-* Time to write unit testing code: 2 weeks
+* Remaining error checking items can be found at (https://drive.google.com/open?id=1g6kkDiD4sxoUd10kmYNsmhTsWRL7iWHbf9GjY9B-FMY&authuser=0)
+* Estimated time to write code for National reports: 1 week
+* Estimated time to adapt code for running server-side using Pyodbc: 1 week
+* Estimated time to write unit testing code: 2 weeks
     * Current completion estimate of unit testing code: 10/140 functions, functions still need comprehensive input lists for testing
-    * Nose completion percent: will meet with Dan Davis to learn this fucntion 6/5
+    * Nose completion percent: [2%](https://github.com/Kibrael/hmda-viz-prototype/tree/gh-pages/processing/cover/index.html)
 * Time to refactor code to allow for creating FI disclosure reports at time of submission: 2 days
 * Write scripts to support Jekyll build: 3 days
 * Issue 172 - hard-code 'NA' for report B: 2 hours
