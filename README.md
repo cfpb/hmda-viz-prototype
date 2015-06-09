@@ -89,7 +89,7 @@ TBD
 * Estimated time to write unit testing code: 2 weeks
     * Current completion estimate of unit testing code: 10/140 functions, functions still need comprehensive input lists for testing
     * Nose completion percent: [2%](https://github.com/Kibrael/hmda-viz-prototype/tree/gh-pages/processing/cover/index.html)
-* Time to refactor code to allow for creating FI disclosure reports at time of submission: 2 days
+* Time to refactor code to allow for creating FI disclosure reports at time of submission: 1 week
 * Write scripts to support Jekyll build: 3 days
 * Issue 172 - hard-code 'NA' for report B: 2 hours
 * Issues 142 and 167 - standardize code and precision for mean and median calculations: 2 days
