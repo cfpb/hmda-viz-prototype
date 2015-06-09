@@ -80,8 +80,8 @@ TBD
 ## Status
 **Time to Market**
 1. Processing time:
-    - Aggregate: 2-3 days processing time
-    - Disclosure: TBD
+    * Aggregate: 2-3 days processing time
+    * Disclosure: TBD
 2. Time needed to test format, accuracy, footnotes, etc: 30 hours
 3. Remaining testing items can be found at (https://drive.google.com/open?id=1g6kkDiD4sxoUd10kmYNsmhTsWRL7iWHbf9GjY9B-FMY&authuser=0)
 4. Time to write code for National reports: 1 week
