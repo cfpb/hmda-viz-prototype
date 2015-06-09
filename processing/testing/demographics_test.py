@@ -26,7 +26,7 @@ def test_rate_spread_index(rate, expected_result): # #test rate spread index (fo
 	demo = demographics()
 
 	# Action
-	actual_result = demo.rate_spread_index(rate)
+	actual_result = demo.rate_spread_index_3_2(rate)
 
 	# Assert
 	assert_equals(actual_result, expected_result)
@@ -49,7 +49,7 @@ def test_rate_spread_index_11_x(rate, expected_result):
 	demo = demographics()
 
 	# Action
-	actual_result = demo.rate_spread_index_11x(rate)
+	actual_result = demo.rate_spread_index_11_x(rate)
 
 	# Assert
 	assert_equals(actual_result, expected_result)
@@ -110,7 +110,7 @@ def test_minority_count(race_list, expected_result):#testing minority_count
 	([0,0,0,0,1], True),
 	([1,1,1,1,1], True),
 	([2,5,3,6,0], True),
-	([7,0,0,0,0], False)
+	([7,0,0,0,0], None)
 	])
 def test_set_non_white(input_list, expected_result):
 	# Arrange
@@ -157,12 +157,12 @@ def test_set_minority_status(input_dict, expected_result):
 @parameterized([
 	({'a ethn': '1', 'co ethn': '4'}, 0)
 	])
-def test_set_loan_ethn(input_dict, expected_result):
+def test_set_ethnicity(input_dict, expected_result):
 	# Arrange
 	demo = demographics()
 
 	# Action
-	actual_result = demo.set_loan_ethn(input_dict)
+	actual_result = demo.set_ethnicity(input_dict)
 
 	# Assert
 	assert_equals(actual_result, expected_result)
@@ -171,12 +171,12 @@ def test_set_loan_ethn(input_dict, expected_result):
 	(['1','2',' ',' ',' ',], [1,2,0,0,0]),
 	([' ','5','3','2',' '], [0,5,3,2,0])
 	])
-def test_a_race_list(race_list, expected_result):
+def test_make_race_list(race_list, expected_result):
 	# Arrange
 	demo = demographics()
 
 	# Action
- 	actual_result = demo.a_race_list(race_list)
+ 	actual_result = demo.make_race_list(race_list)
 
 	# Assert
 	assert_equals(actual_result, expected_result)
