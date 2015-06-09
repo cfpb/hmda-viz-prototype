@@ -44,7 +44,7 @@ def test_rate_spread_index(rate, expected_result): # #test rate spread index (fo
 	('5.99', 7),
 	('7.99', 8)
 	])
-def test_rate_spread_index_11x(rate, expected_result):
+def test_rate_spread_index_11_x(rate, expected_result):
 	# Arrange
 	demo = demographics()
 
