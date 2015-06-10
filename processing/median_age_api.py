@@ -18,3 +18,15 @@ class median_age_API(object):
 			return return_list[8]
 		except:
 			print "Unable to connect to Census API"
+
+	def get_all_tract_ages_MSA(self, MSA):
+		#get list of tracts from cbsa db for the MSA
+		# call API for each tract and store the age as a value with the 11 digit tract number as the key
+		pass
+
+	def get_all_tract_ages(self):
+		pass
+		#get a list of MSAs from cbsa db
+		#get a list of tracts for each MSA (call get atll tract ages MSA)
+		#build a dict of MSAs with lists of dictionaries holding 11 digit tract numbers as keys and median ages as values
+		#write to a file

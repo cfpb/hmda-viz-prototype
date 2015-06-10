@@ -32,6 +32,7 @@ htmlcov/
 nosetests.xml
 coverage.xml
 processing/testing/*
+cover/
 
 # Front-End #
 #############
@@ -45,12 +46,14 @@ _site
 
 .sass-cache/
 
-
+# Virtual Environment#
+hmda-viz-prototype/
 
 
 # Processing#
 #############
 processing/processing_log.txt
+processing/old_files
 
 
 # for now remove aggregate/2012 and /2013, except 2013/alabama #
@@ -62,6 +65,7 @@ disclosure/*
 !disclosure/2013
 disclosure/2013/*
 !disclosure/2013/wells_fargo_bank_na
+
 
 
 

@@ -55,6 +55,7 @@ We are still in the prototyping phase so there is a lot of work happening on bot
 - Only 2013 data has been tested for code compatability.
 - Disclosure and national reports are not yet produced.
 - Selector.py does not return a list of reports, only MSAs to run for each report.
+- Report 11-1 requires over 10x processing time of other reports in the 11 series. This may be due to index errors in the demographic_indexing.py file.
 
 ## Getting help
 

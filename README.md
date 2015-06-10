@@ -79,20 +79,20 @@ TBD
 
 ## Status
 **Time to Market**
-1. Processing time:
-    - Aggregate: 2-3 days processing time
-    - Disclosure: TBD
-2. Time needed to test format, accuracy, footnotes, etc: 30 hours
-3. Remaining testing items can be found at (https://drive.google.com/open?id=1g6kkDiD4sxoUd10kmYNsmhTsWRL7iWHbf9GjY9B-FMY&authuser=0)
-4. Time to write code for National reports: 1 week
-5. Time to adapt code for running server-side using Pyodbc: 1 week
-6. Time to write unit testing code: 2 weeks
-    - Current completion estimate of unit testing code: 10/140 functions, functions still need comprehensive input lists for testing
-    - Nose completion percent: will meet with Dan Davis to learn this fucntion 6/5
-7. Time to refactor code to allow for creating FI disclosure reports at time of submission: 2 days
-8. Write scripts to support Jekyll build: 3 days
-9. Issue 172 - hard-code 'NA' for report B: 2 hours
-10. Issues 142 and 167 - standardize code and precision for mean and median calculations: 2 days
+* Processing time:
+    * Aggregate: 2-3 days processing time
+    * Disclosure: TBD
+* Time needed to test format, accuracy, footnotes, etc: 30 hours
+* Remaining error checking items can be found at (https://drive.google.com/open?id=1g6kkDiD4sxoUd10kmYNsmhTsWRL7iWHbf9GjY9B-FMY&authuser=0)
+* Estimated time to write code for National reports: 1 week
+* Estimated time to adapt code for running server-side using Pyodbc: 1 week
+* Estimated time to write unit testing code: 2 weeks
+    * Current completion estimate of unit testing code: 10/140 functions, functions still need comprehensive input lists for testing
+    * Nose completion percent: [2%](https://github.com/Kibrael/hmda-viz-prototype/tree/gh-pages/processing/cover/index.html)
+* Time to refactor code to allow for creating FI disclosure reports at time of submission: 1 week
+* Write scripts to support Jekyll build: 3 days
+* Issue 172 - hard-code 'NA' for report B: 2 hours
+* Issues 142 and 167 - standardize code and precision for mean and median calculations: 2 days
 
 
 
