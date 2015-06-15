@@ -81,7 +81,7 @@ TBD
 **Time to Market**
 * Processing time:
     * Aggregate: 2-3 days processing time
-    * Disclosure: TBD
+    * Disclosure: 30-45 days processing time (assuming 11-1 processing time can be made to match other reports in the 11 series)
 * Time needed to test format, accuracy, footnotes, etc: 30 hours
 * Remaining error checking items can be found at (https://drive.google.com/open?id=1g6kkDiD4sxoUd10kmYNsmhTsWRL7iWHbf9GjY9B-FMY&authuser=0)
 * Estimated time to write code for National reports: 1 week
