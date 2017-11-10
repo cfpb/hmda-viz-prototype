@@ -1,16 +1,16 @@
 {
     "table": "3-1",
     "type": "Aggregate",
-    "desc": "Loans sold, by characteristics of borrower and census tract in which property is located and by type of purchaser (includes originations and purchased loans)",
+    "description": "Loans sold, by characteristics of borrower and census tract in which property is located and by type of purchaser (includes originations and purchased loans)",
     "year": "2013",
-    "report-date": "05/28/2015",
+    "reportDate": "05/28/2015",
     "msa": {
         "id": "11500",
         "name": "Anniston-Oxford",
         "state": "AL",
-        "state_name": "Alabama"
+        "stateName": "Alabama"
     },
-    "borrowercharacteristics": [
+    "borrowerCharacteristics": [
         {
             "characteristic": "Race",
             "races": [
@@ -623,9 +623,9 @@
         },
         {
             "characteristic": "Minority Status",
-            "minoritystatuses": [
+            "minorityStatuses": [
                 {
-                    "minoritystatus": "White Non-Hispanic",
+                    "minorityStatus": "White Non-Hispanic",
                     "purchasers": [
                         {
                             "name": "Fannie Mae",
@@ -675,7 +675,7 @@
                     ]
                 },
                 {
-                    "minoritystatus": "Others, Including Hispanic",
+                    "minorityStatus": "Others, Including Hispanic",
                     "purchasers": [
                         {
                             "name": "Fannie Mae",
@@ -728,9 +728,9 @@
         },
         {
             "characteristic": "Applicant Income",
-            "applicantincomes": [
+            "applicantIncomes": [
                 {
-                    "applicantincome": "Less than 50% of MSA/MD median",
+                    "applicantIncome": "Less than 50% of MSA/MD median",
                     "purchasers": [
                         {
                             "name": "Fannie Mae",
@@ -780,7 +780,7 @@
                     ]
                 },
                 {
-                    "applicantincome": "50-79% of MSA/MD median",
+                    "applicantIncome": "50-79% of MSA/MD median",
                     "purchasers": [
                         {
                             "name": "Fannie Mae",
@@ -830,7 +830,7 @@
                     ]
                 },
                 {
-                    "applicantincome": "80-99% of MSA/MD median",
+                    "applicantIncome": "80-99% of MSA/MD median",
                     "purchasers": [
                         {
                             "name": "Fannie Mae",
@@ -880,7 +880,7 @@
                     ]
                 },
                 {
-                    "applicantincome": "100-119% of MSA/MD median",
+                    "applicantIncome": "100-119% of MSA/MD median",
                     "purchasers": [
                         {
                             "name": "Fannie Mae",
@@ -930,7 +930,7 @@
                     ]
                 },
                 {
-                    "applicantincome": "120% or more of MSA/MD median",
+                    "applicantIncome": "120% or more of MSA/MD median",
                     "purchasers": [
                         {
                             "name": "Fannie Mae",
@@ -980,7 +980,7 @@
                     ]
                 },
                 {
-                    "applicantincome": "Income Not Available",
+                    "applicantIncome": "Income Not Available",
                     "purchasers": [
                         {
                             "name": "Fannie Mae",
@@ -1032,7 +1032,7 @@
             ]
         }
     ],
-    "censuscharacteristics": [
+    "censusCharacteristics": [
         {
             "characteristic": "Racial/Ethnic Composition",
             "tractpctminorities": [
@@ -1290,9 +1290,9 @@
         },
         {
             "characteristic": "Income",
-            "incomelevels": [
+            "incomeLevels": [
                 {
-                    "incomelevel": "Low income",
+                    "incomeLevel": "Low income",
                     "purchasers": [
                         {
                             "name": "Fannie Mae",
@@ -1342,7 +1342,7 @@
                     ]
                 },
                 {
-                    "incomelevel": "Moderate income",
+                    "incomeLevel": "Moderate income",
                     "purchasers": [
                         {
                             "name": "Fannie Mae",
@@ -1392,7 +1392,7 @@
                     ]
                 },
                 {
-                    "incomelevel": "Middle income",
+                    "incomeLevel": "Middle income",
                     "purchasers": [
                         {
                             "name": "Fannie Mae",
@@ -1442,7 +1442,7 @@
                     ]
                 },
                 {
-                    "incomelevel": "Upper income",
+                    "incomeLevel": "Upper income",
                     "purchasers": [
                         {
                             "name": "Fannie Mae",
